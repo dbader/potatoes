@@ -53,7 +53,7 @@ void puts(char* str)
 
 void drawtest()
 { 
-        puts_col("                                                                                ",BLACK,0x0); 
+        puts_col("Test by Dmitriy Traytel                                                         ",WHITE,0x0); 
         puts_col("                                                                                ",BLACK,0x1); 
         puts_col("                                                                                ",BLACK,0x2); 
         puts_col("                                                                                ",BLACK,0x3); 
