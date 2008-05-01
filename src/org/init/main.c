@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern void putc(char ch);
 extern void puts(char* str);
 extern void drawtest();
+
 int main(struct multiboot *mboot_ptr)
 { 
         drawtest();
