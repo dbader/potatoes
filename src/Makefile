@@ -1,7 +1,7 @@
 # etiOS makefile
 # based on James M's kernel tutorials
 
-SOURCES=boot.o main.o
+SOURCES=boot.o monitor.o main.o
 
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector
 LDFLAGS=-Tlink.ld

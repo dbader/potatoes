@@ -24,14 +24,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // main.c -- Defines the C-code kernel entry point, calls initialisation routines.
 //           Made for JamesM's tutorials <www.jamesmolloy.co.uk>
 
+extern void putc(char ch);
+extern void puts(char* str);
+extern void drawtest();
 int main(struct multiboot *mboot_ptr)
-{
-        unsigned short *disp = (unsigned short*)0xB8000;
-        int i;
-    
-        for(i = 0; i < 500; i++) {
-                *disp++ = 0xDEADBABE;
-        }
-        
-        return 0xDEADBABA;
+{ 
+        drawtest();
+	return 0;
 }
