@@ -1,4 +1,4 @@
-/*
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -20,9 +20,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-// main.c -- Defines the C-code kernel entry point, calls initialisation routines.
-//           Made for JamesM's tutorials <www.jamesmolloy.co.uk>
+/**
+ * Brief file description goes here. Detailed file description goes
+ * here.
+ *
+ * @author John Doe
+ * @author $LastChangedBy$
+ * @version $Rev$
+ */
 
 extern void putc(char ch);
 extern void puts(char* str);
