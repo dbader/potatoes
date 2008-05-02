@@ -6,6 +6,6 @@
 
 cd src/kernel
 make
-cd ..
+cd ../..
 ./update_image.sh
 ./run_bochs.sh
