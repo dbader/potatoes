@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
+ * @file 
  * Basic constant definitions. This file defines constants used
  * throughout the kernel.
  *

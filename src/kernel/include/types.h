@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
+ * @file
  * Basic type definitions. This file defines basic data types used
  * throughout the kernel. You should use these types whenever possible
  * in order to avoid the possible ambiguity of the builtin types.
@@ -33,15 +34,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __TYPES_H
 #define __TYPES_H
 
-/**
- * Macros.
- */
+/* Macros */
 #define MIN(a, b) (a < b ? a : b)
 #define MAX(a, b) (a > b ? a : b)
 
-/**
- * Basic types.
- */
+/* Basic types */
 typedef unsigned char   uint8;
 typedef signed   char   sint8;
 typedef unsigned short  uint16;

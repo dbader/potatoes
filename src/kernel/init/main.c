@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
+ * @file
  * Brief file description goes here. Detailed file description goes
  * here.
  *
