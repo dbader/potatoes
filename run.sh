@@ -4,7 +4,7 @@
 # builds a new image then runs it using bochs
 
 
-cd src
+cd src/kernel
 make
 cd ..
 ./update_image.sh
