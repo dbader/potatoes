@@ -20,7 +20,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//first just-playing-version (DT)
+/*
+ *date          stat
+ *-----------------------------------------------
+ *01.05.08      first just-playing-version (DT)
+ *02.05.08      positioning fixes
+ * 		put* (it's a regex :) ) functions write only to the display-memory (B8000-B8FA0)(DT)
+ *04.05.08	updated types (from types.h)
+ */
+ 
+//colors macros
+#include "../include/types.h"
+
 enum{
         BLACK=0x0,
         BLUE=0x1,
@@ -40,25 +51,31 @@ enum{
         WHITE=0xF,
 };
 
-static unsigned short *disp = (unsigned short*)0xB8000;
-	
-void putc_col(char ch, short fg, short bg)
+static uint16 *disp = (uint16*)0xB8000; //display pointer
+
+/*
+ *  writes a colored character to the display (fg=foregroung, bg=background)
+ */	
+void putc_col(uint8 ch, uint8 fg, uint8 bg)
 {
-        if((unsigned int)disp >= 0xB8FA0) disp=(unsigned short*)0xB8000;
+        if((uint32)disp >= 0xB8FA0) disp-=0x7D0; //return to beginning, if outside of display-memory
         switch(ch){
         case '\n':
-                disp += 0x50 - (((unsigned int)disp - 0xB8000) % 0xA0) / 2;
+                disp += 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2; //calculating the "new line" starting position
                 break;
         case '\t':
-                disp += 0x8 - (((unsigned int)disp - 0xB8000) % 0x10) / 2;
+                disp += 0x8 - (((uint32)disp - 0xB8000) % 0x10) / 2; //calculating the "next tab" starting position
                 break;
         default:
-                *disp = bg * 0x1000 + fg * 0x100 + ch;
+                *disp = bg * 0x1000 + fg * 0x100 + ch; //print character to the display pointer
                 disp += 1;
 	}
 }
 
-void puts_col(char* str, short fg, short bg)
+/*
+ *  writes colored a string to the display (fg=foregroung, bg=background)
+ */
+void puts_col(uint8* str, uint8 fg, uint8 bg)
 {
         while(*str!=0){
                 putc_col(*str,fg,bg);
@@ -66,17 +83,23 @@ void puts_col(char* str, short fg, short bg)
         }
 }
 
-void putc(char ch)
+/*
+ * writes a character to the display
+ */
+void putc(uint8 ch)
 {
         putc_col(ch,WHITE,BLACK);
 }
 
-void puts(char* str)
+/*
+ * writes a string to the display
+ */
+void puts(uint8* str)
 {
         puts_col(str,WHITE,BLACK);
 }
 
-void drawtest()
+void drawtest() //output-testing
 { 
         puts_col("Test by Dmitriy Traytel (the i/o-master of etiOS)                               ",WHITE,BLACK); 
         puts("      _   _  ____   _____\n"); 
@@ -104,5 +127,5 @@ void drawtest()
         puts_col("                                        ",BLACK,YELLOW); 
         puts_col("                                        \n",BLACK,BLACK);
         puts("\tcolor-test\tok\n");
-	
+//        while(1)putc(getc());	
 }
