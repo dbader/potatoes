@@ -32,8 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 04.05.08      updated types (from types.h)
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: Dmitriy Traytel $
- * @version $Rev: 37 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  *
  */
  

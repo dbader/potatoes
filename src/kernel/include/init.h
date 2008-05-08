@@ -1,4 +1,4 @@
-/* $Id: const.h 37 2008-05-02 22:59:03Z dbader $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Basic difinitions for functions used in the main()-function of the kernel
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: Dmitriy Traytel $
- * @version $Rev: 37 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
  
  //init-functions

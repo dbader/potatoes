@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * standard i/o functions
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: Dmitriy Traytel $
- * @version $Rev: 37 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  *
  */
 #include "../include/types.h"
