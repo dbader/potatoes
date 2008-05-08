@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: const.h 37 2008-05-02 22:59:03Z dbader $
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -21,19 +21,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file
- * Brief file description goes here. Detailed file description goes
- * here.
+ * @file 
+ * Basic difinitions for functions used in the main()-function of the kernel
  *
- * @author John Doe
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author Dmitriy Traytel
+ * @author $LastChangedBy: Dmitriy Traytel $
+ * @version $Rev: 37 $
  */
  
-#include "../include/init.h"
+ //init-functions
 
-int main(struct multiboot *mboot_ptr)
-{ 
-        drawtest();
-	return 0;
-}
+//test-functions
+extern void drawtest();

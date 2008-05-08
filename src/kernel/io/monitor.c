@@ -20,13 +20,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*
- *date          stat
- *-----------------------------------------------
- *01.05.08      first just-playing-version (DT)
- *02.05.08      positioning fixes
- * 		put* (it's a regex :) ) functions write only to the display-memory (B8000-B8FA0)(DT)
- *04.05.08	updated types (from types.h)
+/**
+ * @file 
+ * Function to print things on the monitor
+ *
+ * date          stat
+ * -----------------------------------------------
+ * 01.05.08      first just-playing-version (DT)
+ * 02.05.08      positioning fixes
+ *  	         put* (it's a regex :) ) functions write only to the display-memory (B8000-B8FA0) (DT)
+ * 04.05.08      updated types (from types.h)
+ * 
+ * @author Dmitriy Traytel
+ * @author $LastChangedBy: Dmitriy Traytel $
+ * @version $Rev: 37 $
+ *
  */
  
 //colors macros
@@ -53,18 +61,28 @@ enum{
 
 static uint16 *disp = (uint16*)0xB8000; //display pointer
 
-/*
+/**
  *  writes a colored character to the display (fg=foregroung, bg=background)
  */	
 void putc_col(uint8 ch, uint8 fg, uint8 bg)
 {
-        if((uint32)disp >= 0xB8FA0) disp-=0x7D0; //return to beginning, if outside of display-memory
+        uint32 i=0;
+        uint32 temp;
+        if((uint32)disp >= 0xB8FA0)disp-=0x7D0; //return to beginning, if outside of display-memory
         switch(ch){
         case '\n':
-                disp += 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2; //calculating the "new line" starting position
+                temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
+                while(i < temp){ //calculating the "new line" starting position
+                        i++;
+                        putc_col(' ',WHITE,BLACK);
+                }
                 break;
         case '\t':
-                disp += 0x8 - (((uint32)disp - 0xB8000) % 0x10) / 2; //calculating the "next tab" starting position
+                temp = 0x8 - (((uint32)disp - 0xB8000) % 0x10) / 2;
+                while(i < temp){ //calculating the "next tab" starting position
+                        i++;
+                        putc_col(' ',WHITE,BLACK);
+                }
                 break;
         default:
                 *disp = bg * 0x1000 + fg * 0x100 + ch; //print character to the display pointer
@@ -99,9 +117,47 @@ void puts(uint8* str)
         puts_col(str,WHITE,BLACK);
 }
 
+/*
+ * writes an integer to the display
+ */
+void puti(sint32 x)
+{
+        int div=1000000000;
+        if(x < 0){
+                putc_col('-',RED,BLACK);
+                x = -x;
+        }
+        else if (x == 0) {putc_col('0',RED,BLACK); return;}
+        while(div > x)
+                        div /= 10;
+        while(div > 0){
+                putc_col((uint8)(x / div + 48),RED,BLACK);
+                x%=div;
+                div /= 10;
+        }    
+}
+
+/*
+ * writes a hex-byte to the display
+ */
+void puthex(uint8 ch)
+{
+        uint8 low = ch % 16;
+        uint8 high = ch / 16;  
+        if(high>9)
+                putc_col((high + 55),GREEN,BLACK);
+        else
+                putc_col((high + 48),GREEN,BLACK);   
+        if(low>9)
+                putc_col((low + 55),GREEN,BLACK);
+        else
+                putc_col((low + 48),GREEN,BLACK); 
+        putc_col('h',GREEN,BLACK);
+}
+
 void drawtest() //output-testing
 { 
-        puts_col("Test by Dmitriy Traytel (the i/o-master of etiOS)                               ",WHITE,BLACK); 
+        puts_col("Test by Dmitriy Traytel (the i/o-master of etiOS)\n",WHITE,BLACK); 
         puts("      _   _  ____   _____\n"); 
 	puts("     | | (_)/ __ \\ / ____|\n");
         puts("  ___| |_ _| |  | | (___\n");
@@ -109,8 +165,33 @@ void drawtest() //output-testing
         puts("|  __/ |_| | |__| |____) |\n");
         puts(" \\___|\\__|_|\\____/|_____/\n\n");
         puts_col("Copyright 2008 Daniel Bader,Vincenz Doelle,Johannes Schamburger,Dmitriy Traytel\n",0xA,BLACK);
+        
         puts("\ttab-test\tok\n");
+        puti(strlen("hallo welt")); //strlen-test
+        
+        //some ints
+        puts("\t");
+        puti(0);
+        puts("\t");
+        puti(100);
+        puts("\t");
+        puti(-2);
+        puts("\t");
+        
+        //some hex-bytes
+        uint8 *test=(uint8*)0x60;
+        puthex(*test);                  //0x60h
+        puthex(*(test+1));              //0x61h
+        puthex(*(test+2));              //0x62h
+        puthex(*(test+3));              //0x63h
+        puthex(*(test+4));              //0x64h
+        puthex(*(test+5));              //0x65h
+        
+        puts("\t\n");
+        puts("\tnumber-test\tok\n");
+        
         puts("\tbegin color test:\n");
+        puts_col("                                        ",BLACK,WHITE);
         puts_col("                                        ",BLACK,BLUE); 
         puts_col("                                        ",BLACK,GREEN); 
         puts_col("                                        ",BLACK,CYAN); 
@@ -125,7 +206,6 @@ void drawtest() //output-testing
         puts_col("                                        ",BLACK,PINK); 
         puts_col("                                        ",BLACK,MAGENTA); 
         puts_col("                                        ",BLACK,YELLOW); 
-        puts_col("                                        \n",BLACK,BLACK);
-        puts("\tcolor-test\tok\n");
-//        while(1)putc(getc());	
+        puts_col("                                        ",BLACK,BLACK);
+        puts("\tcolor-test\tok\n");		
 }
