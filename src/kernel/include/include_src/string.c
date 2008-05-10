@@ -28,8 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
-#include "types.h"
+#include "../types.h"
 
+/**
+ * returns the length of a null-terminated string
+ */
 sint32 strlen(uint8* str)
 {
         sint32 length=0;

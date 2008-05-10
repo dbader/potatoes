@@ -20,26 +20,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * @file 
- * Function to print things on the monitor
- *
+/*
  * date          stat
  * -----------------------------------------------
  * 01.05.08      first just-playing-version (DT)
  * 02.05.08      positioning fixes
- *  	         put* (it's a regex :) ) functions write only to the display-memory (B8000-B8FA0) (DT)
+ *               put* (it's a regex :) ) functions write only to the display-memory (B8000-B8FA0) (DT)
  * 04.05.08      updated types (from types.h)
+ */
+ 
+/**
+ * @file 
+ * Function to print things on the monitor
  * 
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
  * @version $Rev$
  *
  */
- 
-//colors macros
+
 #include "../include/types.h"
 
+//colors macros
 enum{
         BLACK=0x0,
         BLUE=0x1,
@@ -90,7 +92,7 @@ void putc_col(uint8 ch, uint8 fg, uint8 bg)
 	}
 }
 
-/*
+/**
  *  writes colored a string to the display (fg=foregroung, bg=background)
  */
 void puts_col(uint8* str, uint8 fg, uint8 bg)
@@ -101,7 +103,7 @@ void puts_col(uint8* str, uint8 fg, uint8 bg)
         }
 }
 
-/*
+/**
  * writes a character to the display
  */
 void putc(uint8 ch)
@@ -109,7 +111,7 @@ void putc(uint8 ch)
         putc_col(ch,WHITE,BLACK);
 }
 
-/*
+/**
  * writes a string to the display
  */
 void puts(uint8* str)
@@ -117,7 +119,7 @@ void puts(uint8* str)
         puts_col(str,WHITE,BLACK);
 }
 
-/*
+/**
  * writes an integer to the display
  */
 void puti(sint32 x)
@@ -137,7 +139,7 @@ void puti(sint32 x)
         }    
 }
 
-/*
+/**
  * writes a hex-byte to the display
  */
 void puthex(uint8 ch)
@@ -155,7 +157,10 @@ void puthex(uint8 ch)
         putc_col('h',GREEN,BLACK);
 }
 
-void drawtest() //output-testing
+/**
+ * output-testing
+ */
+void drawtest()
 { 
         puts_col("Test by Dmitriy Traytel (the i/o-master of etiOS)\n",WHITE,BLACK); 
         puts("      _   _  ____   _____\n"); 
