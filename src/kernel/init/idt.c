@@ -1,4 +1,4 @@
-/* $Id: string.c 43 2008-05-10 09:31:59Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Builds and initializes the interrupt descriptor table.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 43 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../include/types.h"

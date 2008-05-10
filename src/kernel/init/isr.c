@@ -1,4 +1,4 @@
-/* $Id: main.c 40 2008-05-08 20:43:32Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Handler for exceptions
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 40 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../include/types.h"
