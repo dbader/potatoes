@@ -29,7 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
  
- //init-functions
+//init-functions
+extern void idt_init();
+extern void isr_init();
+//extern void irq_init;
 
 //test-functions
 extern void drawtest();

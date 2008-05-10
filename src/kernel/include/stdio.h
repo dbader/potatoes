@@ -31,6 +31,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../include/types.h"
 
+enum colors{
+        BLACK=0x0,
+        BLUE=0x1,
+        GREEN=0x2,
+        CYAN=0x3,
+        RED=0x4,
+        VIOLET=0x5,
+        ORANGE=0x6,
+        LIGHTGREY=0x7,
+        DARKGREY=0x8,
+        LIGHTBLUE=0x9,
+        LIGHTGREEN=0xA,
+        TURQUOISE=0xB,
+        PINK=0xC,
+        MAGENTA=0xD,
+        YELLOW=0xE,
+        WHITE=0xF,
+};
+
 //prints colored character
 extern void putc_col(uint8 ch, uint8 fg, uint8 bg);
 //prints colored string

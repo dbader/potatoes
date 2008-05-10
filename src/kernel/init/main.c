@@ -31,9 +31,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
 #include "../include/init.h"
+#include "../include/stdio.h"
 
 int main(struct multiboot *mboot_ptr)
-{ 
+{
+        int i=0;
+        idt_init();
+        isr_init();
+        //i=1/i;
         drawtest();
 	return 0;
 }

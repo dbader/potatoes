@@ -38,11 +38,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  *
  */
-
+ 
 #include "../include/types.h"
 
 //colors macros
-enum{
+enum colors{
         BLACK=0x0,
         BLUE=0x1,
         GREEN=0x2,
