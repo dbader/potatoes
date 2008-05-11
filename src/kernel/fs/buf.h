@@ -1,4 +1,4 @@
-/* $Id: buf.h 37 2008-05-02 22:59:03Z vdoelle $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -30,8 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 3) current_indirect_adr_buffer
  * 
  * @author Vincenz Doelle
- * @author $LastChangedBy: vdoelle $
- * @version $Rev: 37 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 
