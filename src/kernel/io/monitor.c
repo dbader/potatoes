@@ -41,7 +41,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
 #include "../include/types.h"
 
-//colors macros
+/*
+ * colors macros
+ */
 enum colors{
         BLACK=0x0,
         BLUE=0x1,
@@ -95,10 +97,10 @@ void putc_col(uint8 ch, uint8 fg, uint8 bg)
 /**
  *  writes colored a string to the display (fg=foregroung, bg=background)
  */
-void puts_col(uint8* str, uint8 fg, uint8 bg)
+void puts_col(char* str, uint8 fg, uint8 bg)
 {
         while(*str!=0){
-                putc_col(*str,fg,bg);
+                putc_col(*str, fg, bg);
                 str += 1;
         }
 }
@@ -106,17 +108,17 @@ void puts_col(uint8* str, uint8 fg, uint8 bg)
 /**
  * writes a character to the display
  */
-void putc(uint8 ch)
+void putc(char ch)
 {
-        putc_col(ch,WHITE,BLACK);
+        putc_col(ch, WHITE, BLACK);
 }
 
 /**
  * writes a string to the display
  */
-void puts(uint8* str)
+void puts(char* str)
 {
-        puts_col(str,WHITE,BLACK);
+        puts_col(str, WHITE, BLACK);
 }
 
 /**
@@ -184,33 +186,33 @@ void drawtest()
         puts("\t");
         
         //some hex-bytes
-        uint8 *test=(uint8*)0x60;
-        puthex(*test);                  //0x60h
-        puthex(*(test+1));              //0x61h
-        puthex(*(test+2));              //0x62h
-        puthex(*(test+3));              //0x63h
-        puthex(*(test+4));              //0x64h
-        puthex(*(test+5));              //0x65h
+        uint8 *test = (uint8*)0x60;
+        puthex(*test);                    //0x60h
+        puthex(*(test + 1));              //0x61h
+        puthex(*(test + 2));              //0x62h
+        puthex(*(test + 3));              //0x63h
+        puthex(*(test + 4));              //0x64h
+        puthex(*(test + 5));              //0x65h
         
         puts("\t\n");
         puts("\tnumber-test\tok\n");
         
         puts("\tbegin color test:\n");
-        puts_col("                                        ",BLACK,WHITE);
-        puts_col("                                        ",BLACK,BLUE); 
-        puts_col("                                        ",BLACK,GREEN); 
-        puts_col("                                        ",BLACK,CYAN); 
-        puts_col("                                        ",BLACK,RED); 
-        puts_col("                                        ",BLACK,VIOLET);
-        puts_col("                                        ",BLACK,ORANGE); 
-        puts_col("                                        ",BLACK,LIGHTGREY); 
-        puts_col("                                        ",BLACK,DARKGREY); 
-        puts_col("                                        ",BLACK,LIGHTBLUE); 
-        puts_col("                                        ",BLACK,LIGHTGREEN);
-        puts_col("                                        ",BLACK,TURQUOISE); 
-        puts_col("                                        ",BLACK,PINK); 
-        puts_col("                                        ",BLACK,MAGENTA); 
-        puts_col("                                        ",BLACK,YELLOW); 
-        puts_col("                                        ",BLACK,BLACK);
+        puts_col("                                        ", BLACK, WHITE);
+        puts_col("                                        ", BLACK, BLUE); 
+        puts_col("                                        ", BLACK, GREEN); 
+        puts_col("                                        ", BLACK, CYAN); 
+        puts_col("                                        ", BLACK, RED); 
+        puts_col("                                        ", BLACK, VIOLET);
+        puts_col("                                        ", BLACK, ORANGE); 
+        puts_col("                                        ", BLACK, LIGHTGREY); 
+        puts_col("                                        ", BLACK, DARKGREY); 
+        puts_col("                                        ", BLACK, LIGHTBLUE); 
+        puts_col("                                        ", BLACK, LIGHTGREEN);
+        puts_col("                                        ", BLACK, TURQUOISE); 
+        puts_col("                                        ", BLACK, PINK); 
+        puts_col("                                        ", BLACK, MAGENTA); 
+        puts_col("                                        ", BLACK, YELLOW); 
+        puts_col("                                        ", BLACK, BLACK);
         puts("\tcolor-test\tok\n");		
 }

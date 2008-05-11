@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
-#include "../types.h"
+#include "../include/types.h"
 
 /**
  * returns the length of a null-terminated string

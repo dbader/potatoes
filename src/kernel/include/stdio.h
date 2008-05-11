@@ -51,13 +51,13 @@ enum colors{
 };
 
 //prints colored character
-extern void putc_col(uint8 ch, uint8 fg, uint8 bg);
+extern void putc_col(char ch, uint8 fg, uint8 bg);
 //prints colored string
-extern void puts_col(uint8* str, uint8 fg, uint8 bg);
+extern void puts_col(char *str, uint8 fg, uint8 bg);
 //prints black character
-extern void putc(uint8 ch);
+extern void putc(char ch);
 //prints black string
-extern void puts(uint8* str);
+extern void puts(char *str);
 //prints an integer
 extern void puti(sint32 x);
 //prints a hex-byte - important for io-debugging (-for me! ;-))

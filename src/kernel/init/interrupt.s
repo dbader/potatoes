@@ -293,7 +293,7 @@ isr_handler:
 	mov fs, ax
 	mov gs, ax
 	;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax): 12*4=48
-	push dword [esp+48] ;function argument
+	push dword [esp + 48] ;function argument
 	call ex_handler
 	pop eax
 	pop gs
@@ -302,6 +302,7 @@ isr_handler:
 	pop ds
 	popa
 	add esp, 8 ;clean up stack
+;	add dword [esp], 4 ;jump over the interrupt-causing source code
 	iret
 ;********************************************************************************************
 	
