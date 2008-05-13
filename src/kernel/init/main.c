@@ -22,10 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Brief file description goes here. Detailed file description goes
- * here.
+ * Main kernel file. Includes the C code entry point.
  *
- * @author John Doe
+ * @author Daniel Bader
  * @author $LastChangedBy$
  * @version $Rev$
  */
@@ -33,6 +32,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/init.h"
 #include "../include/stdio.h"
 
+/**
+ * Multiboot structure. 
+ * @see http://www.gnu.org/software/grub/manual/multiboot/multiboot.html
+ */
+struct multiboot {
+   uint32 flags;
+   uint32 mem_lower;
+   uint32 mem_upper;
+   uint32 boot_device;
+   uint32 cmdline;
+   uint32 mods_count;
+   uint32 mods_addr;
+   uint32 num;
+   uint32 size;
+   uint32 addr;
+   uint32 shndx;
+   uint32 mmap_length;
+   uint32 mmap_addr;
+   uint32 drives_length;
+   uint32 drives_addr;
+   uint32 config_table;
+   uint32 boot_loader_name;
+   uint32 apm_table;
+   uint32 vbe_control_info;
+   uint32 vbe_mode_info;
+   uint32 vbe_mode;
+   uint32 vbe_interface_seg;
+   uint32 vbe_interface_off;
+   uint32 vbe_interface_len;
+}  __attribute__((packed));
+
+/**
+ * Kernel panic function. Displays an error message and enters an infinite
+ * loop thus effectively halting the kernel.
+ * 
+ * @param msg Message to display.
+ */
+void panic(char *msg)
+{
+        puts("KERNEL PANIC: ");
+        puts(msg);
+        for (;;) {}
+}
+
+/**
+ * C kernel entry point.
+ * 
+ * @param mboot_ptr the multiboot struct passed by the bootloader (grub). 
+ */
 int main(struct multiboot *mboot_ptr)
 {
         int i=0;
@@ -40,5 +88,6 @@ int main(struct multiboot *mboot_ptr)
         isr_init();
         //i=1/i;
         drawtest();
+        panic("tick tick tick BOOM! :-)");
 	return 0;
 }
