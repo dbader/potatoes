@@ -146,7 +146,5 @@ uint8 *ex_messages[] = {
 
 void ex_handler(uint32 num)
 {
-        puts(ex_messages[num]);
-        puts_col("\n***********\n*  TILT!  *\n***********\n",BLACK,RED);
-        for(;;);
+        panic(ex_messages[num]);
 }

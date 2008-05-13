@@ -65,29 +65,30 @@ struct multiboot {
 
 /**
  * Kernel panic function. Displays an error message and enters an infinite
- * loop thus effectively halting the kernel.
+ * loop thus effectively halting the kernel. This should only be called when
+ * a non-recoverable ("fatal") error occurs inside the kernel.
  * 
  * @param msg Message to display.
  */
 void panic(char *msg)
 {
-        puts("KERNEL PANIC: ");
-        puts(msg);
-        for (;;) {}
+        puts_col("KERNEL PANIC: ", BLACK, RED);
+        puts_col(msg, BLACK, RED);
+        for (;;) ;
 }
 
 /**
  * C kernel entry point.
  * 
- * @param mboot_ptr the multiboot struct passed by the bootloader (grub). 
+ * @param mboot_ptr The multiboot struct passed by the bootloader (grub). 
  */
 int main(struct multiboot *mboot_ptr)
 {
         int i=0;
         idt_init();
-        isr_init();
-        //i=1/i;
+        isr_init();      
         drawtest();
+        i=1/i;
         panic("tick tick tick BOOM! :-)");
 	return 0;
 }
