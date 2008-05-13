@@ -80,6 +80,8 @@ void panic(char *msg)
         for (;;) ;
 }
 
+#define MBOOT_INFO(x) puts("\n"); puts(#x); puts(": "); puti(mboot_ptr->x);
+
 /**
  * C kernel entry point.
  * 
@@ -87,6 +89,15 @@ void panic(char *msg)
  */
 int main(struct multiboot *mboot_ptr)
 {
+        puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
+        
+        MBOOT_INFO(mem_lower)
+        MBOOT_INFO(mem_upper)
+        MBOOT_INFO(size)
+        MBOOT_INFO(flags)
+        MBOOT_INFO(addr)
+        puts("\n\n");
+        
         int i=0;
         idt_init();
         isr_init();    
@@ -94,7 +105,7 @@ int main(struct multiboot *mboot_ptr)
         /* ------------------------- */
         /* test some string stuff */
         char f[100];
-        char t[] = "this BLABLA";
+        char t[] = "This BLABLA";
         char t2[] = "is a STRING.H";
         char t3[] = " test.";
         bzero(f, sizeof(f));
