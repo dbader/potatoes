@@ -3,7 +3,7 @@
 
 SOURCES=boot/boot.o lib/string.o io/monitor.o init/interrupt.o init/idt.o init/isr.o init/main.o
 
-CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector
+CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
 LDFLAGS=-Tlink.ld
 ASFLAGS=-felf
 

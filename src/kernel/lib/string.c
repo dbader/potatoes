@@ -42,3 +42,120 @@ sint32 strlen(uint8* str)
         }
         return length;
 }
+
+/**
+ * Copies string src to string dest (including terminating \0 character).
+ * For stability and security reasons, try to use strncpy() whenever possible.
+ * @see strncpy
+ * @param dest Destination string
+ * @param src Source string
+ * @return dest, the destination string 
+ */
+char* strcpy(char *dest, char *src) 
+{
+        char *ret = dest;
+        while (*src != '\0')
+                *dest++ = *src++;
+        *dest = '\0';
+        return ret;
+}
+
+/**
+ * Copies at most n characters from src to dest. If src is less than n
+ * characters long, the remainder of dest is filled with \0 characters.
+ * Otherwise, dest is not terminated.
+ * @param dest Destination string
+ * @param src Source string
+ * @param n Number of bytes to copy at most
+ * @return dest, the destination string
+ */
+char* strncpy(char *dest, char *src, uint32 n) 
+{
+        char *ret = dest;
+        while (n-- > 0) {
+                if (*src != '\0')
+                        *dest++ = *src++;
+                else
+                        *dest++ = '\0';
+        }
+        return ret;
+}
+
+/**
+ * Locates the first occurence of ch n the string pointed to by str.
+ * The terminating '\c' character is considered to be part of the string.
+ * @param str the string to search
+ * @param ch the character to look for
+ * @return the first occurence of ch in str or NULL if not found 
+ */
+char* index(char *str, char ch)
+{
+        while (*str != ch && *str != '\0')
+                str++;
+        return str;
+}
+
+/**
+ * Concatenates two strings by appending a copy of s2 to the end of s1. 
+ * @param s1 the "head"
+ * @param s2 the "tail"
+ * @return the concatenated string
+ */
+char* strcat(char *s1, char *s2)
+{
+        return strcpy(index(s1, '\0'), s2);
+}
+
+/**
+ * Concatenates two strings by appending a copy of s2 to the end of s1. 
+ * Not more than n characters are copied from s2.
+ * @param s1 the "head"
+ * @param s2 the "tail"
+ * @param n max number of characters to copy
+ * @return the concatenated string
+ */
+char* strncat(char *s1, char *s2, uint32 n)
+{
+        return strncpy(index(s1, '\0'), s2, n);        
+}
+
+
+/**
+ * Writes count bytes of value value to the memory referenced by dest.
+ * @param dest Destination memory
+ * @param value Value dest is filled with
+ * @param count Number of bytes to write
+ * @return dest, the destination memory
+ */
+void* memset(void *dest, uint8 value, uint32 count) 
+{
+        void *ret = dest;
+        for (int i = 0; i < count; i++)
+                *((uint8*)dest++) = value;
+        return ret;
+}
+
+/**
+ * Writes count bytes of value zero to dest.
+ * @param dest Destination memory
+ * @param count Number of bytes to write
+ */
+void bzero(void *dest, uint32 count)
+{
+        memset(dest, 0, count);
+}
+
+/**
+ * Copies count bytes form src to dest.
+ * @param dest Destination memory
+ * @param src Source memory
+ * @param count Number of bytes to copy
+ * @return dest, the destination memory
+ */
+void* memcpy(void *dest, void *src, uint32 count)
+{
+        void *ret = dest;
+        for (int i = 0; i < count; i++)
+                *((uint8*)dest++) = *((uint8*)src++);
+        return ret;
+}

@@ -30,7 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
 #include "../include/init.h"
+#include "../include/const.h"
 #include "../include/stdio.h"
+#include "../include/assert.h"
+#include "../include/string.h"
 
 /**
  * Multiboot structure. 
@@ -86,9 +89,32 @@ int main(struct multiboot *mboot_ptr)
 {
         int i=0;
         idt_init();
-        isr_init();      
-        drawtest();
-        i=1/i;
+        isr_init();    
+        
+        /* ------------------------- */
+        /* test some string stuff */
+        char f[100];
+        char t[] = "this BLABLA";
+        char t2[] = "is a STRING.H";
+        char t3[] = " test.";
+        bzero(f, sizeof(f));
+        strncat(f, t, 5);
+        strcat(f, t2);
+        strcat(f, t3);
+        puts(f); puts("\n\n");
+        /* ------------------------- */
+        
+        //drawtest();
+        
+        // test ASSERT() macro
+        ASSERT(TRUE)
+        ASSERT(FALSE)
+        ASSERT(i != 0)
+        
+        // test exception handler
+        i = 1 / i;
+        
+        // should not get here
         panic("tick tick tick BOOM! :-)");
 	return 0;
 }

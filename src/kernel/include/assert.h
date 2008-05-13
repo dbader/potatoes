@@ -22,19 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Headers for string.c
+ * Definition of the ASSERT() macro.
  *
- * @author Dmitriy Traytel
+ * @author Daniel Bader
  * @author $LastChangedBy$
  * @version $Rev$
  */
- 
-extern sint32 strlen(uint8* str);
-extern char* strcpy(char *dest, char *src);
-extern char* strncpy(char *dest, char *src, uint32 n);
-extern char* index(char *str, char ch);
-extern char* strcat(char *s1, char *s2);
-extern char* strncat(char *s1, char *s2, uint32 n);
-extern void* memset(void *dest, uint8 value, uint32 count);
-extern void bzero(void *dest, uint32 count);
-extern void* memcpy(void *dest, void *src, uint32 count);
+
+#define ASSERT(x) if (!(x)) { \
+        puts("ASSERTION FAILED: "__FILE__":"); puts(__FUNCTION__); \
+        puts("():"); puti(__LINE__); puts(". Reason: "#x"\n"); }
