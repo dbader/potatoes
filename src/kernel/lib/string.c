@@ -31,15 +31,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 
 /**
- * returns the length of a null-terminated string
+ * Returns the length of a null-terminated string.
+ * @param str String to check
+ * @return Number of characters preceding the terminating null character.
  */
-sint32 strlen(uint8* str)
+uint32 strlen(char* str)
 {
-        sint32 length=0;
-        while((*str) != 0){
+        uint32 length = 0;
+        while (*str++ != '\0')
                 length++;
-                str++;
-        }
         return length;
 }
 
@@ -88,7 +88,7 @@ char* strncpy(char *dest, char *src, uint32 n)
  * @param ch the character to look for
  * @return the first occurence of ch in str or NULL if not found 
  */
-char* index(char *str, char ch)
+char* strchr(char *str, char ch)
 {
         while (*str != ch && *str != '\0')
                 str++;
@@ -103,7 +103,7 @@ char* index(char *str, char ch)
  */
 char* strcat(char *s1, char *s2)
 {
-        return strcpy(index(s1, '\0'), s2);
+        return strcpy(strchr(s1, '\0'), s2);
 }
 
 /**
@@ -116,7 +116,7 @@ char* strcat(char *s1, char *s2)
  */
 char* strncat(char *s1, char *s2, uint32 n)
 {
-        return strncpy(index(s1, '\0'), s2, n);        
+        return strncpy(strchr(s1, '\0'), s2, n);        
 }
 
 

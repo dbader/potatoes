@@ -31,4 +31,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define ASSERT(x) if (!(x)) { \
         puts("ASSERTION FAILED: "__FILE__":"); puts(__FUNCTION__); \
-        puts("():"); puti(__LINE__); puts(". Reason: "#x"\n"); }
+        puts("():"); puti(__LINE__); puts(". Expr: "#x"\n"); }

@@ -80,6 +80,7 @@ void panic(char *msg)
         for (;;) ;
 }
 
+/* just a hack */
 #define MBOOT_INFO(x) puts("\n"); puts(#x); puts(": "); puti(mboot_ptr->x);
 
 /**
