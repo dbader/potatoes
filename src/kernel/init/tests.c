@@ -1,4 +1,4 @@
-/* $Id: init.h 55 2008-05-15 20:08:02Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Basic difinitions for functions used in the main()-function of the kernel
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 55 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #include "../include/const.h"
 #include "../include/types.h"
