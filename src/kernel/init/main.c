@@ -90,6 +90,7 @@ void panic(char *msg)
  */
 int main(struct multiboot *mboot_ptr)
 {
+        gdt_init();
         puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
         
         MBOOT_INFO(mem_lower)

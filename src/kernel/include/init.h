@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
 //init-functions
+extern void gdt_init(); 
 extern void idt_init();
 extern void isr_init();
 //extern void irq_init;
