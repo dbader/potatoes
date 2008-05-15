@@ -28,12 +28,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
- 
+
 //init-functions
 extern void gdt_init(); 
 extern void idt_init();
 extern void isr_init();
 extern void irq_init();
+extern void set_interrupts();
 
 //test-functions
-extern void drawtest();
+extern void draw_test();
+extern void printf_test();
+extern void grubstruct_test(struct multiboot *mboot_ptr);
+extern void assert_test();
+extern void strings_test();
