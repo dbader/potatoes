@@ -49,4 +49,6 @@ typedef signed   int    sint32;
 typedef float   float32;
 typedef double  float64;
 
+typedef uint8   bool;
+
 #endif /* types.h */

@@ -39,3 +39,5 @@ extern char* strncat(char *s1, char *s2, uint32 n);
 extern void* memset(void *dest, uint8 value, uint32 count);
 extern void bzero(void *dest, uint32 count);
 extern void* memcpy(void *dest, void *src, uint32 count);
+
+extern void printf(char *fmt, ...);

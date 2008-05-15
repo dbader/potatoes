@@ -122,6 +122,10 @@ int main(struct multiboot *mboot_ptr)
         
         //drawtest();
         
+        printf("this is a printf() test:\n");
+        printf("hello %d and %d - 15%% done. - %s world!\n - %u - %c - %p\n\n",
+                        23, 42, "hello,", -17, '@', &main);
+        
         // test ASSERT() macro
         ASSERT(TRUE)
         ASSERT(FALSE)

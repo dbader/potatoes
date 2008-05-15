@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 #include "../include/types.h"
+#include "../include/stdio.h"
 
 /**
  * Returns the length of a null-terminated string.
@@ -158,4 +159,53 @@ void* memcpy(void *dest, void *src, uint32 count)
         for (int i = 0; i < count; i++)
                 *((uint8*)dest++) = *((uint8*)src++);
         return ret;
+}
+
+/**
+ * Prints formatted output. The following format specifiers are supported:
+ *      %% - prints the % character
+ *      %i - prints a signed integer
+ *      %d - prints a signed integer
+ *      %u - prints an unsigned integer
+ *      %c - prints a single character
+ *      %s - prints a string
+ *      %p - prints a pointer
+ * All other format specifiers are ignored.
+ * @param fmt format string
+ * @param ... variable number of arguments
+ */
+void printf(char *fmt, ...)
+{
+        char **arg = &fmt + 1;
+        char ch;
+        
+        while ((ch = *fmt++) != '\0')
+                if (ch != '%')
+                        putc(ch);
+                else {
+                        ch = *fmt++;
+                        switch (ch) {
+                        case '%': // print '%' 
+                                putc(ch); 
+                                break;
+                        case 'i': // signed integer
+                        case 'd':
+                                puti((sint32)*arg++);
+                                break;
+                        case 'u': // unsigned integer
+                                puti((uint32)*arg++);
+                                break;
+                        case 'c': // character
+                                putc(*arg++);
+                                break;
+                        case 's': // string
+                                while((ch = *(*arg)++) != '\0')
+                                        putc(ch);
+                                *arg++;
+                                break;
+                        case 'p': // pointer
+                                puti((uint32)*arg++);
+                                break;
+                        }
+                }
 }
