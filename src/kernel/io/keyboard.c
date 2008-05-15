@@ -1,4 +1,4 @@
-/* $Id: idt.c 46 2008-05-10 21:08:12Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Keyboard-handler
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 46 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
  
 #include "../include/stdio.h" 
