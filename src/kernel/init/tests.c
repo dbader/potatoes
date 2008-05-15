@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/assert.h"
 #include "../include/string.h"
 #include "../include/stdio.h"
+#include "../include/init.h"
 
 /**
  * output-testing
@@ -97,12 +98,11 @@ void printf_test()
         int x = 42;
         printf("this is a printf() test:\n");
         printf("hello %d and %d - 15%% done. - %s world!\n - %u - %c - %p\n\n",
-                                23, x, "hello,", -17, '@', &x);
+                        23, x, "hello,", -17, '@', &x);
 }
 
 void strings_test()
 {
-        /* ------------------------- */
         /* test some string stuff */
         char f[100];
         char t[] = "This BLABLA";
@@ -113,7 +113,6 @@ void strings_test()
         strcat(f, t2);
         strcat(f, t3);
         puts(f); puts("\n\n");
-        /* ------------------------- */
 }
 // test ASSERT() macro
 void assert_test()
@@ -124,38 +123,7 @@ void assert_test()
         ASSERT(i != 0)
 }
 
-/**
- * Multiboot structure. 
- * @see http://www.gnu.org/software/grub/manual/multiboot/multiboot.html
- */
-struct multiboot {
-   uint32 flags;
-   uint32 mem_lower;
-   uint32 mem_upper;
-   uint32 boot_device;
-   uint32 cmdline;
-   uint32 mods_count;
-   uint32 mods_addr;
-   uint32 num;
-   uint32 size;
-   uint32 addr;
-   uint32 shndx;
-   uint32 mmap_length;
-   uint32 mmap_addr;
-   uint32 drives_length;
-   uint32 drives_addr;
-   uint32 config_table;
-   uint32 boot_loader_name;
-   uint32 apm_table;
-   uint32 vbe_control_info;
-   uint32 vbe_mode_info;
-   uint32 vbe_mode;
-   uint32 vbe_interface_seg;
-   uint32 vbe_interface_off;
-   uint32 vbe_interface_len;
-}  __attribute__((packed));
-
-/* just a hack */
+/* just a hack to easily dump mboot fields */
 #define MBOOT_INFO(x) puts("\n"); puts(#x); puts(": "); puti(mboot_ptr->x);
 
 void grubstruct_test(struct multiboot *mboot_ptr)

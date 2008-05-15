@@ -29,16 +29,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
+/**
+ * Multiboot structure. 
+ * @see http://www.gnu.org/software/grub/manual/multiboot/multiboot.html
+ */
+struct multiboot {
+   uint32 flags;
+   uint32 mem_lower;
+   uint32 mem_upper;
+   uint32 boot_device;
+   uint32 cmdline;
+   uint32 mods_count;
+   uint32 mods_addr;
+   uint32 num;
+   uint32 size;
+   uint32 addr;
+   uint32 shndx;
+   uint32 mmap_length;
+   uint32 mmap_addr;
+   uint32 drives_length;
+   uint32 drives_addr;
+   uint32 config_table;
+   uint32 boot_loader_name;
+   uint32 apm_table;
+   uint32 vbe_control_info;
+   uint32 vbe_mode_info;
+   uint32 vbe_mode;
+   uint32 vbe_interface_seg;
+   uint32 vbe_interface_off;
+   uint32 vbe_interface_len;
+}  __attribute__((packed));
+
 //init-functions
-extern void gdt_init(); 
-extern void idt_init();
-extern void isr_init();
-extern void irq_init();
-extern void set_interrupts();
+ void gdt_init(); 
+ void idt_init();
+ void isr_init();
+ void irq_init();
+ void set_interrupts();
 
 //test-functions
-extern void draw_test();
-extern void printf_test();
-extern void grubstruct_test(struct multiboot *mboot_ptr);
-extern void assert_test();
-extern void strings_test();
+ void draw_test();
+ void printf_test();
+ void grubstruct_test(struct multiboot *mboot_ptr);
+ void assert_test();
+ void strings_test();

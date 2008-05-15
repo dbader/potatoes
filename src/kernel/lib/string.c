@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
+#include "../include/const.h"
 #include "../include/types.h"
 #include "../include/stdio.h"
 
@@ -163,19 +164,22 @@ void* memcpy(void *dest, void *src, uint32 count)
 
 /**
  * Prints formatted output. The following format specifiers are supported:
- *      %% - prints the % character
- *      %i - prints a signed integer
- *      %d - prints a signed integer
- *      %u - prints an unsigned integer
- *      %c - prints a single character
- *      %s - prints a string
- *      %p - prints a pointer
+ *      %% - prints the % character.
+ *      %i - prints a signed integer.
+ *      %d - prints a signed integer.
+ *      %u - prints an unsigned integer.
+ *      %c - prints a single character.
+ *      %s - prints a string.
+ *      %p - prints a pointer.
  * All other format specifiers are ignored.
  * @param fmt format string
  * @param ... variable number of arguments
  */
 void printf(char *fmt, ...)
 {
+        if (fmt == NULL)
+                return;
+        
         char **arg = &fmt + 1;
         char ch;
         
@@ -196,7 +200,7 @@ void printf(char *fmt, ...)
                                 puti((uint32)*arg++);
                                 break;
                         case 'c': // character
-                                putc(*arg++);
+                                putc((char)*arg++);
                                 break;
                         case 's': // string
                                 while((ch = *(*arg)++) != '\0')

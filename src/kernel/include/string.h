@@ -29,15 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
  
-extern uint32 strlen(char* str);
-extern char* strcpy(char *dest, char *src);
-extern char* strncpy(char *dest, char *src, uint32 n);
-extern char* strchr(char *str, char ch);
-extern char* strcat(char *s1, char *s2);
-extern char* strncat(char *s1, char *s2, uint32 n);
+uint32 strlen(char* str);
+char* strcpy(char *dest, char *src);
+char* strncpy(char *dest, char *src, uint32 n);
+char* strchr(char *str, char ch);
+char* strcat(char *s1, char *s2);
+char* strncat(char *s1, char *s2, uint32 n);
 
-extern void* memset(void *dest, uint8 value, uint32 count);
-extern void bzero(void *dest, uint32 count);
-extern void* memcpy(void *dest, void *src, uint32 count);
+void* memset(void *dest, uint8 value, uint32 count);
+void bzero(void *dest, uint32 count);
+void* memcpy(void *dest, void *src, uint32 count);
 
-extern void printf(char *fmt, ...);
+void printf(char *fmt, ...);
