@@ -6,3 +6,5 @@ log: bochsout.txt
 mouse: enabled=0
 clock: sync=realtime
 cpu: ips=500000
+user_shortcut: keys=pause
+keyboard_mapping: enabled=1, map=/usr/share/bochs/keymaps/x11-pc-de.map

@@ -108,7 +108,7 @@ void isr_init()
       idt_fill_entry(31, (uint32)isr31, 0x8, 0x8E);
 }
 
-uint8 *ex_messages[] = {
+char *ex_messages[] = {
         "division by zero",
         "debug",
         "not maskable interrupt",

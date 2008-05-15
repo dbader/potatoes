@@ -53,8 +53,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define NUM_INODES              100                                     /*max. num of opened inodes/files*/
 
 extern int get_HD_size();
-
-enum { NUM_BLOCKS_ON_HD =       get_HD_size()};
+int *hd_size;
+enum { NUM_BLOCKS_ON_HD =       *hd_size};
 enum { NUM_BMAP_BLOCKS =        (NUM_BLOCKS_ON_HD)/(BLOCK_SIZE) };            /*#blocks for the block bitmap*/
 
 #define BOOT_BLOCK              (block_nr) 0

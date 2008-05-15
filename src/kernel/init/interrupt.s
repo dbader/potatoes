@@ -21,14 +21,18 @@
 
 ;@author Dmitriy Traytel
 
-	;Install our idt-table:
+[GLOBAL set_interrupts]
+set_interrupts:
+	sti
+;********************************************************************************************
+	;Installation of our idt-table:
 [GLOBAL idt_load]
 [EXTERN idtp]
 idt_load:
 	lidt [idtp]
 	ret
 ;********************************************************************************************
-	;Install the interrupt service routines:
+	;Installation of the interrupt service routines:
 [GLOBAL isr0]
 [GLOBAL isr1]
 [GLOBAL isr2]
@@ -302,7 +306,177 @@ isr_handler:
 	pop ds
 	popa
 	add esp, 8 ;clean up stack
-;	add dword [esp], 4 ;jump over the interrupt-causing source code
+;	add dword [esp], 4 ;jump over the interrupt-causing source code (eip auf dem stack)
 	iret
 ;********************************************************************************************
+[GLOBAL irq0]
+[GLOBAL irq1]
+[GLOBAL irq2]
+[GLOBAL irq3]
+[GLOBAL irq4]
+[GLOBAL irq5]
+[GLOBAL irq6]
+[GLOBAL irq7]
+[GLOBAL irq8]
+[GLOBAL irq9]
+[GLOBAL irq10]
+[GLOBAL irq11]
+[GLOBAL irq12]
+[GLOBAL irq13]
+[GLOBAL irq14]
+[GLOBAL irq15]
+
+;IRQs: IDT-entries 32-47
+
+;Timer
+irq0:
+	cli
+	push byte 0
+	push byte 32
+	jmp irq_handler
+
+;Keyboard
+irq1:
+	cli
+	push byte 0
+	push byte 33
+	jmp irq_handler
+
+;IRQ 9
+irq2:
+	cli
+	push byte 0
+	push byte 34
+	jmp irq_handler
+
+;COM 2,4,6,8
+irq3:
+	cli
+	push byte 0
+	push byte 35
+	jmp irq_handler
+
+;COM 1,3,5,7
+irq4:
+	cli
+	push byte 0
+	push byte 36
+	jmp irq_handler
+
+;Free/LTP 2
+irq5:
+	cli
+	push byte 0
+	push byte 37
+	jmp irq_handler
+
+;Floppy
+irq6:
+	cli
+	push byte 0
+	push byte 38
+	jmp irq_handler
+
+;LTP 1
+irq7:
+	cli
+	push byte 0
+	push byte 39
+	jmp irq_handler
+
+;Realtime clock (RTC)
+irq8:
+	cli
+	push byte 0
+	push byte 40
+	jmp irq_handler
+
+;Free/->IRQ 2/VGA,NIC
+irq9:
+	cli
+	push byte 0
+	push byte 41
+	jmp irq_handler
 	
+;Free/PCI
+irq10:
+	cli
+	push byte 0
+	push byte 42
+	jmp irq_handler
+
+;Free/SCSI
+irq11:
+	cli
+	push byte 0
+	push byte 43
+	jmp irq_handler
+
+;PS/2
+irq12:
+	cli
+	push byte 0
+	push byte 44
+	jmp irq_handler
+
+;Coprocessor
+irq13:
+	cli
+	push byte 0
+	push byte 45
+	jmp irq_handler
+
+;Primary IDE
+irq14:
+	cli
+	push byte 0
+	push byte 46
+	jmp irq_handler
+
+;Secondary IDE
+irq15:
+	cli
+	push byte 0
+	push byte 47
+	jmp irq_handler
+
+
+[EXTERN hw_handler]
+
+irq_handler:
+	pusha
+	push ds
+	push es
+	push fs
+	push gs
+	mov ax, 0x10 ;kernel data segment
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax): 12*4=48
+	push dword [esp + 48] ;function argument
+	mov eax, hw_handler
+	call eax
+	pop eax
+	pop gs
+	pop fs
+	pop es
+	pop ds
+	popa
+	add esp, 8 ;clean up stack
+	iret
+
+[GLOBAL outb]
+[GLOBAL inb]
+
+outb:
+	mov eax, [esp+8] ;value
+	mov edx, [esp+4] ;target address
+	out dx, al
+	ret
+		
+inb:
+	mov edx, [esp+4] ;source address
+	in al, dx
+	ret

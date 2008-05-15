@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
 /**
  * @file 
- * Function to print things on the monitor
+ * Functions to print things on the monitor
  * 
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
@@ -78,15 +78,19 @@ void putc_col(uint8 ch, uint8 fg, uint8 bg)
                 temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
                 while(i < temp){ //calculating the "new line" starting position
                         i++;
-                        putc_col(' ',WHITE,BLACK);
+                        putc_col(' ',fg,bg);
                 }
                 break;
         case '\t':
                 temp = 0x8 - (((uint32)disp - 0xB8000) % 0x10) / 2;
                 while(i < temp){ //calculating the "next tab" starting position
                         i++;
-                        putc_col(' ',WHITE,BLACK);
+                        putc_col(' ',fg,bg);
                 }
+                break;
+        case '\b':
+                disp -= 1;
+                *disp = bg * 0x1000 + fg * 0x100 + ' ';
                 break;
         default:
                 *disp = bg * 0x1000 + fg * 0x100 + ch; //print character to the display pointer

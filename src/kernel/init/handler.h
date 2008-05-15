@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: idt.c 46 2008-05-10 21:08:12Z dtraytel $
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -22,18 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Basic difinitions for functions used in the main()-function of the kernel
+ * Header-file for specific hardware interrupt-handlers.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 46 $
  */
  
-//init-functions
-extern void gdt_init(); 
-extern void idt_init();
-extern void isr_init();
-extern void irq_init();
-
-//test-functions
-extern void drawtest();
+ extern void kb_handler();

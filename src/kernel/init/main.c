@@ -90,7 +90,6 @@ void panic(char *msg)
  */
 int main(struct multiboot *mboot_ptr)
 {
-        gdt_init();
         puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
         
         MBOOT_INFO(mem_lower)
@@ -101,8 +100,12 @@ int main(struct multiboot *mboot_ptr)
         puts("\n\n");
         
         int i=0;
+        
+        gdt_init();
         idt_init();
-        isr_init();    
+        isr_init();
+        irq_init();
+        set_interrupts();
         
         /* ------------------------- */
         /* test some string stuff */
@@ -124,10 +127,10 @@ int main(struct multiboot *mboot_ptr)
         ASSERT(FALSE)
         ASSERT(i != 0)
         
+        for(;;);
         // test exception handler
-        i = 1 / i;
-        
+        //i = 1 / i;
         // should not get here
-        panic("tick tick tick BOOM! :-)");
+        //panic("tick tick tick BOOM! :-)");
 	return 0;
 }
