@@ -73,6 +73,8 @@ struct multiboot {
  void set_interrupts();
 
  void panic(char *msg);
+ void free(uint32 address);
+
  
 //test-functions
  void draw_test();
@@ -80,5 +82,6 @@ struct multiboot {
  void grubstruct_test(struct multiboot *mboot_ptr);
  void assert_test();
  void strings_test();
+ void malloc_test();
  
 #endif /* init.h */

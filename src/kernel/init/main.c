@@ -67,6 +67,7 @@ int main(struct multiboot *mboot_ptr)
         //draw_test();
         printf_test();
         //assert_test();
+        malloc_test();
         
         for(;;);
 	return 0;

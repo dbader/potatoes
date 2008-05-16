@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 #include "../include/init.h"
 
+
 /**
  * output-testing
  */
@@ -134,4 +135,14 @@ void grubstruct_test(struct multiboot *mboot_ptr)
         MBOOT_INFO(flags)
         MBOOT_INFO(addr)
         puts("\n\n");
+}
+
+void malloc_test() {
+        void *test;
+        puts("malloc(23068671): allocation of 22 MB -> memory is full (10 of 32 MB are reserved for the kernel)\n");
+        test = malloc(23068671);
+        puti((uint32)test);
+        puts("\nmalloc(1): allocation of 1 KB -> function returns pointer to address -1\n");
+        test = malloc(1);
+        puti((uint32)test);
 }
