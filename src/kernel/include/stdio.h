@@ -29,7 +29,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  *
  */
-#include "../include/types.h"
+
+#ifndef __STDIO_H
+#define __STDIO_H
+
+#include "types.h"
 
 enum colors{
         BLACK=0x0,
@@ -62,3 +66,5 @@ void puts(char *str);
 void puti(sint32 x);
 //prints a hex-byte - important for io-debugging (-for me! ;-))
 void puthex(uint8 ch);
+
+#endif /* types.h */

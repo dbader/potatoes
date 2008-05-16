@@ -5,6 +5,7 @@
 
 
 cd src/kernel
+make clean
 make
 cd ../..
 ./update_image.sh

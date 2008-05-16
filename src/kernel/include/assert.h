@@ -28,7 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
+#ifndef __ASSERT_H
+#define __ASSERT_H
 
 #define ASSERT(x) if (!(x)) { \
-        puts("ASSERTION FAILED: "__FILE__":"); puts(__FUNCTION__); \
-        puts("():"); puti(__LINE__); puts(". Expr: "#x"\n"); }
+        printf("ASSERTION FAILED: %s:%s():%d. Expr: %s\n", __FILE__, __FUNCTION__, __LINE__, #x); }
+
+#endif /* assert.h */

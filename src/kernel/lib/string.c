@@ -85,7 +85,7 @@ char* strncpy(char *dest, char *src, uint32 n)
 
 /**
  * Locates the first occurence of ch n the string pointed to by str.
- * The terminating '\c' character is considered to be part of the string.
+ * The terminating '\0' character is considered to be part of the string.
  * @param str the string to search
  * @param ch the character to look for
  * @return the first occurence of ch in str or NULL if not found 
@@ -200,7 +200,7 @@ void printf(char *fmt, ...)
                                 puti((uint32)*arg++);
                                 break;
                         case 'c': // character
-                                putc((char)*arg++);
+                                putc((char)*arg++[0]);
                                 break;
                         case 's': // string
                                 while((ch = *(*arg)++) != '\0')

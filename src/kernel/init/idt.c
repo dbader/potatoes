@@ -58,6 +58,8 @@ void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg)
         idt[pos].high_offset = offset / 65536;
 }
 
+extern void idt_load();
+
 void idt_init()
 {
         idtp.maxsize = (64 * 256) - 1;

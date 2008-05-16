@@ -29,35 +29,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
+#ifndef __INIT_H
+#define __INIT_H
+
+#include "types.h"
+
 /**
  * Multiboot structure. 
  * @see http://www.gnu.org/software/grub/manual/multiboot/multiboot.html
  */
 struct multiboot {
-   unsigned int flags;
-   unsigned int mem_lower;
-   unsigned int mem_upper;
-   unsigned int boot_device;
-   unsigned int cmdline;
-   unsigned int mods_count;
-   unsigned int mods_addr;
-   unsigned int num;
-   unsigned int size;
-   unsigned int addr;
-   unsigned int shndx;
-   unsigned int mmap_length;
-   unsigned int mmap_addr;
-   unsigned int drives_length;
-   unsigned int drives_addr;
-   unsigned int config_table;
-   unsigned int boot_loader_name;
-   unsigned int apm_table;
-   unsigned int vbe_control_info;
-   unsigned int vbe_mode_info;
-   unsigned int vbe_mode;
-   unsigned int vbe_interface_seg;
-   unsigned int vbe_interface_off;
-   unsigned int vbe_interface_len;
+   uint32 flags;
+   uint32 mem_lower;
+   uint32 mem_upper;
+   uint32 boot_device;
+   uint32 cmdline;
+   uint32 mods_count;
+   uint32 mods_addr;
+   uint32 num;
+   uint32 size;
+   uint32 addr;
+   uint32 shndx;
+   uint32 mmap_length;
+   uint32 mmap_addr;
+   uint32 drives_length;
+   uint32 drives_addr;
+   uint32 config_table;
+   uint32 boot_loader_name;
+   uint32 apm_table;
+   uint32 vbe_control_info;
+   uint32 vbe_mode_info;
+   uint32 vbe_mode;
+   uint32 vbe_interface_seg;
+   uint32 vbe_interface_off;
+   uint32 vbe_interface_len;
 }  __attribute__((packed));
 
 //init-functions
@@ -67,9 +72,13 @@ struct multiboot {
  void irq_init();
  void set_interrupts();
 
+ void panic(char *msg);
+ 
 //test-functions
  void draw_test();
  void printf_test();
  void grubstruct_test(struct multiboot *mboot_ptr);
  void assert_test();
  void strings_test();
+ 
+#endif /* init.h */

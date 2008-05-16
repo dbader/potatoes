@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/types.h"
 #include "../include/stdio.h"
+#include "../include/init.h"
 
 extern void isr0();
 extern void isr1();

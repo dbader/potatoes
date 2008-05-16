@@ -34,6 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../io/keyboard.h"
 
+extern uint8 inb(uint8 port);
+
 void kb_handler()
 {
         uint8 scancode = inb(0x60);

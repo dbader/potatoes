@@ -52,6 +52,8 @@ extern void irq14();
 extern void irq15();
 extern void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg);
 
+extern void outb(uint8 port, uint8 value);
+
 void pic_remap(){
         outb(0x20, 0x11);
         outb(0xA0, 0x11);

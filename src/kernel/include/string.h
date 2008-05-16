@@ -28,6 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
+
+#ifndef __STRING_H
+#define __STRING_H
  
 uint32 strlen(char* str);
 char* strcpy(char *dest, char *src);
@@ -41,3 +44,5 @@ void bzero(void *dest, uint32 count);
 void* memcpy(void *dest, void *src, uint32 count);
 
 void printf(char *fmt, ...);
+
+#endif /* string.h */
