@@ -36,5 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define NULL            0
 #define TRUE            1
 #define FALSE           0
+#define MAX_SINT32      2147483647
+#define FREQUENCY       200 //inits timer with frequency 200Hz (shoots every 5 ms)
 
 #endif /* const.h */

@@ -34,6 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/stdio.h"
 #include "../include/init.h"
+#include "../include/util.h"
+
 
 
 /**
@@ -145,4 +147,20 @@ void malloc_test() {
         puts("\nmalloc(1): allocation of 1 KB -> function returns pointer to address -1\n");
         test = malloc(1);
         puti((uint32)test);
+}
+
+void sleep_test()
+{
+        printf("Sleep test...\n");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        sleep(1); printf(".");
+        printf("\n10 seconds later\n");
 }

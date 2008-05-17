@@ -52,6 +52,7 @@ void panic(char *msg)
  * 
  * @param mboot_ptr The multiboot struct passed by the bootloader (grub). 
  */
+
 int main(struct multiboot *mboot_ptr)
 {
         puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
@@ -60,14 +61,16 @@ int main(struct multiboot *mboot_ptr)
         idt_init();
         isr_init();
         irq_init();
+        timer_init(FREQUENCY);
         set_interrupts();
         
-        grubstruct_test(mboot_ptr);
+        //grubstruct_test(mboot_ptr);
         //strings_test();       
         //draw_test();
-        printf_test();
+        //printf_test();
         //assert_test();
-        malloc_test();
+        //malloc_test();
+        sleep_test();
         
         for(;;);
 	return 0;

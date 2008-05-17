@@ -66,22 +66,23 @@ struct multiboot {
 }  __attribute__((packed));
 
 //init-functions
- void gdt_init(); 
- void idt_init();
- void isr_init();
- void irq_init();
- void set_interrupts();
+void gdt_init(); 
+void idt_init();
+void isr_init();
+void irq_init(); 
+void timer_init(int hz);
+void set_interrupts();
 
- void panic(char *msg);
- void free(uint32 address);
+void panic(char *msg);
+void free(uint32 address);
 
  
 //test-functions
- void draw_test();
- void printf_test();
- void grubstruct_test(struct multiboot *mboot_ptr);
- void assert_test();
- void strings_test();
- void malloc_test();
+void draw_test();
+void printf_test();
+void grubstruct_test(struct multiboot *mboot_ptr);
+void assert_test();
+void strings_test();
+void malloc_test();
  
 #endif /* init.h */

@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: main.c 63 2008-05-16 18:14:10Z jschamburger $
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -21,13 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
- * Header-file for specific hardware interrupt-handlers.
+ * @file
+ * Useful function headers.
  *
- * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author Daniel Bader
+ * @author $LastChangedBy: jschamburger $
+ * @version $Rev: 63 $
  */
- 
-void kb_handler();
-void timer_handler(); 
+#include "types.h"
+
+void sleep(sint32 sec);

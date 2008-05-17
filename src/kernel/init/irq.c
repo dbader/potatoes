@@ -110,10 +110,10 @@ char *hw_messages[] = {
 void hw_handler(uint32 num){
         switch (num-32){
         case 0:
+                timer_handler();
                 break;
         case 1:
                 kb_handler();
-                //puts(hw_messages[num-32]);
                 break;
         case 2: break;
         case 3: break;
