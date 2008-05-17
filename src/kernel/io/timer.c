@@ -1,4 +1,4 @@
-/* $Id: keyboard.c 62 2008-05-16 14:10:38Z dbader $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Timer-handler
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dbader $
- * @version $Rev: 62 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../include/const.h"
