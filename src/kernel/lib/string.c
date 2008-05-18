@@ -195,6 +195,23 @@ char* strsep(char **str_ptr, char *delims)
 }
 
 /**
+ * Compares two strings.
+ * @param s1 String
+ * @param s2 String 
+ * @return 0 if both strings are equal, >0 if s1 greater than s2, <0 if s1 is less than s2
+ */
+sint32 strcmp(char *s1, char *s2)
+{
+        while (*s1 != '\0' &&  *s2 != '\0') {
+                if (*s1 != *s2)
+                        break;
+                s1++;
+                s2++;
+        }
+        return (sint32)(*s1 - *s2);
+}
+
+/**
  * Writes count bytes of value value to the memory referenced by dest.
  * @param dest Destination memory
  * @param value Value dest is filled with

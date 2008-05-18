@@ -45,6 +45,7 @@ void panic(char *msg)
         puts_col("KERNEL PANIC: ", BLACK, RED);
         puts_col(msg, BLACK, RED);
         for (;;) ;
+        //TODO panic() should disable interrupts.
 }
 
 /**
