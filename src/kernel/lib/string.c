@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/stdio.h"
+//#include "../mm/mm.h"
 
 /**
  * Returns the length of a null-terminated string.
@@ -92,9 +93,29 @@ char* strncpy(char *dest, char *src, uint32 n)
  */
 char* strchr(char *str, char ch)
 {
-        while (*str != ch && *str != '\0')
-                str++;
-        return str;
+        do {
+                if (*str == ch)
+                        return str;
+        } while (*str++ != '\0');
+
+        return NULL;
+}
+
+/**
+ * Duplicates a string. strdup() allocates sufficient memory for a copy of
+ * the string str, copies it and returns a pointer to the copied string.
+ * Strings returned by strdup() must be released by calling free().
+ * @param str the string to duplicate
+ * @return The pointer to the duplicated string or NULL on error
+ */
+char* strdup(char* str)
+{
+        char *ret = (char*)malloc_name(strlen(str), "strdup()");
+        
+        if (ret == NULL)
+                return NULL;
+        else
+                return strcpy(ret, str);
 }
 
 /**
@@ -121,6 +142,57 @@ char* strncat(char *s1, char *s2, uint32 n)
         return strncpy(strchr(s1, '\0'), s2, n);        
 }
 
+/**
+ * Tokenizes a string. Take note that strsep() will manipulate both the string pointer
+ * **str_ptr points at as well as the contents of the respective string.
+ *  
+ * Example:
+ * 
+ *      char path[] = "/usr/share/bin/editor";
+ *      char delim[] = "/";
+ *      char *tok;
+ *      char *copy = strdup(path);
+ *      char *work_copy = copy;
+ *
+ *      do {
+ *              printf("strsep(\"%s\") ", work_copy);
+ *              tok = strsep(&work_copy, delim);
+ *              printf("-> \"%s\"\n", tok);
+ *      } while (tok != NULL);
+ *
+ *      printf("\ncopy = %p\n", copy);
+ *      printf("work_copy = %p\n", work_copy);
+ *      puts("done.");
+ *
+ *      free(copy);
+ * 
+ * @bug The current implementation does not handle multiple delimiters (as specified in the
+ *      libc manual). Only the first character in *delims is used for tokenizing the input string.
+ * 
+ * @param str_ptr Pointer to string to tokenize
+ * @param delims String containing all delimiter characters
+ * @return The next token or NULL if the end of the input string was reached
+ */
+char* strsep(char **str_ptr, char *delims)
+{
+        //_printf("strsep(\"%s\") ", *str_ptr);
+        
+        if (*str_ptr == NULL)
+                return NULL;
+        
+        char *ret = *str_ptr;      
+        char *offs = strchr(*str_ptr, *delims);
+        
+        if (offs == NULL) {
+                *str_ptr = NULL;
+                return ret;
+        }
+        
+        *offs = '\0';
+        *str_ptr = offs + 1;
+        
+        return ret;
+}
 
 /**
  * Writes count bytes of value value to the memory referenced by dest.
@@ -169,7 +241,7 @@ void* memcpy(void *dest, void *src, uint32 count)
  *      %d - prints a signed integer.
  *      %u - prints an unsigned integer.
  *      %c - prints a single character.
- *      %s - prints a string.
+ *      %s - prints a string. "(null)" if argument is NULL.
  *      %p - prints a pointer.
  * All other format specifiers are ignored.
  * @param fmt format string
@@ -203,8 +275,17 @@ void printf(char *fmt, ...)
                                 putc((char)*arg++[0]);
                                 break;
                         case 's': // string
-                                while((ch = *(*arg)++) != '\0')
-                                        putc(ch);
+                                if (*arg != NULL) {
+                                        while((ch = *(*arg)++) != '\0')
+                                                putc(ch);
+                                } else {
+                                        putc('('); //FIXME: print a string
+                                        putc('n');
+                                        putc('u');
+                                        putc('l');
+                                        putc('l');
+                                        putc(')');
+                                }
                                 *arg++;
                                 break;
                         case 'p': // pointer

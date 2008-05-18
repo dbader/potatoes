@@ -70,6 +70,7 @@ int main(struct multiboot *mboot_ptr)
         //printf_test();
         //assert_test();
         //malloc_test();
+        strsep_test();
         sleep_test();
         
         for(;;);

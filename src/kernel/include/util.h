@@ -24,10 +24,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  * Useful function headers.
  *
- * @author Daniel Bader
+ * @author Dmitriy Traytel
  * @author $LastChangedBy$
  * @version $Rev$
  */
+
+#ifndef __UTIL_H
+#define __UTIL_H
+
 #include "types.h"
 
 void sleep(sint32 sec);
+
+#endif /* util.h */

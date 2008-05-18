@@ -116,7 +116,31 @@ void strings_test()
         strcat(f, t2);
         strcat(f, t3);
         puts(f); puts("\n\n");
+        
+        
 }
+
+void strsep_test()
+{
+        char path[] = "/usr/share/bin/editor";
+        char delim[] = "/";
+        char *tok;
+        char *copy = strdup(path);
+        char *work_copy = copy;
+      
+        do {
+                printf("strsep(\"%s\") ", work_copy);
+                tok = strsep(&work_copy, delim);
+                printf("-> \"%s\"\n", tok);
+        } while (tok != NULL);
+
+        printf("\ncopy = %p\n", copy);
+        printf("work_copy = %p\n", work_copy);
+        puts("done.");
+
+        free(copy);
+}
+
 // test ASSERT() macro
 void assert_test()
 {

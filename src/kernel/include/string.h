@@ -38,6 +38,8 @@ char* strncpy(char *dest, char *src, uint32 n);
 char* strchr(char *str, char ch);
 char* strcat(char *s1, char *s2);
 char* strncat(char *s1, char *s2, uint32 n);
+char* strdup(char* str);
+char* strsep(char **str_ptr, char *delims);
 
 void* memset(void *dest, uint8 value, uint32 count);
 void bzero(void *dest, uint32 count);
