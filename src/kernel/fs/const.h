@@ -34,7 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONST_H_
 #define CONST_H_
 
-// svn:keywords "Id Revision Author"
 
 #define BLOCK_SIZE              1024
 #define DIR_ENTRY_SIZE          sizeof (struct dir_entry)
@@ -47,15 +46,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define INODES_PER_BLOCK        ((BLOCK_SIZE)/(DISK_INODE_SIZE))
 #define DIR_ENTRIES_PER_BLOCK   ((BLOCK_SIZE)/(DIR_ENTRY_SIZE)))
 
-#define NUM_FILES               64                                      /*#entries in filp table*/
-#define NUM_SUPERS              1                                       /*1 FS -> 1 super block*/
-#define NUM_OPEN_FILES          20                                      /*per process*/
-#define NUM_INODES              100                                     /*max. num of opened inodes/files*/
+#define NUM_FILES               64                                      /* #entries in filp table */
+#define NUM_PROC_FILES          20                                      /* #concurrently opened files per process */
+#define NUM_INODES              100                                     /* max. num of opened inodes/files */
 
-extern int get_HD_size();
-int *hd_size;
-enum { NUM_BLOCKS_ON_HD =       *hd_size};
-enum { NUM_BMAP_BLOCKS =        (NUM_BLOCKS_ON_HD)/(BLOCK_SIZE) };            /*#blocks for the block bitmap*/
+#define NUM_DIRECT_POINTER      25                                      /* # direct pointer in inode */
+
+#define NUM_BLOCKS_ON_HD        65536                                   /* 65536 * 1024 byte = 64 MB */
+#define NUM_BMAP_BLOCKS         (NUM_BLOCKS_ON_HD)/(BLOCK_SIZE*8)       /* #blocks for the block bitmap*/
 
 #define BOOT_BLOCK              (block_nr) 0
 #define SUPER_BLOCK             (block_nr) 1
@@ -64,6 +62,10 @@ enum { NUM_BMAP_BLOCKS =        (NUM_BLOCKS_ON_HD)/(BLOCK_SIZE) };            /*
 #define CLEAN                   0
 #define DIRTY                   1
 
+#define NOT_EXISTENT            -1
+#define NOT_FOUND               -1
+#define NOT_POSSIBLE            -1
 
+#define FD_OFFSET               10                                      /* offset for file descriptor numbers */
 
 #endif /*CONST_H_*/

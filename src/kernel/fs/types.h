@@ -37,72 +37,98 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef uint32 block_nr;
 typedef uint16 inode_nr;
 
-
-typedef struct{
+/**
+ * The directory entry.
+ */
+typedef struct {
         block_nr inode;
         char name[NAME_SIZE];
-}dir_entry;
+} dir_entry;
 
 
+/**
+ * The inode on disk.
+ */
 typedef struct {
-        uint16 i_mode;                         /* file, directory */
-        uint16 i_ref_count;
-        uint32 i_size;
+        uint16 i_mode;                          /* file | directory */
+        uint32 i_size;                          /* in byte */
         uint32 i_create_ts;
         uint32 i_modify_ts;
-        block_nr i_direct_pointer[20];          /* 20*32Bit = 640Bit */
+        block_nr i_direct_pointer[NUM_DIRECT_POINTER];          /* 25*32Bit = 800Bit*/
         block_nr i_single_indirect_pointer;
         block_nr i_double_indirect_pointer;
-}d_inode;
+} d_inode;
 
 
-typedef struct{
+/**
+ * The inode in memory.
+ */
+typedef struct {
+        inode_nr i_num;
         block_nr i_adr;
         uint16 i_mode;
-        uint16 i_ref_count;
         uint32 i_size;
         uint32 i_create_ts;
         uint32 i_modify_ts;
-        block_nr i_direct_pointer[20];          /* 20*32Bit = 640Bit */
+        block_nr i_direct_pointer[NUM_DIRECT_POINTER];          /* 25*32Bit = 800Bit */
         block_nr i_single_indirect_pointer;
         block_nr i_double_indirect_pointer;
-}m_inode;
+} m_inode;
 
 
-typedef struct{
+/**
+ * The global file descriptor.
+ */
+typedef struct {
         uint16 f_desc;                          /* file (f) descriptor */
         m_inode *f_inode;
-        uint8  f_name[NAME_SIZE];               /* file name */
-        uint16 f_mode;                          /* see i_mode */
+        char *f_name;                          /* pointer to absolute file path */
+        uint8 f_mode;                           /* see i_mode */
         uint16 f_count;                         /* number of process file descriptors accessing this file */
-}file;
+} file;
 
-
-typedef struct{
+/**
+ * The process file descriptor.
+ */
+typedef struct {
         uint16 pf_desc;                         /* process file (pf) descriptor */
-        uint16 *pf_f_desc;                      /* pointer to global file descriptor */
+        uint16 pf_f_desc;                       /* pointer to global file descriptor */
         uint32 pf_pos;                          /* position in file */
-}proc_file;                                     /* process file descriptor from process filp */
+} proc_file;                                    /* process file descriptor from process filp */
 
-
-/* BITMAPS */
-
-typedef struct{
+/**
+ * The block bitmap.
+ * Split on NUM_BMAP_BLOCKS blocks.
+ */
+typedef struct {
         uint16 bit : 1;
-}bmap;                                          /* block bitmap */
+} bit;
 
 
-/* BUFFER TYPES */
-
-typedef struct{
+/**
+ * A buffer for one block.
+ */
+typedef struct {
         uint32 block_nr;
-        uint8 cache[BLOCK_SIZE];                /* 32*32 = 1024 bit space for block content */
-}block_buf;
+        uint8 cache[BLOCK_SIZE];                /* 1024 * 1 byte = 1024 byte space for block content */
+} block_buf;
 
+
+/**
+ * The cache for one generic block.
+ */  
 typedef block_buf block_cache;
 
+
+/**
+ * The cache for a block which should be written.
+ */
 typedef block_buf write_cache;
 
+
+/*
+ * The cache for a block containing indirect addresses.
+ */
 typedef block_buf crt_ind_adr_block;            /* current indirect address block */
 
 

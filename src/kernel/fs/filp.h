@@ -32,13 +32,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef FILP_H_
 #define FILP_H_
 
-/* central struct */
+/* the global file table (gft) */
+file gft[NUM_FILES];
 
-extern file filp[NUM_FILES];
 
+/* functions */
+
+void init_file_table();
+void init_proc_file_table(proc_file proc_filp[]);
+sint16 insert_file(m_inode *inode, char *name, uint8 mode);
+sint16 insert_proc_file(proc_file proc_filp[], uint16 glo_desc);
+sint16 alloc_file();
+sint16 alloc_proc_file(proc_file proc_filp[]);
+file *get_file(uint16 fd);
+void inc_count(uint16 fd);
+sint16 name2desc(char *name);
+sint16 inode2desc(m_inode *inode);
+bool contains_file(uint16 fd);
+uint16 conv_desc(uint16 desc);
 
 /* definition */
 
-#define NIL_FILE (file *) 0                     /* there is no free filp entry left */
+#define NIL_FILE 0
+
+#define NIL_PROC_FILE 0
+
 
 #endif /*FILP_H_*/

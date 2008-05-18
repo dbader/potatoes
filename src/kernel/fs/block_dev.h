@@ -22,15 +22,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Basic definitions of all based functions.
+ * Basic definitions of all block based functions.
  *
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
  */
  
-#ifndef BLOCK_MGR_
-#define BLOCK_MGR_
+#ifndef BLOCK_DEV_
+#define BLOCK_DEV_
 
 extern uint32 read_block(block_nr block, uint16 *buf, uint16 num_bytes);
 
@@ -42,4 +42,4 @@ extern uint8 alloc_block(block_nr near_to_block);
 
 extern uint32 new_block(); 
 
-#endif /*BLOCK_MGR_*/
+#endif /*BLOCK_DEV_*/
