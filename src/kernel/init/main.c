@@ -34,7 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 #include "../pm/pm_main.h"
 #include "../io/io.h"
-
 /**
  * Global pointer to multiboot structure
  * As of now, this is only needed for mboot_test() in tests.c. This should later
@@ -89,6 +88,7 @@ int main(struct multiboot *mboot_ptr)
         //TODO: call fs_init();
         
         do_tests();
+        
         
         for(;;);
 	return 0;

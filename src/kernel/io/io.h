@@ -7,7 +7,6 @@ void idt_init();
 void isr_init();
 void irq_init(); 
 void timer_init(int hz);
-void set_interrupts();
 
 extern void set_interrupts();
 extern void clear_interrupts();

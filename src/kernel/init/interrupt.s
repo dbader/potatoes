@@ -24,10 +24,12 @@
 [GLOBAL set_interrupts]
 set_interrupts:
 	sti
+	ret
 ;********************************************************************************************
 [GLOBAL clear_interrupts]
 clear_interrupts:
         cli
+        ret
 ;********************************************************************************************
 	;Installation of our idt-table:
 [GLOBAL idt_load]

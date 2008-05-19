@@ -34,9 +34,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void io_init()
 {
-		idt_init();
+        idt_init();
         isr_init();
-        irq_init();
-        timer_init(FREQUENCY);
-        set_interrupts();
+	    irq_init();
+	    timer_init(FREQUENCY);
+	    set_interrupts();
 }
