@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../include/stdio.h"
+#include "../include/stdlib.h"
 #include "pm_main.h"
 #include "pm_ringbuffer.h"
 

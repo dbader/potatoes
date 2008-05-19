@@ -35,8 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/assert.h"
 #include "../include/stdio.h"
 #include "../include/string.h"
-
-//TODO: Include malloc header.
+#include "../include/stdlib.h"
 
 /**
  * Allocates and initializes a new ring_buffer.
@@ -138,7 +137,7 @@ sint32 rf_write(ring_fifo *fifo, uint8 *buf, uint32 count)
         
         while (count-- > 0) {
                 if (fifo->len == fifo->size) {
-                        monitor_puts("rf_write: buffer is full.");
+                        printf("rf_write: buffer is full.");
                         return written;
                 } 
                 
@@ -168,7 +167,7 @@ sint32 rf_read(ring_fifo *fifo, uint8 *buf, uint32 count)
         
         while (count-- > 0) {
                 if (fifo->len == 0) {
-                        monitor_puts("rf_read: buffer is empty.");
+                        printf("rf_read: buffer is empty.");
                         return read;
                 }
 

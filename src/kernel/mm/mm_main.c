@@ -33,17 +33,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 #include "mm_const.h"
 
+
+//TODO: this should be declared in some header file.
+void gdt_init();
+
 /**
- * initializes memory management (including the GDT)
+ * Initializes memory management (including the GDT)
  * 
- * @param start the start of the part of the memory
- *              to be managed
- * @param end the end of the part of the memory
- *              to be managed
+ * @param start the start of the part of the memory to be managed
+ * @param end the end of the part of the memory to be managed
  */
-
-gdt_init();
-
 void mm_init(uint32 start, uint32 end) {
         
         gdt_init();

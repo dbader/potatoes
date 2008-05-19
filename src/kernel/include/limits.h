@@ -29,6 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
+#ifndef __LIMITS_H
+#define __LIMITS_H
+
 #define SINT8_MAX       0x7F
 #define UINT8_MAX       0xFF
 #define SINT16_MAX      0x7FFF
@@ -39,3 +42,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SINT8_MIN       0x80
 #define SINT16_MIN      0x8000
 #define SINT32_MIN      0x80000000
+
+#endif /* limits.h */

@@ -72,9 +72,7 @@ extern struct multiboot *g_mboot_ptr;
 void mm_init(uint32 start, uint32 end);
 void io_init();
 
-//TODO not the right place for this two functions
 void panic(char *msg);
-void free(uint32 address);
 
  
 //test-functions

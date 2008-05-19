@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/stdio.h"
-//#include "../mm/mm.h"
+#include "../include/stdlib.h"
 
 /**
  * Returns the length of a null-terminated string.
@@ -47,7 +47,7 @@ uint32 strlen(char* str)
 }
 
 /**
- * Copies string src to string dest (including terminating \0 character).
+ * Copies string src to string dest (including terminating \\0 character).
  * For stability and security reasons, try to use strncpy() whenever possible.
  * @see strncpy
  * @param dest Destination string
@@ -65,7 +65,7 @@ char* strcpy(char *dest, char *src)
 
 /**
  * Copies at most n characters from src to dest. If src is less than n
- * characters long, the remainder of dest is filled with \0 characters.
+ * characters long, the remainder of dest is filled with \\0 characters.
  * Otherwise, dest is not terminated.
  * @param dest Destination string
  * @param src Source string
@@ -86,7 +86,7 @@ char* strncpy(char *dest, char *src, uint32 n)
 
 /**
  * Locates the first occurence of ch n the string pointed to by str.
- * The terminating '\0' character is considered to be part of the string.
+ * The terminating \\0 character is considered to be part of the string.
  * @param str the string to search
  * @param ch the character to look for
  * @return the first occurence of ch in str or NULL if not found 
@@ -162,7 +162,7 @@ char* strncat(char *s1, char *s2, uint32 n)
  *
  *      printf("\ncopy = %p\n", copy);
  *      printf("work_copy = %p\n", work_copy);
- *      monitor_puts("done.");
+ *      puts("done.");
  *
  *      free(copy);
  * 

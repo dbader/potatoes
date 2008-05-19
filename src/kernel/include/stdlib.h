@@ -38,6 +38,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 extern void *malloc(uint32 size);
 extern void *malloc_name(uint32 size, char* name);
-extern void free(uint32 address);
+extern void free(void* start);
 
 #endif /* stdlib.h */
