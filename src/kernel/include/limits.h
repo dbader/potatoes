@@ -1,4 +1,4 @@
-/* $Id: const.h 68 2008-05-17 22:16:52Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Definition of the maximum and minimum values of different types.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 68 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #define SINT8_MAX       0x7F
