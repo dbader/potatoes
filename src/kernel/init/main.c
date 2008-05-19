@@ -83,6 +83,7 @@ int main(struct multiboot *mboot_ptr)
         
         io_init();
         
+        //TODO: @Daniel pm_init() would better fit into init.h
         pm_init();
         
         //TODO: call fs_init();
