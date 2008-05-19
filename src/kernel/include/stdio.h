@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * standard i/o functions
+ * Standard I/O functions
  *
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
@@ -67,4 +67,7 @@ void puti(sint32 x);
 //prints a hex-byte - important for io-debugging (-for me! ;-))
 void puthex(uint8 ch);
 
-#endif /* types.h */
+void putchar(char c);
+void printf(char *fmt, ...);
+
+#endif /* stdio.h */

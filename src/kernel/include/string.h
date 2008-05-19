@@ -46,6 +46,4 @@ void* memset(void *dest, uint8 value, uint32 count);
 void bzero(void *dest, uint32 count);
 void* memcpy(void *dest, void *src, uint32 count);
 
-void printf(char *fmt, ...);
-
 #endif /* string.h */
