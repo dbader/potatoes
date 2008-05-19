@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
-#ifndef SUPER_H_
-#define SUPER_H_
+#ifndef __SUPER_H_
+#define __SUPER_H_
 
 struct super_block {
         block_nr s_HD_size;                             /* #blocks on HD */
@@ -51,7 +51,7 @@ void init_super_block();
 
 void load_super_block();
 
-struct super_block *get_super();
+struct super_block* get_super();
 
 #define NIL_SUPER (struct super_block *) 0
 

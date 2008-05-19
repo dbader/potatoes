@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
-#ifndef FILP_H_
-#define FILP_H_
+#ifndef __FS_FILE_TABLE_H_
+#define __FS_FILE_TABLE_H_
 
 /* the global file table (gft) */
 file gft[NUM_FILES];
@@ -58,4 +58,4 @@ uint16 conv_desc(uint16 desc);
 #define NIL_PROC_FILE 0
 
 
-#endif /*FILP_H_*/
+#endif /*__FS_FILE_TABLE_H_*/

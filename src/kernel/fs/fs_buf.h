@@ -35,9 +35,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
-#ifndef BUF_H_
-#define BUF_H_
+#ifndef __FS_BUF_H_
+#define __FS_BUF_H_
 
 /* to be defined */
 
-#endif /*BUF_H_*/
+#endif /*__FS_BUF_H_*/

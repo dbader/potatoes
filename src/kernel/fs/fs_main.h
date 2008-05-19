@@ -1,4 +1,4 @@
-/* $Id: file_dev.h 47 2008-05-11 10:34:21Z vdoelle $
+/* $Id: fs_main.h 47 2008-05-11 10:34:21Z vdoelle $
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -29,8 +29,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev: 47 $
  */
 
-#ifndef FILE_DEV_H_
-#define FILE_DEV_H_
+#ifndef __FS_MAIN_H_
+#define __FS_MAIN_H_
+
+/* MKFS */
+
 
 /* CREATE */
 
@@ -49,4 +52,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* PATH */
 
-#endif /*FILE_DEV_H_*/
+#endif /*__FS_MAIN_*/

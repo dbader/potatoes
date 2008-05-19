@@ -31,8 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
-#ifndef CONST_H_
-#define CONST_H_
+#ifndef __FS_CONST_H_
+#define __FS_CONST_H_
 
 
 #define BLOCK_SIZE              1024
@@ -68,4 +68,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define FD_OFFSET               10                                      /* offset for file descriptor numbers */
 
-#endif /*CONST_H_*/
+#endif /*__FS_CONST_H_*/

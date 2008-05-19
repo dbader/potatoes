@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
  
-#ifndef BLOCK_DEV_
-#define BLOCK_DEV_
+#ifndef __FS_BLOCK_DEV_H_
+#define __FS_BLOCK_DEV_H_
 
 extern uint32 read_block(block_nr block, uint16 *buf, uint16 num_bytes);
 
@@ -42,4 +42,4 @@ extern uint8 alloc_block(block_nr near_to_block);
 
 extern uint32 new_block(); 
 
-#endif /*BLOCK_DEV_*/
+#endif /*__FS_BLOCK_DEV_H_*/

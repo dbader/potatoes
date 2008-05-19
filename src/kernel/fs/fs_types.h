@@ -31,8 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
-#ifndef TYPES_H_
-#define TYPES_H_
+#ifndef __FS_TYPES_H_
+#define __FS_TYPES_H_
 
 typedef uint32 block_nr;
 typedef uint16 inode_nr;
@@ -133,4 +133,4 @@ typedef block_buf crt_ind_adr_block;            /* current indirect address bloc
 
 
 
-#endif /*TYPES_H_*/
+#endif /*__FS_TYPES_H_*/

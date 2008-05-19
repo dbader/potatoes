@@ -31,12 +31,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
-#ifndef INODE_H_
-#define INODE_H_
+#ifndef __FS_INODE_TABLE_H_
+#define __FS_INODE_TABLE_H_
 
 /* central struct */
 
-extern m_inode inode_table[NUM_INODES];
+m_inode inode_table[NUM_INODES];
 
 
 /* definition */
@@ -46,14 +46,14 @@ extern m_inode inode_table[NUM_INODES];
 
 /* functions */
 
-extern m_inode * read_inode(inode_nr inode);
+m_inode * read_inode(inode_nr inode);
 
-extern uint8 write_inode(m_inode *inode);
+uint8 write_inode(m_inode *inode);
 
-extern uint8 free_inode(inode_nr inode);
+uint8 free_inode(inode_nr inode);
 
-extern uint8 alloc_inode(void);
+uint8 alloc_inode(void);
 
-extern uint32 new_inode(); 
+uint32 new_inode(); 
 
-#endif /*INODE_H_*/
+#endif /*__FS_INODE_TABLE_H_*/

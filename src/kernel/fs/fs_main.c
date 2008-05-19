@@ -32,16 +32,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 
-#include "const.h"
-#include "types.h"
+#include "fs_const.h"
+#include "fs_types.h"
 
-bool mk_fs(){
+bool fs_init()
+{
+      return mk_fs();  
+}
+
+bool fs_shutdown()
+{
+        
+}
+
+
+
+bool mk_fs()
+{
        
         
         return TRUE;
 }
 
-bool load_fs(){
+bool load_fs()
+{
         //TODO
         //load super
         //load bmap
@@ -51,7 +65,8 @@ bool load_fs(){
         return TRUE;
 }
 
-bool create_fs(){
+bool create_fs()
+{
         //TODO
         //create super
         //create bmap

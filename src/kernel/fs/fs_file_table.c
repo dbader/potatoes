@@ -32,9 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/string.h"
 
-#include "const.h"
-#include "types.h"
-#include "filp.h"
+#include "fs_const.h"
+#include "fs_types.h"
+#include "fs_filp.h"
 
 /**
  * Initializes the global filp table with NULL elements
