@@ -149,16 +149,17 @@ void assert_test()
 }
 
 /* just a hack to easily dump mboot fields */
-#define MBOOT_INFO(x) puts("\n"); puts(#x); puts(": "); puti(mboot_ptr->x);
+#define MBOOT_INFO(x) printf("\t%s = %u\n", #x, mboot_ptr->x); 
 
 void grubstruct_test(struct multiboot *mboot_ptr)
 {
+        printf("mboot struct:\n");
         MBOOT_INFO(mem_lower)
         MBOOT_INFO(mem_upper)
         MBOOT_INFO(size)
         MBOOT_INFO(flags)
         MBOOT_INFO(addr)
-        puts("\n\n");
+        puts("\n");
 }
 
 void malloc_test() {
@@ -193,7 +194,7 @@ void do_tests()
         grubstruct_test(g_mboot_ptr);
         //strings_test();       
         //draw_test();
-        //printf_test();
+        printf_test();
         //assert_test();
         //malloc_test();
         //strsep_test();

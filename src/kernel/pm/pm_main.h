@@ -32,6 +32,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __PM_MAIN_H
 #define __PM_MAIN_H
 
+#include "pm_ringbuffer.h"
+
+/**
+ * Process structure.
+ * TODO: Maybe move this into pm_process.h
+ */
+typedef struct {
+        char *name;
+        uint32 pid;
+        sint8 state;
+        uint32 *addr;
+        uint32 timeslice;
+        ring_fifo *stdin;
+        
+        /* machine_state ms; */
+        /* xxx *stdout */
+        /* llist *mem_blocks; */
+        /* proc_file_table *pft; */
+     
+        struct process *next; 
+} process_t;
+
 void pm_init();
 
 #endif /* pm_main.h */

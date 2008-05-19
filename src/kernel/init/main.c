@@ -73,10 +73,10 @@ int main(struct multiboot *mboot_ptr)
 
         /* Some memory info. Most of this is of special importance to Johannes / MM. */
         g_mboot_ptr = mboot_ptr;
-        printf("%d bytes lower memory starting at addr 0\n", g_mboot_ptr->mem_lower * 1024);
-        printf("%d bytes upper memory starting at addr %d\n", g_mboot_ptr->mem_upper * 1024, 1024 * 1024);
-        printf("kernel ends at addr %d\n", &end - 1);
-        printf("memory begins at addr %d\n\n", &end);
+        printf("%d bytes lower memory starting at addr 0x0\n", g_mboot_ptr->mem_lower * 1024);
+        printf("%d bytes upper memory starting at addr 0x%x\n", g_mboot_ptr->mem_upper * 1024, 1024 * 1024);
+        printf("kernel ends at addr 0x%x\n", &end - 1);
+        printf("memory begins at addr 0x%x\n\n", &end);
         
         //TODO: replace with call to mem_init(mem_start, mem_end);
         gdt_init();

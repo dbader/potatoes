@@ -30,6 +30,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../include/stdio.h"
+#include "pm_main.h"
+#include "pm_ringbuffer.h"
+
+process_t *procs_head;
+process_t *active_proc;
+process_t *focus_proc;
+
+uint32 next_pid = 0;
 
 /**
  * Performs process management initializations.
@@ -37,4 +45,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void pm_init()
 {
         printf("pm: init");
+        procs_head = (process_t*) malloc(sizeof(process_t));
+        
+        procs_head->name = "kernel";
+        procs_head->pid = next_pid++;
 }

@@ -250,3 +250,66 @@ void* memcpy(void *dest, void *src, uint32 count)
                 *((uint8*)dest++) = *((uint8*)src++);
         return ret;
 }
+
+/**
+ * Reverses a string in place. This is not a part of the C standard library.
+ * @param str the string to reverse
+ * @return the reversed string
+ */
+char* strreverse(char *str)
+{
+        char *start = str;
+        char *end = str + strlen(str) - 1;
+        while (start < end) {
+                char c = *start;
+                *start = *end;
+                *end = c;
+                start++;
+                end--;
+        }
+        return str;
+}
+
+/**
+ * Converts an integer into a string using an arbitrary base. Make sure the buffer for
+ * the converted string is large enough. The smaller the base the more space is required, eg
+ * for converting a 32 bit integer you can expect 35 bytes to be sufficient
+ * (base 2: 32 bytes for digits + 1 byte for the terminator + some space just to feel safe
+ * and take into account future format changes).
+ * 
+ * This is not a part of the C standard library.
+ * 
+ * @param n the number to convert
+ * @param str the target string buffer
+ * @param base the base to use for the conversion
+ * @return The original value of str
+ */
+char* itoa(int n, char *str, unsigned int base)
+{      
+        char *ret = str;
+        bool neg = FALSE;
+        
+        /* Treat negative base 10 integers specially. */
+        if (base == 10 && n < 0) {
+                *str++ = '-';
+                n = -n;
+                neg = TRUE;
+        }
+        
+        /* Convert to unsigned to get proper two's complement hex strings. */
+        unsigned int num = n;
+        
+        do {
+                int rem = num % base;
+                *str++ = rem < 10 ? '0' + rem : 55 + rem;
+        } while (num /= base);
+        
+        *str = '\0';
+        
+        /* Do not change the position of the minus sign. */
+        if (neg) {
+                strreverse(++ret);
+                return --ret;
+        } else
+                return strreverse(ret);
+}

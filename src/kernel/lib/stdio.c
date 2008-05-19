@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/types.h"
 #include "../include/const.h"
+#include "../include/string.h"
 
 /* TODO: These are just dummy declarations until we have a proper interface for monitor
  * output, ie monitor_write(char c) */
@@ -56,9 +57,11 @@ void putchar(char c)
  *      %i - prints a signed integer.
  *      %d - prints a signed integer.
  *      %u - prints an unsigned integer.
+ *      %o - prints an unsigned integer in octal format (base 8).
+ *      %x - prints an unsigned integer in hexadecimal format (base 16).
  *      %c - prints a single character.
  *      %s - prints a string. "(null)" if argument is NULL.
- *      %p - prints a pointer.
+ *      %p - prints a pointer (base 16).
  * All other format specifiers are ignored.
  * @param fmt format string
  * @param ... variable number of arguments
@@ -71,6 +74,7 @@ void printf(char *fmt, ...)
         char **arg = &fmt + 1;
         char ch; 
         int character;
+        char buf[40];
         
         while ((ch = *fmt++) != '\0')
                 if (ch == '%') {
@@ -81,10 +85,13 @@ void printf(char *fmt, ...)
                                 break;
                         case 'i': // signed integer
                         case 'd':
-                                puti((sint32)*arg++);
+                                puts(itoa((sint32)*arg++, buf, 10));
                                 break;
                         case 'u': // unsigned integer
-                                puti((uint32)*arg++);
+                                puts(itoa((uint32)*arg++, buf, 10));
+                                break;
+                        case 'o':
+                                puts(itoa((uint32)*arg++, buf, 8));
                                 break;
                         case 'c': // character
                                 /* This is a bit peculiar but needed to shut up the
@@ -104,8 +111,9 @@ void printf(char *fmt, ...)
                                 }
                                 *arg++;
                                 break;
+                        case 'x': // hexadecimal integer
                         case 'p': // pointer
-                                puti((uint32)*arg++);
+                                puts(itoa((uint32)*arg++, buf, 16));
                                 break;
                         }
                 } else
