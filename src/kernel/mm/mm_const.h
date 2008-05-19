@@ -31,21 +31,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/types.h"
 
-#ifndef MM_H_
-#define MM_H_
+#ifndef __MM_CONST_H_
+#define __MM_CONST_H_
 
-// memory for applications starts at 10 MB and ends at 32 MB
-const uint32 START = 0x009FFFFF;
-const uint32 END = 0x01FFFFFF;
-void *mem_occupied_top;
+uint32 mm_start;
+uint32 mm_end;
+void *mm_occupied_top;
 
-// allocates size bytes 
-extern void *malloc(uint32 size);
-
-// allocates size bytes and additionally saves a name in the header of the block
-extern void *malloc_name(uint32 size, uint8 name[]);
-
-// frees the memory in the block starting at address
-extern void free(uint32 address);
-
-#endif /*MM_H_*/
+#endif /* __MM_CONST_H_ */

@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: malloc_free.c 64 2008-05-16 18:17:51Z jschamburger $
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -24,9 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  * Functions to allocate and free memory
  *
- * @author jschamburger
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author Johannes Schamburger
+ * @author $LastChangedBy: jschamburger $
+ * @version $Rev: 64 $
  */
 
 /*
@@ -36,37 +36,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../include/types.h"
-#include "mm.h"
+#include "../include/const.h"
+#include "../include/stdio.h"
+#include "../mm/mm_const.h"
 
 /**
  * allocates size bytes and additionally saves a name in the header of the block
+ * 
+ * @param size how much space shall be allocated
+ * @param name the name of the memory block (mainly for debugging purposes)
+ * @return pointer to the allocated space
  */
-void *malloc_name(uint32 size, uint8 name[])
+void *malloc_name(uint32 size, char* name)
 {
-        if(!mem_occupied_top)
-                mem_occupied_top = (void*)START;
-        
-        mem_occupied_top += size;
-        if((uint32)mem_occupied_top < END) {
-                return (void*)(mem_occupied_top);
+//        puti(MM_END);
+        mm_occupied_top += size;
+        if ((uint32) mm_occupied_top < mm_end) {
+                return (void*) (mm_occupied_top - size);
         } else {
-                mem_occupied_top -= size;
-                return (void*)-1;
+                mm_occupied_top -= size;
+                return (void*) NULL;
         }
 }
 
 /** 
  * allocates size bytes
+ * 
+ * @param size how much space shall be allocated
+ * @return pointer to the allocated space
  */ 
 void *malloc(uint32 size)
 {
-        return malloc_name(size,"noname");
+        return (void*) malloc_name(size,"noname");
 }
 
 /**
- * frees the memory in the block starting at address
+ * frees a memory block
+ * 
+ * @param start pointer to the start of the block that shall be freed
  */
-void free(uint32 address)
+void free(void* start)
 {
         ;
 }

@@ -34,7 +34,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 
 
-// The structure of one GDT entry.
+/** 
+ * The structure of one GDT entry.
+ */
 struct gdt_entry // 64 bit
 {
         uint16 limit_low;
@@ -45,7 +47,9 @@ struct gdt_entry // 64 bit
         uint8  base_high;
 } __attribute__((packed));
 
-// The structure of the GDT pointer which tells the processor where to find our GDT
+/** 
+ * The structure of the GDT pointer which tells the processor where to find our GDT
+ */
 struct gdt_pointer // 48 bit
 {
    uint16 limit;
@@ -57,7 +61,9 @@ struct gdt_pointer gp;
 
 extern void gdt_flush();
 
-// define one GDT entry
+/**
+ * defines one GDT entry
+ */
 void gdt_add_entry(sint32 num, uint32 base, uint32 limit, uint8 access, uint8 gran)
 {
         gdt[num].base_low = (base & 0xFFFF);
@@ -71,6 +77,9 @@ void gdt_add_entry(sint32 num, uint32 base, uint32 limit, uint8 access, uint8 gr
         gdt[num].access = access;
 }
 
+/**
+ * initializes the GDT
+ */
 void gdt_init()
 {
         gp.limit = (sizeof(struct gdt_entry) * 3) - 1; // the size of the GDT

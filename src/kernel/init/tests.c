@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/assert.h"
 #include "../include/string.h"
 #include "../include/stdio.h"
+#include "../include/stdlib.h"
 #include "../include/init.h"
 #include "../include/util.h"
 
@@ -167,7 +168,7 @@ void malloc_test() {
         puts("malloc(23068671): allocation of 22 MB -> memory is full (10 of 32 MB are reserved for the kernel)\n");
         test = malloc(23068671);
         puti((uint32)test);
-        puts("\nmalloc(1): allocation of 1 KB -> function returns pointer to address -1\n");
+        puts("\nmalloc(1): allocation of 1 KB -> function returns pointer to address 0 (NULL)\n");
         test = malloc(1);
         puti((uint32)test);
 }

@@ -77,10 +77,8 @@ int main(struct multiboot *mboot_ptr)
         printf("%d bytes upper memory starting at addr 0x%x\n", g_mboot_ptr->mem_upper * 1024, 1024 * 1024);
         printf("kernel ends at addr 0x%x\n", &end - 1);
         printf("memory begins at addr 0x%x\n\n", &end);
-        
-        //TODO: replace with call to mem_init(mem_start, mem_end);
-        gdt_init();
-        
+
+        mm_init(0x009FFFFF, 0x01FFFFFF);
         //TODO: replace with call to io_init().
         idt_init();
         isr_init();

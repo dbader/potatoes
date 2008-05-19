@@ -69,7 +69,7 @@ struct multiboot {
 extern struct multiboot *g_mboot_ptr;
 
 //init-functions
-void gdt_init(); 
+void mm_init(uint32 start, uint32 end);
 void idt_init();
 void isr_init();
 void irq_init(); 
