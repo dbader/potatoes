@@ -34,13 +34,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 
 #include "../io/io_keyboard.h"
+#include "../pm/pm_input.h"
 
 extern uint8 inb(uint8 port);
 
 /**
  * Echo-mode flag
  */
-bool echo = TRUE; //accessible for PM
+bool echo = FALSE; //accessible for PM
 
 /**
  * Handles an keyboard interrupt, by calling the PM. In echo-mode prints the char directly to the screen.
@@ -57,13 +58,13 @@ void kb_handler()
         }   
         else if (shift) { //Key pressed while shift is pressed
                 if (kb_shift_map[scancode] != 0) {
-                        //TODO: call add_char(kb_shift_map[scancode]);
+                        pm_handle_input(kb_shift_map[scancode]);
                         if(echo) putc(kb_shift_map[scancode]);
                 }
         }
         else if (alt) { //Key pressed while alt is pressed
                 if (kb_alt_map[scancode] != 0) {
-                        //TODO: call add_char(kb_alt_map[scancode]);
+                        pm_handle_input(kb_alt_map[scancode]);
                         if(echo) putc(kb_alt_map[scancode]);
                 }
         }     
@@ -73,7 +74,7 @@ void kb_handler()
                 else if (scancode == ALT)
                         alt = 1;
                 else if (kb_map[scancode] != 0) {
-                        //TODO: call add_char(kb_map[scancode]);
+                        pm_handle_input(kb_map[scancode]);
                         if(echo) putc(kb_map[scancode]);
                 }
         }

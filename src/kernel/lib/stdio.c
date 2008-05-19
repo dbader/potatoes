@@ -69,7 +69,8 @@ void printf(char *fmt, ...)
                 return;
         
         char **arg = &fmt + 1;
-        char ch;
+        char ch; 
+        int character;
         
         while ((ch = *fmt++) != '\0')
                 if (ch == '%') {
@@ -86,7 +87,13 @@ void printf(char *fmt, ...)
                                 puti((uint32)*arg++);
                                 break;
                         case 'c': // character
-                                putchar((char)*arg++[0]);
+                                /* This is a bit peculiar but needed to shut up the
+                                 * "cast from pointer to integer of different size"
+                                 * compiler warning.
+                                 * Code was: putchar((char)*arg++);
+                                 */
+                                character = (int)*arg++;
+                                putchar((char)character);
                                 break;
                         case 's': // string
                                 if (*arg != NULL) {

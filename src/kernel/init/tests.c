@@ -36,8 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/init.h"
 #include "../include/util.h"
 
-
-
 /**
  * output-testing
  */
@@ -187,4 +185,17 @@ void sleep_test()
         sleep(1); printf(".");
         sleep(1); printf(".");
         printf("\n10 seconds later\n");
+}
+
+void do_tests()
+{
+        puts("\n\ndo_tests():\n");
+        grubstruct_test(g_mboot_ptr);
+        //strings_test();       
+        //draw_test();
+        //printf_test();
+        //assert_test();
+        //malloc_test();
+        //strsep_test();
+        //sleep_test();
 }

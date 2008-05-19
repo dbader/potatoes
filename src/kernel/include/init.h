@@ -65,6 +65,9 @@ struct multiboot {
    uint32 vbe_interface_len;
 }  __attribute__((packed));
 
+/** Global pointer to multiboot structure */
+extern struct multiboot *g_mboot_ptr;
+
 //init-functions
 void gdt_init(); 
 void idt_init();
@@ -78,13 +81,6 @@ void free(uint32 address);
 
  
 //test-functions
-void draw_test();
-void printf_test();
-void grubstruct_test(struct multiboot *mboot_ptr);
-void assert_test();
-void sleep_test();
-void strings_test();
-void strsep_test();
-void malloc_test();
+void do_tests();
  
 #endif /* init.h */

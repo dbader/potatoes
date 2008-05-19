@@ -32,6 +32,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/init.h"
 #include "../include/const.h"
 #include "../include/stdio.h"
+#include "../pm/pm_main.h"
+
+/**
+ * Global pointer to multiboot structure
+ * As of now, this is only needed for mboot_test() in tests.c. This should later
+ * be removed and only used in the kernel main(). 
+ */
+struct multiboot *g_mboot_ptr;
+
+/** 
+ * The address of end is equal to the end of kernel code in memory + 1. 
+ * This constant gets defined in the linker script link.ld. 
+ */
+extern int end;
 
 /**
  * Kernel panic function. Displays an error message and enters an infinite
@@ -53,26 +67,32 @@ void panic(char *msg)
  * 
  * @param mboot_ptr The multiboot struct passed by the bootloader (grub). 
  */
-
 int main(struct multiboot *mboot_ptr)
 {
         puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
+
+        /* Some memory info. Most of this is of special importance to Johannes / MM. */
+        g_mboot_ptr = mboot_ptr;
+        printf("%d bytes lower memory starting at addr 0\n", g_mboot_ptr->mem_lower * 1024);
+        printf("%d bytes upper memory starting at addr %d\n", g_mboot_ptr->mem_upper * 1024, 1024 * 1024);
+        printf("kernel ends at addr %d\n", &end - 1);
+        printf("memory begins at addr %d\n\n", &end);
         
+        //TODO: replace with call to mem_init(mem_start, mem_end);
         gdt_init();
+        
+        //TODO: replace with call to io_init().
         idt_init();
         isr_init();
         irq_init();
         timer_init(FREQUENCY);
         set_interrupts();
         
-        //grubstruct_test(mboot_ptr);
-        //strings_test();       
-        //draw_test();
-        //printf_test();
-        //assert_test();
-        //malloc_test();
-        strsep_test();
-        sleep_test();
+        pm_init();
+        
+        //TODO: call fs_init();
+        
+        do_tests();
         
         for(;;);
 	return 0;
