@@ -82,6 +82,7 @@ void draw_test();
 void printf_test();
 void grubstruct_test(struct multiboot *mboot_ptr);
 void assert_test();
+void sleep_test();
 void strings_test();
 void strsep_test();
 void malloc_test();

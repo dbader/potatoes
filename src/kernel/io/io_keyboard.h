@@ -30,6 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
+#include "../include/types.h"
+
 #define LSHIFT 0x2A
 #define RSHIFT 0x36
 #define ALT 0x38
@@ -170,7 +172,7 @@ char kb_shift_map[]={
         0,      //0x01 Esc
         '!',    //0x02 
         '"',    //0x03
-        '§',    //0x04
+        '\365', //0x04
         '$',    //0x05
         '%',    //0x06
         '&',    //0x07
@@ -315,7 +317,7 @@ char kb_alt_map[]={
         '\t',   //0x0F
         '@',    //0x10
         0,      //0x11
-        '‚',    //0x12 //FIXME: was 'â‚¬'
+        0,      //0x12 //FIXME: was 'â‚¬' I think there is no â‚¬ in ascii...
         '\364', //0x13
         0,      //0x14
         0,      //0x15
@@ -427,5 +429,11 @@ char kb_alt_map[]={
         0,      //0x7F
 };
 
-static char shift = 0;
-static char alt = 0;
+/**
+ * Shift-pressed flag
+ */
+static bool shift = 0;
+/**
+ * Alt-pressed flag
+ */
+static bool alt = 0;

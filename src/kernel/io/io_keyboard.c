@@ -28,38 +28,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
- 
-#include "../include/stdio.h" 
-#include "../include/types.h"
 
-#include "../io/keyboard.h"
+#include "../include/const.h" 
+#include "../include/types.h"
+#include "../include/stdio.h"
+
+#include "../io/io_keyboard.h"
 
 extern uint8 inb(uint8 port);
 
+/**
+ * Echo-mode flag
+ */
+bool echo = TRUE; //accessible for PM
+
+/**
+ * Handles an keyboard interrupt, by calling the PM. In echo-mode prints the char directly to the screen.
+ */
 void kb_handler()
 {
         uint8 scancode = inb(0x60);
-        if(scancode & 0x80){
-                if((scancode & (~0x80)) == LSHIFT || (scancode & (~0x80)) == RSHIFT){
+        if (scancode & 0x80) { //Key released
+                if ((scancode & (~0x80)) == LSHIFT || (scancode & (~0x80)) == RSHIFT) {
                         shift = 0;
                 }
-                else if((scancode & (~0x80)) == ALT)
+                else if ((scancode & (~0x80)) == ALT)
                         alt = 0;
         }   
-        else if(shift){
-                if (kb_shift_map[scancode] != 0)
-                        putc(kb_shift_map[scancode]);
+        else if (shift) { //Key pressed while shift is pressed
+                if (kb_shift_map[scancode] != 0) {
+                        //TODO: call add_char(kb_shift_map[scancode]);
+                        if(echo) putc(kb_shift_map[scancode]);
+                }
         }
-        else if(alt){
-                if (kb_alt_map[scancode] != 0)
-                        putc(kb_alt_map[scancode]);
+        else if (alt) { //Key pressed while alt is pressed
+                if (kb_alt_map[scancode] != 0) {
+                        //TODO: call add_char(kb_alt_map[scancode]);
+                        if(echo) putc(kb_alt_map[scancode]);
+                }
         }     
-        else{
-                if(scancode == LSHIFT || scancode == RSHIFT)
+        else{ //Key pressed
+                if (scancode == LSHIFT || scancode == RSHIFT)
                         shift = 1;
-                else if(scancode == ALT)
+                else if (scancode == ALT)
                         alt = 1;
-                else if (kb_map[scancode] != 0)
-                        putc(kb_map[scancode]);
+                else if (kb_map[scancode] != 0) {
+                        //TODO: call add_char(kb_map[scancode]);
+                        if(echo) putc(kb_map[scancode]);
+                }
         }
 }

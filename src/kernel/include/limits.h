@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: const.h 68 2008-05-17 22:16:52Z dtraytel $
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -22,20 +22,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Basic constant definitions. This file defines constants used
- * throughout the kernel.
+ * Definition of the maximum and minimum values of different types.
  *
- * @author Daniel Bader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author Dmitriy Traytel
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 68 $
  */
 
-#ifndef __CONST_H
-#define __CONST_H
+#define SINT8_MAX       0x7F
+#define UINT8_MAX       0xFF
+#define SINT16_MAX      0x7FFF
+#define UINT16_MAX      0xFFFF
+#define SINT32_MAX      0x7FFFFFFF
+#define UINT32_MAX      0xFFFFFFFF
 
-#define NULL            0
-#define TRUE            1
-#define FALSE           0
-#define FREQUENCY       100 //inits timer with frequency 100Hz (shoots every 10 ms)
-
-#endif /* const.h */
+#define SINT8_MIN       0x80
+#define SINT16_MIN      0x8000
+#define SINT32_MIN      0x80000000

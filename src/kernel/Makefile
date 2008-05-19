@@ -1,7 +1,7 @@
 # etiOS makefile
 # based on James M's kernel tutorials
 
-SOURCES=boot/boot.o lib/string.o io/keyboard.o io/monitor.o io/timer.o \
+SOURCES=boot/boot.o lib/string.o io/io_keyboard.o io/io_monitor.o io/io_timer.o \
         init/gdt.o init/global.o init/interrupt.o init/idt.o init/isr.o \
         init/irq.o init/tests.o init/main.o mm/malloc_free.o
 

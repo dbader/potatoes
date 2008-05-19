@@ -34,41 +34,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Functions to print things on the monitor
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 58 $
  *
  */
  
 #include "../include/types.h"
-
-/*
- * colors macros
- */
-enum colors{
-        BLACK=0x0,
-        BLUE=0x1,
-        GREEN=0x2,
-        CYAN=0x3,
-        RED=0x4,
-        VIOLET=0x5,
-        ORANGE=0x6,
-        LIGHTGREY=0x7,
-        DARKGREY=0x8,
-        LIGHTBLUE=0x9,
-        LIGHTGREEN=0xA,
-        TURQUOISE=0xB,
-        PINK=0xC,
-        MAGENTA=0xD,
-        YELLOW=0xE,
-        WHITE=0xF,
-};
+#include "../include/stdio.h"
 
 static uint16 *disp = (uint16*)0xB8000; //display pointer
 
 /**
  *  writes a colored character to the display (fg=foregroung, bg=background)
  */	
-void putc_col(uint8 ch, uint8 fg, uint8 bg)
+void putc_col(char ch, uint8 fg, uint8 bg)
 {
         uint32 i=0;
         uint32 temp;
@@ -101,7 +80,7 @@ void putc_col(uint8 ch, uint8 fg, uint8 bg)
 /**
  *  writes colored a string to the display (fg=foregroung, bg=background)
  */
-void puts_col(char* str, uint8 fg, uint8 bg)
+void puts_col(char *str, uint8 fg, uint8 bg)
 {
         while(*str!=0){
                 putc_col(*str, fg, bg);
@@ -120,7 +99,7 @@ void putc(char ch)
 /**
  * writes a string to the display
  */
-void puts(char* str)
+void puts(char *str)
 {
         puts_col(str, WHITE, BLACK);
 }

@@ -30,26 +30,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../include/const.h"
+#include "../include/limits.h"
 #include "../include/types.h"
 #include "../include/stdio.h"  
 
 static sint32 ticks = 0;
 
+/**
+ * Handles a timer-interrupt by incrementing the ticks-counter and calling the PM.
+ */
 void timer_handler(){
         ticks++;
-        //call pm
-        if(ticks == MAX_SINT32) ticks = 0;
+        //TODO: call switch();
+        if(ticks == SINT32_MAX) ticks = 0;
         //printf("%d\n",ticks);
 }
 
 /**
- * sleeps sec seconds
+ * Sleeps num seconds
  */
-void sleep(sint32 sec){
-        sint32 i = ticks + FREQUENCY*sec;
-        if(MAX_SINT32 - ticks < FREQUENCY*sec){
-                sleep((MAX_SINT32-ticks)/FREQUENCY);
-                sleep(sec-(MAX_SINT32-ticks)/FREQUENCY); 
+void sleep(sint32 num){
+        sint32 i = ticks + FREQUENCY*num;
+        if(SINT32_MAX - ticks < FREQUENCY*num){
+                sleep((SINT32_MAX-ticks)/FREQUENCY);
+                sleep(num-(SINT32_MAX-ticks)/FREQUENCY); 
         }
         else
         {
@@ -57,6 +61,9 @@ void sleep(sint32 sec){
         }
 }
 
+/**
+ * Initializes the timer with the given frequency freq
+ */
 void timer_init(sint32 freq)
 {
     int counter = 1193180 / freq; //1193180Hz - base 8254 frequency
