@@ -70,11 +70,7 @@ extern struct multiboot *g_mboot_ptr;
 
 //init-functions
 void mm_init(uint32 start, uint32 end);
-void idt_init();
-void isr_init();
-void irq_init(); 
-void timer_init(int hz);
-void set_interrupts();
+void io_init();
 
 void panic(char *msg);
 void free(uint32 address);

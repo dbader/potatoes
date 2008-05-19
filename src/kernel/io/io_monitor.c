@@ -47,7 +47,7 @@ static uint16 *disp = (uint16*)0xB8000; //display pointer
 /**
  *  writes a colored character to the display (fg=foregroung, bg=background)
  */	
-void putc_col(char ch, uint8 fg, uint8 bg)
+void monitor_cputc(char ch, uint8 fg, uint8 bg)
 {
         uint32 i=0;
         uint32 temp;
@@ -57,14 +57,14 @@ void putc_col(char ch, uint8 fg, uint8 bg)
                 temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
                 while(i < temp){ //calculating the "new line" starting position
                         i++;
-                        putc_col(' ',fg,bg);
+                        monitor_cputc(' ',fg,bg);
                 }
                 break;
         case '\t':
                 temp = 0x8 - (((uint32)disp - 0xB8000) % 0x10) / 2;
                 while(i < temp){ //calculating the "next tab" starting position
                         i++;
-                        putc_col(' ',fg,bg);
+                        monitor_cputc(' ',fg,bg);
                 }
                 break;
         case '\b':
@@ -80,10 +80,10 @@ void putc_col(char ch, uint8 fg, uint8 bg)
 /**
  *  writes colored a string to the display (fg=foregroung, bg=background)
  */
-void puts_col(char *str, uint8 fg, uint8 bg)
+void monitor_cputs(char *str, uint8 fg, uint8 bg)
 {
         while(*str!=0){
-                putc_col(*str, fg, bg);
+                monitor_cputc(*str, fg, bg);
                 str += 1;
         }
 }
@@ -91,34 +91,34 @@ void puts_col(char *str, uint8 fg, uint8 bg)
 /**
  * writes a character to the display
  */
-void putc(char ch)
+void monitor_putc(char ch)
 {
-        putc_col(ch, WHITE, BLACK);
+        monitor_cputc(ch, WHITE, BLACK);
 }
 
 /**
  * writes a string to the display
  */
-void puts(char *str)
+void monitor_puts(char *str)
 {
-        puts_col(str, WHITE, BLACK);
+        monitor_cputs(str, WHITE, BLACK);
 }
 
 /**
  * writes an integer to the display
  */
-void puti(sint32 x)
+void monitor_puti(sint32 x)
 {
         int div=1000000000;
         if(x < 0){
-                putc_col('-',RED,BLACK);
+                monitor_cputc('-',RED,BLACK);
                 x = -x;
         }
-        else if (x == 0) {putc_col('0',RED,BLACK); return;}
+        else if (x == 0) {monitor_cputc('0',RED,BLACK); return;}
         while(div > x)
                         div /= 10;
         while(div > 0){
-                putc_col((uint8)(x / div + 48),RED,BLACK);
+                monitor_cputc((uint8)(x / div + 48),RED,BLACK);
                 x%=div;
                 div /= 10;
         }    
@@ -127,17 +127,16 @@ void puti(sint32 x)
 /**
  * writes a hex-byte to the display
  */
-void puthex(uint8 ch)
+void monitor_puthex(uint8 ch)
 {
         uint8 low = ch % 16;
         uint8 high = ch / 16;  
         if(high>9)
-                putc_col((high + 55),GREEN,BLACK);
+                monitor_cputc((high + 55),GREEN,BLACK);
         else
-                putc_col((high + 48),GREEN,BLACK);   
+                monitor_cputc((high + 48),GREEN,BLACK);   
         if(low>9)
-                putc_col((low + 55),GREEN,BLACK);
+                monitor_cputc((low + 55),GREEN,BLACK);
         else
-                putc_col((low + 48),GREEN,BLACK); 
-        putc_col('h',GREEN,BLACK);
+                monitor_cputc((low + 48),GREEN,BLACK);
 }

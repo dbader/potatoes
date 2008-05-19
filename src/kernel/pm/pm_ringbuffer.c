@@ -138,7 +138,7 @@ sint32 rf_write(ring_fifo *fifo, uint8 *buf, uint32 count)
         
         while (count-- > 0) {
                 if (fifo->len == fifo->size) {
-                        puts("rf_write: buffer is full.");
+                        monitor_puts("rf_write: buffer is full.");
                         return written;
                 } 
                 
@@ -168,7 +168,7 @@ sint32 rf_read(ring_fifo *fifo, uint8 *buf, uint32 count)
         
         while (count-- > 0) {
                 if (fifo->len == 0) {
-                        puts("rf_read: buffer is empty.");
+                        monitor_puts("rf_read: buffer is empty.");
                         return read;
                 }
 

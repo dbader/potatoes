@@ -49,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void *malloc_name(uint32 size, char* name)
 {
-//        puti(MM_END);
+//        monitor_puti(MM_END);
         mm_occupied_top += size;
         if ((uint32) mm_occupied_top < mm_end) {
                 return (void*) (mm_occupied_top - size);

@@ -162,7 +162,7 @@ char* strncat(char *s1, char *s2, uint32 n)
  *
  *      printf("\ncopy = %p\n", copy);
  *      printf("work_copy = %p\n", work_copy);
- *      puts("done.");
+ *      monitor_puts("done.");
  *
  *      free(copy);
  * 

@@ -34,6 +34,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/stdio.h"  
 
+#include "../io/io.h" 
+/**
+ * This variable is incremented after every IRQ0 (or reseted to 0) 
+ */
 static sint32 ticks = 0;
 
 /**
@@ -71,11 +75,11 @@ void timer_init(sint32 freq)
     /* 0x36=00.11.011.0b
      * ---------------------------------------
      * 00-Select counter 0
-     * 11-Read/load LSB first then MSB
+     * 11-Read/load LSB first then MSB of the counter
      * 011-Mode 3: Square wave rate Generator
      * 0-Binary counter
      */
      
     outb(0x40, counter % 0xFF); //LSB
-    outb(0x40, counter / 0xFF); //BSB
+    outb(0x40, counter / 0xFF); //MSB
 }

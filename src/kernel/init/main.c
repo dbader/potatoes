@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/stdio.h"
 #include "../pm/pm_main.h"
+#include "../io/io.h"
 
 /**
  * Global pointer to multiboot structure
@@ -56,10 +57,10 @@ extern int end;
  */
 void panic(char *msg)
 {
-        puts_col("KERNEL PANIC: ", BLACK, RED);
-        puts_col(msg, BLACK, RED);
+        monitor_cputs("KERNEL PANIC: ", BLACK, RED);
+        monitor_cputs(msg, BLACK, RED);
+        clear_interrupts();
         for (;;) ;
-        //TODO panic() should disable interrupts.
 }
 
 /**
@@ -69,7 +70,7 @@ void panic(char *msg)
  */
 int main(struct multiboot *mboot_ptr)
 {
-        puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
+        monitor_puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
 
         /* Some memory info. Most of this is of special importance to Johannes / MM. */
         g_mboot_ptr = mboot_ptr;
@@ -79,12 +80,8 @@ int main(struct multiboot *mboot_ptr)
         printf("memory begins at addr 0x%x\n\n", &end);
 
         mm_init(0x009FFFFF, 0x01FFFFFF);
-        //TODO: replace with call to io_init().
-        idt_init();
-        isr_init();
-        irq_init();
-        timer_init(FREQUENCY);
-        set_interrupts();
+        
+        io_init();
         
         pm_init();
         

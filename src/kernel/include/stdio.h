@@ -55,17 +55,17 @@ enum colors{
 };
 
 //prints colored character
-void putc_col(char ch, uint8 fg, uint8 bg);
+void monitor_cputc(char ch, uint8 fg, uint8 bg);
 //prints colored string
-void puts_col(char *str, uint8 fg, uint8 bg);
+void monitor_cputs(char *str, uint8 fg, uint8 bg);
 //prints black character
-void putc(char ch);
+void monitor_putc(char ch);
 //prints black string
-void puts(char *str);
+void monitor_puts(char *str);
 //prints an integer
-void puti(sint32 x);
+void monitor_puti(sint32 x);
 //prints a hex-byte - important for io-debugging (-for me! ;-))
-void puthex(uint8 ch);
+void monitor_puthex(uint8 ch);
 
 void putchar(char c);
 void printf(char *fmt, ...);

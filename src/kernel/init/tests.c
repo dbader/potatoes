@@ -42,57 +42,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void draw_test()
 { 
-        puts_col("Test by Dmitriy Traytel (the i/o-master of etiOS)\n",WHITE,BLACK); 
-        puts("      _   _  ____   _____\n"); 
-        puts("     | | (_)/ __ \\ / ____|\n");
-        puts("  ___| |_ _| |  | | (___\n");
-        puts(" / _ \\ __| | |  | |\\___ \\\n"); 
-        puts("|  __/ |_| | |__| |____) |\n");
-        puts(" \\___|\\__|_|\\____/|_____/\n\n");
-        puts_col("Copyright 2008 Daniel Bader,Vincenz Doelle,Johannes Schamburger,Dmitriy Traytel\n",0xA,BLACK);
+        monitor_cputs("Test by Dmitriy Traytel (the i/o-master of etiOS)\n",WHITE,BLACK); 
+        monitor_puts("      _   _  ____   _____\n"); 
+        monitor_puts("     | | (_)/ __ \\ / ____|\n");
+        monitor_puts("  ___| |_ _| |  | | (___\n");
+        monitor_puts(" / _ \\ __| | |  | |\\___ \\\n"); 
+        monitor_puts("|  __/ |_| | |__| |____) |\n");
+        monitor_puts(" \\___|\\__|_|\\____/|_____/\n\n");
+        monitor_cputs("Copyright 2008 Daniel Bader,Vincenz Doelle,Johannes Schamburger,Dmitriy Traytel\n",0xA,BLACK);
         
-        puts("\ttab-test\tok\n");
-        puti(strlen("hallo welt")); //strlen-test
+        monitor_puts("\ttab-test\tok\n");
+        monitor_puti(strlen("hallo welt")); //strlen-test
         
         //some ints
-        puts("\t");
-        puti(0);
-        puts("\t");
-        puti(100);
-        puts("\t");
-        puti(-2);
-        puts("\t");
+        monitor_puts("\t");
+        monitor_puti(0);
+        monitor_puts("\t");
+        monitor_puti(100);
+        monitor_puts("\t");
+        monitor_puti(-2);
+        monitor_puts("\t");
         
         //some hex-bytes
         uint8 *test = (uint8*)0x60;
-        puthex(*test);                    //0x60h
-        puthex(*(test + 1));              //0x61h
-        puthex(*(test + 2));              //0x62h
-        puthex(*(test + 3));              //0x63h
-        puthex(*(test + 4));              //0x64h
-        puthex(*(test + 5));              //0x65h
+        monitor_puthex(*test);                    //0x60h
+        monitor_puthex(*(test + 1));              //0x61h
+        monitor_puthex(*(test + 2));              //0x62h
+        monitor_puthex(*(test + 3));              //0x63h
+        monitor_puthex(*(test + 4));              //0x64h
+        monitor_puthex(*(test + 5));              //0x65h
         
-        puts("\t\n");
-        puts("\tnumber-test\tok\n");
+        monitor_puts("\t\n");
+        monitor_puts("\tnumber-test\tok\n");
         
-        puts("\tbegin color test:\n");
-        puts_col("                                        ", BLACK, WHITE);
-        puts_col("                                        ", BLACK, BLUE); 
-        puts_col("                                        ", BLACK, GREEN); 
-        puts_col("                                        ", BLACK, CYAN); 
-        puts_col("                                        ", BLACK, RED); 
-        puts_col("                                        ", BLACK, VIOLET);
-        puts_col("                                        ", BLACK, ORANGE); 
-        puts_col("                                        ", BLACK, LIGHTGREY); 
-        puts_col("                                        ", BLACK, DARKGREY); 
-        puts_col("                                        ", BLACK, LIGHTBLUE); 
-        puts_col("                                        ", BLACK, LIGHTGREEN);
-        puts_col("                                        ", BLACK, TURQUOISE); 
-        puts_col("                                        ", BLACK, PINK); 
-        puts_col("                                        ", BLACK, MAGENTA); 
-        puts_col("                                        ", BLACK, YELLOW); 
-        puts_col("                                        ", BLACK, BLACK);
-        puts("\tcolor-test\tok\n");             
+        monitor_puts("\tbegin color test:\n");
+        monitor_cputs("                                        ", BLACK, WHITE);
+        monitor_cputs("                                        ", BLACK, BLUE); 
+        monitor_cputs("                                        ", BLACK, GREEN); 
+        monitor_cputs("                                        ", BLACK, CYAN); 
+        monitor_cputs("                                        ", BLACK, RED); 
+        monitor_cputs("                                        ", BLACK, VIOLET);
+        monitor_cputs("                                        ", BLACK, ORANGE); 
+        monitor_cputs("                                        ", BLACK, LIGHTGREY); 
+        monitor_cputs("                                        ", BLACK, DARKGREY); 
+        monitor_cputs("                                        ", BLACK, LIGHTBLUE); 
+        monitor_cputs("                                        ", BLACK, LIGHTGREEN);
+        monitor_cputs("                                        ", BLACK, TURQUOISE); 
+        monitor_cputs("                                        ", BLACK, PINK); 
+        monitor_cputs("                                        ", BLACK, MAGENTA); 
+        monitor_cputs("                                        ", BLACK, YELLOW); 
+        monitor_cputs("                                        ", BLACK, BLACK);
+        monitor_puts("\tcolor-test\tok\n");             
 }
 
 void printf_test()
@@ -114,7 +114,7 @@ void strings_test()
         strncat(f, t, 5);
         strcat(f, t2);
         strcat(f, t3);
-        puts(f); puts("\n\n");
+        monitor_puts(f); monitor_puts("\n\n");
         
         
 }
@@ -135,7 +135,7 @@ void strsep_test()
 
         printf("\ncopy = %p\n", copy);
         printf("work_copy = %p\n", work_copy);
-        puts("done.");
+        monitor_puts("done.");
 
         free(copy);
 }
@@ -160,17 +160,17 @@ void grubstruct_test(struct multiboot *mboot_ptr)
         MBOOT_INFO(size)
         MBOOT_INFO(flags)
         MBOOT_INFO(addr)
-        puts("\n");
+        monitor_puts("\n");
 }
 
 void malloc_test() {
         void *test;
-        puts("malloc(23068671): allocation of 22 MB -> memory is full (10 of 32 MB are reserved for the kernel)\n");
+        monitor_puts("malloc(23068671): allocation of 22 MB -> memory is full (10 of 32 MB are reserved for the kernel)\n");
         test = malloc(23068671);
-        puti((uint32)test);
-        puts("\nmalloc(1): allocation of 1 KB -> function returns pointer to address 0 (NULL)\n");
+        monitor_puti((uint32)test);
+        monitor_puts("\nmalloc(1): allocation of 1 KB -> function returns pointer to address 0 (NULL)\n");
         test = malloc(1);
-        puti((uint32)test);
+        monitor_puti((uint32)test);
 }
 
 void sleep_test()
@@ -191,7 +191,7 @@ void sleep_test()
 
 void do_tests()
 {
-        puts("\n\ndo_tests():\n");
+        monitor_puts("\n\ndo_tests():\n");
         grubstruct_test(g_mboot_ptr);
         //strings_test();       
         //draw_test();

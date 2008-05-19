@@ -25,6 +25,10 @@
 set_interrupts:
 	sti
 ;********************************************************************************************
+[GLOBAL clear_interrupts]
+clear_interrupts:
+        cli
+;********************************************************************************************
 	;Installation of our idt-table:
 [GLOBAL idt_load]
 [EXTERN idtp]

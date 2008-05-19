@@ -33,10 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/stdio.h"
 
+#include "../io/io.h"
 #include "../io/io_keyboard.h"
 #include "../pm/pm_input.h"
-
-extern uint8 inb(uint8 port);
 
 /**
  * Echo-mode flag
@@ -59,13 +58,13 @@ void kb_handler()
         else if (shift) { //Key pressed while shift is pressed
                 if (kb_shift_map[scancode] != 0) {
                         pm_handle_input(kb_shift_map[scancode]);
-                        if(echo) putc(kb_shift_map[scancode]);
+                        if(echo) monitor_putc(kb_shift_map[scancode]);
                 }
         }
         else if (alt) { //Key pressed while alt is pressed
                 if (kb_alt_map[scancode] != 0) {
                         pm_handle_input(kb_alt_map[scancode]);
-                        if(echo) putc(kb_alt_map[scancode]);
+                        if(echo) monitor_putc(kb_alt_map[scancode]);
                 }
         }     
         else{ //Key pressed
@@ -75,7 +74,7 @@ void kb_handler()
                         alt = 1;
                 else if (kb_map[scancode] != 0) {
                         pm_handle_input(kb_map[scancode]);
-                        if(echo) putc(kb_map[scancode]);
+                        if(echo) monitor_putc(kb_map[scancode]);
                 }
         }
 }

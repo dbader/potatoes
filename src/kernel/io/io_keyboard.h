@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
+#ifndef __IO_KEYBOARD_H_
+#define __IO_KEYBOARD_H_
 
 #include "../include/types.h"
 
@@ -317,7 +319,7 @@ char kb_alt_map[]={
         '\t',   //0x0F
         '@',    //0x10
         0,      //0x11
-        0,      //0x12 //FIXME: was '€' I think there is no € in ascii...
+        0,      //0x12 //Was '€' - I think there is no € in ascii...
         '\364', //0x13
         0,      //0x14
         0,      //0x15
@@ -437,3 +439,5 @@ static bool shift = 0;
  * Alt-pressed flag
  */
 static bool alt = 0;
+
+#endif /*__IO_KEYBOARD_H*/

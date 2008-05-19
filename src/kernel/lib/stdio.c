@@ -35,12 +35,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* TODO: These are just dummy declarations until we have a proper interface for monitor
  * output, ie monitor_write(char c) */
-void putc_col(char ch, uint8 fg, uint8 bg);
-void puts_col(char *str, uint8 fg, uint8 bg);
-void putc(char ch);
-void puts(char *str);
-void puti(sint32 x);
-void puthex(uint8 ch);
+void monitor_cputc(char ch, uint8 fg, uint8 bg);
+void monitor_cputs(char *str, uint8 fg, uint8 bg);
+void monitor_putc(char ch);
+void monitor_puts(char *str);
+void monitor_puti(sint32 x);
+void monitor_puthex(uint8 ch);
 
 /**
  * Writes a character to stdout.
@@ -48,7 +48,7 @@ void puthex(uint8 ch);
  */
 void putchar(char c)
 {
-        putc(c);
+        monitor_putc(c);
 }
 
 /**
@@ -85,13 +85,13 @@ void printf(char *fmt, ...)
                                 break;
                         case 'i': // signed integer
                         case 'd':
-                                puts(itoa((sint32)*arg++, buf, 10));
+                                monitor_puts(itoa((sint32)*arg++, buf, 10));
                                 break;
                         case 'u': // unsigned integer
-                                puts(itoa((uint32)*arg++, buf, 10));
+                                monitor_puts(itoa((uint32)*arg++, buf, 10));
                                 break;
                         case 'o':
-                                puts(itoa((uint32)*arg++, buf, 8));
+                                monitor_puts(itoa((uint32)*arg++, buf, 8));
                                 break;
                         case 'c': // character
                                 /* This is a bit peculiar but needed to shut up the
@@ -107,13 +107,13 @@ void printf(char *fmt, ...)
                                         while ((ch = *(*arg)++) != '\0')
                                                 putchar(ch);
                                 } else {
-                                        puts("(null)");
+                                        monitor_puts("(null)");
                                 }
                                 *arg++;
                                 break;
                         case 'x': // hexadecimal integer
                         case 'p': // pointer
-                                puts(itoa((uint32)*arg++, buf, 16));
+                                monitor_puts(itoa((uint32)*arg++, buf, 16));
                                 break;
                         }
                 } else

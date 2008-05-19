@@ -46,9 +46,24 @@ struct idt_pointer //16+32=48 bit
         uint32 start;
 }__attribute__((packed)); //gcc-flag to use 64 connected bits of memory for the struct
 
-struct idt_entry idt[256]; //our idt with 256 descriptors
+/**
+ * Our idt with 256 descriptors
+ */
+struct idt_entry idt[256];
+
+/**
+ * The pointer to our idt
+ */
 struct idt_pointer idtp;
 
+/**
+ * Makes a new idt-entry
+ * 
+ * @param pos Number of the new idt-entry
+ * @param offset Offset to be added to the base address
+ * @param sel Selector for the segment's base address
+ * @param flg Deskriptor flags
+ */
 void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg)
 {
         idt[pos].selector = sel;
@@ -58,8 +73,14 @@ void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg)
         idt[pos].high_offset = offset / 65536;
 }
 
+/**
+ * Tells the CPU where to find our IDT
+ */
 extern void idt_load();
 
+/**
+ * Initializes a new idt with blank entries
+ */
 void idt_init()
 {
         idtp.maxsize = (64 * 256) - 1;
