@@ -41,8 +41,65 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
 #include "../include/types.h"
 #include "../include/stdio.h"
+#include "../include/string.h"
+#include "../include/stdlib.h"
 
 static uint16 *disp = (uint16*)0xB8000; //display pointer
+static void *scroll_up_ptr;
+static void *scroll_down_ptr;
+static uint32 num_lines_up = 0;
+static uint32 num_lines_down = 0;
+
+void monitor_init()
+{
+	scroll_up_ptr = malloc_name(10000,"video buffer");
+	bzero(scroll_up_ptr,10000);
+	scroll_down_ptr = malloc_name(10000,"video buffer");
+	bzero(scroll_down_ptr,10000);
+}
+/**
+ * Scrolls the monitor down in the 'natural' way
+ */
+void monitor_scroll()
+{
+	num_lines_up++;
+	scroll_up_ptr += 0xA0;
+	memcpy(scroll_up_ptr, (void*)0xB8000, 0xA0);
+	memcpy((void*)0xB8000, (void*)0xB80A0, 0xFA0);
+	disp -= 0x50;
+}
+
+/**
+ * Scrolls the monitor up on request
+ */
+void monitor_scrollup()
+{
+	if (num_lines_up > 0) {
+		num_lines_up--;
+		num_lines_down++;
+		scroll_down_ptr += 0xA0;
+		memcpy(scroll_down_ptr, (void*)0xB8F00, 0xA0);
+		memcpy((void*)0xB80A0, (void*)0xB8000, 0xF00);
+		memcpy((void*)0xB8000, scroll_up_ptr, 0xA0);
+		scroll_up_ptr -= 0xA0;
+	}
+}
+
+/**
+ * Scrolls the monitor down on request
+ */
+void monitor_scrolldown()
+{
+	if (num_lines_down > 0) {
+		num_lines_down--;
+		num_lines_up++;
+		scroll_up_ptr += 0xA0;
+		memcpy(scroll_up_ptr, (void*)0xB8000, 0xA0);
+		memcpy((void*)0xB8000, (void*)0xB80A0, 0xF00);
+		memcpy((void*)0xB8F00, scroll_down_ptr, 0xA0);
+		scroll_down_ptr -= 0xA0;
+	}
+}
 
 /**
  *  writes a colored character to the display (fg=foregroung, bg=background)
@@ -51,7 +108,7 @@ void monitor_cputc(char ch, uint8 fg, uint8 bg)
 {
         uint32 i=0;
         uint32 temp;
-        if((uint32)disp >= 0xB8FA0)disp-=0x7D0; //return to beginning, if outside of display-memory
+        if((uint32)disp >= 0xB8FA0)monitor_scroll(); //scroll, if outside of display-memory
         switch(ch){
         case '\n':
                 temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;

@@ -39,8 +39,9 @@ void io_init()
        
         idt_init(); dprintf("io: IDT initialized\n");      
         isr_init(); dprintf("io: ISRs initialized\n");
-	irq_init(); dprintf("io: IRQs initialized\n");
+        irq_init(); dprintf("io: IRQs initialized\n");
 	
-	timer_init(FREQUENCY); dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
-	set_interrupts();      dprintf("io: interrupts enabled\n");
+        monitor_init();			dprintf("io: monitor initialized\n");
+        timer_init(FREQUENCY); 	dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
+        set_interrupts();      	dprintf("io: interrupts enabled\n");
 }

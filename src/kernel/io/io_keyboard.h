@@ -37,6 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LSHIFT 0x2A
 #define RSHIFT 0x36
 #define ALT 0x38
+#define SCROLL_UP 0x49
+#define SCROLL_DOWN 0x51
 
 char kb_map[]={
         0,      //empty

@@ -67,6 +67,11 @@ void monitor_puti(sint32 x);
 //prints a hex-byte - important for io-debugging (-for me! ;-))
 void monitor_puthex(uint8 ch);
 
+//scrolls the monitor up
+void monitor_scrollup();
+//scrolls the monitor down
+void monitor_scrolldown();
+
 void putchar(char c);
 void printf(char *fmt, ...);
 

@@ -245,9 +245,15 @@ void bzero(void *dest, uint32 count)
  */
 void* memcpy(void *dest, void *src, uint32 count)
 {
+		void *temp = malloc(count);
         void *ret = dest;
         for (int i = 0; i < count; i++)
-                *((uint8*)dest++) = *((uint8*)src++);
+                *((uint8*)temp++) = *((uint8*)src++);
+        temp -= count;
+        for (int i = 0; i < count; i++)
+                        *((uint8*)dest++) = *((uint8*)temp++);
+        temp -= count;
+        free(temp);
         return ret;
 }
 

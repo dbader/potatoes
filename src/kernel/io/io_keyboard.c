@@ -72,6 +72,10 @@ void kb_handler()
                         shift = 1;
                 else if (scancode == ALT)
                         alt = 1;
+                else if (scancode == SCROLL_UP)
+                		monitor_scrollup();
+                else if (scancode == SCROLL_DOWN)
+                        monitor_scrolldown();
                 else if (kb_map[scancode] != 0) {
                         pm_handle_input(kb_map[scancode]);
                         if(echo) monitor_putc(kb_map[scancode]);
