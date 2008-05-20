@@ -31,6 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/stdio.h"
 #include "../include/stdlib.h"
+#include "../include/debug.h"
+#include "../io/io.h"
 #include "pm_main.h"
 #include "pm_ringbuffer.h"
 
@@ -45,9 +47,17 @@ uint32 next_pid = 0;
  */
 void pm_init()
 {
-        printf("pm: init");
+        dprintf("pm: init\n");
+        
         procs_head = (process_t*) malloc(sizeof(process_t));
         
         procs_head->name = "kernel";
         procs_head->pid = next_pid++;
+}
+/**
+ * Reschedule if needed.
+ */
+void pm_schedule()
+{
+        //dprintf("sched: %d\n", get_ticks());
 }

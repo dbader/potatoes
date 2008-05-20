@@ -55,5 +55,6 @@ typedef struct {
 } process_t;
 
 void pm_init();
+void pm_schedule();
 
 #endif /* pm_main.h */

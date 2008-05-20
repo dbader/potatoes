@@ -32,8 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/init.h"
 #include "../include/const.h"
 #include "../include/stdio.h"
-#include "../pm/pm_main.h"
 #include "../io/io.h"
+
 /**
  * Global pointer to multiboot structure
  * As of now, this is only needed for mboot_test() in tests.c. This should later
@@ -46,6 +46,11 @@ struct multiboot *g_mboot_ptr;
  * This constant gets defined in the linker script link.ld. 
  */
 extern int end;
+
+/**
+ * The address of start is equal to the start address of the kernel code in memory
+ */
+extern int start;
 
 /**
  * Kernel panic function. Displays an error message and enters an infinite
@@ -69,26 +74,25 @@ void panic(char *msg)
  */
 int main(struct multiboot *mboot_ptr)
 {
-        monitor_puts("etiOS - $Rev$ - "__DATE__" "__TIME__"\n\n");
+        printf("etiOS - $Rev$ - "__DATE__" "__TIME__"\n");
 
         /* Some memory info. Most of this is of special importance to Johannes / MM. */
         g_mboot_ptr = mboot_ptr;
+        /*
         printf("%d bytes lower memory starting at addr 0x0\n", g_mboot_ptr->mem_lower * 1024);
-        printf("%d bytes upper memory starting at addr 0x%x\n", g_mboot_ptr->mem_upper * 1024, 1024 * 1024);
-        printf("kernel ends at addr 0x%x\n", &end - 1);
-        printf("memory begins at addr 0x%x\n\n", &end);
+        printf("%d bytes upper memory starting at addr 0x%x\n", g_mboot_ptr->mem_upper * 1024, 0x100000);
+        printf("kernel starts at 0x%x\n", &start);
+        printf("kernel ends at 0x%x\n", &end - 1);
+        printf("memory begins at 0x%x\n\n", &end); */
 
-        mm_init(0x009FFFFF, 0x01FFFFFF);
-        
-        io_init();
-        
-        //TODO: @Daniel pm_init() would better fit into init.h
+        mm_init((uint32)&end, 0x100000 + g_mboot_ptr->mem_upper * 1024);
+        io_init();      
         pm_init();
-        
         //TODO: call fs_init();
         
-        do_tests();
+        printf("main: init complete at %d ticks.\n", get_ticks());
         
+        do_tests();
         
         for(;;);
 	return 0;

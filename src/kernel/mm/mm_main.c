@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/types.h"
 #include "../include/stdio.h"
+#include "../include/debug.h"
 #include "mm_const.h"
 
 
@@ -43,12 +44,15 @@ void gdt_init();
  * @param start the start of the part of the memory to be managed
  * @param end the end of the part of the memory to be managed
  */
-void mm_init(uint32 start, uint32 end) {
+void mm_init(uint32 start, uint32 end) 
+{      
+        dprintf("mm: init\n");
         
-        gdt_init();
+        gdt_init(); dprintf("mm: GDT initialized\n");
         
         mm_start = start;
         mm_end = end;
         mm_occupied_top = (void*) start;
-
+        
+        dprintf("mm: memory 0x%x - 0x%x (%dmb)\n", start, end, (end - start) / (1024 * 1024));
 }

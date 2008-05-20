@@ -34,7 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/stdio.h"  
 
-#include "../io/io.h" 
+#include "../io/io.h"
+#include "../pm/pm_main.h"  
 /**
  * This variable is incremented after every IRQ0 (or reseted to 0) 
  */
@@ -45,9 +46,18 @@ static sint32 ticks = 0;
  */
 void timer_handler(){
         ticks++;
-        //TODO: call switch();
+        pm_schedule();
         if(ticks == SINT32_MAX) ticks = 0;
         //printf("%d\n",ticks);
+}
+
+/**
+ * Returns the timer ticks.
+ * @return ticks since system boot or last timer wraparound
+ */
+sint32 get_ticks()
+{
+        return ticks;
 }
 
 /**

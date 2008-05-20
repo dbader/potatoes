@@ -71,6 +71,7 @@ extern struct multiboot *g_mboot_ptr;
 //init-functions
 void mm_init(uint32 start, uint32 end);
 void io_init();
+void pm_init();
 
 void panic(char *msg);
 

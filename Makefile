@@ -15,7 +15,7 @@
 PROJDIRS = src/kernel/boot src/kernel/include src/kernel/init src/kernel/io src/kernel/lib \
 	   src/kernel/mm src/kernel/pm
 
-# Add all source files in the subdirs referenced by PROJDIRS
+# Adds all source files in the subdirs referenced by PROJDIRS
 SRCFILES := $(shell find $(PROJDIRS) -mindepth 1 -maxdepth 3 -name "*.c")
 HDRFILES := $(shell find $(PROJDIRS) -mindepth 1 -maxdepth 3 -name "*.h")
 ASMFILES := $(shell find $(PROJDIRS) -mindepth 1 -maxdepth 3 -name "*.s")
@@ -24,7 +24,7 @@ DEPFILES := $(patsubst %.c,%.d,$(SRCFILES))
 ALLFILES := $(SRCFILES) $(HDRFILES) $(ASMFILES) 
 
 # Generated files that should be deleted by make clean
-GENFILES := src/kernel/kernel src/kernel/kernel.map floppy.img
+GENFILES := src/kernel/kernel src/kernel/kernel.map floppy.img etios.pdf
 
 # Toolflags
 CFLAGS=-DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
@@ -59,9 +59,7 @@ clean:
 	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
 runbochs: image
-	-@sudo umount $(LOOPDEV)
-	-@sudo /sbin/losetup -d $(LOOPDEV)
-	@sudo /sbin/losetup $(LOOPDEV) floppy.img
+	-@sudo /sbin/losetup $(LOOPDEV) floppy.img
 	-@sudo bochs -f src/tools/bochsrc
 	@sudo /sbin/losetup -d $(LOOPDEV)
 	
@@ -69,6 +67,7 @@ doc:
 	@echo " DOXYGEN"
 	@doxygen > /dev/null
 	@cd doc/latex && $(MAKE) > /dev/null
+	@cp doc/latex/refman.pdf ./etios.pdf
 	
 todo:
 	@echo "TODO:"
@@ -76,8 +75,6 @@ todo:
 	
 image: kernel
 	@echo "Initializing floppy image..."
-	-@sudo umount $(LOOPDEV)
-	-@sudo /sbin/losetup -d $(LOOPDEV)
 	@dd if=/dev/zero of=floppy.img bs=512 count=1440 status=noxfer
 	@sudo /sbin/losetup $(LOOPDEV) floppy.img
 	@sudo mkfs -t ext2 $(LOOPDEV) > /dev/null
@@ -94,17 +91,17 @@ image: kernel
 	@echo "root (fd0)" > grubconf.conf
 	@echo "setup (fd0)" >> grubconf.conf
 	@echo "quit" >> grubconf.conf
-	@sudo cat grubconf.conf | grub --batch --device-map=grubdevice.map $(LOOPDEV) > /dev/null
+	@sudo cat grubconf.conf | sudo grub --batch --device-map=grubdevice.map $(LOOPDEV) > /dev/null
 	@rm grubdevice.map grubconf.conf
 	
 	@sudo /sbin/losetup -d $(LOOPDEV)
 	@echo "Done."
 
--include $(DEPFILES)
-
 kernel: $(OBJFILES) Makefile
 	@echo " LD	src/kernel/kernel"
 	@ld $(LDFLAGS) -Map src/kernel/kernel.map -o src/kernel/kernel $(OBJFILES)
+
+-include $(DEPFILES)
 
 %.o: %.s Makefile
 	@echo " AS	$(patsubst functions/%,%,$@)"

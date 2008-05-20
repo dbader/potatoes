@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../include/debug.h"
+#include "../io/io.h"
 
 /**
  * Handles keyboard input. This gets called from the I/O code after a keypress was received
@@ -45,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void pm_handle_input(char c)
 {
-        dprintf("pm_handle_input: %c\n", c);
+        dprintf("pm_handle_input: %c @ %d\n", c, get_ticks());
         //putchar(c);
 }
 

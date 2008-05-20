@@ -31,12 +31,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../io/io.h"
 #include "../include/const.h"
+#include "../include/debug.h"
 
 void io_init()
 {
-        idt_init();
-        isr_init();
-	    irq_init();
-	    timer_init(FREQUENCY);
-	    set_interrupts();
+        dprintf("io: init\n");
+       
+        idt_init(); dprintf("io: IDT initialized\n");      
+        isr_init(); dprintf("io: ISRs initialized\n");
+	irq_init(); dprintf("io: IRQs initialized\n");
+	
+	timer_init(FREQUENCY); dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
+	set_interrupts();      dprintf("io: interrupts enabled\n");
 }
