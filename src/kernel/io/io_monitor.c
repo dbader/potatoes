@@ -50,12 +50,14 @@ static void *scroll_down_ptr;
 static uint32 num_lines_up = 0;
 static uint32 num_lines_down = 0;
 
+//FIXME: prevent scrolling writing everywhere in the memory (set limits)!!!
 void monitor_init()
 {
-	scroll_up_ptr = malloc_name(10000,"video buffer");
-	bzero(scroll_up_ptr,10000);
-	scroll_down_ptr = malloc_name(10000,"video buffer");
-	bzero(scroll_down_ptr,10000);
+	//160KB = 1000 * 160B = 1000 lines
+	scroll_up_ptr = malloc_name(160000,"video buffer");
+	bzero(scroll_up_ptr,160000);
+	scroll_down_ptr = malloc_name(160000,"video buffer");
+	bzero(scroll_down_ptr,160000);
 }
 /**
  * Scrolls the monitor down in the 'natural' way
