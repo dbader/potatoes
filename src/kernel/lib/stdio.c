@@ -33,8 +33,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/string.h"
 
-/* TODO: These are just dummy declarations until we have a proper interface for monitor
- * output, ie monitor_write(char c) */
 void monitor_cputc(char ch, uint8 fg, uint8 bg);
 void monitor_cputs(char *str, uint8 fg, uint8 bg);
 void monitor_putc(char ch);
@@ -45,10 +43,26 @@ void monitor_puthex(uint8 ch);
 /**
  * Writes a character to stdout.
  * @param c character to write
+ * @return the character written
  */
-void putchar(char c)
+int putchar(char c)
 {
         monitor_putc(c);
+        return c;
+}
+
+/**
+ * Writes a string to stdout.
+ * @bug Does not return the number of characters written.
+ * @bug Does not write a terminating newline character. A change in behavior breaks other things
+ *      (namely printf()). Please leave it like that for now.
+ * @param s the string
+ * @return the number of characters written
+ */
+int puts(char *s)
+{
+        monitor_puts(s);
+        return 0; //TODO return number of chars written.
 }
 
 /**
@@ -85,13 +99,13 @@ void printf(char *fmt, ...)
                                 break;
                         case 'i': // signed integer
                         case 'd':
-                                monitor_puts(itoa((sint32)*arg++, buf, 10));
+                                puts(itoa((sint32)*arg++, buf, 10));
                                 break;
                         case 'u': // unsigned integer
-                                monitor_puts(itoa((uint32)*arg++, buf, 10));
+                                puts(itoa((uint32)*arg++, buf, 10));
                                 break;
                         case 'o':
-                                monitor_puts(itoa((uint32)*arg++, buf, 8));
+                                puts(itoa((uint32)*arg++, buf, 8));
                                 break;
                         case 'c': // character
                                 /* This is a bit peculiar but needed to shut up the
@@ -99,7 +113,7 @@ void printf(char *fmt, ...)
                                  * compiler warning.
                                  * Code was: putchar((char)*arg++);
                                  */
-                                character = (int)*arg++;
+                                character = (int) *arg++;
                                 putchar((char)character);
                                 break;
                         case 's': // string
@@ -107,13 +121,13 @@ void printf(char *fmt, ...)
                                         while ((ch = *(*arg)++) != '\0')
                                                 putchar(ch);
                                 } else {
-                                        monitor_puts("(null)");
+                                        puts("(null)");
                                 }
                                 *arg++;
                                 break;
                         case 'x': // hexadecimal integer
                         case 'p': // pointer
-                                monitor_puts(itoa((uint32)*arg++, buf, 16));
+                                puts(itoa((uint32)*arg++, buf, 16));
                                 break;
                         }
                 } else

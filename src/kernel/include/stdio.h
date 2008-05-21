@@ -72,7 +72,8 @@ void monitor_scrollup();
 //scrolls the monitor down
 void monitor_scrolldown();
 
-void putchar(char c);
+int putchar(char c);
+int puts(char *s);
 void printf(char *fmt, ...);
 
 #endif /* stdio.h */
