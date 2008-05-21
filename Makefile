@@ -37,7 +37,7 @@ LOOPDEV=/dev/loop0
 # The mount point for the loopback image
 LOOPMNT=/mnt2
 
-.PHONY: all clean runbochs doc todo image link
+.PHONY: all clean fiximg runbochs doc todo image link
 
 all: kernel image doc
 
@@ -47,6 +47,7 @@ help:
 	@echo "all	- builds the kernel, floppy image and documentation"
 	@echo "clean	- removes all generated files"
 	@echo "doc	- builds doxygen documentation"
+	@echo "fiximg	- unmounts the image and disables loopback"
 	@echo "image	- builds floppy image (floppy.img)"
 	@echo "kernel	- builds the kernel"
 	@echo "runbochs	- starts bochs"
@@ -60,42 +61,47 @@ clean:
 	
 runbochs: image
 	-@sudo /sbin/losetup $(LOOPDEV) floppy.img
-	-@sudo bochs -f src/tools/bochsrc
+	-@sudo bochs -f src/tools/bochsrc > /dev/null
 	@sudo /sbin/losetup -d $(LOOPDEV)
 	
 doc:
 	@echo " DOXYGEN"
 	@doxygen > /dev/null
-	@cd doc/latex && $(MAKE) > /dev/null
+	@cd doc/latex && $(MAKE) > /dev/null 2> /dev/null
 	@cp doc/latex/refman.pdf ./etios.pdf
+	
+# Sometimes the image remains mounted after an error, use this target to fix this.	
+fiximg:
+	@echo "Unmounting image..."
+	-@sudo umount $(LOOPDEV)
+	@echo "Disabling loopback..."
+	-@sudo /sbin/losetup -d $(LOOPDEV)
+	@echo "Done."
 	
 todo:
 	@echo "TODO:"
 	-@for file in $(ALLFILES); do grep -H TODO $$file; done; true
 	
 image: kernel
-	@echo "Initializing floppy image..."
-	@dd if=/dev/zero of=floppy.img bs=512 count=1440 status=noxfer
+	@echo " IMAGE  floppy.img"
+	@dd if=/dev/zero of=floppy.img bs=512 count=1440 status=noxfer 2> /dev/null
 	@sudo /sbin/losetup $(LOOPDEV) floppy.img
-	@sudo mkfs -t ext2 $(LOOPDEV) > /dev/null
+	@sudo mkfs -t ext2 $(LOOPDEV) > /dev/null 2> /dev/null
 
 	@sudo mount -t ext2 $(LOOPDEV) $(LOOPMNT)
-	@echo "Copying etiOS kernel..."
 	@sudo mkdir $(LOOPMNT)/grub
 	@sudo cp -r image/* $(LOOPMNT)
 	@sudo cp src/kernel/kernel $(LOOPMNT)
 	@sudo umount $(LOOPDEV)
 	
-	@echo "Installing grub..."
 	@echo "(fd0) $(LOOPDEV)" > grubdevice.map
 	@echo "root (fd0)" > grubconf.conf
 	@echo "setup (fd0)" >> grubconf.conf
 	@echo "quit" >> grubconf.conf
-	@sudo cat grubconf.conf | sudo grub --batch --device-map=grubdevice.map $(LOOPDEV) > /dev/null
+	@sudo cat grubconf.conf | sudo grub --batch --device-map=grubdevice.map $(LOOPDEV) > /dev/null 2> /dev/null
 	@rm grubdevice.map grubconf.conf
 	
 	@sudo /sbin/losetup -d $(LOOPDEV)
-	@echo "Done."
 
 kernel: $(OBJFILES) Makefile
 	@echo " LD	src/kernel/kernel"
