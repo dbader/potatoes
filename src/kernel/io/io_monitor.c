@@ -67,7 +67,7 @@ void monitor_scroll()
 	num_lines_up++;
 	scroll_up_ptr += 0xA0;
 	memcpy(scroll_up_ptr, (void*)0xB8000, 0xA0);
-	memcpy((void*)0xB8000, (void*)0xB80A0, 0xFA0);
+	memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
 	disp -= 0x50;
 }
 
@@ -81,7 +81,7 @@ void monitor_scrollup()
 		num_lines_down++;
 		scroll_down_ptr += 0xA0;
 		memcpy(scroll_down_ptr, (void*)0xB8F00, 0xA0);
-		memcpy((void*)0xB80A0, (void*)0xB8000, 0xF00);
+		memmove((void*)0xB80A0, (void*)0xB8000, 0xF00);
 		memcpy((void*)0xB8000, scroll_up_ptr, 0xA0);
 		scroll_up_ptr -= 0xA0;
 	}
@@ -97,7 +97,7 @@ void monitor_scrolldown()
 		num_lines_up++;
 		scroll_up_ptr += 0xA0;
 		memcpy(scroll_up_ptr, (void*)0xB8000, 0xA0);
-		memcpy((void*)0xB8000, (void*)0xB80A0, 0xF00);
+		memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
 		memcpy((void*)0xB8F00, scroll_down_ptr, 0xA0);
 		scroll_down_ptr -= 0xA0;
 	}

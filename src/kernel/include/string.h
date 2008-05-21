@@ -34,17 +34,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
 uint32 strlen(char* str);
 char* strcpy(char *dest, char *src);
-char* strncpy(char *dest, char *src, uint32 n);
+char* strncpy(char *dest, char *src, size_t n);
 char* strchr(char *str, char ch);
 char* strcat(char *s1, char *s2);
-char* strncat(char *s1, char *s2, uint32 n);
+char* strncat(char *s1, char *s2, size_t n);
 char* strdup(char* str);
 char* strsep(char **str_ptr, char *delims);
 sint32 strcmp(char *s1, char *s2);
 
-void* memset(void *dest, uint8 value, uint32 count);
+void* memset(void *dest, uint8 value, size_t count);
 void bzero(void *dest, uint32 count);
-void* memcpy(void *dest, void *src, uint32 count);
+void* memcpy(void *dest, void *src, size_t count);
+void* memmove(void *dest, void *src, size_t count);
 
 char* strreverse(char *str);
 char* itoa(int n, char *str, unsigned int base);

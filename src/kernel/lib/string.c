@@ -72,7 +72,7 @@ char* strcpy(char *dest, char *src)
  * @param n Number of bytes to copy at most
  * @return dest, the destination string
  */
-char* strncpy(char *dest, char *src, uint32 n) 
+char* strncpy(char *dest, char *src, size_t n) 
 {
         char *ret = dest;
         while (n-- > 0) {
@@ -137,7 +137,7 @@ char* strcat(char *s1, char *s2)
  * @param n max number of characters to copy
  * @return the concatenated string
  */
-char* strncat(char *s1, char *s2, uint32 n)
+char* strncat(char *s1, char *s2, size_t n)
 {
         return strncpy(strchr(s1, '\0'), s2, n);        
 }
@@ -218,7 +218,7 @@ sint32 strcmp(char *s1, char *s2)
  * @param count Number of bytes to write
  * @return dest, the destination memory
  */
-void* memset(void *dest, uint8 value, uint32 count) 
+void* memset(void *dest, uint8 value, size_t count) 
 {
         void *ret = dest;
         for (int i = 0; i < count; i++)
@@ -231,19 +231,35 @@ void* memset(void *dest, uint8 value, uint32 count)
  * @param dest Destination memory
  * @param count Number of bytes to write
  */
-void bzero(void *dest, uint32 count)
+void bzero(void *dest, size_t count)
 {
         memset(dest, 0, count);
 }
 
 /**
- * Copies count bytes form src to dest.
+ * Copies count bytes form src to dest. Undefined for overlapping blocks.
  * @param dest Destination memory
  * @param src Source memory
  * @param count Number of bytes to copy
  * @return dest, the destination memory
  */
-void* memcpy(void *dest, void *src, uint32 count)
+void* memcpy(void *dest, void *src, size_t count)
+{
+        void *ret = dest;
+        for (int i = 0; i < count; i++)
+        *((uint8*)dest++) = *((uint8*)src++);
+
+        return ret;
+}
+
+/**
+ * Copies count bytes form src to dest. Defined for overlapping blocks.
+ * @param dest Destination memory
+ * @param src Source memory
+ * @param count Number of bytes to copy
+ * @return dest, the destination memory
+ */
+void* memmove(void *dest, void *src, size_t count)
 {
 		void *temp = malloc(count);
         void *ret = dest;
