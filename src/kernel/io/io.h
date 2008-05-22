@@ -15,4 +15,6 @@ extern void clear_interrupts();
 extern void outb(uint16 port, uint8 value);
 extern uint8 inb(uint16 port);
 
+void monitor_invert();
+
 #endif /*__IO_MAIN_H_*/

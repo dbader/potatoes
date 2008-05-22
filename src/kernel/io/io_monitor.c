@@ -43,12 +43,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 #include "../include/string.h"
 #include "../include/stdlib.h"
+#include "../include/util.h"
+
+#include "../io/io.h"
 
 static uint16 *disp = (uint16*)0xB8000; //display pointer
 static void *scroll_up_ptr;
 static void *scroll_down_ptr;
 static uint32 num_lines_up = 0;
 static uint32 num_lines_down = 0;
+static uint16 charnum = 0;
 
 //FIXME: prevent scrolling writing everywhere in the memory (set limits)!!!
 void monitor_init()
@@ -68,7 +72,15 @@ void monitor_scroll()
 	scroll_up_ptr += 0xA0;
 	memcpy(scroll_up_ptr, (void*)0xB8000, 0xA0);
 	memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
+	for(uint16 *temp = (uint16*)0xB8F00; temp < (uint16*)0xB8FA0; temp++){
+		*temp = 0xF00;
+	}
 	disp -= 0x50;
+	charnum -= 80;
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, charnum >> 8);
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, charnum);
 }
 
 /**
@@ -110,30 +122,34 @@ void monitor_cputc(char ch, uint8 fg, uint8 bg)
 {
         uint32 i=0;
         uint32 temp;
-        if((uint32)disp >= 0xB8FA0)monitor_scroll(); //scroll, if outside of display-memory
+        if(charnum >= 1999)monitor_scroll(); //scroll, if outside of display-memory
         switch(ch){
         case '\n':
                 temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
-                while(i < temp){ //calculating the "new line" starting position
-                        i++;
+                while(i++ < temp){ //calculating the "new line" starting position
                         monitor_cputc(' ',fg,bg);
                 }
                 break;
         case '\t':
                 temp = 0x8 - (((uint32)disp - 0xB8000) % 0x10) / 2;
-                while(i < temp){ //calculating the "next tab" starting position
-                        i++;
+                while(i++ < temp){ //calculating the "next tab" starting position
                         monitor_cputc(' ',fg,bg);
                 }
                 break;
         case '\b':
-                disp -= 1;
+                disp--;
+                charnum--;
                 *disp = bg * 0x1000 + fg * 0x100 + ' ';
                 break;
         default:
                 *disp = bg * 0x1000 + fg * 0x100 + ch; //print character to the display pointer
-                disp += 1;
-	}
+                disp++;
+                charnum++;
+        }
+        outb(0x3D4, 0x0E);
+        outb(0x3D5, charnum >> 8);
+        outb(0x3D4, 0x0F);
+        outb(0x3D5, charnum);
 }
 
 /**
@@ -198,4 +214,10 @@ void monitor_puthex(uint8 ch)
                 monitor_cputc((low + 55),GREEN,BLACK);
         else
                 monitor_cputc((low + 48),GREEN,BLACK);
+}
+
+void monitor_invert()
+{
+	for(uint8 *temp = (uint8*)0xB8001; (uint32)temp < 0xB8FA0; temp+=2)
+		*temp = 0xFF - *temp;
 }

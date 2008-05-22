@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Echo-mode flag
  */
-bool echo = FALSE; //accessible for PM
+bool echo = TRUE; //accessible for PM
 
 /**
  * Handles an keyboard interrupt, by calling the PM. In echo-mode prints the char directly to the screen.
@@ -57,14 +57,15 @@ void kb_handler()
         }   
         else if (shift) { //Key pressed while shift is pressed
                 if (kb_shift_map[scancode] != 0) {
-                        pm_handle_input(kb_shift_map[scancode]);
                         if(echo) monitor_putc(kb_shift_map[scancode]);
+                        else pm_handle_input(kb_map[scancode]);
                 }
         }
         else if (alt) { //Key pressed while alt is pressed
+        		if (scancode == 0x12) monitor_invert();
                 if (kb_alt_map[scancode] != 0) {
-                        pm_handle_input(kb_alt_map[scancode]);
                         if(echo) monitor_putc(kb_alt_map[scancode]);
+                        else pm_handle_input(kb_map[scancode]);
                 }
         }     
         else{ //Key pressed
@@ -77,8 +78,8 @@ void kb_handler()
                 else if (scancode == SCROLL_DOWN)
                         monitor_scrolldown();
                 else if (kb_map[scancode] != 0) {
-                        pm_handle_input(kb_map[scancode]);
                         if(echo) monitor_putc(kb_map[scancode]);
+                        else pm_handle_input(kb_map[scancode]);
                 }
         }
 }
