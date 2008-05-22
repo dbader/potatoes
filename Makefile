@@ -24,7 +24,7 @@ DEPFILES := $(patsubst %.c,%.d,$(SRCFILES))
 ALLFILES := $(SRCFILES) $(HDRFILES) $(ASMFILES) 
 
 # Generated files that should be deleted by make clean
-GENFILES := src/kernel/kernel src/kernel/kernel.map floppy.img etios.pdf
+GENFILES := src/kernel/kernel src/kernel/kernel.map etios.pdf
 
 # Toolflags
 CFLAGS=-DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
@@ -60,11 +60,9 @@ clean:
 	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
 runbochs: image
-	-@sudo /sbin/losetup $(LOOPDEV) floppy.img
-	-@sudo bochs -f src/tools/bochsrc > /dev/null
-	@sudo /sbin/losetup -d $(LOOPDEV)
+	@bochs -f src/tools/bochsrc
 	
-doc:
+doc: $(OBJFILES) Makefile
 	@echo " DOXYGEN"
 	@doxygen > /dev/null
 	@cd doc/latex && $(MAKE) > /dev/null 2> /dev/null
@@ -86,11 +84,11 @@ image: kernel
 	@echo " IMAGE  floppy.img"
 	@dd if=/dev/zero of=floppy.img bs=512 count=1440 status=noxfer 2> /dev/null
 	@sudo /sbin/losetup $(LOOPDEV) floppy.img
-	@sudo mkfs -t ext2 $(LOOPDEV) > /dev/null 2> /dev/null
+	@sudo mkfs -t vfat $(LOOPDEV) > /dev/null 2> /dev/null
 
-	@sudo mount -t ext2 $(LOOPDEV) $(LOOPMNT)
+	@sudo mount -t vfat $(LOOPDEV) $(LOOPMNT)
 	@sudo mkdir $(LOOPMNT)/grub
-	@sudo cp -r image/* $(LOOPMNT)
+	@-sudo cp -r image/* $(LOOPMNT)
 	@sudo cp src/kernel/kernel $(LOOPMNT)
 	@sudo umount $(LOOPDEV)
 	
@@ -105,7 +103,7 @@ image: kernel
 
 kernel: $(OBJFILES) Makefile
 	@echo " LD	src/kernel/kernel"
-	@ld $(LDFLAGS) -Map src/kernel/kernel.map -o src/kernel/kernel $(OBJFILES)
+	@$(LD) $(LDFLAGS) -Map src/kernel/kernel.map -o src/kernel/kernel $(OBJFILES)
 
 -include $(DEPFILES)
 

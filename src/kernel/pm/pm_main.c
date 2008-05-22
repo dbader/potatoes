@@ -32,9 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 #include "../include/stdlib.h"
 #include "../include/debug.h"
+#include "../include/ringbuffer.h"
 #include "../io/io.h"
 #include "pm_main.h"
-#include "pm_ringbuffer.h"
+
 
 process_t *procs_head;
 process_t *active_proc;

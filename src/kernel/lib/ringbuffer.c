@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: pm_ringbuffer.c 87 2008-05-19 22:43:25Z dbader $
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,11 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Ring buffer implementation. Mainly used by the process management stdin queue.
  *
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dbader $
+ * @version $Rev: 87 $
  */
 
-#include "pm_ringbuffer.h"
+#include "../include/ringbuffer.h"
 #include "../include/types.h"
 #include "../include/const.h"
 #include "../include/assert.h"

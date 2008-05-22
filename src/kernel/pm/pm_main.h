@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __PM_MAIN_H
 #define __PM_MAIN_H
 
-#include "pm_ringbuffer.h"
+#include "../include/ringbuffer.h"
 
 /**
  * Process structure.
