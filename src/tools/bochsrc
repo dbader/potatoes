@@ -9,3 +9,6 @@ clock: sync=realtime
 cpu: ips=500000
 user_shortcut: keys=pause
 keyboard_mapping: enabled=1, map=/usr/share/bochs/keymaps/x11-pc-de.map
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata0-master: type=disk, path="c.img", mode=flat, cylinders=20, heads=16, spt=63
+

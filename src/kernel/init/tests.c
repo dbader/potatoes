@@ -192,9 +192,9 @@ void sleep_test()
 void do_tests()
 {
         monitor_puts("\n\ndo_tests():\n");
-        grubstruct_test(g_mboot_ptr);
+        //grubstruct_test(g_mboot_ptr);
         //strings_test();       
-        draw_test();
+        //draw_test();
         //printf_test();
         //assert_test();
         //malloc_test();
