@@ -83,7 +83,7 @@ void gdt_add_entry(sint32 num, uint32 base, uint32 limit, uint8 access, uint8 gr
 void gdt_init()
 {
         gp.limit = (sizeof(struct gdt_entry) * 3) - 1; // the size of the GDT
-        gp.base = (uint32)&gdt; // the base adress of the GDT
+        gp.base = (uint32)&gdt; // the base address of the GDT
 
         gdt_add_entry(0, 0, 0, 0, 0); // the null descriptor
         gdt_add_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // second entry: code segment

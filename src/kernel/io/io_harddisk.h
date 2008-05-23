@@ -38,4 +38,9 @@ struct hd_info{
 	uint16 reserved5[96];
 }__attribute__((__packed__));
 
+struct address{
+	uint32 cyl;
+	uint16 head;
+	uint16 sector;
+};
 #endif /*__IO_HARDDISK_H_*/

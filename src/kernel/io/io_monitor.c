@@ -34,8 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Functions to print things on the monitor
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 58 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  *
  */
  

@@ -48,10 +48,20 @@ inb:
 [GLOBAL repinsw]
 
 repinsw:
+        cld
         mov ecx, [esp+12] ;value
-        mov edi, [esp+8] ;buffer
+        mov edi, [esp+8] ;dest buffer
         mov edx, [esp+4] ;source address
         rep insw
         ret
 
-;void repinsw(int port, ushort_t *addr, int cnt)
+;********************************************************************************************
+[GLOBAL repoutsw]
+
+repoutsw:
+        cld
+        mov ecx, [esp+12] ;value
+        mov esi, [esp+8] ;source buffer
+        mov edx, [esp+4] ;dest address
+        rep outsw
+        ret

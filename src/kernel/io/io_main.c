@@ -43,6 +43,6 @@ void io_init()
 	
         monitor_init();			dprintf("io: monitor initialized\n");
         timer_init(FREQUENCY); 	dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
-        hd_init();			dprintf("io: monitor initialized\n");
         set_interrupts();      	dprintf("io: interrupts enabled\n");
+        hd_init();			dprintf("io: hard disk initialized\n");
 }

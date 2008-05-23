@@ -189,6 +189,14 @@ void sleep_test()
         printf("\n10 seconds later\n");
 }
 
+/**
+ * Memcopy using hd ;-)
+ */
+void hd_test(){
+	hd_write_sector(42,(uint16*)0xB8000);
+	hd_read_sector((uint16*)0xB85A0,42);
+}
+
 void do_tests()
 {
         monitor_puts("\n\ndo_tests():\n");
@@ -200,4 +208,5 @@ void do_tests()
         //malloc_test();
         //strsep_test();
         //sleep_test();
+        hd_test();
 }
