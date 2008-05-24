@@ -39,11 +39,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * TODO: Maybe move this into pm_process.h
  */
 typedef struct {
+        /** process name */
         char *name;
+        
+        /** process id */
         uint32 pid;
+        
+        /** process state: running, dead, ... */ 
         sint8 state;
-        uint32 *addr;
+        
+        /** memory address */
+        void *addr;
+        
+        /** process timeslice */
         uint32 timeslice;
+        
+        /** STDIN queue */
         ring_fifo *stdin;
         
         /* machine_state ms; */
@@ -51,6 +62,7 @@ typedef struct {
         /* llist *mem_blocks; */
         /* proc_file_table *pft; */
      
+        /** linked list next ptr */
         struct process *next; 
 } process_t;
 

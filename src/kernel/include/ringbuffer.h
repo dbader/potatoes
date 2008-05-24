@@ -38,11 +38,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * A static circular FIFO buffer.
  */
 typedef struct {
-        uint8  *data;   /** the data pointer */
-        uint32  size;   /** size of data (max value of len) */
-        uint32  start;  /** read pointer */
-        uint32  end;    /** write pointer */
-        uint32  len;    /** number of used bytes */
+        /** the data pointer */
+        uint8  *data;
+        
+        /** size of data (max value of len) */
+        uint32  size;
+        
+        /** read position */
+        uint32  start;
+        
+        /** write position */
+        uint32  end;
+        
+        /** number of used bytes */
+        uint32  len;
 } ring_fifo;
 
 ring_fifo* rf_alloc(uint32 size);

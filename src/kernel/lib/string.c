@@ -148,23 +148,23 @@ char* strncat(char *s1, char *s2, size_t n)
  *  
  * Example:
  * 
- *      char path[] = "/usr/share/bin/editor";
- *      char delim[] = "/";
- *      char *tok;
- *      char *copy = strdup(path);
- *      char *work_copy = copy;
+ *      char path[] = "/usr/share/bin/editor";<p>
+ *      char delim[] = "/";<p>
+ *      char *tok;<p>
+ *      char *copy = strdup(path);<p>
+ *      char *work_copy = copy;<p><p>
  *
- *      do {
- *              printf("strsep(\"%s\") ", work_copy);
- *              tok = strsep(&work_copy, delim);
- *              printf("-> \"%s\"\n", tok);
- *      } while (tok != NULL);
+ *      do {<p>
+ *              printf("strsep(\"%s\") ", work_copy);<p>
+ *              tok = strsep(&work_copy, delim);<p>
+ *              printf("-> \"%s\"\n", tok);<p>
+ *      } while (tok != NULL);<p><p>
  *
- *      printf("\ncopy = %p\n", copy);
- *      printf("work_copy = %p\n", work_copy);
- *      puts("done.");
+ *      printf("\ncopy = %p\n", copy);<p>
+ *      printf("work_copy = %p\n", work_copy);<p>
+ *      puts("done.");<p>
  *
- *      free(copy);
+ *      free(copy);<p>
  * 
  * @bug The current implementation does not handle multiple delimiters (as specified in the
  *      libc manual). Only the first character in *delims is used for tokenizing the input string.
@@ -237,7 +237,9 @@ void bzero(void *dest, size_t count)
 }
 
 /**
- * Copies count bytes form src to dest. Undefined for overlapping blocks.
+ * Copies count bytes form src to dest. Undefined behaviour when src and dest
+ * are overlapping (use memmove() instead).
+ * @see memmove
  * @param dest Destination memory
  * @param src Source memory
  * @param count Number of bytes to copy
@@ -253,7 +255,10 @@ void* memcpy(void *dest, void *src, size_t count)
 }
 
 /**
- * Copies count bytes form src to dest. Defined for overlapping blocks.
+ * Copies count bytes form src to dest. Unlike memcpy(), memmove() supports copy operations
+ * where the blocks referenced by src and dest are overlapping. Should you not need such
+ * functionality, use memcpy() for performance reasons.
+ * @see memcpy
  * @param dest Destination memory
  * @param src Source memory
  * @param count Number of bytes to copy
@@ -261,16 +266,14 @@ void* memcpy(void *dest, void *src, size_t count)
  */
 void* memmove(void *dest, void *src, size_t count)
 {
-		void *temp = malloc(count);
-        void *ret = dest;
-        for (int i = 0; i < count; i++)
-                *((uint8*)temp++) = *((uint8*)src++);
-        temp -= count;
-        for (int i = 0; i < count; i++)
-                        *((uint8*)dest++) = *((uint8*)temp++);
-        temp -= count;
+        void *temp = malloc(count);
+
+        memcpy(temp, src, count);
+        memcpy(dest, temp, count);
+        
         free(temp);
-        return ret;
+        
+        return dest;
 }
 
 /**

@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../include/types.h"
+#include "../include/debug.h"
 
 
 /** 
@@ -66,6 +67,7 @@ extern void gdt_flush();
  */
 void gdt_add_entry(sint32 num, uint32 base, uint32 limit, uint8 access, uint8 gran)
 {
+        dprintf("mm: GDT[%d] 0x%x - 0x%x access: 0x%x gran: 0x%x\n", num, base, limit, access, gran);
         gdt[num].base_low = (base & 0xFFFF);
         gdt[num].base_middle = (base >> 16) & 0xFF;
         gdt[num].base_high = (base >> 24) & 0xFF;

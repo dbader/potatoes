@@ -44,15 +44,17 @@ all: kernel image doc
 help:
 	@echo "Available make targets:"
 	@echo
-	@echo "all	- builds the kernel, floppy image and documentation"
-	@echo "clean	- removes all generated files"
-	@echo "doc	- builds doxygen documentation"
-	@echo "fiximg	- unmounts the image and disables loopback"
-	@echo "image	- builds floppy image (floppy.img)"
-	@echo "kernel	- builds the kernel"
-	@echo "runbochs	- starts bochs"
-	@echo "todo	- search sourcecode for TODOs"
-	@echo "help	- displays this list"
+	@echo "all		- builds the kernel, floppy image and documentation"
+	@echo "clean		- removes all generated files"
+	@echo "doc		- builds doxygen documentation"
+	@echo "fiximg		- unmounts the image and disables loopback"
+	@echo "image		- builds floppy image (floppy.img)"
+	@echo "kernel		- builds the kernel"
+	@echo "mac_runbochs	- starts bochs (mac)"
+	@echo "mac_image	- update floppy.img (mac)"
+	@echo "runbochs		- starts bochs"
+	@echo "todo		- search sourcecode for TODOs"
+	@echo "help		- displays this list"
 
 clean:
 	@echo " CLEAN"
@@ -61,6 +63,9 @@ clean:
 	
 runbochs: image
 	@bochs -f src/tools/bochsrc
+	
+mac_runbochs: mac_image
+	@/Applications/bochs.app/Contents/MacOS/bochs -q -f src/tools/bochsrc
 	
 doc: $(OBJFILES) Makefile
 	@echo " DOXYGEN"
@@ -100,6 +105,13 @@ image: kernel
 	@rm grubdevice.map grubconf.conf
 	
 	@sudo /sbin/losetup -d $(LOOPDEV)
+	
+# This only updates the kernel file and needs a bootable copy of floppy.img
+mac_image: kernel
+	@echo " IMAGE  floppy.img"
+	@hdiutil attach floppy.img > /dev/null
+	@cp src/kernel/kernel /Volumes/ETIOS_BOOT
+	@hdiutil detach /Volumes/ETIOS_BOOT > /dev/null
 
 kernel: $(OBJFILES) Makefile
 	@echo " LD	src/kernel/kernel"
