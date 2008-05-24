@@ -34,26 +34,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __FS_INODE_TABLE_H_
 #define __FS_INODE_TABLE_H_
 
-/* central struct */
-
+/** The (memory-) inode table */
 m_inode inode_table[NUM_INODES];
 
+/** The root inode */
+m_inode *root;
 
-/* definition */
 
-#define NIL_INODE (m_inode *) 0                         /* there is no free inode entry left */
+/* definitions */
+
+#define NIL_INODE -1   
 
 
 /* functions */
 
-m_inode * read_inode(inode_nr inode);
+void init_inode_table();
 
-uint8 write_inode(m_inode *inode);
+m_inode* get_inode(inode_nr i_num);
 
-uint8 free_inode(inode_nr inode);
+bool write_inode(m_inode *inode);
 
-uint8 alloc_inode(void);
+void cpy_minode_to_dinode(m_inode *mi, d_inode *di);
 
-uint32 new_inode(); 
+void free_inode(inode_nr i_num);
+
+m_inode* alloc_inode();
+
 
 #endif /*__FS_INODE_TABLE_H_*/

@@ -32,14 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __FS_BLOCK_DEV_H_
 #define __FS_BLOCK_DEV_H_
 
-extern uint32 read_block(block_nr block, uint16 *buf, uint16 num_bytes);
+void rd_block(block_nr blk_nr, void *buf, size_t num_bytes);
+void wrt_block(block_nr blk_nr, void *buf, size_t num_bytes);
+void wrt_cache(block_cache *cache, size_t num_bytes);
 
-extern uint32 write_block(block_nr block, uint16 *buf, uint16 num_bytes);
 
-extern uint8 free_block(block_nr block);
-
-extern uint8 alloc_block(block_nr near_to_block);
-
-extern uint32 new_block(); 
 
 #endif /*__FS_BLOCK_DEV_H_*/

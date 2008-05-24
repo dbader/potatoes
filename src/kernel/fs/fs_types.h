@@ -35,7 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __FS_TYPES_H_
 
 typedef uint32 block_nr;
-typedef uint16 inode_nr;
+typedef sint16 inode_nr;
+typedef sint16 file_nr;
 
 /**
  * The directory entry.
@@ -80,9 +81,9 @@ typedef struct {
  * The global file descriptor.
  */
 typedef struct {
-        uint16 f_desc;                          /* file (f) descriptor */
+        file_nr f_desc;                         /* file (f) descriptor */
         m_inode *f_inode;
-        char *f_name;                          /* pointer to absolute file path */
+        char *f_name;                           /* pointer to absolute file path */
         uint8 f_mode;                           /* see i_mode */
         uint16 f_count;                         /* number of process file descriptors accessing this file */
 } file;
@@ -91,45 +92,25 @@ typedef struct {
  * The process file descriptor.
  */
 typedef struct {
-        uint16 pf_desc;                         /* process file (pf) descriptor */
-        uint16 pf_f_desc;                       /* pointer to global file descriptor */
+        file_nr pf_desc;                        /* process file (pf) descriptor */
+        file_nr pf_f_desc;                      /* pointer to global file descriptor */
         uint32 pf_pos;                          /* position in file */
 } proc_file;                                    /* process file descriptor from process filp */
-
-/**
- * The block bitmap.
- * Split on NUM_BMAP_BLOCKS blocks.
- */
-typedef struct {
-        uint16 bit : 1;
-} bit;
 
 
 /**
  * A buffer for one block.
  */
 typedef struct {
-        uint32 block_nr;
-        uint8 cache[BLOCK_SIZE];                /* 1024 * 1 byte = 1024 byte space for block content */
-} block_buf;
+        block_nr block_nr;
+        uint8 cache[BLOCK_SIZE];                /* BLOCK_SIZE * 1 byte = BLOCK_SIZE byte space for block content */
+} block_buffer;
 
 
 /**
  * The cache for one generic block.
  */  
-typedef block_buf block_cache;
-
-
-/**
- * The cache for a block which should be written.
- */
-typedef block_buf write_cache;
-
-
-/*
- * The cache for a block containing indirect addresses.
- */
-typedef block_buf crt_ind_adr_block;            /* current indirect address block */
+typedef block_buffer block_cache;
 
 
 

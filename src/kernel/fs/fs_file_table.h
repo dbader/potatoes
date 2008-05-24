@@ -40,22 +40,23 @@ file gft[NUM_FILES];
 
 void init_file_table();
 void init_proc_file_table(proc_file proc_filp[]);
-sint16 insert_file(m_inode *inode, char *name, uint8 mode);
-sint16 insert_proc_file(proc_file proc_filp[], uint16 glo_desc);
-sint16 alloc_file();
-sint16 alloc_proc_file(proc_file proc_filp[]);
-file *get_file(uint16 fd);
-void inc_count(uint16 fd);
-sint16 name2desc(char *name);
-sint16 inode2desc(m_inode *inode);
-bool contains_file(uint16 fd);
-uint16 conv_desc(uint16 desc);
+file_nr insert_file(m_inode *inode, char *name, uint8 mode);
+file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd);
+file* alloc_file();
+proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES]);
+file* get_file(file_nr fd);
+proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd);
+void inc_count(file_nr fd);
+file_nr name2desc(char *name);
+file_nr inode2desc(m_inode *inode);
+bool contains_file(file_nr fd);
+file_nr conv_desc(file_nr fd);
 
 /* definition */
 
-#define NIL_FILE 0
+#define NIL_FILE -1
 
-#define NIL_PROC_FILE 0
+#define NIL_PROC_FILE -1
 
 
 #endif /*__FS_FILE_TABLE_H_*/

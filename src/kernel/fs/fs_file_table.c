@@ -34,178 +34,200 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs_const.h"
 #include "fs_types.h"
-#include "fs_filp.h"
+#include "fs_file_table.h"
 
 /**
- * Initializes the global filp table with NULL elements
+ * Initialize the global filp table with NULL elements
  */
 void init_file_table()
 {
         for(int i = 0; i < NUM_FILES; i++){
-                gft[i].f_desc = NIL_FILE;
+                gft[i].f_desc = NIL_FILE;               //desc = NIL_FILE = -1 => desc not assigned => file not used
         }
 }
 
 /**
- * Initializes the process filp table with NULL elements
+ * Initialize the process filp table with NULL elements
  */
 void init_proc_file_table(proc_file pft[NUM_PROC_FILES])  //TODO: proc_file_table *pft ? --> typedef proc_file_table
 {
         for(int i = 0; i < NUM_PROC_FILES; i++){
-                pft[i].pf_desc = NIL_PROC_FILE;
+                pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
         }
 }
 
 /**
- * Inserts a new file to the global filp table
+ * Insert a new file to the global filp table
  * 
  * @return desc - the assigned file descriptor
  */
-sint16 insert_file(m_inode *inode, char *name, uint8 mode) //length: NUM_FILES
+file_nr insert_file(m_inode *inode, char *name, uint8 mode) //length: NUM_FILES
 {
-        sint16 fd = alloc_file();
+        file_nr old = name2desc(name);          //exists a file with the same path already?
+        if (old != NOT_FOUND){
+                inc_count(old);                 //increment reference counter
+                return old;
+        }
+                
+        file *fd = alloc_file();
         
-        if (fd == NOT_FOUND){
+        if (fd == (file*) 0){
                 return NOT_POSSIBLE;
         }
-        if (contains_file(fd) == TRUE){
-                inc_count(fd);
-        } else {
-                gft[fd].f_desc  = fd;
-                gft[fd].f_inode = inode;
-                gft[fd].f_name  = name;
-                gft[fd].f_mode  = mode;
-                gft[fd].f_count = 1;
-        }
+
+        fd->f_inode = inode;
+        fd->f_name  = name;
+        fd->f_mode  = mode;
         
-        return fd;
+        return fd->f_desc;
 }
 
 
 /**
- * Inserts a new file to a given process filp table
+ * Insert a new file to a given process filp table
  * 
  * @return fd - the assigned file descriptor
  */
-sint16 insert_proc_file(proc_file pft[NUM_PROC_FILES], uint16 glo_fd) //length: NUM_PROC_FILES
+file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length: NUM_PROC_FILES
 {
-        sint16 fd = alloc_proc_file(pft);
+        proc_file *fd = alloc_proc_file(pft);
         
-        if (fd == NOT_FOUND){
+        if (fd == (proc_file*) 0){
                 return NOT_POSSIBLE;
         }
         
-        pft[fd].pf_desc   = fd;
-        pft[fd].pf_f_desc = glo_fd;
-        pft[fd].pf_pos    = 0;
+        fd->pf_f_desc = glo_fd;
+        fd->pf_pos    = 0;
         
-        return fd;
+        return fd->pf_desc;
 }
 
 /**
- * Finds an unused descriptor in the global filp table
+ * Allocate an unused file in the global file table.
  * 
- * @return desc - the found descriptor
+ * @return Pointer to the allocated file
  */
-sint16 alloc_file()
+file* alloc_file()
 {
         for(int i = 0; i < NUM_FILES; i++){
                 if (gft[i].f_desc == NIL_FILE){
-                        return conv_desc(i);
+                        gft[i].f_desc = conv_desc(i);
+                        gft[i].f_count = 1;
+                        return &gft[i];
                 }
         }
-        return NOT_FOUND;
+        return (file*) 0;
 }
 
 /**
- * Finds an unused descriptor in the process filp table
+ * Allocate an unused file in the process file table.
  * 
- * @return desc - the found descriptor
+ * @return Pointer to the allocated file
  */
-sint16 alloc_proc_file(proc_file pft[NUM_PROC_FILES])
+proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES])
 {
         for(int i = 0; i < NUM_PROC_FILES; i++){
                 if (pft[i].pf_desc == NIL_PROC_FILE){
-                        return conv_desc(i);
+                        pft[i].pf_desc = conv_desc(i);
+                        return &pft[i];
                 }
         }
-        return NOT_FOUND;  
+        return (proc_file*) 0;
 }
 
 /**
- * Finds a file in the global filp table
+ * Find a file in the global file table
  * 
- * @return *file - the found file
+ * @return Pointer to the found file
  */
 
-file* get_file(uint16 fd)
+file* get_file(file_nr fd)
 {
         for (int i = 0; i < NUM_FILES; i++){
                 if ( gft[i].f_desc == fd )
                         return &gft[i];
         } 
                
-        return (file *) 0;  
+        return (file*) 0;  
 }
 
 /**
- * Increments the reference counter of a file
+ * Find a file in the process file table
+ * 
+ * @return Pointer to the found file
  */
-void inc_count(uint16 fd)
+
+proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
+{
+        for (int i = 0; i < NUM_PROC_FILES; i++){
+                if ( pft[i].pf_desc == fd )
+                        return &pft[i];
+        } 
+               
+        return (proc_file*) 0;  
+}
+
+/**
+ * Increment the reference counter of a file
+ * 
+ * @param fd The file descriptor.
+ */
+void inc_count(file_nr fd)
 {
         file *f = get_file(fd);
         f->f_count++;
 }
 
 /**
- * Finds the descriptor of a file with the file name
+ * Find the descriptor of a file with the file name
  * 
- * @return fd - the found file descriptor
+ * @param name  The file name
+ * @return fd   The found file descriptor
  */
-sint16 name2desc(char *name) //in global filp table
+file_nr name2desc(char *name) //in global filp table
 { 
         int i;
         for (i = 0; i < NUM_FILES; i++){
-               /*TODO: enable when strcmp is implemented 
-                * if (strcmp(name, gft[i].f_name) == 0) 
-                *        return conv_desc(i);
-                */
+                if (strcmp(name, gft[i].f_name) == 0) 
+                        return gft[i].f_desc;
         } 
         
         return NOT_FOUND; 
 }
 
 /**
- * Finds the descriptor of a file with the inode (number)
+ * Find the descriptor of a file with the inode (number)
  * 
- * @return fd - the found file descriptor
+ * @param  inode  The inode     
+ * @return fd     The found file descriptor
  */
-sint16 inode2desc(m_inode *inode)
+file_nr inode2desc(m_inode *inode)
 {
         for (int i = 0; i < NUM_FILES; i++){
                 if ( inode->i_num == (gft[i].f_inode)->i_num )
-                        return conv_desc(i);
+                        return gft[i].f_desc;
         } 
                
         return NOT_FOUND; 
 }
 
 /**
- * Looks whether the global filp table contains a special file descriptor
+ * Look whether the global file table contains a special file descriptor
  * 
  * @return TRUE | FALSE
  */
-bool contains_file(uint16 fd)
+bool contains_file(file_nr fd)
 {
         return ( get_file(fd) != (file *) 0);
 }
 
 /**
- * Converts a filp table entry number to the really used descriptor
+ * Convert a file table entry number to the real descriptor
  * 
+ * @param  fd The file descriptor
  * @return fd = fd + FS_OFFSET
  */
-uint16 conv_desc(uint16 fd)
+file_nr conv_desc(file_nr fd)
 {
         return fd + FD_OFFSET;
 }

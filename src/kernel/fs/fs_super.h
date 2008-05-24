@@ -32,6 +32,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __SUPER_H_
 #define __SUPER_H_
 
+
+/**
+ * extern deklaration of the block bitmap
+ */
+extern uint8 bmap[NUM_BLOCKS_ON_HD / 8];
+
+/**
+ * extern deklaration of root inode
+ */
+extern m_inode *root;
+
 struct super_block {
         block_nr s_HD_size;                             /* #blocks on HD */
         uint16  s_bmap_blocks;                          /* # blocks used by block bitmap */
@@ -39,7 +50,7 @@ struct super_block {
         uint32 s_max_file_size;
         
         /* in mem */
-        bit *s_bmap;                                    /* pointer to block bitmap */
+        uint8 *s_bmap;                                  /* pointer to block bitmap */
         m_inode *s_iroot;                               /* pointer to root inode */
         uint32 s_modify_ts;
         uint16 s_read_only;                             /* TRUE or FALSE */
@@ -52,6 +63,7 @@ void init_super_block();
 void load_super_block();
 
 struct super_block* get_super();
+
 
 #define NIL_SUPER (struct super_block *) 0
 

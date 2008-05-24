@@ -22,12 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Basic buffer definitions.
- * Types of temporary buffers used:
- * 
- * 1) current_block_buffer
- * 2) write_pre_cache_buffer
- * 3) current_indirect_adr_buffer
+ * Basic buffer/cache definitions.
  * 
  * @author Vincenz Doelle
  * @author $LastChangedBy$
@@ -38,6 +33,63 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __FS_BUF_H_
 #define __FS_BUF_H_
 
-/* to be defined */
+/**
+ * A flat buffer/ byte array.
+ */
+uint8 write_buffer[BLOCK_SIZE];
+
+/**
+ * A flat buffer/ byte array.
+ */
+uint8 read_buffer[BLOCK_SIZE];
+
+/**
+ * A cache for reading a block.
+ */
+block_cache read_cache;
+
+/**
+ * A cache for writing a block.
+ */
+block_cache write_cache;
+
+/**
+ *  A disk inode cache.
+ */
+d_inode d_inode_cache;
+
+/**
+ * A directory cache.
+ * 
+ * (4 bytes for block_nr, NAME_SIZE bytes for the name)
+ */
+dir_entry dir_cache[BLOCK_SIZE/(4 + NAME_SIZE)];
+
+/*
+ * The cache for a block containing indirect addresses.
+ * (current indirect address block)
+ */
+block_cache adr_cache;
+
+
+/***********************************************************************/
+
+void clear_cache(block_cache *cache);
+
+void clear_buffer(uint8 buffer[BLOCK_SIZE]);
+
+uint8* get_write_buffer();
+
+uint8* get_read_buffer();
+
+block_cache* get_write_cache();
+
+block_cache* get_read_cache();
+
+block_cache* get_adr_cache();
+
+dir_entry* get_dir_cache();
+
+d_inode* get_d_inode_cache();
 
 #endif /*__FS_BUF_H_*/

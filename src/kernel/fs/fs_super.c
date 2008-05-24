@@ -32,33 +32,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 
-#include "const.h"
-#include "types.h"
-#include "super.h"
-
-/**
- * Pointer to the root inode.
- */       
-extern m_inode *root;
-
-/**
- * The bitmap for the HD blocks.
- */
-extern bit bmap[NUM_BLOCKS_ON_HD];
-
-extern void reset_bmap();
+#include "fs_const.h"
+#include "fs_types.h"
+#include "fs_super.h"
 
 /**
  * Time function.
  * @return current system time.
  */
-extern uint32 get_time();
+uint32 get_time();
 
 /**
  * Pointer to super block structure.
  */
 struct super_block *super; 
-        
+
 /**
  * Initializes the super block.
  */
@@ -70,16 +58,16 @@ void init_super_block()
         
         super->s_bmap_blocks = NUM_BMAP_BLOCKS;
         
-        super->s_first_data_block = 1 /*boot*/ + 1 /*super*/ + NUM_BMAP_BLOCKS /*block bitmap*/;
+        super->s_first_data_block = ROOT_INODE_BLOCK + 1;
         
-        /* with 32 Bit addresses and a block size of 1024: 65 MB */
+        /* with 32 Bit addresses and a block size of 512: 16MB */
         super->s_max_file_size = (NUM_DIRECT_POINTER + BLOCK_SIZE*8/32 + (BLOCK_SIZE*8/32)*(BLOCK_SIZE*8/32)) * BLOCK_SIZE;
         
         /* pointer to blocks of block bitmap */
-        super->s_bmap = &bmap[0];
+        super->s_bmap = bmap;
         
         /* pointer to root inode */
-        //super->s_iroot = root;
+        super->s_iroot = root;
         
         //super->s_modify_ts = get_time();
         

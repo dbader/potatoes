@@ -32,42 +32,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 
-#include "const.h"
-#include "types.h"
+#include "fs_const.h"
+#include "fs_types.h"
+#include "fs_buf.h"
+
+#include "../include/string.h"
+#include "../include/stdio.h"
 
 
-/**
- * central block bitmap from bmap.c
- */
-extern bit bmap[NUM_BLOCKS_ON_HD];
-
-/**
- * mark_block from bmap.c
- */
-extern void mark_block(block_nr blk, bool flag);
-
-extern block_nr get_free_block(block_nr start);
-
-
-
-uint32 read_block(block_nr block, uint16 *buf, uint16 num_bytes);
-
-uint32 write_block(block_nr block, uint16 *buf, uint16 num_bytes);
-
-uint8 free_block(block_nr block);
-
-block_nr alloc_block(block_nr start);
-
-uint32 new_block(); 
+extern void read_sector(uint32 source, void* target);
+extern void hd_read_sector(uint16* dest, uint32 src);
+extern void hd_write_sector(uint32 dest, uint16* src);
 
 /**
- * Allocates a new block.
- * Search linear from the "start" block number.
+ * Read a block from HD into buf and cache it into the read_cache.
+ * 
+ * @param block         The block number which should be read
+ * @param *buf          A pointer to the dest. buffer
+ * @param num_bytes     Number of bytes that should be read
  */
-
-block_nr alloc_block(block_nr start){
-        block_nr blk_nr;
-        blk_nr = get_free_block(start);
-        mark_block(blk_nr, TRUE);
-        return blk_nr;
+void rd_block(block_nr blk_nr, void *buf, size_t num_bytes)
+{       
+        block_cache *cache = get_read_cache();
+        clear_cache(cache);
+        
+        hd_read_sector((uint16*)cache->cache, blk_nr);                            //get block from IO 
+       
+        cache->block_nr = blk_nr;                                        //remember the block number
+        
+        memcpy(buf, cache->cache, num_bytes);                            //copy block to destination
 }
+
+void wrt_block(block_nr blk_nr, void *buf, size_t num_bytes)
+{
+        block_cache *cache = get_write_cache();
+        clear_cache(cache);
+        
+        cache->block_nr = blk_nr;
+
+        memcpy(cache->cache, buf, num_bytes);
+        
+        hd_write_sector(blk_nr, (uint16*)cache->cache);
+}
+
+void wrt_cache(block_cache *cache, size_t num_bytes)
+{
+        wrt_block(cache->block_nr, cache->cache, num_bytes);
+}
+
+
+

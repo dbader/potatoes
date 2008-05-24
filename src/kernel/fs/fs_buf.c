@@ -33,3 +33,101 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
+#include "../include/const.h"
+#include "../include/types.h"
+#include "../include/string.h"
+
+#include "fs_const.h"
+#include "fs_types.h"
+#include "fs_buf.h"
+
+/**
+ * Clears a struct of type 'block_cache'.
+ * 
+ * @param cache Pointer to a cache
+ */
+void clear_cache(block_cache *cache)
+{
+        bzero(cache->cache, BLOCK_SIZE);
+        cache->block_nr = 0;
+}
+
+/**
+ * Clears a array of bytes = a buffer.
+ * 
+ * @param Pointer to the array/buffer
+ */
+void clear_buffer(uint8 buffer[BLOCK_SIZE])
+{
+        bzero(buffer, BLOCK_SIZE);
+}
+
+/**
+ * Returns a pointer to the write buffer.
+ * 
+ * @return A byte pointer
+ */
+uint8* get_write_buffer()
+{
+        return write_buffer;
+}
+
+/**
+ * Returns a pointer to the read buffer.
+ * 
+ * @return A byte pointer
+ */
+uint8* get_read_buffer()
+{
+        return read_buffer;
+}
+
+/**
+ * Returns a pointer to the write cache.
+ * 
+ * @return A block_cache pointer
+ */
+block_cache* get_write_cache()
+{
+        return &write_cache;
+}
+
+/**
+ * Returns a pointer to the read cache.
+ * 
+ * @return A block_cache pointer
+ */
+block_cache* get_read_cache()
+{
+        return &read_cache;
+}
+
+/**
+ * Returns a pointer to the address cache.
+ * 
+ * @return A block_cache pointer
+ */
+block_cache* get_adr_cache()
+{
+        return &adr_cache;
+}
+
+/**
+ * Returns a pointer to the directory cache.
+ * 
+ * @return A dir_entry pointer
+ */
+dir_entry* get_dir_cache()
+{
+        return dir_cache;
+}
+
+/**
+ * Returns a pointer to the disk inode cache.
+ * 
+ * @return A d_inode pointer
+ */
+d_inode* get_d_inode_cache()
+{
+        return &d_inode_cache;
+}

@@ -1,4 +1,4 @@
-/* $Id: fs_main.h 47 2008-05-11 10:34:21Z vdoelle $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,14 +25,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Basic definitions of all functions concerning work on files
  * 
  * @author Vincenz Doelle
- * @author $LastChangedBy: vdoelle $
- * @version $Rev: 47 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef __FS_MAIN_H_
 #define __FS_MAIN_H_
 
 /* MKFS */
+bool fs_init();
+bool fs_shutdown();
+bool load_fs();
+bool create_ts();
 
 
 /* CREATE */

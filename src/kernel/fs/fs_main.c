@@ -34,24 +34,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs_const.h"
 #include "fs_types.h"
+#include "fs_main.h"
+
 
 bool fs_init()
 {
-      return mk_fs();  
+        return TRUE;
 }
 
 bool fs_shutdown()
 {
-        
-}
-
-
-
-bool mk_fs()
-{
-       
-        
-        return TRUE;
+        return TRUE;   
 }
 
 bool load_fs()
@@ -72,7 +65,6 @@ bool create_fs()
         //create bmap
         
         //create root dir
-        
         
         return TRUE;
 }
