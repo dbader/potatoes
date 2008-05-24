@@ -76,8 +76,8 @@ int putchar(char c);
 int puts(char *s);
 void printf(char *fmt, ...);
 
-void hd_write_sector(uint32 dest, uint16* src);
-void hd_read_sector(uint16* dest, uint32 src);
+void hd_write_sector(uint32 dest, void* src);
+void hd_read_sector(void* dest, uint32 src);
 extern uint32 maxaddr;
 
 #endif /* stdio.h */

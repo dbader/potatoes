@@ -41,8 +41,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 extern void read_sector(uint32 source, void* target);
-extern void hd_read_sector(uint16* dest, uint32 src);
-extern void hd_write_sector(uint32 dest, uint16* src);
+extern void hd_read_sector(void* dest, uint32 src);
+extern void hd_write_sector(uint32 dest, void* src);
 
 /**
  * Read a block from HD into buf and cache it into the read_cache.
@@ -56,7 +56,7 @@ void rd_block(block_nr blk_nr, void *buf, size_t num_bytes)
         block_cache *cache = get_read_cache();
         clear_cache(cache);
         
-        hd_read_sector((uint16*)cache->cache, blk_nr);                            //get block from IO 
+        hd_read_sector((void*)cache->cache, blk_nr);                            //get block from IO 
        
         cache->block_nr = blk_nr;                                        //remember the block number
         
@@ -72,7 +72,7 @@ void wrt_block(block_nr blk_nr, void *buf, size_t num_bytes)
 
         memcpy(cache->cache, buf, num_bytes);
         
-        hd_write_sector(blk_nr, (uint16*)cache->cache);
+        hd_write_sector(blk_nr, (void*)cache->cache);
 }
 
 void wrt_cache(block_cache *cache, size_t num_bytes)

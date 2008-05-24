@@ -1,6 +1,6 @@
 /* $Id$
       _   _  ____   _____ 
-     | | (_)/ __ \ / ____|
+     | | (_)/ __ \ / ____|uint16
   ___| |_ _| |  | | (___  
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 #include "../include/types.h"
 #include "../include/const.h"
+#include "../include/init.h"
 
 #include "../io/io.h"
 #include "../io/io_harddisk.h"
@@ -72,7 +73,7 @@ void hd_init()
 			,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
 }
 
-void hd_write_sector(uint32 dest, uint16* src)
+void hd_write_sector(uint32 dest, void *src)
 {
 	if(dest > maxaddr) return;
 	struct address addr = itoaddr(dest);
@@ -86,7 +87,7 @@ void hd_write_sector(uint32 dest, uint16* src)
 	wait_on_hd_interrupt();
 }
 
-void hd_read_sector(uint16* dest, uint32 src)
+void hd_read_sector(void *dest, uint32 src)
 {
 	if(src > maxaddr) return;
 	struct address addr = itoaddr(src);
@@ -102,4 +103,5 @@ void hd_read_sector(uint16* dest, uint32 src)
 
 void hd_handler(){
 	if (inb(0x1F7) & 0x40) hd_interrupt = TRUE;
+	else panic("IDE ERROR");
 }
