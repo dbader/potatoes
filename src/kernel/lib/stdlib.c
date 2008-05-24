@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param name the name of the memory block (mainly for debugging purposes)
  * @return pointer to the allocated space
  */
-void *malloc_name(uint32 size, char* name)
+void* malloc_name(uint32 size, char* name)
 {
 //        monitor_puti(MM_END);
         mm_occupied_top += size;
@@ -65,7 +65,7 @@ void *malloc_name(uint32 size, char* name)
  * @param size how much space shall be allocated
  * @return pointer to the allocated space
  */ 
-void *malloc(uint32 size)
+void* malloc(uint32 size)
 {
         return (void*) malloc_name(size,"noname");
 }
@@ -75,7 +75,7 @@ void *malloc(uint32 size)
  * 
  * @param start pointer to the start of the block that shall be freed
  */
-void free(void* start)
+void free(void *start)
 {
         ;
 }

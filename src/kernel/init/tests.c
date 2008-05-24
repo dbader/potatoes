@@ -193,8 +193,14 @@ void sleep_test()
  * Memcopy using hd ;-)
  */
 void hd_test(){
-	hd_write_sector(42,(uint16*)0xB8000);
-	hd_read_sector((uint16*)0xB85A0,42);
+        char src_string[] = "'foobar' visited HD on block 42 - that's great! - Thanks Dmitriy!!";
+        hd_write_sector(42, (uint16*) src_string);
+        
+        char *res_string = malloc(50);
+        hd_read_sector((uint16*) res_string, 42);
+        puts(res_string);
+	//hd_write_sector(42,(uint16*)0xB8000);
+	//hd_read_sector((uint16*)0xB85A0,42);
 }
 
 void do_tests()
