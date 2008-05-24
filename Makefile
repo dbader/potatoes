@@ -13,7 +13,7 @@
 #
 
 PROJDIRS = src/kernel/boot src/kernel/include src/kernel/init src/kernel/io src/kernel/lib \
-	   src/kernel/mm src/kernel/pm
+	   src/kernel/mm src/kernel/pm src/kernel/fs
 
 # Adds all source files in the subdirs referenced by PROJDIRS
 SRCFILES := $(shell find $(PROJDIRS) -mindepth 1 -maxdepth 3 -name "*.c")
