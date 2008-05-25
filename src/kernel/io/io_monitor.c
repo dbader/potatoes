@@ -44,12 +44,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/stdlib.h"
 #include "../include/util.h"
+#include "../include/ringbuffer.h"
 
 #include "../io/io.h"
 
 static uint16 *disp = (uint16*)0xB8000; //display pointer
-static void *scroll_up_ptr;
-static void *scroll_down_ptr;
+ring_fifo *scroll_up_ptr;
+ring_fifo *scroll_down_ptr;
 static uint32 num_lines_up = 0;
 static uint32 num_lines_down = 0;
 static uint16 charnum = 0;
@@ -58,10 +59,8 @@ static uint16 charnum = 0;
 void monitor_init()
 {
 	//160KB = 1000 * 160B = 1000 lines
-	scroll_up_ptr = malloc_name(160000,"video buffer");
-	bzero(scroll_up_ptr,160000);
-	scroll_down_ptr = malloc_name(160000,"video buffer");
-	bzero(scroll_down_ptr,160000);
+	scroll_up_ptr = rf_alloc(160000);
+	scroll_down_ptr = rf_alloc(160000);
 }
 /**
  * Scrolls the monitor down in the 'natural' way
@@ -69,14 +68,15 @@ void monitor_init()
 void monitor_scroll()
 {
 	num_lines_up++;
-	scroll_up_ptr += 0xA0;
-	memcpy(scroll_up_ptr, (void*)0xB8000, 0xA0);
+	rf_write(scroll_up_ptr,(uint8*)0xB8000, 0xA0);
 	memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
 	for(uint16 *temp = (uint16*)0xB8F00; temp < (uint16*)0xB8FA0; temp++){
 		*temp = 0xF00;
 	}
 	disp -= 0x50;
 	charnum -= 80;
+	
+	//Cursor update
 	outb(0x3D4, 0x0E);
 	outb(0x3D5, charnum >> 8);
 	outb(0x3D4, 0x0F);
@@ -91,11 +91,9 @@ void monitor_scrollup()
 	if (num_lines_up > 0) {
 		num_lines_up--;
 		num_lines_down++;
-		scroll_down_ptr += 0xA0;
-		memcpy(scroll_down_ptr, (void*)0xB8F00, 0xA0);
+		rf_write(scroll_down_ptr,(uint8*)0xB8F00, 0xA0);
 		memmove((void*)0xB80A0, (void*)0xB8000, 0xF00);
-		memcpy((void*)0xB8000, scroll_up_ptr, 0xA0);
-		scroll_up_ptr -= 0xA0;
+		rf_read(scroll_up_ptr, (uint8*)0xB8000, 0xA0);
 	}
 }
 
@@ -108,10 +106,9 @@ void monitor_scrolldown()
 		num_lines_down--;
 		num_lines_up++;
 		scroll_up_ptr += 0xA0;
-		memcpy(scroll_up_ptr, (void*)0xB8000, 0xA0);
+		rf_write(scroll_up_ptr,(uint8*)0xB8000, 0xA0);
 		memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
-		memcpy((void*)0xB8F00, scroll_down_ptr, 0xA0);
-		scroll_down_ptr -= 0xA0;
+		rf_read(scroll_down_ptr, (uint8*)0xB8F00, 0xA0);
 	}
 }
 
@@ -196,7 +193,8 @@ void monitor_puti(sint32 x)
                 monitor_cputc((uint8)(x / div + 48),RED,BLACK);
                 x%=div;
                 div /= 10;
-        }    
+        }
+        monitor_putc('\n');
 }
 
 /**

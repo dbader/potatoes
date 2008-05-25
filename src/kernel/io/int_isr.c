@@ -65,6 +65,7 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
+extern void incoming_syscall();
 extern void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg);
 
 /***********************************************************
@@ -75,38 +76,39 @@ extern void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg);
 
 void isr_init() 
 {
-      idt_fill_entry(0, (uint32)isr0, 0x8, 0x8E);
-      idt_fill_entry(1, (uint32)isr1, 0x8, 0x8E);
-      idt_fill_entry(2, (uint32)isr2, 0x8, 0x8E);
-      idt_fill_entry(3, (uint32)isr3, 0x8, 0x8E);
-      idt_fill_entry(4, (uint32)isr4, 0x8, 0x8E);
-      idt_fill_entry(5, (uint32)isr5, 0x8, 0x8E);
-      idt_fill_entry(6, (uint32)isr6, 0x8, 0x8E);
-      idt_fill_entry(7, (uint32)isr7, 0x8, 0x8E);
-      idt_fill_entry(8, (uint32)isr8, 0x8, 0x8E);
-      idt_fill_entry(9, (uint32)isr9, 0x8, 0x8E);
-      idt_fill_entry(10, (uint32)isr10, 0x8, 0x8E);
-      idt_fill_entry(11, (uint32)isr11, 0x8, 0x8E);
-      idt_fill_entry(12, (uint32)isr12, 0x8, 0x8E);
-      idt_fill_entry(13, (uint32)isr13, 0x8, 0x8E);
-      idt_fill_entry(14, (uint32)isr14, 0x8, 0x8E);
-      idt_fill_entry(15, (uint32)isr15, 0x8, 0x8E);
-      idt_fill_entry(16, (uint32)isr16, 0x8, 0x8E);
-      idt_fill_entry(17, (uint32)isr17, 0x8, 0x8E);
-      idt_fill_entry(18, (uint32)isr18, 0x8, 0x8E);
-      idt_fill_entry(19, (uint32)isr19, 0x8, 0x8E);
-      idt_fill_entry(20, (uint32)isr20, 0x8, 0x8E);
-      idt_fill_entry(21, (uint32)isr21, 0x8, 0x8E);
-      idt_fill_entry(22, (uint32)isr22, 0x8, 0x8E);
-      idt_fill_entry(23, (uint32)isr23, 0x8, 0x8E);
-      idt_fill_entry(24, (uint32)isr24, 0x8, 0x8E);
-      idt_fill_entry(25, (uint32)isr25, 0x8, 0x8E);
-      idt_fill_entry(26, (uint32)isr26, 0x8, 0x8E);
-      idt_fill_entry(27, (uint32)isr27, 0x8, 0x8E);
-      idt_fill_entry(28, (uint32)isr28, 0x8, 0x8E);
-      idt_fill_entry(29, (uint32)isr29, 0x8, 0x8E);
-      idt_fill_entry(30, (uint32)isr30, 0x8, 0x8E);
-      idt_fill_entry(31, (uint32)isr31, 0x8, 0x8E);
+        idt_fill_entry(0, (uint32)isr0, 0x8, 0x8E);
+        idt_fill_entry(1, (uint32)isr1, 0x8, 0x8E);
+        idt_fill_entry(2, (uint32)isr2, 0x8, 0x8E);
+        idt_fill_entry(3, (uint32)isr3, 0x8, 0x8E);
+        idt_fill_entry(4, (uint32)isr4, 0x8, 0x8E);
+        idt_fill_entry(5, (uint32)isr5, 0x8, 0x8E);
+        idt_fill_entry(6, (uint32)isr6, 0x8, 0x8E);
+        idt_fill_entry(7, (uint32)isr7, 0x8, 0x8E);
+        idt_fill_entry(8, (uint32)isr8, 0x8, 0x8E);
+        idt_fill_entry(9, (uint32)isr9, 0x8, 0x8E);
+        idt_fill_entry(10, (uint32)isr10, 0x8, 0x8E);
+        idt_fill_entry(11, (uint32)isr11, 0x8, 0x8E);
+        idt_fill_entry(12, (uint32)isr12, 0x8, 0x8E);
+        idt_fill_entry(13, (uint32)isr13, 0x8, 0x8E);
+        idt_fill_entry(14, (uint32)isr14, 0x8, 0x8E);
+        idt_fill_entry(15, (uint32)isr15, 0x8, 0x8E);
+        idt_fill_entry(16, (uint32)isr16, 0x8, 0x8E);
+        idt_fill_entry(17, (uint32)isr17, 0x8, 0x8E);
+        idt_fill_entry(18, (uint32)isr18, 0x8, 0x8E);
+        idt_fill_entry(19, (uint32)isr19, 0x8, 0x8E);
+        idt_fill_entry(20, (uint32)isr20, 0x8, 0x8E);
+        idt_fill_entry(21, (uint32)isr21, 0x8, 0x8E);
+        idt_fill_entry(22, (uint32)isr22, 0x8, 0x8E);
+        idt_fill_entry(23, (uint32)isr23, 0x8, 0x8E);
+        idt_fill_entry(24, (uint32)isr24, 0x8, 0x8E);
+        idt_fill_entry(25, (uint32)isr25, 0x8, 0x8E);
+        idt_fill_entry(26, (uint32)isr26, 0x8, 0x8E);
+        idt_fill_entry(27, (uint32)isr27, 0x8, 0x8E);
+        idt_fill_entry(28, (uint32)isr28, 0x8, 0x8E);
+        idt_fill_entry(29, (uint32)isr29, 0x8, 0x8E);
+        idt_fill_entry(30, (uint32)isr30, 0x8, 0x8E);
+        idt_fill_entry(31, (uint32)isr31, 0x8, 0x8E);
+        idt_fill_entry(0x42, (uint32)incoming_syscall, 0x8, 0x8E);
 }
 
 char *ex_messages[] = {
@@ -144,6 +146,12 @@ char *ex_messages[] = {
         "reserved",
         "reserved"       
 };
+
+void syscall_handler(uint32 num)
+{
+        //TODO: call pm
+        printf("syscall #%d\n",num);
+}
 
 void ex_handler(uint32 num)
 {

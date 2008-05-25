@@ -37,6 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/init.h"
 #include "../include/util.h"
 
+#include "../io/io.h"
+
 /**
  * output-testing
  */
@@ -192,7 +194,8 @@ void sleep_test()
 /**
  * Memcopy using hd ;-)
  */
-void hd_test(){
+void hd_test()
+{
         char src_string[] = "'foobar' visited HD on block 42 - that's great! - Thanks Dmitriy!!";
         hd_write_sector(42, (void*) src_string);
         
@@ -201,6 +204,13 @@ void hd_test(){
         puts(res_string);
         //hd_write_sector(42,(uint16*)0xB8000);
         //hd_read_sector((uint16*)0xB85A0,42);
+}
+
+void syscall_test()
+{
+	make_syscall(23);
+	make_syscall(42);
+	make_syscall(3);
 }
 
 void do_tests()
@@ -214,5 +224,6 @@ void do_tests()
         //malloc_test();
         //strsep_test();
         //sleep_test();
-        hd_test();
+        //hd_test();
+        syscall_test();
 }

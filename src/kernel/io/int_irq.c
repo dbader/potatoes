@@ -107,7 +107,8 @@ char *hw_messages[] = {
         "secondary ide"
 };
 
-void hw_handler(uint32 num){
+void hw_handler(uint32 num)
+{
         switch (num-32){
         case 0:
                 timer_handler();
@@ -128,8 +129,8 @@ void hw_handler(uint32 num){
         case 12: break;
         case 13: break;
         case 14: 
-        		hd_handler();
-        		break;
+                hd_handler();
+                break;
         case 15: break;
         }
         

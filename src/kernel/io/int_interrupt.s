@@ -280,6 +280,7 @@ isr31:
 	push byte 31
 	jmp isr_handler
 
+
 [EXTERN ex_handler]
 
 isr_handler:
@@ -303,7 +304,7 @@ isr_handler:
 	pop ds
 	popa
 	add esp, 8 ;clean up stack
-;	add dword [esp], 4 ;jump over the interrupt-causing source code (eip auf dem stack)
+        sti
 	iret
 ;********************************************************************************************
 [GLOBAL irq0]
@@ -462,4 +463,46 @@ irq_handler:
 	pop ds
 	popa
 	add esp, 8 ;clean up stack
+	sti
 	iret
+
+;********************************************************************************************
+[GLOBAL make_syscall]
+
+make_syscall:
+        int 0x42
+        ret
+
+[GLOBAL incoming_syscall]	
+;SYSCALL (NUM)
+incoming_syscall:
+        cli
+        push dword [esp+16]
+        push byte 0x42
+        jmp handle_syscall
+        
+[EXTERN syscall_handler]
+handle_syscall:
+        pusha
+        push ds
+        push es
+        push fs
+        push gs
+        mov ax, 0x10 ;kernel data segment
+        mov ds, ax
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
+        ;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax + interrupt number): 13*4=52
+        push dword [esp + 52] ;function argument
+        mov eax, syscall_handler
+        call eax
+        pop eax
+        pop gs
+        pop fs
+        pop es
+        pop ds
+        popa
+        add esp, 8 ;clean up stack
+        sti
+        iret
