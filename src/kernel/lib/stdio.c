@@ -71,6 +71,7 @@ int puts(char *s)
  *      %i - prints a signed integer.
  *      %d - prints a signed integer.
  *      %u - prints an unsigned integer.
+ *      %b - prints an unsigned integer in binary format (base 2)
  *      %o - prints an unsigned integer in octal format (base 8).
  *      %x - prints an unsigned integer in hexadecimal format (base 16).
  *      %c - prints a single character.
@@ -89,6 +90,7 @@ void printf(char *fmt, ...)
         char ch; 
         int character;
         char buf[40];
+        int base = 10;
         
         while ((ch = *fmt++) != '\0')
                 if (ch == '%') {
@@ -104,8 +106,11 @@ void printf(char *fmt, ...)
                         case 'u': // unsigned integer
                                 puts(itoa((uint32)*arg++, buf, 10));
                                 break;
-                        case 'o':
+                        case 'o': // octal
                                 puts(itoa((uint32)*arg++, buf, 8));
+                                break;
+                        case 'b': // binary
+                                puts(itoa((uint32)*arg++, buf, 2));
                                 break;
                         case 'c': // character
                                 /* This is a bit peculiar but needed to shut up the

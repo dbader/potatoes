@@ -88,7 +88,7 @@ int main(struct multiboot *mboot_ptr)
         mm_init((uint32)&end, 0x100000 + g_mboot_ptr->mem_upper * 1024);
         io_init();      
         pm_init();
-        //TODO: call fs_init();
+        fs_init();
         
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
