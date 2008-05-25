@@ -31,6 +31,9 @@ CFLAGS=-DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
 LDFLAGS=-m elf_i386 -Tsrc/kernel/link.ld
 ASFLAGS=-felf
 
+#The size of hda (in MB)
+HDASIZE=20
+
 # The loopback device for the image
 LOOPDEV=/dev/loop0
 
@@ -61,7 +64,7 @@ clean:
 	-@for file in $(OBJFILES) $(DEPFILES) $(GENFILES); do if [ -f $$file ]; then rm $$file; fi; done
 	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
-runbochs: image
+runbochs: new_hd_image image
 	@bochs -f src/tools/bochsrc
 	
 mac_runbochs: mac_image
@@ -106,6 +109,13 @@ image: kernel
 	
 	@sudo /sbin/losetup -d $(LOOPDEV)
 	
+new_hd_image:
+	@rm -f hda.img
+	@bximage -q -hd -mode=flat -size=$(HDASIZE) hda.img | grep ata0-master > temp
+	@sed "s/ata0-master:.*/`cat temp | sed "s/  a/a/1"`/g" src/tools/bochsrc > temp
+	@cat temp > src/tools/bochsrc
+	@rm -f temp
+
 # This only updates the kernel file and needs a bootable copy of floppy.img
 mac_image: kernel
 	@echo " IMAGE  floppy.img"
