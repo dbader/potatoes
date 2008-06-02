@@ -147,10 +147,10 @@ char *ex_messages[] = {
         "reserved"       
 };
 
-void syscall_handler(uint32 num)
+void syscall_handler(uint16 num, void* syscall_struct)
 {
         //TODO: call pm
-        printf("syscall #%d\n",num);
+        printf("syscall #%d,&%p\n", num, syscall_struct);
 }
 
 void ex_handler(uint32 num)

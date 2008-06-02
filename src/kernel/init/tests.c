@@ -208,9 +208,13 @@ void hd_test()
 
 void syscall_test()
 {
-	make_syscall(23);
-	make_syscall(42);
-	make_syscall(3);
+	void* test1 = malloc(1);
+	void* test2 = malloc(2);
+	void* test3 = malloc(1);
+	printf("%p\t%p\t%p\n", test1, test2, test3);
+	make_syscall(23, test1);
+	make_syscall(42, test2);
+	make_syscall(3, test3);
 }
 
 void do_tests()

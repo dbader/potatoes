@@ -477,8 +477,8 @@ make_syscall:
 ;SYSCALL (NUM)
 incoming_syscall:
         cli
-        push dword [esp+16]
-        push byte 0x42
+        push dword [esp+16] ;num
+        push dword [esp+24] ;syscall_struct
         jmp handle_syscall
         
 [EXTERN syscall_handler]
@@ -493,10 +493,12 @@ handle_syscall:
         mov es, ax
         mov fs, ax
         mov gs, ax
-        ;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax + interrupt number): 13*4=52
-        push dword [esp + 52] ;function argument
+        ;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax + num + syscall_struct): 12*4=48 13*4+4(last pushed)=56
+        push dword [esp + 48] ;function argument syscall_struct
+        push dword [esp + 56] ;function argument num
         mov eax, syscall_handler
         call eax
+        pop eax
         pop eax
         pop gs
         pop fs
@@ -506,3 +508,40 @@ handle_syscall:
         add esp, 8 ;clean up stack
         sti
         iret
+
+[EXTERN monitor_puti]
+[GLOBAL print_stack]
+printstack:
+        push edx
+        push dword [esp+4]
+        call monitor_puti
+        pop edx
+        push dword [esp+8]
+        call monitor_puti
+        pop edx
+        push dword [esp+12]
+        call monitor_puti
+        pop edx
+        push dword [esp+16]
+        call monitor_puti
+        pop edx
+        push dword [esp+20]
+        call monitor_puti
+        pop edx
+        push dword [esp+24]
+        call monitor_puti
+        pop edx
+        push dword [esp+28]
+        call monitor_puti
+        pop edx
+        push dword [esp+32]
+        call monitor_puti
+        pop edx
+        push dword [esp+36]
+        call monitor_puti
+        pop edx
+        push dword [esp+40]
+        call monitor_puti
+        pop edx
+        pop edx
+        ret

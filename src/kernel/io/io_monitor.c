@@ -60,7 +60,6 @@ static uint32 down_offset = 0;
 //160KB = 1000 * 160B = 1000 lines
 const uint32 io_bufsize = 160000;
 
-//FIXME: prevent scrolling writing everywhere in the memory (set limits)!!!
 void monitor_init()
 {
 	up_buffer_start = malloc_name(io_bufsize, "scrolling buffer(up)");

@@ -13,7 +13,7 @@ sint32 get_ticks();
 
 extern void set_interrupts();
 extern void clear_interrupts();
-extern void make_syscall(uint16 num);
+extern void make_syscall(uint16 num, void* syscall_struct);
 extern void outb(uint16 port, uint8 value);
 extern uint8 inb(uint16 port);
 extern void repinsw(uint16 port, uint16 *dest, uint32 num);
