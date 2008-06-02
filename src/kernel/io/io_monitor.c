@@ -49,33 +49,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io.h"
 
 static uint16 *disp = (uint16*)0xB8000; //display pointer
-ring_fifo *scroll_up_ptr;
-ring_fifo *scroll_down_ptr;
+void *up_buffer_start;
+void *down_buffer_start;
 static uint32 num_lines_up = 0;
 static uint32 num_lines_down = 0;
 static uint16 charnum = 0;
+static uint32 up_offset = 0;
+static uint32 down_offset = 0;
+
+//160KB = 1000 * 160B = 1000 lines
+const uint32 io_bufsize = 160000;
 
 //FIXME: prevent scrolling writing everywhere in the memory (set limits)!!!
 void monitor_init()
 {
-	//160KB = 1000 * 160B = 1000 lines
-	scroll_up_ptr = rf_alloc(160000);
-	scroll_down_ptr = rf_alloc(160000);
+	up_buffer_start = malloc_name(io_bufsize, "scrolling buffer(up)");
+	bzero(up_buffer_start, io_bufsize);
+	down_buffer_start = malloc_name(io_bufsize, "scrolling buffer(down)");
+	bzero(down_buffer_start, io_bufsize);
 }
 /**
  * Scrolls the monitor down in the 'natural' way
  */
 void monitor_scroll()
 {
-	num_lines_up++;
-	rf_write(scroll_up_ptr,(uint8*)0xB8000, 0xA0);
+	if (num_lines_up < io_bufsize / 0xA0) num_lines_up++;
+	memcpy(up_buffer_start + up_offset,(void*)0xB8000, 0xA0);
+	up_offset = (uint32)(up_offset + 0xA0) % io_bufsize;
 	memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
 	for(uint16 *temp = (uint16*)0xB8F00; temp < (uint16*)0xB8FA0; temp++){
 		*temp = 0xF00;
 	}
 	disp -= 0x50;
 	charnum -= 80;
-	
+
 	//Cursor update
 	outb(0x3D4, 0x0E);
 	outb(0x3D5, charnum >> 8);
@@ -90,10 +97,12 @@ void monitor_scrollup()
 {
 	if (num_lines_up > 0) {
 		num_lines_up--;
-		num_lines_down++;
-		rf_write(scroll_down_ptr,(uint8*)0xB8F00, 0xA0);
+		if (num_lines_down < io_bufsize / 0xA0) num_lines_down++;
+		memcpy(down_buffer_start + down_offset, (void*)0xB8F00, 0xA0);
+		down_offset = (uint32)(down_offset + 0xA0) % io_bufsize;
 		memmove((void*)0xB80A0, (void*)0xB8000, 0xF00);
-		rf_read(scroll_up_ptr, (uint8*)0xB8000, 0xA0);
+		up_offset = (uint32)(up_offset + io_bufsize - 0xA0) % io_bufsize;
+		memcpy((void*)0xB8000, up_buffer_start + up_offset, 0xA0);
 	}
 }
 
@@ -104,11 +113,12 @@ void monitor_scrolldown()
 {
 	if (num_lines_down > 0) {
 		num_lines_down--;
-		num_lines_up++;
-		scroll_up_ptr += 0xA0;
-		rf_write(scroll_up_ptr,(uint8*)0xB8000, 0xA0);
+		if (num_lines_up < io_bufsize / 0xA0) num_lines_up++;
+		memcpy(up_buffer_start + up_offset,(void*)0xB8000, 0xA0);
+		up_offset = (uint32)(up_offset + 0xA0) % io_bufsize;
 		memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
-		rf_read(scroll_down_ptr, (uint8*)0xB8F00, 0xA0);
+		down_offset = (uint32)(down_offset + io_bufsize - 0xA0) % io_bufsize;
+		memcpy((void*)0xB8F00, down_buffer_start + down_offset, 0xA0);
 	}
 }
 
