@@ -93,6 +93,6 @@ int main(struct multiboot *mboot_ptr)
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
         
-        for(;;);
+        halt();
 	return 0;
 }

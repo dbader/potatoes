@@ -18,6 +18,7 @@ extern void outb(uint16 port, uint8 value);
 extern uint8 inb(uint16 port);
 extern void repinsw(uint16 port, uint16 *dest, uint32 num);
 extern void repoutsw(uint16 port, uint16 *src, uint32 num);
+extern void halt();
 
 void monitor_invert();
 

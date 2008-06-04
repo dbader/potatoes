@@ -71,7 +71,9 @@ void sleep(sint32 num){
         }
         else
         {
-                while(ticks < i){}
+                while (ticks < i) {
+                        halt();
+                }
         }
 }
 

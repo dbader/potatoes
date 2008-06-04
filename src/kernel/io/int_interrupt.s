@@ -545,3 +545,8 @@ printstack:
         pop edx
         pop edx
         ret
+        
+[GLOBAL halt]
+halt:
+        hlt
+        ret

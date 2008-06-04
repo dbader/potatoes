@@ -43,7 +43,9 @@ volatile bool hd_interrupt = FALSE;
 
 void wait_on_hd_interrupt()
 {
-	while(!hd_interrupt){}
+	while(!hd_interrupt){
+		halt();
+	}
 	hd_interrupt = FALSE;
 }
 
