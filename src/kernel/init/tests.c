@@ -205,16 +205,17 @@ void hd_test()
         //hd_write_sector(42,(uint16*)0xB8000);
         //hd_read_sector((uint16*)0xB85A0,42);
 }
-
+extern void _syscall(uint16 id, void *data);
 void syscall_test()
 {
 	void* test1 = malloc(1);
 	void* test2 = malloc(2);
 	void* test3 = malloc(1);
 	printf("%p\t%p\t%p\n", test1, test2, test3);
-	make_syscall(23, test1);
-	make_syscall(42, test2);
-	make_syscall(3, test3);
+	
+	_syscall(23, test1);
+	_syscall(42, test2);
+	_syscall(3, test3);
 }
 
 void do_tests()

@@ -258,6 +258,7 @@ void* memcpy(void *dest, void *src, size_t count)
  * Copies count bytes form src to dest. Unlike memcpy(), memmove() supports copy operations
  * where the blocks referenced by src and dest are overlapping. Should you not need such
  * functionality, use memcpy() for performance reasons.
+ * @bug There has to be a better way, ie one that does not use dynamic memory.
  * @see memcpy
  * @param dest Destination memory
  * @param src Source memory
@@ -301,6 +302,8 @@ char* strreverse(char *str)
  * for converting a 32 bit integer you can expect 35 bytes to be sufficient
  * (base 2: 32 bytes for digits + 1 byte for the terminator + some space just to feel safe
  * and take into account future format changes).
+ * In other, GAD inspired words:
+ * bufsize >= ceil(log2(MAX_INT)) which is equal to: bufsize >= sizeof(int) * 8
  * 
  * This is not a part of the C standard library.
  * 

@@ -467,9 +467,9 @@ irq_handler:
 	iret
 
 ;********************************************************************************************
-[GLOBAL make_syscall]
+[GLOBAL _syscall]
 
-make_syscall:
+_syscall:
         int 0x42
         ret
 
@@ -481,7 +481,7 @@ incoming_syscall:
         push dword [esp+24] ;syscall_struct
         jmp handle_syscall
         
-[EXTERN syscall_handler]
+[EXTERN pm_syscall]
 handle_syscall:
         pusha
         push ds
@@ -493,11 +493,10 @@ handle_syscall:
         mov es, ax
         mov fs, ax
         mov gs, ax
-        ;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax + num + syscall_struct): 12*4=48 13*4+4(last pushed)=56
-        push dword [esp + 48] ;function argument syscall_struct
-        push dword [esp + 56] ;function argument num
-        mov eax, syscall_handler
-        call eax
+        ;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax + id + data): 12*4=48 13*4+4(last pushed)=56
+        push dword [esp + 48] ;function argument data
+        push dword [esp + 56] ;function argument id
+        call pm_syscall
         pop eax
         pop eax
         pop gs
@@ -545,8 +544,9 @@ printstack:
         pop edx
         pop edx
         ret
-        
+               
 [GLOBAL halt]
 halt:
         hlt
         ret
+        

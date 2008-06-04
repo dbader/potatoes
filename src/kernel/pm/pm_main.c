@@ -62,3 +62,8 @@ void pm_schedule()
 {
         //dprintf("sched: %d\n", get_ticks());
 }
+
+void pm_syscall(uint16 id, void* data)
+{
+        dprintf("YIKES, SYSCALL! id %u, data 0x%x\n", id, data);
+}

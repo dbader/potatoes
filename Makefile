@@ -31,7 +31,7 @@ CFLAGS=-DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
 LDFLAGS=-m elf_i386 -Tsrc/kernel/link.ld
 ASFLAGS=-felf
 
-#The size of hda (in MB)
+# The size of hda (in MB)
 HDASIZE=20
 
 # The loopback device for the image
@@ -40,23 +40,27 @@ LOOPDEV=/dev/loop0
 # The mount point for the loopback image
 LOOPMNT=/mnt2
 
-.PHONY: all clean fiximg runbochs doc todo image link
+.PHONY: all bin2c clean fiximg runbochs doc todo fdimage hdimage link tools
 
-all: kernel image doc
+all: kernel fdimage hdimage doc tools
 
 help:
 	@echo "Available make targets:"
 	@echo
 	@echo "all		- builds the kernel, floppy image and documentation"
+	@echo "bin2c		- bin2c tool"
 	@echo "clean		- removes all generated files"
 	@echo "doc		- builds doxygen documentation"
 	@echo "fiximg		- unmounts the image and disables loopback"
-	@echo "image		- builds floppy image (floppy.img)"
+	@echo "fdimage		- builds floppy image (floppy.img)"
+	@echo "hdimage		- builds hard disk image (hda.img)"
 	@echo "kernel		- builds the kernel"
 	@echo "mac_runbochs	- starts bochs (mac)"
 	@echo "mac_image	- update floppy.img (mac)"
 	@echo "runbochs		- starts bochs"
 	@echo "todo		- search sourcecode for TODOs"
+	@echo "tools		- all tools"
+	@echo "usbstick		- install etiOS on an usb stick"
 	@echo "help		- displays this list"
 
 clean:
@@ -64,7 +68,7 @@ clean:
 	-@for file in $(OBJFILES) $(DEPFILES) $(GENFILES); do if [ -f $$file ]; then rm $$file; fi; done
 	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
-runbochs: new_hd_image image
+runbochs: fdimage hdimage
 	@bochs -f src/tools/bochsrc
 	
 mac_runbochs: mac_image
@@ -88,8 +92,8 @@ todo:
 	@echo "TODO:"
 	-@for file in $(ALLFILES); do grep -H TODO $$file; done; true
 	
-image: kernel
-	@echo " IMAGE  floppy.img"
+fdimage: kernel
+	@echo " FDIMAGE floppy.img"
 	@dd if=/dev/zero of=floppy.img bs=512 count=1440 status=noxfer 2> /dev/null
 	@sudo /sbin/losetup $(LOOPDEV) floppy.img
 	@sudo mkfs -t vfat $(LOOPDEV) > /dev/null 2> /dev/null
@@ -109,7 +113,8 @@ image: kernel
 	
 	@sudo /sbin/losetup -d $(LOOPDEV)
 	
-new_hd_image:
+hdimage: hda.img
+	@echo " HDIMAGE hda.img"
 	@rm -f hda.img
 	@bximage -q -hd -mode=flat -size=$(HDASIZE) hda.img | grep ata0-master > temp
 	@sed "s/ata0-master:.*/`cat temp | sed "s/  a/a/1"`/g" src/tools/bochsrc > temp
@@ -118,10 +123,59 @@ new_hd_image:
 
 # This only updates the kernel file and needs a bootable copy of floppy.img
 mac_image: kernel
-	@echo " IMAGE  floppy.img"
+	@echo " FDIMAGE  floppy.img"
 	@hdiutil attach floppy.img > /dev/null
 	@cp src/kernel/kernel /Volumes/ETIOS_BOOT
 	@hdiutil detach /Volumes/ETIOS_BOOT > /dev/null
+	
+bin2c: src/tools/bin2c/bin2c.c
+	@echo "Building bin2c..."
+	@echo " CC	$(patsubst functions/%,%,$@)"
+	@gcc src/tools/bin2c/bin2c.c -o bin2c
+	
+tools: bin2c
+
+TARGET_DEV=undefined
+PART_SIZE=undefined
+usbstick: kernel
+ifeq ($(TARGET_DEV),undefined)
+	@echo "Error: Please specify a target device with TARGET_DEV=XXX"
+	@false
+endif
+ifeq ($(PART_SIZE),undefined)
+	@echo "Error: Please specify a partition size (in MB) with PART_SIZE=XXX"
+	@false
+endif
+	@echo "Installing to $(TARGET_DEV), partition size is $(PART_SIZE) MB"
+	@echo "\n*** THIS WILL ERASE ALL DATA ON $(TARGET_DEV) ***\n"
+	@read -p "Do you want to proceed? [yes/no]: " REPLY ; test $$REPLY = "yes"
+	@echo "Partitioning..."
+	@sudo parted $(TARGET_DEV) rm 1
+	@sudo parted $(TARGET_DEV) mkpart primary fat32 0 $(PART_SIZE)
+	@echo "Formatting..."
+	@sudo parted $(TARGET_DEV) mkfs 1 fat32
+	@sudo parted $(TARGET_DEV) toggle 1 boot
+	@sudo parted $(TARGET_DEV) print
+	@echo "Waiting for automounter..."
+	@sleep 5
+	@# Unmount target device (sometimes the automounter mounts it)
+	@if (test -n "`mount | grep $(TARGET_DEV)`") then sudo umount `mount | grep $(TARGET_DEV) | grep -o -e 'on \(/.*\) type' | sed 's/on //' | sed 's/ type//'`; fi
+	@echo "Mounting $(TARGET_DEV)1 on $(LOOPMNT)..."
+	@sudo mount $(TARGET_DEV)1 $(LOOPMNT)
+	@echo "Copying grub and the kernel to $(LOOPMNT)..."
+	@cp -r image/* $(LOOPMNT)
+	@cp src/kernel/kernel $(LOOPMNT)
+	@echo "Installing grub to $(TARGET_DEV)..."
+	@echo "(hd0) $(TARGET_DEV)" > $(LOOPMNT)/boot/grub/device.map
+	@sudo grub-install --root-directory=$(LOOPMNT) $(TARGET_DEV)
+	@echo "Fixing up $(LOOPMNT)/boot/grub/menu.lst..."
+	@echo "timeout 1" > $(LOOPMNT)/boot/grub/menu.lst
+	@echo "title etiOS Kernel" >> $(LOOPMNT)/boot/grub/menu.lst
+	@echo "root (hd0,0)" >> $(LOOPMNT)/boot/grub/menu.lst
+	@echo "kernel /kernel" >> $(LOOPMNT)/boot/grub/menu.lst
+	@echo "Unmounting..."
+	@sudo umount $(LOOPMNT)
+	@echo "Done. etiOS successfully installed to $(TARGET_DEV)."
 
 kernel: $(OBJFILES) Makefile
 	@echo " LD	src/kernel/kernel"
