@@ -51,6 +51,8 @@ mm_header *mm_start;
 // [temporary] start of the part of the memory used for testing
 mm_header *mm_start_test;
 
+void* mm_occupied_top;
+
 /**
  * the end adress of the part of the memory that shall be managed
  */
