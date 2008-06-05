@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __FS_BLOCK_DEV_H_
 #define __FS_BLOCK_DEV_H_
 
-void rd_block(block_nr blk_nr, void *buf, size_t num_bytes);
+void rd_block(void *buf, block_nr blk_nr, size_t num_bytes);
 void wrt_block(block_nr blk_nr, void *buf, size_t num_bytes);
 void wrt_cache(block_cache *cache, size_t num_bytes);
 

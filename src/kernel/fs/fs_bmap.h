@@ -22,41 +22,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Functions concerning syscalls "create" and "delete"
+ * Basic definitions concerning the block bitmap (bmap)
  * 
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
  */
 
-#include "../include/const.h"
-#include "../include/types.h"
-#include "../include/string.h"
-
-#include "fs_const.h"
-#include "fs_types.h"
-#include "fs_block_dev.h"
-#include "fs_buf.h"
-#include "fs_bmap.h"
-#include "fs_inode_table.h"
-#include "fs_file_table.h"
-#include "fs_dir.h"
+#ifndef FS_BMAP_H_
+#define FS_BMAP_H_
 
 /**
- * Create a file from abs. path
- * 
- * @param path The file's absolute path
- * @return the file's file descriptor
+ * Functions on the block bitmap
  */
-file_nr create(char *path)
-{
-        block_nr blk_nr = search_file(path);
-        if (blk_nr != NOT_FOUND){
-                return NOT_POSSIBLE;    //file is already existent
-        }
-        
-        blk_nr = search_file(splice_path(path));
-        
-        blk_nr = alloc_block(blk_nr);
-        
-}
+
+void reset_bmap();
+
+block_nr get_free_block(block_nr start);
+
+void mark_block(block_nr blk_nr, bool flag);
+
+block_nr alloc_block(block_nr start);
+
+
+/**
+ * Central block bitmap structure.
+ */
+ /********************************************/
+        uint8 bmap[NUM_BLOCKS_ON_HD / 8];
+ /********************************************/
+
+#endif /*FS_BMAP_H_*/

@@ -36,21 +36,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define BLOCK_SIZE              512
-#define DIR_ENTRY_SIZE          sizeof (struct dir_entry)
-#define DISK_INODE_SIZE         sizeof (struct d_inode)
-#define MEM_INODE_SIZE          sizeof (struct m_inode)
-#define SUPER_SIZE              sizeof (struct super_block)
+#define DIR_ENTRY_SIZE          BLOCK_SIZE //sizeof (struct dir_entry)
+#define DISK_INODE_SIZE         BLOCK_SIZE //sizeof (struct d_inode)
+#define MEM_INODE_SIZE          BLOCK_SIZE //sizeof (struct m_inode)
+#define SUPER_SIZE              BLOCK_SIZE //sizeof (struct super_block)
 
-#define NAME_SIZE               28
+#define NAME_SIZE               28                                      
 
 #define INODES_PER_BLOCK        ((BLOCK_SIZE)/(DISK_INODE_SIZE))
-#define DIR_ENTRIES_PER_BLOCK   ((BLOCK_SIZE)/(DIR_ENTRY_SIZE)))
+#define DIR_ENTRIES_PER_BLOCK   ((BLOCK_SIZE)/(DIR_ENTRY_SIZE))
 
 #define NUM_FILES               64                                      /* #entries in filp table */
 #define NUM_PROC_FILES          20                                      /* #concurrently opened files per process */
 #define NUM_INODES              200                                     /* max. num of opened inodes(files+dir) */
 
+#define ADDR_SIZE               4
+#define ADDRS_PER_BLOCK         BLOCK_SIZE/ADDR_SIZE
 #define NUM_DIRECT_POINTER      25                                      /* # direct pointer in inode */
+#define BYTES_DIRECT            NUM_DIRECT_POINTER * BLOCK_SIZE
+#define BYTES_SINGLE_INDIRECT   ADDRS_PER_BLOCK * BLOCK_SIZE
+#define BYTES_DOUBLE_INDIRECT   ADDRS_PER_BLOCK * ADDRS_PER_BLOCK * BLOCK_SIZE
+
 
 #define NUM_BLOCKS_ON_HD        131072                                  /* 131072 * 512 byte = 64 MB */
 #define NUM_BMAP_BLOCKS         (NUM_BLOCKS_ON_HD)/(BLOCK_SIZE*8)       /* #blocks for the block bitmap*/

@@ -51,28 +51,26 @@ extern void hd_write_sector(uint32 dest, void* src);
  * @param *buf          A pointer to the dest. buffer
  * @param num_bytes     Number of bytes that should be read
  */
-void rd_block(block_nr blk_nr, void *buf, size_t num_bytes)
+void rd_block(void *buf, block_nr blk_nr, size_t num_bytes)
 {       
-        block_cache *cache = get_read_cache();
-        clear_cache(cache);
+        clear_cache(&read_cache);
         
-        hd_read_sector((void*)cache->cache, blk_nr);                            //get block from IO 
+        hd_read_sector(read_cache.cache, blk_nr);                            //get block from IO 
        
-        cache->block_nr = blk_nr;                                        //remember the block number
+        read_cache.block_nr = blk_nr;                                        //remember the block number
         
-        memcpy(buf, cache->cache, num_bytes);                            //copy block to destination
+        memcpy(buf, read_cache.cache, num_bytes);                            //copy block to destination
 }
 
 void wrt_block(block_nr blk_nr, void *buf, size_t num_bytes)
 {
-        block_cache *cache = get_write_cache();
-        clear_cache(cache);
+        clear_cache(&write_cache);
         
-        cache->block_nr = blk_nr;
+        write_cache.block_nr = blk_nr;
 
-        memcpy(cache->cache, buf, num_bytes);
+        memcpy(write_cache.cache, buf, num_bytes);
         
-        hd_write_sector(blk_nr, (void*)cache->cache);
+        hd_write_sector(blk_nr, write_cache.cache);
 }
 
 void wrt_cache(block_cache *cache, size_t num_bytes)

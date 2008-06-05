@@ -36,25 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_types.h"
 
 #include "fs_super.h"
-
-/**
- * Functions on the block bitmap
- */
-
-void reset_bmap();
-
-block_nr get_free_block(block_nr start);
-
-void mark_block(block_nr blk, bool flag);
-
-
-
-/**
- * Central block bitmap structure.
- */
- /********************************************/
-        uint8 bmap[NUM_BLOCKS_ON_HD / 8];
- /********************************************/
+#include "fs_bmap.h"
 
 
 /**

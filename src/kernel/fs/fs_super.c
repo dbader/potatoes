@@ -35,12 +35,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_const.h"
 #include "fs_types.h"
 #include "fs_super.h"
+#include "fs_block_dev.h"
 
 /**
  * Time function.
  * @return current system time.
  */
-uint32 get_time();
+extern uint32 get_time();
 
 /**
  * Pointer to super block structure.
@@ -83,7 +84,8 @@ void init_super_block()
  */
 void load_super_block()
 {
-        //TODO
+        //read block number SUPER_BLOCK (1) to superblock struct
+        rd_block(super, SUPER_BLOCK, sizeof(super_block));
 }
 
 /**

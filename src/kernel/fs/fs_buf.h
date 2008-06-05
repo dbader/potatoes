@@ -59,17 +59,22 @@ block_cache write_cache;
 d_inode d_inode_cache;
 
 /**
+ *  A memory inode cache.
+ */
+m_inode m_inode_cache;
+
+/**
  * A directory cache.
  * 
  * (4 bytes for block_nr, NAME_SIZE bytes for the name)
  */
-dir_entry dir_cache[BLOCK_SIZE/(4 + NAME_SIZE)];
+dir_entry dir_cache[DIR_ENTRIES_PER_BLOCK];
 
 /*
  * The cache for a block containing indirect addresses.
  * (current indirect address block)
  */
-block_cache adr_cache;
+block_nr addr_cache[ADDRS_PER_BLOCK];
 
 
 /***********************************************************************/
@@ -77,19 +82,5 @@ block_cache adr_cache;
 void clear_cache(block_cache *cache);
 
 void clear_buffer(uint8 buffer[BLOCK_SIZE]);
-
-uint8* get_write_buffer();
-
-uint8* get_read_buffer();
-
-block_cache* get_write_cache();
-
-block_cache* get_read_cache();
-
-block_cache* get_adr_cache();
-
-dir_entry* get_dir_cache();
-
-d_inode* get_d_inode_cache();
 
 #endif /*__FS_BUF_H_*/

@@ -36,10 +36,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_types.h"
 #include "fs_main.h"
 
+extern void reset_bmap();
+extern void init_super_block();
+extern void load_super_block();
 
-bool fs_init()
+extern void panic(char *msg);
+
+void fs_init()
 {
-        return TRUE;
+        panic("FS says 'foobar'!");
 }
 
 bool fs_shutdown()
@@ -47,24 +52,25 @@ bool fs_shutdown()
         return TRUE;   
 }
 
-bool load_fs()
+bool fs_load()
 {
         //TODO
-        //load super
+        load_super_block();
         //load bmap
         
         //load root dir
-        
         return TRUE;
 }
 
-bool create_fs()
+bool fs_create()
 {
         //TODO
-        //create super
-        //create bmap
+        init_super_block();
+        reset_bmap();
         
         //create root dir
         
         return TRUE;
 }
+
+

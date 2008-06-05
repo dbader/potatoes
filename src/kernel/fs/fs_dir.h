@@ -22,9 +22,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Functions to process the path.
+ * Basic functions concerning directories.
  *
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
  */
+#ifndef FS_DIR_H_
+#define FS_DIR_H_
+
+block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name);
+bool contains_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name);
+block_nr search_file(char *path);
+block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[]);
+
+void insert_file_into_dir(block_nr block, char *name);
+
+void delete_file_in_dir(char *name);
+
+char* splice_filename(char *abs_path);
+char* splice_path(char *abs_path);
+
+#endif /*FS_DIR_H_*/

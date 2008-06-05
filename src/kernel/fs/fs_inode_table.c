@@ -52,7 +52,8 @@ void init_inode_table()
                 inode_table[i].i_num = NIL_INODE;
         }
         
-        rd_block(ROOT_INODE_BLOCK, &inode_table[0], BLOCK_SIZE);
+        //load root inode from HD to inode table
+        rd_block(&inode_table[0], ROOT_INODE_BLOCK, BLOCK_SIZE);
         inode_table[0].i_num = ROOT_INODE;
  
         root = &inode_table[0];
@@ -85,16 +86,13 @@ m_inode* get_inode(inode_nr i_num)
 //TODO: counter-check this after implementation of the buffers!
 bool write_inode(m_inode *inode)
 {
-        block_cache *cache = get_write_cache();
-        clear_cache(cache);                         //reset write cache
+        clear_cache(&write_cache);                         //reset write cache
         
-        d_inode *di_cache = get_d_inode_cache(); 
+        cpy_minode_to_dinode(&d_inode_cache, inode);
         
-        cpy_minode_to_dinode(inode, di_cache);
-        
-        memcpy(cache, di_cache, sizeof(d_inode));
+        memcpy(write_cache.cache, &d_inode_cache, sizeof(d_inode));
                 
-        wrt_cache(cache, BLOCK_SIZE);
+        wrt_cache(&write_cache, BLOCK_SIZE);
         
         return TRUE;
 }        
@@ -105,7 +103,7 @@ bool write_inode(m_inode *inode)
  * @param mi The memory inode
  * @param di The disk inode
  */
-void cpy_minode_to_dinode(m_inode *mi, d_inode *di)
+void cpy_minode_to_dinode(d_inode *di, m_inode *mi)
 {
         di->i_mode      = mi->i_mode;
         di->i_size      = mi->i_size;
@@ -118,6 +116,21 @@ void cpy_minode_to_dinode(m_inode *mi, d_inode *di)
         
         di->i_single_indirect_pointer = mi->i_single_indirect_pointer;
         di->i_double_indirect_pointer = mi->i_double_indirect_pointer;
+}
+
+void cpy_dinode_to_minode(m_inode *mi, d_inode *di)
+{
+        mi->i_mode                      = di->i_mode;
+        mi->i_size                      = di->i_size;
+        mi->i_create_ts                 = di->i_create_ts;
+        mi->i_modify_ts                 = di->i_modify_ts;
+        
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+                mi->i_direct_pointer[i] = di->i_direct_pointer[i];
+        }
+
+        mi->i_single_indirect_pointer   = di->i_single_indirect_pointer;
+        mi->i_double_indirect_pointer   = di->i_double_indirect_pointer;
 }
 
 /**

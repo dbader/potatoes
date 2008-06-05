@@ -32,9 +32,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __FS_MAIN_H_
 #define __FS_MAIN_H_
 
+
+
 /* MKFS */
-bool load_fs();
-bool create_ts();
+void fs_init();
+bool fs_shutdown();
+bool fs_load();
+bool fs_create();
 
 
 /* CREATE */
