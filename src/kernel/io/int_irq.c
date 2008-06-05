@@ -54,11 +54,14 @@ extern void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg);
 
 extern void outb(uint8 port, uint8 value);
 
+/**
+ * Remaps the master and slave programable interrupt controller to the idt-entries 32-47
+ */
 void pic_remap(){
         outb(0x20, 0x11);
         outb(0xA0, 0x11);
-        outb(0x21, 0x20);
-        outb(0xA1, 0x28);
+        outb(0x21, 0x20); //IDT #32
+        outb(0xA1, 0x28); //IDT #40
         outb(0x21, 0x04);
         outb(0xA1, 0x02);
         outb(0x21, 0x01);
@@ -67,6 +70,9 @@ void pic_remap(){
         outb(0xA1, 0x0);     
 }
 
+/**
+ * Inits IRQ-support
+ */
 void irq_init() 
 {
         pic_remap();
@@ -107,6 +113,23 @@ char *hw_messages[] = {
         "secondary ide"
 };
 
+/**
+ * The programable interrupt controller needs to be reactivated after every interrupt. This procedure provides this.
+ * 
+ * @param slave should the slave pic be remapped too?
+ */
+void reactivate_pic(bool slave)
+{
+		if(slave)
+				outb(0xA0,0x20);
+		outb(0x20,0x20);
+}
+
+/**
+ * Distributes the interrupts to their handlers.
+ * 
+ * @param num number of the occured interrupt
+ */
 void hw_handler(uint32 num)
 {
         switch (num-32){
@@ -134,7 +157,8 @@ void hw_handler(uint32 num)
         case 15: break;
         }
         
-        if(num>40) 
-                outb(0xA0,0x20);
-        outb(0x20,0x20);
+        if(num>40)
+        		reactivate_pic(1);
+        else
+        		reactivate_pic(0);
 }

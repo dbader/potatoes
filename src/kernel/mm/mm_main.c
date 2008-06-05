@@ -49,7 +49,7 @@ void mm_init(uint32 start, uint32 end)
         // set the start and the end of the memory
         mm_start = (mm_header*) start;
         mm_end = (mm_header*) (end - sizeof(mm_header));
-        mm_occupied_top = start + 10;
+        mm_occupied_top = (void*)(start + sizeof(mm_header));
         
 //        mm_start2 = (mm_header*) (0x1F00000);
         

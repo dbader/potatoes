@@ -60,6 +60,9 @@ static uint32 down_offset = 0;
 //160KB = 1000 * 160B = 1000 lines
 const uint32 io_bufsize = 160000;
 
+/**
+ * Initializes the monitor buffers. 
+ */
 void monitor_init()
 {
 	up_buffer_start = malloc_name(io_bufsize, "scrolling buffer(up)");
@@ -68,7 +71,7 @@ void monitor_init()
 	bzero(down_buffer_start, io_bufsize);
 }
 /**
- * Scrolls the monitor down in the 'natural' way
+ * Scrolls the monitor down in the 'natural' way.
  */
 void monitor_scroll()
 {
@@ -90,7 +93,7 @@ void monitor_scroll()
 }
 
 /**
- * Scrolls the monitor up on request
+ * Scrolls the monitor up on request.
  */
 void monitor_scrollup()
 {
@@ -106,7 +109,7 @@ void monitor_scrollup()
 }
 
 /**
- * Scrolls the monitor down on request
+ * Scrolls the monitor down on request.
  */
 void monitor_scrolldown()
 {
@@ -122,7 +125,11 @@ void monitor_scrolldown()
 }
 
 /**
- *  writes a colored character to the display (fg=foregroung, bg=background)
+ *  Writes a colored character to the display.
+ *  
+ * @param ch character to be written
+ * @param fg foreground-color
+ * @param bg background color
  */	
 void monitor_cputc(char ch, uint8 fg, uint8 bg)
 {
@@ -130,6 +137,11 @@ void monitor_cputc(char ch, uint8 fg, uint8 bg)
         uint32 temp;
         if(charnum >= 1999)monitor_scroll(); //scroll, if outside of display-memory
         switch(ch){
+        case '\a':
+        		monitor_invert();
+        		sleep_ticks(15);
+        		monitor_invert();
+        		break;
         case '\n':
                 temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
                 while(i++ < temp){ //calculating the "new line" starting position
@@ -159,7 +171,11 @@ void monitor_cputc(char ch, uint8 fg, uint8 bg)
 }
 
 /**
- *  writes colored a string to the display (fg=foregroung, bg=background)
+ *  Writes a colored null-terminated string to the display.
+ * 
+ * @param *str pointer to the string
+ * @param fg foreground-color
+ * @param bg background color
  */
 void monitor_cputs(char *str, uint8 fg, uint8 bg)
 {
@@ -170,7 +186,9 @@ void monitor_cputs(char *str, uint8 fg, uint8 bg)
 }
 
 /**
- * writes a character to the display
+ * Writes a character to the display.
+ * 
+ * @param ch character to be written
  */
 void monitor_putc(char ch)
 {
@@ -178,7 +196,9 @@ void monitor_putc(char ch)
 }
 
 /**
- * writes a string to the display
+ * Writes a null-terminated string to the display.
+ * 
+ * @param *str pointer to the string
  */
 void monitor_puts(char *str)
 {
@@ -186,7 +206,9 @@ void monitor_puts(char *str)
 }
 
 /**
- * writes an integer to the display
+ * Writes an integer to the display.
+ * 
+ * @param x integer to be written
  */
 void monitor_puti(sint32 x)
 {
@@ -207,7 +229,9 @@ void monitor_puti(sint32 x)
 }
 
 /**
- * writes a hex-byte to the display
+ * Writes a hex-byte to the display.
+ * 
+ * @param ch character to be written
  */
 void monitor_puthex(uint8 ch)
 {
@@ -223,6 +247,9 @@ void monitor_puthex(uint8 ch)
                 monitor_cputc((low + 48),GREEN,BLACK);
 }
 
+/**
+ * Inverts the monitor.
+ */
 void monitor_invert()
 {
 	for(uint8 *temp = (uint8*)0xB8001; (uint32)temp < 0xB8FA0; temp+=2)

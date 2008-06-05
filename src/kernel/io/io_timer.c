@@ -63,7 +63,8 @@ sint32 get_ticks()
 /**
  * Sleeps num seconds
  */
-void sleep(sint32 num){
+void sleep(sint32 num)
+{
         sint32 i = ticks + FREQUENCY*num;
         if(SINT32_MAX - ticks < FREQUENCY*num){
                 sleep((SINT32_MAX-ticks)/FREQUENCY);
@@ -71,6 +72,28 @@ void sleep(sint32 num){
         }
         else
         {
+        		reactivate_pic();
+        	    set_interrupts();
+                while (ticks < i) {
+                        halt();
+                }
+        }
+}
+
+/**
+ * Sleeps num ticks
+ */
+void sleep_ticks(sint32 num)
+{
+        sint32 i = ticks + num;
+        if(SINT32_MAX - ticks < num){
+                sleep(SINT32_MAX-ticks);
+                sleep(num-(SINT32_MAX-ticks)); 
+        }
+        else
+        {
+        		reactivate_pic();
+        		set_interrupts();
                 while (ticks < i) {
                         halt();
                 }

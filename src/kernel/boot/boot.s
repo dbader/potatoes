@@ -58,11 +58,13 @@ mboot:
 [EXTERN main]                   ; This is the entry point of our C code
 
 start:
-    ; Load multiboot information:
-    push    ebx
 
     ; Execute the kernel:
     cli                         ; Disable interrupts.
+    
+    ; Load multiboot information:
+    push ebx
+    
     call main                   ; call our main() function.
     jmp $                       ; Enter an infinite loop, to stop the processor
                                 ; executing whatever rubbish is in the memory

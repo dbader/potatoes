@@ -46,7 +46,7 @@ bool echo = TRUE; //accessible for PM
  * Handles an keyboard interrupt, by calling the PM. In echo-mode prints the char directly to the screen.
  */
 void kb_handler()
-{
+{		
         uint8 scancode = inb(0x60);
         if (scancode & 0x80) { //Key released
                 if ((scancode & (~0x80)) == LSHIFT || (scancode & (~0x80)) == RSHIFT) {

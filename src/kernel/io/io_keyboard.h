@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 char kb_map[]={
         0,      //empty
-        0,      //0x01 Esc
+        '\a',      //0x01 Esc
         '1',    //0x02 
         '2',    //0x03
         '3',    //0x04

@@ -44,7 +44,7 @@ extern void panic(char *msg);
 
 void fs_init()
 {
-        panic("FS says 'foobar'!");
+        //panic("FS says 'foobar'!");
 }
 
 bool fs_shutdown()

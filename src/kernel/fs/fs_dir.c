@@ -60,6 +60,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_inode_table.h"
 #include "fs_dir.h"
 
+//FIX: Here was the "implicit declaration" warning  -Dmitriy
+//FIXME: maybe you should use an include for this...
+bool fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos);
 
 /**
  * Find a filename within a block of directory entries; format(struct dir_entry): [block_nr, name].

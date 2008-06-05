@@ -84,8 +84,11 @@ int main(struct multiboot *mboot_ptr)
         printf("kernel starts at 0x%x\n", &start);
         printf("kernel ends at 0x%x\n", &end - 1);
         printf("memory begins at 0x%x\n\n", &end); */
-
-        mm_init((uint32)&end, 0x100000 + g_mboot_ptr->mem_upper * 1024);
+        
+        //printf("\n0x%x\n",mboot_ptr->mem_upper);
+        //printf("\n0x%x\n",0x100000 + mboot_ptr->mem_upper * 1024);
+        
+        mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
         io_init();      
         pm_init();
         fs_init();

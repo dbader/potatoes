@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return pointer to the allocated space
  */
 
-/*void* malloc_name(uint32 size, char* name)
+void* malloc_name(uint32 size, char* name)
 {
         // search for a free block big enough: we start at the first block after mm_start, we stop after mm_end
         mm_header *ptr;
@@ -73,9 +73,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }
         
         return (void*) NULL;
-}*/
+}
 
-void* malloc_name(uint32 size, char* name)
+/*void* malloc_name(uint32 size, char* name)
 {
 //        printf("allocation of %d bytes.0x%x\n", size, mm_occupied_top);
         mm_occupied_top += size;
@@ -86,7 +86,7 @@ void* malloc_name(uint32 size, char* name)
                 mm_occupied_top -= size;
                 return (void*) NULL;
         }
-}
+}*/
 
 /** 
  * allocates size bytes

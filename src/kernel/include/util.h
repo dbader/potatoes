@@ -35,5 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "types.h"
 
 void sleep(sint32 sec);
+void sleep_ticks(sint32 ticks);
 
 #endif /* util.h */
