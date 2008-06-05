@@ -36,8 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "types.h"
 
-extern void *malloc(uint32 size);
-extern void *malloc_name(uint32 size, char* name);
-extern void free(void* start);
+void *malloc(uint32 size);
+void *malloc_name(uint32 size, char* name);
+void free(void* start);
 
 #endif /* stdlib.h */

@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/util.h"
 
 #include "../io/io.h"
+#include "../mm/mm.h"
 
 /**
  * output-testing
@@ -165,14 +166,28 @@ void grubstruct_test(struct multiboot *mboot_ptr)
         monitor_puts("\n");
 }
 
-void malloc_test() {
-        void *test;
-        monitor_puts("malloc(23068671): allocation of 22 MB -> memory is full (10 of 32 MB are reserved for the kernel)\n");
-        test = malloc(23068671);
-        monitor_puti((uint32)test);
-        monitor_puts("\nmalloc(1): allocation of 1 KB -> function returns pointer to address 0 (NULL)\n");
-        test = malloc(1);
-        monitor_puti((uint32)test);
+// print a part of the main memory
+void mm_print_memory()
+{
+        mm_header *ptr;
+        for(ptr = mm_start; (uint32)ptr < 0x170000; ptr = (*ptr).next) {
+                printf("%s (0x%x)\n", (*ptr).name, (uint32)ptr);
+                printf("\t(*ptr).next: 0x%x\n", (*ptr).next);
+                printf("\t(*ptr).prev: 0x%x\n", (*ptr).prev);
+                printf("\t(*ptr).size: 0x%x\n", (*ptr).size);
+
+        }
+}
+
+void malloc_test()
+{
+        void *test2[10];
+        for (int i = 0; i <= 3; i++) {
+                test2[i] = malloc_name(0x3BFFC,"name");
+                printf("allocating %d bytes... 0x%x\n", 0x3BFEC, test2[i]);
+        }
+        
+        printf("\n");
 }
 
 void sleep_test()
@@ -226,7 +241,8 @@ void do_tests()
         //draw_test();
         //printf_test();
         //assert_test();
-        //malloc_test();
+        malloc_test();
+        //mm_print_memory();
         //strsep_test();
         //sleep_test();
         //hd_test();
