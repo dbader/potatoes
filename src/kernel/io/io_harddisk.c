@@ -44,6 +44,9 @@ volatile bool hd_interrupt = FALSE;
 void wait_on_hd_interrupt()
 {
 	while(!hd_interrupt){
+		uint8 stat=inb(0x1F7);
+		if(stat & 0x58) break;
+		else if (stat & 1) panic("IDE-ERROR");
 		halt();
 	}
 	hd_interrupt = FALSE;
@@ -51,12 +54,12 @@ void wait_on_hd_interrupt()
 
 struct address itoaddr(uint32 iaddr)
 {
-	struct address adr;
-	adr.sector = iaddr % hd1.apparent_sector_per_track + 1;
-	iaddr = (iaddr - adr.sector + 1) / hd1.apparent_sector_per_track;
-	adr.head = iaddr % hd1.apparent_head;
-	adr.cyl = (iaddr - adr.head) / hd1.apparent_head;
-	return adr;
+	struct address addr;
+	addr.sector = iaddr % hd1.apparent_sector_per_track + 1;
+	iaddr = (iaddr - addr.sector + 1) / hd1.apparent_sector_per_track;
+	addr.head = iaddr % hd1.apparent_head;
+	addr.cyl = (iaddr - addr.head) / hd1.apparent_head;
+	return addr;
 }
 
 uint32 get_hdsize()
@@ -66,7 +69,7 @@ uint32 get_hdsize()
 
 void hd_init()
 {
-	outb(0x1F6,0); //select master drive
+	outb(0x1F6,0xA0); //select master drive
 	outb(0x1F7,0xEC); //identify drive
 	wait_on_hd_interrupt();
 	repinsw(0x1F0,(uint16*)&hd1,256); //read buffer
@@ -104,6 +107,7 @@ void hd_read_sector(void *dest, uint32 src)
 }
 
 void hd_handler(){
-	if (inb(0x1F7) & 0x40) hd_interrupt = TRUE;
+	uint8 stat = inb(0x1F7);
+	if (stat & 0x58) hd_interrupt = TRUE;
 	else panic("IDE ERROR");
 }

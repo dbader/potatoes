@@ -94,7 +94,7 @@ todo:
 	
 fdimage: kernel
 	@echo " FDIMAGE floppy.img"
-	@dd if=/dev/zero of=floppy.img bs=512 count=1440 status=noxfer 2> /dev/null
+	@dd if=/dev/zero of=floppy.img bs=1024 count=1440 status=noxfer 2> /dev/null
 	@sudo /sbin/losetup $(LOOPDEV) floppy.img
 	@sudo mkfs -t vfat $(LOOPDEV) > /dev/null 2> /dev/null
 
