@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/string.h"
+#include "../include/stdlib.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -59,7 +60,7 @@ void init_proc_file_table(proc_file pft[NUM_PROC_FILES])  //TODO: proc_file_tabl
 /**
  * Insert a new file to the global filp table
  * 
- * @return desc - the assigned file descriptor
+ * @return desc The assigned file descriptor
  */
 file_nr insert_file(m_inode *inode, char *name, uint8 mode) //length: NUM_FILES
 {
@@ -86,7 +87,7 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode) //length: NUM_FILES
 /**
  * Insert a new file to a given process filp table
  * 
- * @return fd - the assigned file descriptor
+ * @return fd The assigned file descriptor
  */
 file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length: NUM_PROC_FILES
 {
@@ -167,6 +168,27 @@ proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
         return (proc_file*) 0;  
 }
 
+void free_file(file_nr fd)
+{
+        file *f = get_file(fd);
+        f->f_count--;
+        if (f->f_count == 0){
+                f->f_desc = NIL_FILE;
+                free(f->f_name);
+        }
+}
+
+void free_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
+{
+        proc_file *pf = get_proc_file(pft, fd);
+        
+        pf->pf_desc = NIL_PROC_FILE;
+        pf->pf_pos = 0;
+        
+        free_file(pf->pf_desc);
+        pf->pf_f_desc = NIL_FILE;
+}
+
 /**
  * Increment the reference counter of a file
  * 
@@ -176,6 +198,19 @@ void inc_count(file_nr fd)
 {
         file *f = get_file(fd);
         f->f_count++;
+}
+
+/**
+ * Move file position to current file position + offset. 
+ *
+ * @param pft    A process file table
+ * @param fd     A file descriptor
+ * @param offset The offset
+ */
+void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset)
+{
+        proc_file *pf = get_proc_file(pft, fd);
+        pf->pf_pos = pf->pf_pos + offset;
 }
 
 /**

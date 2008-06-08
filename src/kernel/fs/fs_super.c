@@ -59,7 +59,7 @@ void init_super_block()
         
         super->s_bmap_blocks = NUM_BMAP_BLOCKS;
         
-        super->s_first_data_block = ROOT_INODE_BLOCK + 1;
+        super->s_first_data_block = FIRST_DATA_BLOCK;
         
         /* with 32 Bit addresses and a block size of 512: 16MB */
         super->s_max_file_size = (NUM_DIRECT_POINTER + BLOCK_SIZE*8/32 + (BLOCK_SIZE*8/32)*(BLOCK_SIZE*8/32)) * BLOCK_SIZE;
@@ -89,10 +89,9 @@ void load_super_block()
 }
 
 /**
- * @return pointer to super block structure.
+ * Write the super block from memory to HD.
  */
-struct super_block* get_super()
+void write_super_block()
 {
-        return super;
+        wrt_block(SUPER_BLOCK, super, sizeof(super_block));
 }
-

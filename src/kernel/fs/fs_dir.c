@@ -56,13 +56,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_const.h"
 #include "fs_types.h"
 #include "fs_block_dev.h"
+#include "fs_bmap.h"
 #include "fs_buf.h"
 #include "fs_inode_table.h"
 #include "fs_dir.h"
-
-//FIX: Here was the "implicit declaration" warning  -Dmitriy
-//FIXME: maybe you should use an include for this...
-bool fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos);
+#include "fs_io_functions.h"
 
 /**
  * Find a filename within a block of directory entries; format(struct dir_entry): [block_nr, name].
@@ -79,6 +77,67 @@ block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
                 }
         }
         return NOT_FOUND;
+}
+
+block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
+{
+        bool inserted = FALSE;
+        uint32 pos = 0; //points to start of block 0, 1, 2, ...
+        block_nr dir_entry_blk = 0;
+        block_nr new_blk = 0;
+        
+        m_inode *dir_inode = malloc(sizeof(m_inode)); //for fs_read()
+        read_minode(dir_inode, dir_inode_blk);
+        
+        //scan the directory successively until a free entry is found 
+        do{
+                dir_entry_blk = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos);
+                if (dir_entry_blk == NOT_POSSIBLE){
+                        return NOT_POSSIBLE; //problems during reading
+                }
+                
+                if (contains_filename(dir_cache, name) == TRUE){
+                        return NOT_POSSIBLE; //file is already existent
+                }
+                
+                new_blk = alloc_block(dir_entry_blk);
+                inserted = insert_filename(dir_cache, new_blk, name);
+                
+                if (inserted == FALSE){ //no free dir_entry
+                        mark_block(new_blk, FALSE);
+                        pos += BLOCK_SIZE; //to read the next block if not inserted successfully
+                }
+
+        } while(inserted == FALSE);
+        
+        wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
+        
+        clear_block(new_blk); //reset new block
+        
+        return new_blk;
+}
+
+bool insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr, char *name)
+{
+        for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
+                if (strcmp(file_list[i].name, "") == 0){
+                        file_list[i].inode = blk_nr;
+                        memcpy(file_list[i].name, name, NAME_SIZE);
+                        return TRUE;
+                }
+        }
+        return FALSE;
+}
+
+bool remove_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
+{
+        for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
+                if (strcmp(file_list[i].name, name) == 0){
+                        bzero(file_list[i].name, NAME_SIZE);
+                        file_list[i].inode = NULL;
+                }
+        }
+
 }
 
 /**
@@ -123,17 +182,18 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
 {
         uint32 pos = 0;
         rd_block(&d_inode_cache, crt_dir, BLOCK_SIZE); //read d_inode
-        bool read;
+        block_nr read;
         
         do{
                 cpy_dinode_to_minode(&m_inode_cache, &d_inode_cache); //convert d_inode to m_inode (for fs_read)
                 m_inode_cache.i_adr = crt_dir;
                 
-                read = fs_read(dir_cache, &m_inode_cache, BLOCK_SIZE, pos); //read content = file list
+                read = fs_read(dir_cache, &m_inode_cache, sizeof(dir_cache), pos); //read content = file list
                 
-                pos += (ADDR_SIZE + NAME_SIZE) / 4;     //next dir_entry
+                //pos += (ADDR_SIZE + NAME_SIZE) / 4;     //next dir_entry
+                pos += BLOCK_SIZE; //next data block with dir_entrys //TODO: pos += ?
                 
-        } while(contains_filename(dir_cache, tok) == FALSE && read != FALSE);
+        } while(contains_filename(dir_cache, tok) == FALSE && read != NOT_POSSIBLE);
                 
                 
         block_nr blk_nr = find_filename(dir_cache, tok); //find current file in the directory cache
@@ -141,14 +201,14 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
                 return NOT_FOUND;
         }
         
-        rd_block(dir_cache, blk_nr, sizeof(dir_cache)); //read blk_nr to directory cache
+        //rd_block(dir_cache, blk_nr, sizeof(dir_cache)); //read blk_nr to directory cache
         
         tok = strsep(&path, delim);
         
         if (tok == NULL){ //end of path
                 return blk_nr;
         } else {
-                return rfsearch(crt_dir, path, tok, delim);
+                return rfsearch(blk_nr, path, tok, delim);
         }
 }
 
@@ -158,7 +218,7 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
  * @param abs_path The absolute path
  * @return         The filename
  */
-char* splice_filename(char *abs_path)
+char* get_filename(char *abs_path)
 {
         char delim[] = "/";
         char *tok;
@@ -185,7 +245,7 @@ char* splice_filename(char *abs_path)
  * @param abs_path The absolute path
  * @return         The path
  */
-char* splice_path(char *abs_path)
+char* get_path(char *abs_path)
 {
         char delim[] = "/";
         char *tok;

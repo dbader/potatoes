@@ -50,13 +50,23 @@ m_inode *root;
 
 void init_inode_table();
 
+void load_root();
+
+void write_root();
+
+void create_root();
+
 m_inode* get_inode(inode_nr i_num);
+
+bool read_inode(m_inode *inode);
 
 bool write_inode(m_inode *inode);
 
 void cpy_minode_to_dinode(d_inode *di, m_inode *mi);
 
 void cpy_dinode_to_minode(m_inode *mi, d_inode *di);
+
+m_inode* new_minode(block_nr adr, int mode, bool to_inode_table);
 
 void free_inode(inode_nr i_num);
 

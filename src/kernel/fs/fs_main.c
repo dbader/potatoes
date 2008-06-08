@@ -34,43 +34,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs_const.h"
 #include "fs_types.h"
+#include "fs_file_table.h"
+#include "fs_inode_table.h"
+#include "fs_io_functions.h"
+#include "fs_super.h"
+#include "fs_bmap.h"
 #include "fs_main.h"
-
-extern void reset_bmap();
-extern void init_super_block();
-extern void load_super_block();
 
 extern void panic(char *msg);
 
+/**
+ * Initializes the file system.
+ */
 void fs_init()
 {
-        //panic("FS says 'foobar'!");
+        /*if(!load_fs()){
+                if (!create_fs()){
+                        panic("file system cannot be initialized!");
+                }
+        }*/
 }
 
 bool fs_shutdown()
 {
-        return TRUE;   
+        write_root(); //TODO: intersection with "close all left inodes?"
+        
+        //close all open files
+        for(int i = 0; i < NUM_FILES; i++){
+                fs_close(gft[i].f_desc);
+        }
+        
+        //close all left inodes
+        for (int i = 0; i < NUM_INODES; i++){
+                write_inode(&inode_table[i]);
+        }
+        
+        write_bmap();
+        write_super_block();
+
+        
+        return TRUE; //TODO: void?
 }
 
-bool fs_load()
+bool load_fs()
 {
-        //TODO
+        load_bmap();
+        init_inode_table();
+        load_root();
         load_super_block();
-        //load bmap
         
-        //load root dir
-        return TRUE;
+        return super_block.s_used;
 }
 
-bool fs_create()
+bool create_fs()
 {
-        //TODO
-        init_super_block();
         reset_bmap();
+        init_inode_table();
+        create_root();
+        init_super_block();
         
-        //create root dir
-        
-        return TRUE;
+        return TRUE; //TODO: void?
 }
 
+bool do_read(void *buf, file_nr file, size_t num_bytes)
+{
+        //TODO: do_read
+}
+
+bool do_write(file_nr file, void *buf, size_t num_bytes)
+{
+        //TODO: do_write
+}
+
+//TODO: implement other do_x functions for sys-calls
 

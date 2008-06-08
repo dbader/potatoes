@@ -35,28 +35,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs_const.h"
 #include "fs_types.h"
+
 #include "fs_block_dev.h"
 #include "fs_buf.h"
 #include "fs_bmap.h"
 #include "fs_inode_table.h"
 #include "fs_file_table.h"
 #include "fs_dir.h"
+#include "fs_io_functions.h"
 
 /**
- * Create a file from abs. path
+ * Creates a file from absolute path by inserting the name into the containing directory,
+ * creating a new inode and writing it to HD.
  * 
  * @param path The file's absolute path
- * @return the file's file descriptor
+ * @return The result status of the create operation
  */
-file_nr create(char *path)
+bool fs_create(char *path, int data_type)
 {
-        block_nr blk_nr = search_file(path);
-        if (blk_nr != NOT_FOUND){
-                return NOT_POSSIBLE;    //file is already existent
+        block_nr dir_inode_block = search_file(get_path(path)); //find dir
+        
+        if (dir_inode_block == NOT_FOUND){
+                return FALSE;
         }
         
-        blk_nr = search_file(splice_path(path));
+        block_nr file_block = insert_file_into_dir(dir_inode_block, get_filename(path));
         
-        blk_nr = alloc_block(blk_nr);
+        if (file_block == NOT_POSSIBLE){
+                return FALSE;
+        }
+        
+        //create new inode and write it to HD
+        m_inode *inode = new_minode(file_block, data_type, TRUE); //TODO: to inode table?
+        write_inode(inode);
+        free_inode(inode->i_num); 
+        
+        return TRUE;
+}
+
+/**
+ * Deletes a file by deregistering it from the containing directory.
+ * 
+ * @param path  The absolute file path
+ * @return      The operation's result status
+ */
+bool fs_delete(char *path)
+{
+        block_nr dir_blk = search_file(get_path(path));
         
 }

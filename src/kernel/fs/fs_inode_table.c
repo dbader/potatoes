@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/string.h"
+#include "../include/stdlib.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -43,7 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_inode_table.h"
 
 /**
- * Initialize all inodes with i_num = NIL_INODE = 0
+ * Initialize all inodes with i_num = NIL_INODE = -1
  * -> sign that inode is unused
  */
 void init_inode_table()
@@ -51,12 +52,27 @@ void init_inode_table()
         for (int i = 0; i < NUM_INODES; i++){
                 inode_table[i].i_num = NIL_INODE;
         }
-        
+}
+
+void load_root()
+{
         //load root inode from HD to inode table
-        rd_block(&inode_table[0], ROOT_INODE_BLOCK, BLOCK_SIZE);
-        inode_table[0].i_num = ROOT_INODE;
+        rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, sizeof(m_inode));
+        inode_table[ROOT_INODE].i_num = ROOT_INODE;
  
-        root = &inode_table[0];
+        root = &inode_table[ROOT_INODE];
+}
+
+void write_root()
+{
+        //write root inode to HD
+        wrt_block(ROOT_INODE_BLOCK, &inode_table[ROOT_INODE], sizeof(m_inode));
+}
+
+void create_root()
+{
+        m_inode *new_root = new_minode(ROOT_INODE, DIRECTORY, FALSE);
+        memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
 }
 
 /**
@@ -83,12 +99,31 @@ m_inode* get_inode(inode_nr i_num)
  * @param inode Pointer to the memory inode which should be written
  * @return boolean status of operation
  */
-//TODO: counter-check this after implementation of the buffers!
+void read_dinode(d_inode *inode, block_nr inode_blk)
+{
+        rd_block(inode, inode_blk, sizeof(d_inode));
+}
+
+void read_minode(m_inode *inode, block_nr inode_blk)
+{
+        read_dinode(&d_inode_cache, inode_blk);
+        cpy_dinode_to_minode(inode, &d_inode_cache);
+        inode->i_adr = inode_blk;
+}
+
+/**
+ * Write a memory inode to disk.
+ * First transform memory inode to a disk inode. Then copy this disk inode to the write_cache.
+ * Finally write the write_cache to disk.
+ * 
+ * @param inode Pointer to the memory inode which should be written
+ * @return boolean status of operation
+ */
 bool write_inode(m_inode *inode)
 {
-        clear_cache(&write_cache);                         //reset write cache
-        
         cpy_minode_to_dinode(&d_inode_cache, inode);
+        
+        clear_cache(&write_cache);                         //reset write cache
         
         memcpy(write_cache.cache, &d_inode_cache, sizeof(d_inode));
                 
@@ -131,6 +166,30 @@ void cpy_dinode_to_minode(m_inode *mi, d_inode *di)
 
         mi->i_single_indirect_pointer   = di->i_single_indirect_pointer;
         mi->i_double_indirect_pointer   = di->i_double_indirect_pointer;
+}
+
+m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
+{
+        m_inode *mi;
+        
+        if (!to_inode_table){
+                mi = malloc(sizeof(m_inode));
+        } else {
+                mi = alloc_inode();
+        }
+        
+        mi->i_num  = 0;
+        mi->i_adr  = adr;
+        mi->i_mode = mode;
+        mi->i_size = 0;
+        mi->i_create_ts = NULL; //TODO: get create_ts from Dmitriy
+        
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+                mi->i_direct_pointer[i] = NULL;
+        }
+        
+        mi->i_single_indirect_pointer = NULL;
+        mi->i_double_indirect_pointer = NULL;
 }
 
 /**

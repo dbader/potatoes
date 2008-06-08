@@ -33,9 +33,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __FS_BLOCK_DEV_H_
 
 void rd_block(void *buf, block_nr blk_nr, size_t num_bytes);
+
+void cache_block(block_nr blk_nr, size_t num_bytes);
+
 void wrt_block(block_nr blk_nr, void *buf, size_t num_bytes);
+
 void wrt_cache(block_cache *cache, size_t num_bytes);
 
+void clear_block(block_nr blk_nr);
+
+block_nr get_data_block(m_inode *inode, uint32 pos);
 
 
 #endif /*__FS_BLOCK_DEV_H_*/

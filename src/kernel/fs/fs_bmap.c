@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs_super.h"
 #include "fs_bmap.h"
+#include "fs_block_dev.h"
 
 
 /**
@@ -45,15 +46,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void reset_bmap()
 {
-        struct super_block *super = get_super();
-        block_nr first_data_block = super->s_first_data_block;
-        
-        for (block_nr i = 0; i < first_data_block; i++){
+        for (block_nr i = 0; i < FIRST_DATA_BLOCK; i++){
                 mark_block(i, TRUE);
         }
         
-        for (block_nr i = first_data_block; i < NUM_BLOCKS_ON_HD; i++){
+        for (block_nr i = FIRST_DATA_BLOCK; i < NUM_BLOCKS_ON_HD; i++){
                 mark_block(i, FALSE);
+        }
+}
+
+/**
+ * Loads the block bitmap from HD
+ */
+void load_bmap()
+{
+        int j = 0;
+        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
+                rd_block(&bmap[j*BLOCK_SIZE], i, BLOCK_SIZE);
+                j++;
+        }
+}
+
+/**
+ * Writes the block bitmap to HD.
+ */
+void write_bmap()
+{
+        int j = 0;
+        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
+                wrt_block(i, &bmap[j*BLOCK_SIZE], BLOCK_SIZE); //TODO: test this!
+                j++;
         }
 }
         

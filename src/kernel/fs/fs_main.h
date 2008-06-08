@@ -37,9 +37,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* MKFS */
 void fs_init();
 bool fs_shutdown();
-bool fs_load();
-bool fs_create();
+bool load_fs();
+bool create_fs();
 
+bool do_read(void *buf, file_nr file, size_t num_bytes);
+bool do_write(file_nr file, void *buf, size_t num_bytes);
 
 /* CREATE */
 

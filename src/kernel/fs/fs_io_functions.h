@@ -22,40 +22,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file 
- * Basic definitions concerning the block bitmap (bmap)
+ * Functions definitions concerning read, write, open, close, create, delete.
  * 
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
  */
 
-#ifndef FS_BMAP_H_
-#define FS_BMAP_H_
+#ifndef FS_IO_FUNCTIONS_H_
+#define FS_IO_FUNCTIONS_H_
 
-/**
- * Functions on the block bitmap
- */
+block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos);
 
-void reset_bmap();
+block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos);
 
-void load_bmap();
+file_nr fs_open(char *path);
 
-void write_bmap();
+void fs_close(file_nr fd);
 
-block_nr get_free_block(block_nr start);
+bool fs_create(char *path, int data_type);
 
-void mark_block(block_nr blk_nr, bool flag);
+bool fs_delete(char *path);
 
-block_nr alloc_block(block_nr start);
+void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset);
 
 
-/**
- * Central block bitmap structure.
- * 
- * a bit larger than NUM_BLOCKS_ON_HD / 8
- */
- /****************************************************/
-        uint8 bmap[NUM_BMAP_BLOCKS * BLOCK_SIZE];
- /****************************************************/
+extern void read_dinode(d_inode *inode, block_nr inode_blk);
 
-#endif /*FS_BMAP_H_*/
+extern void read_minode(m_inode *inode, block_nr inode_blk);
+
+extern bool write_inode(m_inode *inode);
+
+#endif /*FS_IO_FUNCTIONS_H_*/
