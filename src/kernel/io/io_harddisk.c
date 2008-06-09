@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file 
@@ -46,23 +46,23 @@ volatile bool hd_interrupt = FALSE;
  */
 void wait_on_hd_interrupt()
 {
-	while(!hd_interrupt){
-		uint8 stat=inb(0x1F7);
-		if(stat & 0x58) break; //drdy dsc drq
-		else if (stat & 1) panic("IDE-ERROR"); //error flag
-		halt();
-	}
-	hd_interrupt = FALSE;
+        while(!hd_interrupt){
+                uint8 stat=inb(0x1F7);
+                if(stat & 0x58) break; //drdy dsc drq
+                else if (stat & 1) panic("IDE-ERROR"); //error flag
+                halt();
+        }
+        hd_interrupt = FALSE;
 }
 
 struct address itoaddr(uint32 iaddr)
 {
-	struct address addr;
-	addr.sector = iaddr % hd1.apparent_sector_per_track + 1;
-	iaddr = (iaddr - addr.sector + 1) / hd1.apparent_sector_per_track;
-	addr.head = iaddr % hd1.apparent_head;
-	addr.cyl = (iaddr - addr.head) / hd1.apparent_head;
-	return addr;
+        struct address addr;
+        addr.sector = iaddr % hd1.apparent_sector_per_track + 1;
+        iaddr = (iaddr - addr.sector + 1) / hd1.apparent_sector_per_track;
+        addr.head = iaddr % hd1.apparent_head;
+        addr.cyl = (iaddr - addr.head) / hd1.apparent_head;
+        return addr;
 }
 
 /**
@@ -72,7 +72,7 @@ struct address itoaddr(uint32 iaddr)
  */
 uint32 get_hdsize()
 {
-	return ((hd1.apparent_cyl*hd1.apparent_head+hd1.apparent_head)*hd1.apparent_sector_per_track + hd1.apparent_sector_per_track - 1); 
+        return ((hd1.apparent_cyl*hd1.apparent_head+hd1.apparent_head)*hd1.apparent_sector_per_track + hd1.apparent_sector_per_track - 1); 
 }
 
 /**
@@ -80,13 +80,13 @@ uint32 get_hdsize()
  */
 void hd_init()
 {
-	outb(0x1F6,0xA0); //select master drive
-	outb(0x1F7,0xEC); //identify drive
-	wait_on_hd_interrupt();
-	repinsw(0x1F0,(uint16*)&hd1,256); //read buffer
-	maxaddr = get_hdsize();
-	printf("io: hard disk initialization:\n\t%u cylinders\n\t%u heads\n\t%u sectors per track\n\t---------------\n\t%d\tmaximal address\n"
-			,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
+        outb(0x1F6,0xA0); //select master drive
+        outb(0x1F7,0xEC); //identify drive
+        wait_on_hd_interrupt();
+        repinsw(0x1F0,(uint16*)&hd1,256); //read buffer
+        maxaddr = get_hdsize();
+        printf("io: hard disk initialization:\n\t%u cylinders\n\t%u heads\n\t%u sectors per track\n\t---------------\n\t%d\tmaximal address\n"
+                        ,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
 }
 
 /**
@@ -97,16 +97,16 @@ void hd_init()
  */
 void hd_write_sector(uint32 dest, void *src)
 {
-	if(dest > maxaddr) return;
-	struct address addr = itoaddr(dest);
-	outb(0x1F2,1);
-	outb(0x1F3,addr.sector);
-	outb(0x1F4,addr.cyl);
-	outb(0x1F5,addr.cyl >> 16);
-	outb(0x1F6,0xA0+addr.head);
-	outb(0x1F7,0x30); //write sector
-	repoutsw(0x1F0,src,256); //write buffer
-	wait_on_hd_interrupt();
+        if(dest > maxaddr) return;
+        struct address addr = itoaddr(dest);
+        outb(0x1F2,1);
+        outb(0x1F3,addr.sector);
+        outb(0x1F4,addr.cyl);
+        outb(0x1F5,addr.cyl >> 16);
+        outb(0x1F6,0xA0+addr.head);
+        outb(0x1F7,0x30); //write sector
+        repoutsw(0x1F0,src,256); //write buffer
+        wait_on_hd_interrupt();
 }
 
 /**
@@ -117,23 +117,23 @@ void hd_write_sector(uint32 dest, void *src)
  */
 void hd_read_sector(void *dest, uint32 src)
 {
-	if(src > maxaddr) return;
-	struct address addr = itoaddr(src);
-	outb(0x1F2,1);
-	outb(0x1F3,addr.sector);
-	outb(0x1F4,addr.cyl);
-	outb(0x1F5,addr.cyl >> 16);
-	outb(0x1F6,0xA0+addr.head);
-	outb(0x1F7,0x20); //read sector
-	wait_on_hd_interrupt();
-	repinsw(0x1F0,dest,256); //read buffer	
+        if(src > maxaddr) return;
+        struct address addr = itoaddr(src);
+        outb(0x1F2,1);
+        outb(0x1F3,addr.sector);
+        outb(0x1F4,addr.cyl);
+        outb(0x1F5,addr.cyl >> 16);
+        outb(0x1F6,0xA0+addr.head);
+        outb(0x1F7,0x20); //read sector
+        wait_on_hd_interrupt();
+        repinsw(0x1F0,dest,256); //read buffer	
 }
 
 /**
  * Handles an hard disk interrupt by setting the hd_interrupt flag.
  */
 void hd_handler(){
-	uint8 stat = inb(0x1F7);
-	if (stat & 0x58) hd_interrupt = TRUE;
-	else panic("IDE ERROR");
+        uint8 stat = inb(0x1F7);
+        if (stat & 0x58) hd_interrupt = TRUE;
+        else panic("IDE ERROR");
 }

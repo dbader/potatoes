@@ -59,13 +59,12 @@ mboot:
 
 start:
 
-    ; Execute the kernel:
-    cli                         ; Disable interrupts.
-    
-    ; Load multiboot information:
-    push ebx
-    
-    call main                   ; call our main() function.
-    jmp $                       ; Enter an infinite loop, to stop the processor
+        ; Execute the kernel:
+        ; Load multiboot information:
+        push ebx
+        
+        cli                     ;Disable interrupts
+        call main               ; call our main() function.
+        jmp $                   ; Enter an infinite loop, to stop the processor
                                 ; executing whatever rubbish is in the memory
                                 ; after our kernel!

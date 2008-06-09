@@ -22,14 +22,14 @@
 ;@author Dmitriy Traytel
 
 ;********************************************************************************************
-	;Installation of our idt-table:
+        ;Installation of our idt-table:
 [GLOBAL idt_load]
 [EXTERN idtp]
 idt_load:
-	lidt [idtp]
-	ret
+        lidt [idtp]
+        ret
 ;********************************************************************************************
-	;Installation of the interrupt service routines:
+        ;Installation of the interrupt service routines:
 [GLOBAL isr0]
 [GLOBAL isr1]
 [GLOBAL isr2]
@@ -65,57 +65,57 @@ idt_load:
 
 ;divide by zero
 isr0:
-	cli
-	push byte 0
-	push byte 0
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 0
+        jmp isr_handler
+        
 ;debug
 isr1:
-	cli
-	push byte 0
-	push byte 1
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 1
+        jmp isr_handler
 
 ;non maskable interrupt
 isr2:
-	cli
-	push byte 0
-	push byte 2
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 2
+        jmp isr_handler
 
 ;breakpoint
 isr3:
-	cli
-	push byte 0
-	push byte 3
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 3
+        jmp isr_handler
+
 ;overflow
 isr4:
-	cli
-	push byte 0
-	push byte 4
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 4
+        jmp isr_handler
+
 ;out of bounds
 isr5:
-	cli
-	push byte 0
-	push byte 5
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 5
+        jmp isr_handler
 
 ;invalid opcode
 isr6:
-	cli
-	push byte 0
-	push byte 6
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 6
+        jmp isr_handler
+
 ;no coprocessor
 isr7:
-	cli
-	push byte 0
+        cli
+        push byte 0
 	push byte 7
 	jmp isr_handler
 
@@ -127,185 +127,187 @@ isr8:
 
 ;coprocessor segment overrun
 isr9:
-	cli
-	push byte 0
-	push byte 9
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 9
+        jmp isr_handler
 	
 ;bad tss (with error code)
 isr10:
-	cli
-	push byte 10
-	jmp isr_handler
-	
+        cli
+        push byte 10
+        jmp isr_handler
+
 ;segment not present (with error code)
 isr11:
-	cli
-	push byte 11
-	jmp isr_handler
-	
+        cli
+        push byte 11
+        jmp isr_handler
+
 ;stack fault (with error code)
+
 isr12:
-	cli
-	push byte 12
-	jmp isr_handler
-	
+        cli
+        push byte 12
+        jmp isr_handler
+
 ;general protection fault (with error code)
 isr13:
-	cli
-	push byte 13
-	jmp isr_handler
+        cli
+        push byte 13
+        jmp isr_handler
 
 ;page fault (with error code)
 isr14:
-	cli
-	push byte 14
-	jmp isr_handler
+        cli
+        push byte 14
+        jmp isr_handler
 
 ;unknown interrupt
 isr15:
-	cli
-	push byte 0
-	push byte 15
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 15
+        jmp isr_handler
+
 ;coprocessor fault
 isr16:
-	cli
-	push byte 0
-	push byte 16
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 16
+        jmp isr_handler
+
 ;reserved
 isr17:
-	cli
-	push byte 0
-	push byte 17
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 17
+        jmp isr_handler
+
 ;reserved
 isr18:
-	cli
-	push byte 0
-	push byte 18
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 18
+        jmp isr_handler
 
 ;reserved
 isr19:
-	cli
-	push byte 0
-	push byte 19
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 19
+        jmp isr_handler
 
 ;reserved
 isr20:
-	cli
-	push byte 0
-	push byte 20
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 20
+        jmp isr_handler
+
 ;reserved
 isr21:
-	cli
-	push byte 0
-	push byte 21
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 21
+        jmp isr_handler
+
 ;reserved
 isr22:
-	cli
-	push byte 0
-	push byte 22
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 22
+        jmp isr_handler
+
 ;reserved
 isr23:
-	cli
-	push byte 0
-	push byte 23
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 23
+        jmp isr_handler
 
 ;reserved
 isr24:
-	cli
-	push byte 0
-	push byte 24
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 24
+        jmp isr_handler
 
 ;reserved
 isr25:
-	cli
-	push byte 0
-	push byte 25
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 25
+        jmp isr_handler
+
 ;reserved
 isr26:
-	cli
-	push byte 0
-	push byte 26
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 26
+        jmp isr_handler
 
 ;reserved
 isr27:
-	cli
-	push byte 0
-	push byte 27
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 27
+        jmp isr_handler
+
 ;reserved
 isr28:
-	cli
-	push byte 0
-	push byte 28
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 28
+        jmp isr_handler
 
 ;reserved
 isr29:
-	cli
-	push byte 0
-	push byte 29
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 29
+        jmp isr_handler
 
 ;reserved
 isr30:
-	cli
-	push byte 0
-	push byte 30
-	jmp isr_handler
-	
+        cli
+        push byte 0
+        push byte 30
+        jmp isr_handler
+
 ;reserved
 isr31:
-	cli
-	push byte 0
-	push byte 31
-	jmp isr_handler
+        cli
+        push byte 0
+        push byte 31
+        jmp isr_handler
 
 
 [EXTERN ex_handler]
 
 isr_handler:
-	pusha
-	push ds
-	push es
-	push fs
-	push gs
-	mov ax, 0x10 ;kernel data segment
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax): 12*4=48
-	push dword [esp + 48] ;function argument
-	call ex_handler
-	pop eax
-	pop gs
-	pop fs
-	pop es
-	pop ds
-	popa
-	add esp, 8 ;clean up stack
+        pusha
+        push ds
+        push es
+        push fs
+        push gs
+        mov ax, 0x10 ;kernel data segment
+        mov ds, ax
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
+        ;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax): 12*4=48
+        push dword [esp + 48] ;function argument
+        call ex_handler
+        pop eax
+        pop gs
+        pop fs
+        pop es
+        pop ds
+        popa
+        add esp, 8 ;clean up stack
         sti
-	iret
+        iret
 ;********************************************************************************************
 [GLOBAL irq0]
 [GLOBAL irq1]
@@ -328,143 +330,143 @@ isr_handler:
 
 ;Timer
 irq0:
-	cli
-	push byte 0
-	push byte 32
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 32
+        jmp irq_handler
 
 ;Keyboard
 irq1:
-	cli
-	push byte 0
-	push byte 33
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 33
+        jmp irq_handler
 
 ;IRQ 9
 irq2:
-	cli
-	push byte 0
-	push byte 34
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 34
+        jmp irq_handler
 
 ;COM 2,4,6,8
 irq3:
-	cli
-	push byte 0
-	push byte 35
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 35
+        jmp irq_handler
 
 ;COM 1,3,5,7
 irq4:
-	cli
-	push byte 0
-	push byte 36
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 36
+        jmp irq_handler
 
 ;Free/LTP 2
 irq5:
-	cli
-	push byte 0
-	push byte 37
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 37
+        jmp irq_handler
 
 ;Floppy
 irq6:
-	cli
-	push byte 0
-	push byte 38
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 38
+        jmp irq_handler
 
 ;LTP 1
 irq7:
-	cli
-	push byte 0
-	push byte 39
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 39
+        jmp irq_handler
 
 ;Realtime clock (RTC)
 irq8:
-	cli
-	push byte 0
-	push byte 40
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 40
+        jmp irq_handler
 
 ;Free/->IRQ 2/VGA,NIC
 irq9:
-	cli
-	push byte 0
-	push byte 41
-	jmp irq_handler
-	
+        cli
+        push byte 0
+        push byte 41
+        jmp irq_handler
+
 ;Free/PCI
 irq10:
-	cli
-	push byte 0
-	push byte 42
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 42
+        jmp irq_handler
 
 ;Free/SCSI
 irq11:
-	cli
-	push byte 0
-	push byte 43
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 43
+        jmp irq_handler
 
 ;PS/2
 irq12:
-	cli
-	push byte 0
-	push byte 44
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 44
+        jmp irq_handler
 
 ;Coprocessor
 irq13:
-	cli
-	push byte 0
-	push byte 45
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 45
+        jmp irq_handler
 
 ;Primary IDE
 irq14:
-	cli
-	push byte 0
-	push byte 46
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 46
+        jmp irq_handler
 
 ;Secondary IDE
 irq15:
-	cli
-	push byte 0
-	push byte 47
-	jmp irq_handler
+        cli
+        push byte 0
+        push byte 47
+        jmp irq_handler
 
 
 [EXTERN hw_handler]
 
 irq_handler:
-	pusha
-	push ds
-	push es
-	push fs
-	push gs
-	mov ax, 0x10 ;kernel data segment
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax): 12*4=48
-	push dword [esp + 48] ;function argument
-	mov eax, hw_handler
-	call eax
-	pop eax
-	pop gs
-	pop fs
-	pop es
-	pop ds
-	popa
-	add esp, 8 ;clean up stack
-	sti
-	iret
+        pusha
+        push ds
+        push es
+        push fs
+        push gs
+        mov ax, 0x10 ;kernel data segment
+        mov ds, ax
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
+        ;jump over pushed registers (gs, fs, es, ds, edi, esi, ebp, esp, ebx, edx, ecx, eax): 12*4=48
+        push dword [esp + 48] ;function argument
+        mov eax, hw_handler
+        call eax
+        pop eax
+        pop gs
+        pop fs
+        pop es
+        pop ds
+        popa
+        add esp, 8 ;clean up stack
+        sti
+        iret
 
 ;********************************************************************************************
 [GLOBAL _syscall]

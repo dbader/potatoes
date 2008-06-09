@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file
@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
- 
+
 #include "../include/init.h"
 #include "../include/const.h"
 #include "../include/stdio.h"
@@ -84,18 +84,18 @@ int main(struct multiboot *mboot_ptr)
         printf("kernel starts at 0x%x\n", &start);
         printf("kernel ends at 0x%x\n", &end - 1);
         printf("memory begins at 0x%x\n\n", &end); */
-        
+
         //printf("\n0x%x\n",mboot_ptr->mem_upper);
         //printf("\n0x%x\n",0x100000 + mboot_ptr->mem_upper * 1024);
-        
+
         mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
         io_init();      
         pm_init();
         fs_init();
-        
+
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
-        
+
         halt();
-	return 0;
+        return 0;
 }

@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file 
@@ -72,8 +72,8 @@ void sleep(sint32 num)
         }
         else
         {
-        		reactivate_pic();
-        	    set_interrupts();
+                reactivate_pic();
+                set_interrupts();
                 while (ticks < i) {
                         halt();
                 }
@@ -92,8 +92,8 @@ void sleep_ticks(sint32 num)
         }
         else
         {
-        		reactivate_pic();
-        		set_interrupts();
+                reactivate_pic();
+                set_interrupts();
                 while (ticks < i) {
                         halt();
                 }
@@ -105,16 +105,16 @@ void sleep_ticks(sint32 num)
  */
 void timer_init(sint32 freq)
 {
-    int counter = 1193180 / freq; //1193180Hz - base 8254 frequency
-    outb(0x43, 0x36);
-    /* 0x36=00.11.011.0b
-     * ---------------------------------------
-     * 00-Select counter 0
-     * 11-Read/load LSB first then MSB of the counter
-     * 011-Mode 3: Square wave rate Generator
-     * 0-Binary counter
-     */
-     
-    outb(0x40, counter % 0xFF); //LSB
-    outb(0x40, counter / 0xFF); //MSB
+        int counter = 1193180 / freq; //1193180Hz - base 8254 frequency
+        outb(0x43, 0x36);
+        /* 0x36=00.11.011.0b
+         * ---------------------------------------
+         * 00-Select counter 0
+         * 11-Read/load LSB first then MSB of the counter
+         * 011-Mode 3: Square wave rate Generator
+         * 0-Binary counter
+         */
+
+        outb(0x40, counter % 0xFF); //LSB
+        outb(0x40, counter / 0xFF); //MSB
 }

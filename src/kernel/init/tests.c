@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file 
@@ -53,10 +53,10 @@ void draw_test()
         monitor_puts("|  __/ |_| | |__| |____) |\n");
         monitor_puts(" \\___|\\__|_|\\____/|_____/\n\n");
         monitor_cputs("Copyright 2008 Daniel Bader,Vincenz Doelle,Johannes Schamburger,Dmitriy Traytel\n",0xA,BLACK);
-        
+
         monitor_puts("\ttab-test\tok\n");
         monitor_puti(strlen("hallo welt")); //strlen-test
-        
+
         //some ints
         monitor_puts("\t");
         monitor_puti(0);
@@ -65,7 +65,7 @@ void draw_test()
         monitor_puts("\t");
         monitor_puti(-2);
         monitor_puts("\t");
-        
+
         //some hex-bytes
         uint8 *test = (uint8*)0x60;
         monitor_puthex(*test);                    //0x60h
@@ -74,10 +74,10 @@ void draw_test()
         monitor_puthex(*(test + 3));              //0x63h
         monitor_puthex(*(test + 4));              //0x64h
         monitor_puthex(*(test + 5));              //0x65h
-        
+
         monitor_puts("\t\n");
         monitor_puts("\tnumber-test\tok\n");
-        
+
         monitor_puts("\tbegin color test:\n");
         monitor_cputs("                                        ", BLACK, WHITE);
         monitor_cputs("                                        ", BLACK, BLUE); 
@@ -118,8 +118,8 @@ void strings_test()
         strcat(f, t2);
         strcat(f, t3);
         monitor_puts(f); monitor_puts("\n\n");
-        
-        
+
+
 }
 
 void strsep_test()
@@ -129,7 +129,7 @@ void strsep_test()
         char *tok;
         char *copy = strdup(path);
         char *work_copy = copy;
-      
+
         do {
                 printf("strsep(\"%s\") ", work_copy);
                 tok = strsep(&work_copy, delim);
@@ -186,7 +186,7 @@ void malloc_test()
                 test2[i] = malloc_name(0x3BFFC,"name");
                 printf("allocating %d bytes... 0x%x\n", 0x3BFEC, test2[i]);
         }
-        
+
         printf("\n");
 }
 
@@ -213,7 +213,7 @@ void hd_test()
 {
         char src_string[] = "'foobar' visited HD on block 42 - that's great! - Thanks Dmitriy!!";
         hd_write_sector(42, (void*) src_string);
-        
+
         char *res_string = malloc(50);
         hd_read_sector((void*) res_string, 42);
         puts(res_string);
@@ -223,77 +223,77 @@ void hd_test()
 extern void _syscall(uint16 id, void *data);
 void syscall_test()
 {
-	void* test1 = malloc(1);
-	void* test2 = malloc(2);
-	void* test3 = malloc(1);
-	printf("%p\t%p\t%p\n", test1, test2, test3);
-	
-	_syscall(23, test1);
-	_syscall(42, test2);
-	_syscall(3, test3);
+        void* test1 = malloc(1);
+        void* test2 = malloc(2);
+        void* test3 = malloc(1);
+        printf("%p\t%p\t%p\n", test1, test2, test3);
+
+        _syscall(23, test1);
+        _syscall(42, test2);
+        _syscall(3, test3);
 }
 
 void ralph_wiggum()
 {
-	printf("                                                                   \n");
-	printf("                       #WWWWWWWW@                                  \n");
-	printf("                   WWWWW# W@+W WWWWWW                              \n");
-	printf("                @W  W#W  W W+ W *W WWWWW                           \n");
-	printf("              @W  W W  +@ W  @    + W WW@W                         \n");
-	printf("             WW  W W  +* W   W    W  * W#@WW                       \n");
-	printf("           W W  W W   # #   W  #  *  @  W W#W                      \n");
-	printf("          W W  @ *   W  W   W  W   W  W  W W WW                    \n");
-	printf("         W W  W  @  W  W       W   W   *  * W WW                   \n");
-	printf("        W W  W  W      W   W   W   @   W  W  W WW                  \n");
-	printf("       W W  W  +   W       W   W    +      @  + W@                 \n");
-	printf("      W  + #   W      @    W   W    W   W  W  W  W*                \n");
-	printf("        W  W  +   W   W             W   #        ++#               \n");
-	printf("     W *  W   W   W   W                           W W              \n");
-	printf("    #  W  W   @                                   #  W             \n");
-	printf("    W    +   @   @        WW +WW          #WWWW@   W               \n");
-	printf("      W  W   W   W      +#      **       W      W  W               \n");
-	printf("   @  @  W   W          W        @      W        W W               \n");
-	printf("   W     +   *         +          @     W          W               \n");
-	printf("   W #  +              W   #      W     W    WW    @               \n");
-	printf("     W                 W  WW@     W     W    WW    @               \n");
-	printf("     WW@               *   W      W     W        # @               \n");
-	printf("    W+  #W              W                W       # W               \n");
-	printf("                        +        W        W     #  W               \n");
-	printf("   *  #*                  W    +W      *W+ +WW#    @               \n");
-	printf("   * ++                    +WW#          *@        W               \n");
-	printf("    @  *                        @         W        W               \n");
-	printf("    W                           +  #      W         W              \n");
-	printf("     W                          +W  W     W          W             \n");
-	printf("      +WWW                     W+    W  #W           @             \n");
-	printf("        W                     W      W@+              W            \n");
-	printf("         W                   W     @#                 W            \n");
-	printf("         W              @   @      @                  @            \n");
-	printf("          W             W   W     W WWW              W             \n");
-	printf("           W            WW@       W    W          *W               \n");
-	printf("           *W          *   #            #      @WW                 \n");
-	printf("          W  W@            +          W@WW###*W                    \n");
-	printf("         #     W           +        @+    *   W                    \n");
-	printf("         W      @W         *              W  #                     \n");
-	printf("         W        *WW      *              W @                      \n");
-	printf("         W           *WWWWWW            W @@ WW                    \n");
-	printf("        # W              W  +W@        W W W   W*                  \n");
-	printf("      @W  @W            W      W+      WW  @   WW                  \n");
-	printf("     *      W           #       #W     W   W  W  *                 \n");
-	printf("     W       W+        W          W    W    WW   W                 \n");
-	printf("     +         W      W            W   W    W W  W                 \n");
-	printf("                WW   W*             W +    W   W WW                \n");
-	printf("                  #W#@              W WW  W     W* W               \n");
-	printf("                   W#                W  WW       + +               \n");
-	printf("     @            W                  W           W  W              \n");
-	printf("     W                               W              +              \n");
-	printf("     W                               W               W             \n");
-	printf("    @ W                             +@               WW            \n");
-	printf("   W  W                             W                 W            \n");
-	printf("   +   W                           W                  WW           \n");
-	printf("  W     W                         W                   @            \n");
-	printf("  W     @+                       W                     WW          \n");
-	printf("         W                      W                      W           \n");
-	printf(" +        W*                  WW                       W W         \n");
+        printf("                                                                   \n");
+        printf("                       #WWWWWWWW@                                  \n");
+        printf("                   WWWWW# W@+W WWWWWW                              \n");
+        printf("                @W  W#W  W W+ W *W WWWWW                           \n");
+        printf("              @W  W W  +@ W  @    + W WW@W                         \n");
+        printf("             WW  W W  +* W   W    W  * W#@WW                       \n");
+        printf("           W W  W W   # #   W  #  *  @  W W#W                      \n");
+        printf("          W W  @ *   W  W   W  W   W  W  W W WW                    \n");
+        printf("         W W  W  @  W  W       W   W   *  * W WW                   \n");
+        printf("        W W  W  W      W   W   W   @   W  W  W WW                  \n");
+        printf("       W W  W  +   W       W   W    +      @  + W@                 \n");
+        printf("      W  + #   W      @    W   W    W   W  W  W  W*                \n");
+        printf("        W  W  +   W   W             W   #        ++#               \n");
+        printf("     W *  W   W   W   W                           W W              \n");
+        printf("    #  W  W   @                                   #  W             \n");
+        printf("    W    +   @   @        WW +WW          #WWWW@   W               \n");
+        printf("      W  W   W   W      +#      **       W      W  W               \n");
+        printf("   @  @  W   W          W        @      W        W W               \n");
+        printf("   W     +   *         +          @     W          W               \n");
+        printf("   W #  +              W   #      W     W    WW    @               \n");
+        printf("     W                 W  WW@     W     W    WW    @               \n");
+        printf("     WW@               *   W      W     W        # @               \n");
+        printf("    W+  #W              W                W       # W               \n");
+        printf("                        +        W        W     #  W               \n");
+        printf("   *  #*                  W    +W      *W+ +WW#    @               \n");
+        printf("   * ++                    +WW#          *@        W               \n");
+        printf("    @  *                        @         W        W               \n");
+        printf("    W                           +  #      W         W              \n");
+        printf("     W                          +W  W     W          W             \n");
+        printf("      +WWW                     W+    W  #W           @             \n");
+        printf("        W                     W      W@+              W            \n");
+        printf("         W                   W     @#                 W            \n");
+        printf("         W              @   @      @                  @            \n");
+        printf("          W             W   W     W WWW              W             \n");
+        printf("           W            WW@       W    W          *W               \n");
+        printf("           *W          *   #            #      @WW                 \n");
+        printf("          W  W@            +          W@WW###*W                    \n");
+        printf("         #     W           +        @+    *   W                    \n");
+        printf("         W      @W         *              W  #                     \n");
+        printf("         W        *WW      *              W @                      \n");
+        printf("         W           *WWWWWW            W @@ WW                    \n");
+        printf("        # W              W  +W@        W W W   W*                  \n");
+        printf("      @W  @W            W      W+      WW  @   WW                  \n");
+        printf("     *      W           #       #W     W   W  W  *                 \n");
+        printf("     W       W+        W          W    W    WW   W                 \n");
+        printf("     +         W      W            W   W    W W  W                 \n");
+        printf("                WW   W*             W +    W   W WW                \n");
+        printf("                  #W#@              W WW  W     W* W               \n");
+        printf("                   W#                W  WW       + +               \n");
+        printf("     @            W                  W           W  W              \n");
+        printf("     W                               W              +              \n");
+        printf("     W                               W               W             \n");
+        printf("    @ W                             +@               WW            \n");
+        printf("   W  W                             W                 W            \n");
+        printf("   +   W                           W                  WW           \n");
+        printf("  W     W                         W                   @            \n");
+        printf("  W     @+                       W                     WW          \n");
+        printf("         W                      W                      W           \n");
+        printf(" +        W*                  WW                       W W         \n");
 }
 
 void do_tests()
@@ -304,11 +304,11 @@ void do_tests()
         //draw_test();
         //printf_test();
         //assert_test();
-        malloc_test();
+        add_shortcut(0,1,'m',malloc_test);
         //mm_print_memory();
         //strsep_test();
         //sleep_test();
         //hd_test();
-        syscall_test();
-        ralph_wiggum();
+        add_shortcut(0,1,'s',syscall_test);
+        add_shortcut(1,0,'r',ralph_wiggum);
 }

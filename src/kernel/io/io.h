@@ -8,8 +8,11 @@ void isr_init();
 void irq_init(); 
 void timer_init(int hz);
 void monitor_init();
+void keyboard_init();
 void hd_init();
 sint32 get_ticks();
+
+void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*function)());
 
 /**
  * Permits interrupts

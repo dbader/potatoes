@@ -18,8 +18,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
- 
+ */
+
 /**
  * @file 
  * Functions to print things on the monitor
@@ -29,13 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  *
  */
- 
+
+#include "../include/const.h"
 #include "../include/types.h"
 #include "../include/stdio.h"
 #include "../include/string.h"
 #include "../include/stdlib.h"
 #include "../include/util.h"
 #include "../include/ringbuffer.h"
+#include "../include/assert.h"
 
 #include "../io/io.h"
 
@@ -58,26 +60,26 @@ const uint32 io_bufsize = 160000;
  */
 void cursor_move(uint8 dir)
 {
-	switch (dir){
-	case 0: 
-		charnum = (charnum + 2000 - 80) % 2000; 
-		break;
-	case 1: 
-		charnum = (charnum + 80) % 2000; 
-		break;
-	case 2: 
-		charnum = (charnum - charnum % 80) + (charnum % 80 +80 - 1) % 80;
-		break;
-	case 3: 
-		charnum = (charnum - charnum % 80) + (charnum +1) % 80;
-		break;
-	}
-	disp = (uint16*)0xB8000 + charnum; 
-	//Cursor update
-	outb(0x3D4, 0x0E);
-	outb(0x3D5, charnum >> 8);
-	outb(0x3D4, 0x0F);
-	outb(0x3D5, charnum);
+        switch (dir){
+        case 0: 
+                charnum = (charnum + 2000 - 80) % 2000; 
+                break;
+        case 1: 
+                charnum = (charnum + 80) % 2000; 
+                break;
+        case 2: 
+                charnum = (charnum - charnum % 80) + (charnum % 80 +80 - 1) % 80;
+                break;
+        case 3: 
+                charnum = (charnum - charnum % 80) + (charnum +1) % 80;
+                break;
+        }
+        disp = (uint16*)0xB8000 + charnum; 
+        //Cursor update
+        outb(0x3D4, 0x0E);
+        outb(0x3D5, charnum >> 8);
+        outb(0x3D4, 0x0F);
+        outb(0x3D5, charnum);
 }
 
 /**
@@ -85,10 +87,12 @@ void cursor_move(uint8 dir)
  */
 void monitor_init()
 {
-	up_buffer_start = malloc_name(io_bufsize, "scrolling buffer(up)");
-	bzero(up_buffer_start, io_bufsize);
-	down_buffer_start = malloc_name(io_bufsize, "scrolling buffer(down)");
-	bzero(down_buffer_start, io_bufsize);
+        up_buffer_start = malloc_name(io_bufsize, "scrolling buffer(up)");
+        ASSERT(up_buffer_start != NULL);
+        bzero(up_buffer_start, io_bufsize);
+        down_buffer_start = malloc_name(io_bufsize, "scrolling buffer(down)");
+        ASSERT(down_buffer_start != NULL);
+        bzero(down_buffer_start, io_bufsize);
 }
 
 /**
@@ -96,21 +100,21 @@ void monitor_init()
  */
 void monitor_scroll()
 {
-	if (num_lines_up < io_bufsize / 0xA0) num_lines_up++;
-	memcpy(up_buffer_start + up_offset,(void*)0xB8000, 0xA0);
-	up_offset = (uint32)(up_offset + 0xA0) % io_bufsize;
-	memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
-	for(uint16 *temp = (uint16*)0xB8F00; temp < (uint16*)0xB8FA0; temp++){
-		*temp = 0xF00;
-	}
-	disp -= 0x50;
-	charnum -= 80;
+        if (num_lines_up < io_bufsize / 0xA0) num_lines_up++;
+        memcpy(up_buffer_start + up_offset,(void*)0xB8000, 0xA0);
+        up_offset = (uint32)(up_offset + 0xA0) % io_bufsize;
+        memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
+        for(uint16 *temp = (uint16*)0xB8F00; temp < (uint16*)0xB8FA0; temp++){
+                *temp = 0xF00;
+        }
+        disp -= 0x50;
+        charnum -= 80;
 
-	//Cursor update
-	outb(0x3D4, 0x0E);
-	outb(0x3D5, charnum >> 8);
-	outb(0x3D4, 0x0F);
-	outb(0x3D5, charnum);
+        //Cursor update
+        outb(0x3D4, 0x0E);
+        outb(0x3D5, charnum >> 8);
+        outb(0x3D4, 0x0F);
+        outb(0x3D5, charnum);
 }
 
 /**
@@ -118,15 +122,15 @@ void monitor_scroll()
  */
 void monitor_scrollup()
 {
-	if (num_lines_up > 0) {
-		num_lines_up--;
-		if (num_lines_down < io_bufsize / 0xA0) num_lines_down++;
-		memcpy(down_buffer_start + down_offset, (void*)0xB8F00, 0xA0);
-		down_offset = (uint32)(down_offset + 0xA0) % io_bufsize;
-		memmove((void*)0xB80A0, (void*)0xB8000, 0xF00);
-		up_offset = (uint32)(up_offset + io_bufsize - 0xA0) % io_bufsize;
-		memcpy((void*)0xB8000, up_buffer_start + up_offset, 0xA0);
-	}
+        if (num_lines_up > 0) {
+                num_lines_up--;
+                if (num_lines_down < io_bufsize / 0xA0) num_lines_down++;
+                memcpy(down_buffer_start + down_offset, (void*)0xB8F00, 0xA0);
+                down_offset = (uint32)(down_offset + 0xA0) % io_bufsize;
+                memmove((void*)0xB80A0, (void*)0xB8000, 0xF00);
+                up_offset = (uint32)(up_offset + io_bufsize - 0xA0) % io_bufsize;
+                memcpy((void*)0xB8000, up_buffer_start + up_offset, 0xA0);
+        }
 }
 
 /**
@@ -134,15 +138,15 @@ void monitor_scrollup()
  */
 void monitor_scrolldown()
 {
-	if (num_lines_down > 0) {
-		num_lines_down--;
-		if (num_lines_up < io_bufsize / 0xA0) num_lines_up++;
-		memcpy(up_buffer_start + up_offset,(void*)0xB8000, 0xA0);
-		up_offset = (uint32)(up_offset + 0xA0) % io_bufsize;
-		memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
-		down_offset = (uint32)(down_offset + io_bufsize - 0xA0) % io_bufsize;
-		memcpy((void*)0xB8F00, down_buffer_start + down_offset, 0xA0);
-	}
+        if (num_lines_down > 0) {
+                num_lines_down--;
+                if (num_lines_up < io_bufsize / 0xA0) num_lines_up++;
+                memcpy(up_buffer_start + up_offset,(void*)0xB8000, 0xA0);
+                up_offset = (uint32)(up_offset + 0xA0) % io_bufsize;
+                memmove((void*)0xB8000, (void*)0xB80A0, 0xF00);
+                down_offset = (uint32)(down_offset + io_bufsize - 0xA0) % io_bufsize;
+                memcpy((void*)0xB8F00, down_buffer_start + down_offset, 0xA0);
+        }
 }
 
 /**
@@ -159,10 +163,10 @@ void monitor_cputc(char ch, uint8 fg, uint8 bg)
         if(charnum >= 1999)monitor_scroll(); //scroll, if outside of display-memory
         switch(ch){
         case '\a':
-        		monitor_invert();
-        		sleep_ticks(15);
-        		monitor_invert();
-        		break;
+                monitor_invert();
+                sleep_ticks(15);
+                monitor_invert();
+                break;
         case '\n':
                 temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
                 while(i++ < temp){ //calculating the "new line" starting position
@@ -240,7 +244,7 @@ void monitor_puti(sint32 x)
         }
         else if (x == 0) {monitor_cputc('0',RED,BLACK); return;}
         while(div > x)
-                        div /= 10;
+                div /= 10;
         while(div > 0){
                 monitor_cputc((uint8)(x / div + 48),RED,BLACK);
                 x%=div;
@@ -261,7 +265,7 @@ void monitor_puthex(uint8 ch)
         if(high>9)
                 monitor_cputc((high + 55),GREEN,BLACK);
         else
-                monitor_cputc((high + 48),GREEN,BLACK);   
+                monitor_cputc((high + 48),GREEN,BLACK);
         if(low>9)
                 monitor_cputc((low + 55),GREEN,BLACK);
         else
@@ -273,6 +277,6 @@ void monitor_puthex(uint8 ch)
  */
 void monitor_invert()
 {
-	for(uint8 *temp = (uint8*)0xB8001; (uint32)temp < 0xB8FA0; temp+=2)
-		*temp = 0xFF - *temp;
+        for(uint8 *temp = (uint8*)0xB8001; (uint32)temp < 0xB8FA0; temp+=2)
+                *temp = 0xFF - *temp;
 }

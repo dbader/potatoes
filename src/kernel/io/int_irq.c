@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file 
@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
- 
+
 #include "../include/types.h"
 #include "../include/stdio.h"
 
@@ -95,22 +95,22 @@ void irq_init()
 }
 
 char *hw_messages[] = {
-        "timer",
-        "keyboard",
-        "irq 9",
-        "com 2,4,6,8",
-        "com 1,3,5,7",
-        "ltp 2",
-        "floppy",
-        "ltp 1",
-        "rtc",
-        "vga",
-        "pci",
-        "scsi",
-        "ps/2",
-        "coprocessor",
-        "primary ide",
-        "secondary ide"
+                "timer",
+                "keyboard",
+                "irq 9",
+                "com 2,4,6,8",
+                "com 1,3,5,7",
+                "ltp 2",
+                "floppy",
+                "ltp 1",
+                "rtc",
+                "vga",
+                "pci",
+                "scsi",
+                "ps/2",
+                "coprocessor",
+                "primary ide",
+                "secondary ide"
 };
 
 /**
@@ -120,9 +120,9 @@ char *hw_messages[] = {
  */
 void reactivate_pic(bool slave)
 {
-		if(slave)
-				outb(0xA0,0x20);
-		outb(0x20,0x20);
+        if(slave)
+                outb(0xA0,0x20);
+        outb(0x20,0x20);
 }
 
 /**
@@ -156,9 +156,9 @@ void hw_handler(uint32 num)
                 break;
         case 15: break;
         }
-        
+
         if(num>40)
-        		reactivate_pic(1);
+                reactivate_pic(1);
         else
-        		reactivate_pic(0);
+                reactivate_pic(0);
 }

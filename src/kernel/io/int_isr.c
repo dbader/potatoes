@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file
@@ -112,39 +112,39 @@ void isr_init()
 }
 
 char *ex_messages[] = {
-        "division by zero",
-        "debug",
-        "not maskable interrupt",
-        "breakpoint",
-        "overflow",
-        "out of bounds",
-        "invalid opcode",
-        "no coprocessor",
-        "double fault",
-        "coprocessor segment overrun",
-        "bad tss",
-        "segment not present",
-        "stack fault",
-        "general protection",
-        "page fault",
-        "unknown interrupt",
-        "coprocessor fault",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",       
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved"       
+                "division by zero",
+                "debug",
+                "not maskable interrupt",
+                "breakpoint",
+                "overflow",
+                "out of bounds",
+                "invalid opcode",
+                "no coprocessor",
+                "double fault",
+                "coprocessor segment overrun",
+                "bad tss",
+                "segment not present",
+                "stack fault",
+                "general protection",
+                "page fault",
+                "unknown interrupt",
+                "coprocessor fault",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",       
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved",
+                "reserved"       
 };
 
 void ex_handler(uint32 num)

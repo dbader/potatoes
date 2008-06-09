@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file 
@@ -36,13 +36,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void io_init()
 {
         dprintf("io: init\n");
-       
-        idt_init(); dprintf("io: IDT initialized\n");      
-        isr_init(); dprintf("io: ISRs initialized\n");
-        irq_init(); dprintf("io: IRQs initialized\n");
-	
-        monitor_init();			dprintf("io: monitor initialized\n");
-        timer_init(FREQUENCY); 	dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
-        set_interrupts();      	dprintf("io: interrupts enabled\n");
-        hd_init();			dprintf("io: hard disk initialized\n");
+
+        idt_init();                     dprintf("io: IDT initialized\n");
+        isr_init();                     dprintf("io: ISRs initialized\n");
+        irq_init();                     dprintf("io: IRQs initialized\n");
+
+        monitor_init();                 dprintf("io: monitor initialized\n");
+        timer_init(FREQUENCY);          dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
+        set_interrupts();               dprintf("io: interrupts enabled\n");
+        hd_init();                      dprintf("io: hard disk initialized\n");
 }

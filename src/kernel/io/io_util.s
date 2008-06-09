@@ -39,7 +39,7 @@ outb:
         mov edx, [esp+4] ;target address
         out dx, al
         ret
-                
+
 inb:
         mov edx, [esp+4] ;source address
         in al, dx
