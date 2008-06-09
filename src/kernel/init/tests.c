@@ -233,6 +233,69 @@ void syscall_test()
 	_syscall(3, test3);
 }
 
+void ralph_wiggum()
+{
+	printf("                                                                   \n");
+	printf("                       #WWWWWWWW@                                  \n");
+	printf("                   WWWWW# W@+W WWWWWW                              \n");
+	printf("                @W  W#W  W W+ W *W WWWWW                           \n");
+	printf("              @W  W W  +@ W  @    + W WW@W                         \n");
+	printf("             WW  W W  +* W   W    W  * W#@WW                       \n");
+	printf("           W W  W W   # #   W  #  *  @  W W#W                      \n");
+	printf("          W W  @ *   W  W   W  W   W  W  W W WW                    \n");
+	printf("         W W  W  @  W  W       W   W   *  * W WW                   \n");
+	printf("        W W  W  W      W   W   W   @   W  W  W WW                  \n");
+	printf("       W W  W  +   W       W   W    +      @  + W@                 \n");
+	printf("      W  + #   W      @    W   W    W   W  W  W  W*                \n");
+	printf("        W  W  +   W   W             W   #        ++#               \n");
+	printf("     W *  W   W   W   W                           W W              \n");
+	printf("    #  W  W   @                                   #  W             \n");
+	printf("    W    +   @   @        WW +WW          #WWWW@   W               \n");
+	printf("      W  W   W   W      +#      **       W      W  W               \n");
+	printf("   @  @  W   W          W        @      W        W W               \n");
+	printf("   W     +   *         +          @     W          W               \n");
+	printf("   W #  +              W   #      W     W    WW    @               \n");
+	printf("     W                 W  WW@     W     W    WW    @               \n");
+	printf("     WW@               *   W      W     W        # @               \n");
+	printf("    W+  #W              W                W       # W               \n");
+	printf("                        +        W        W     #  W               \n");
+	printf("   *  #*                  W    +W      *W+ +WW#    @               \n");
+	printf("   * ++                    +WW#          *@        W               \n");
+	printf("    @  *                        @         W        W               \n");
+	printf("    W                           +  #      W         W              \n");
+	printf("     W                          +W  W     W          W             \n");
+	printf("      +WWW                     W+    W  #W           @             \n");
+	printf("        W                     W      W@+              W            \n");
+	printf("         W                   W     @#                 W            \n");
+	printf("         W              @   @      @                  @            \n");
+	printf("          W             W   W     W WWW              W             \n");
+	printf("           W            WW@       W    W          *W               \n");
+	printf("           *W          *   #            #      @WW                 \n");
+	printf("          W  W@            +          W@WW###*W                    \n");
+	printf("         #     W           +        @+    *   W                    \n");
+	printf("         W      @W         *              W  #                     \n");
+	printf("         W        *WW      *              W @                      \n");
+	printf("         W           *WWWWWW            W @@ WW                    \n");
+	printf("        # W              W  +W@        W W W   W*                  \n");
+	printf("      @W  @W            W      W+      WW  @   WW                  \n");
+	printf("     *      W           #       #W     W   W  W  *                 \n");
+	printf("     W       W+        W          W    W    WW   W                 \n");
+	printf("     +         W      W            W   W    W W  W                 \n");
+	printf("                WW   W*             W +    W   W WW                \n");
+	printf("                  #W#@              W WW  W     W* W               \n");
+	printf("                   W#                W  WW       + +               \n");
+	printf("     @            W                  W           W  W              \n");
+	printf("     W                               W              +              \n");
+	printf("     W                               W               W             \n");
+	printf("    @ W                             +@               WW            \n");
+	printf("   W  W                             W                 W            \n");
+	printf("   +   W                           W                  WW           \n");
+	printf("  W     W                         W                   @            \n");
+	printf("  W     @+                       W                     WW          \n");
+	printf("         W                      W                      W           \n");
+	printf(" +        W*                  WW                       W W         \n");
+}
+
 void do_tests()
 {
         monitor_puts("\n\ndo_tests():\n");
@@ -247,4 +310,5 @@ void do_tests()
         //sleep_test();
         //hd_test();
         syscall_test();
+        ralph_wiggum();
 }

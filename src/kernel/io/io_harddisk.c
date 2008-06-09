@@ -41,12 +41,15 @@ struct hd_info hd1;
 uint32 maxaddr;
 volatile bool hd_interrupt = FALSE;
 
+/**
+ * Waits on hard disk to set the hd_interrupt flag or the drive_ready flag in the status register 
+ */
 void wait_on_hd_interrupt()
 {
 	while(!hd_interrupt){
 		uint8 stat=inb(0x1F7);
-		if(stat & 0x58) break;
-		else if (stat & 1) panic("IDE-ERROR");
+		if(stat & 0x58) break; //drdy dsc drq
+		else if (stat & 1) panic("IDE-ERROR"); //error flag
 		halt();
 	}
 	hd_interrupt = FALSE;
@@ -62,11 +65,19 @@ struct address itoaddr(uint32 iaddr)
 	return addr;
 }
 
+/**
+ * Returns the size of the hard disk.
+ * 
+ * @return size of the master hard disk in sectors
+ */
 uint32 get_hdsize()
 {
 	return ((hd1.apparent_cyl*hd1.apparent_head+hd1.apparent_head)*hd1.apparent_sector_per_track + hd1.apparent_sector_per_track - 1); 
 }
 
+/**
+ * Initializes the hard disk drive (IDE 0 master).
+ */
 void hd_init()
 {
 	outb(0x1F6,0xA0); //select master drive
@@ -74,10 +85,16 @@ void hd_init()
 	wait_on_hd_interrupt();
 	repinsw(0x1F0,(uint16*)&hd1,256); //read buffer
 	maxaddr = get_hdsize();
-	printf("hard disk initialized: \n\t%u cylinders\n\t%u heads\n\t%u sectors per track\n\t---------------\n\t%d\tmaximal address\n"
+	printf("io: hard disk initialization:\n\t%u cylinders\n\t%u heads\n\t%u sectors per track\n\t---------------\n\t%d\tmaximal address\n"
 			,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
 }
 
+/**
+ * Writes a sector to the hard disk.
+ * 
+ * @param dest the address of the sector to be written to
+ * @param *src the pointer where data should be written from
+ */
 void hd_write_sector(uint32 dest, void *src)
 {
 	if(dest > maxaddr) return;
@@ -92,6 +109,12 @@ void hd_write_sector(uint32 dest, void *src)
 	wait_on_hd_interrupt();
 }
 
+/**
+ * Reads a sector from the hard disk.
+ * 
+ * @param *dest the pointer where the read data should go to 
+ * @param src the address of the sector to be read from
+ */
 void hd_read_sector(void *dest, uint32 src)
 {
 	if(src > maxaddr) return;
@@ -106,6 +129,9 @@ void hd_read_sector(void *dest, uint32 src)
 	repinsw(0x1F0,dest,256); //read buffer	
 }
 
+/**
+ * Handles an hard disk interrupt by setting the hd_interrupt flag.
+ */
 void hd_handler(){
 	uint8 stat = inb(0x1F7);
 	if (stat & 0x58) hd_interrupt = TRUE;

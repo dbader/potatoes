@@ -3,6 +3,11 @@
 
 #include "../include/types.h"
 
+/**
+ * This struct is filled by the IDENTIFY DRIVE command 
+ * 
+ * contains hard disk geometry data and more
+ */
 struct hd_info{
 	uint16 config_word;
 	uint16 num_cyl;
@@ -38,6 +43,9 @@ struct hd_info{
 	uint16 reserved5[96];
 }__attribute__((__packed__));
 
+/**
+ * address data for the hard disk packed in a struct 
+ */
 struct address{
 	uint32 cyl;
 	uint16 head;

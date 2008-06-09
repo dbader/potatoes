@@ -39,6 +39,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ALT 0x38
 #define SCROLL_UP 0x49
 #define SCROLL_DOWN 0x51
+#define CURSOR_UP 0x48
+#define CURSOR_DOWN 0x50
+#define CURSOR_LEFT 0x4B
+#define CURSOR_RIGHT 0x4D
+
+void cursor_move(uint8 dir);
 
 char kb_map[]={
         0,      //empty

@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bool echo = TRUE; //accessible for PM
 
 /**
- * Handles an keyboard interrupt, by calling the PM. In echo-mode prints the char directly to the screen.
+ * Handles an keyboard interrupt, by calling the PM (providing already the right character). In echo-mode prints the typed character directly to the screen.
  */
 void kb_handler()
 {		
@@ -69,7 +69,15 @@ void kb_handler()
                 }
         }     
         else{ //Key pressed
-                if (scancode == LSHIFT || scancode == RSHIFT)
+        		if (scancode == CURSOR_UP)
+        				cursor_move(0);
+        		else if (scancode == CURSOR_DOWN)
+        				cursor_move(1);
+        		else if (scancode == CURSOR_LEFT)
+        		  		cursor_move(2);
+        		else if (scancode == CURSOR_RIGHT)
+        		        cursor_move(3);     		        		
+        		else if (scancode == LSHIFT || scancode == RSHIFT)
                         shift = 1;
                 else if (scancode == ALT)
                         alt = 1;

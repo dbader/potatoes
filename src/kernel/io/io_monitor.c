@@ -19,15 +19,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-/*
- * date          stat
- * -----------------------------------------------
- * 01.05.08      first just-playing-version (DT)
- * 02.05.08      positioning fixes
- *               put* (it's a regex :) ) functions write only to the display-memory (B8000-B8FA0) (DT)
- * 04.05.08      updated types (from types.h)
- */
  
 /**
  * @file 
@@ -61,6 +52,35 @@ static uint32 down_offset = 0;
 const uint32 io_bufsize = 160000;
 
 /**
+ * Moves the cursor in the given direction
+ * 
+ * @param dir 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT
+ */
+void cursor_move(uint8 dir)
+{
+	switch (dir){
+	case 0: 
+		charnum = (charnum + 2000 - 80) % 2000; 
+		break;
+	case 1: 
+		charnum = (charnum + 80) % 2000; 
+		break;
+	case 2: 
+		charnum = (charnum - charnum % 80) + (charnum % 80 +80 - 1) % 80;
+		break;
+	case 3: 
+		charnum = (charnum - charnum % 80) + (charnum +1) % 80;
+		break;
+	}
+	disp = (uint16*)0xB8000 + charnum; 
+	//Cursor update
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, charnum >> 8);
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, charnum);
+}
+
+/**
  * Initializes the monitor buffers. 
  */
 void monitor_init()
@@ -70,6 +90,7 @@ void monitor_init()
 	down_buffer_start = malloc_name(io_bufsize, "scrolling buffer(down)");
 	bzero(down_buffer_start, io_bufsize);
 }
+
 /**
  * Scrolls the monitor down in the 'natural' way.
  */

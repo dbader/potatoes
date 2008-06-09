@@ -31,6 +31,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/types.h"
 
+/** 
+ * The structure of one IDT entry.
+ */
 struct idt_entry //16+16+8+8+16=64 bit
 {
         uint16 low_offset;
@@ -40,6 +43,9 @@ struct idt_entry //16+16+8+8+16=64 bit
         uint16 high_offset;
 }__attribute__((packed)); //gcc-flag to use 64 connected bits of memory for the struct 
 
+/** 
+ * The structure of the IDT pointer which tells the processor where to find our IDT
+ */
 struct idt_pointer //16+32=48 bit
 {
         uint16 maxsize;
