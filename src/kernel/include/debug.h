@@ -34,7 +34,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __DEBUG_H
 
 #include "stdio.h"
+#include "../io/io.h"
 
 #define dprintf printf
+
+#define SHORTCUT_CTRL(ch, func) add_shortcut(TRUE, FALSE, ch, func); \
+        printf("SHORTCUT: CTRL + %c ==> %s()\n", ch, #func)
+
+#define SHORTCUT_ALT(ch, func) add_shortcut(FALSE, TRUE, ch, func); \
+        printf("SHORTCUT: ALT + %c ==> %s()\n", ch, #func)
+
+#define SHORTCUT_CTRL_ALT(ch, func) add_shortcut(TRUE, TRUE, ch, func); \
+        printf("SHORTCUT: CTRL + ALT + %c ==> %s()\n", ch, #func)
 
 #endif /* debug.h */

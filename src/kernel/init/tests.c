@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdlib.h"
 #include "../include/init.h"
 #include "../include/util.h"
+#include "../include/debug.h"
 
 #include "../io/io.h"
 #include "../mm/mm.h"
@@ -304,11 +305,13 @@ void do_tests()
         //draw_test();
         //printf_test();
         //assert_test();
-        add_shortcut(0,1,'m',malloc_test);
         //mm_print_memory();
         //strsep_test();
         //sleep_test();
         //hd_test();
-        add_shortcut(0,1,'s',syscall_test);
-        add_shortcut(1,0,'r',ralph_wiggum);
+        SHORTCUT_CTRL('1', assert_test);
+        SHORTCUT_CTRL_ALT('p', printf_test);
+        SHORTCUT_CTRL('m', malloc_test);
+        SHORTCUT_CTRL('s', syscall_test);
+        SHORTCUT_CTRL('r', ralph_wiggum);
 }
