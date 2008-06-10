@@ -41,10 +41,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SHORTCUT_CTRL(ch, func) add_shortcut(TRUE, FALSE, ch, func); \
         printf("SHORTCUT: CTRL + %c ==> %s()\n", ch, #func)
 
-#define SHORTCUT_ALT(ch, func) add_shortcut(FALSE, TRUE, ch, func); \
-        printf("SHORTCUT: ALT + %c ==> %s()\n", ch, #func)
+#define SHORTCUT_SUPER(ch, func) add_shortcut(FALSE, TRUE, ch, func); \
+        printf("SHORTCUT: SUPER + %c ==> %s()\n", ch, #func)
 
-#define SHORTCUT_CTRL_ALT(ch, func) add_shortcut(TRUE, TRUE, ch, func); \
-        printf("SHORTCUT: CTRL + ALT + %c ==> %s()\n", ch, #func)
+#define SHORTCUT_CTRL_SUPER(ch, func) add_shortcut(TRUE, TRUE, ch, func); \
+        printf("SHORTCUT: CTRL + SUPER + %c ==> %s()\n", ch, #func)
 
 #endif /* debug.h */

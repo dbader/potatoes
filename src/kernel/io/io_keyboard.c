@@ -101,18 +101,29 @@ void kb_handler()
                         else pm_handle_input(kb_map[scancode]);
                 }
         }
-        else if (ctrl) { //Key pressed while ctrl is pressed
+        else if (ctrl && super_button) { //Key pressed while ctrl & super are pressed
                 int i = 0;
                 for(i; i<=shcut_num; i++)
-                        if ( shortcuts[i].control && shortcuts[i].ch == kb_map[scancode] ){
+                        if ( shortcuts[i].control && shortcuts[i].super  
+                                        && shortcuts[i].ch == kb_map[scancode] ){
+                                shortcuts[i].func();
+                                break;
+                        }               
+        }
+        else if (ctrl && scancode != SUPER) { //Key pressed while ctrl is pressed
+                int i = 0;
+                for(i; i<=shcut_num; i++)
+                        if ( shortcuts[i].control && !shortcuts[i].super
+                                        && shortcuts[i].ch == kb_map[scancode] ){
                                 shortcuts[i].func();
                                 break;
                         }
         }
-        else if (super_button) { //Key pressed while super is pressed
+        else if (super_button && scancode != CTRL) { //Key pressed while super is pressed
                 int i = 0;
                 for(i; i<=shcut_num; i++)
-                        if ( shortcuts[i].super && shortcuts[i].ch == kb_map[scancode] ){
+                        if ( shortcuts[i].super && !shortcuts[i].control
+                                        && shortcuts[i].ch == kb_map[scancode] ){
                                 shortcuts[i].func();
                                 break;
                         }

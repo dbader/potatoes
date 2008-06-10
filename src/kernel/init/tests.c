@@ -310,7 +310,7 @@ void do_tests()
         //sleep_test();
         //hd_test();
         SHORTCUT_CTRL('1', assert_test);
-        SHORTCUT_CTRL_ALT('p', printf_test);
+        SHORTCUT_CTRL_SUPER('p', printf_test);
         SHORTCUT_CTRL('m', malloc_test);
         SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
