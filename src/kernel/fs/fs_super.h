@@ -64,6 +64,8 @@ void load_super_block();
 
 void write_super_block();
 
+void dump_super();
+
 #define NIL_SUPER (struct super_block *) 0
 
 #endif /*SUPER_H_*/

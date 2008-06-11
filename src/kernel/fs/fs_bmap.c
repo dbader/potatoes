@@ -31,6 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/const.h"
 #include "../include/types.h"
+#include "../include/debug.h"
+#include "../include/string.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -46,13 +48,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void reset_bmap()
 {
-        for (block_nr i = 0; i < FIRST_DATA_BLOCK; i++){
+        dprintf("resetting bmap (size = %d)\n", sizeof(bmap));
+        
+        bzero(bmap, sizeof(bmap));
+        
+        block_nr fdp = FIRST_DATA_BLOCK;
+        
+        for (block_nr i = 0; i < fdp; i++){
                 mark_block(i, TRUE);
         }
         
-        for (block_nr i = FIRST_DATA_BLOCK; i < NUM_BLOCKS_ON_HD; i++){
-                mark_block(i, FALSE);
-        }
+        dprintf("bmap reset\n");
 }
 
 /**
@@ -91,15 +97,11 @@ block_nr get_free_block(block_nr start)
         block_nr blk = start;
         
         while(blk < NUM_BLOCKS_ON_HD){
-               uint8 byte = bmap[blk / 8];
-               for (int i = 0; i < 8; i++){
-                       byte = byte << i;
-                       if ((byte | 0x7F) == FALSE){  //byte OR 01111111 is FALSE -> first bit is 0
-                               return blk;
-                       } else{
-                               blk++; //try next block
-                       }
+               if (is_allocated_block(blk) == FALSE){
+                       return blk;
                }
+               blk++;
+              
         }
         return NOT_FOUND;
 }
@@ -115,17 +117,36 @@ void mark_block(block_nr blk_nr, bool flag)
         uint8 byte = bmap[blk_nr / 8];
         uint8 bit  = blk_nr % 8;
         
-        byte = byte << bit;
+        //dprintf("byte: %b\n", byte);
         
+        byte = (byte >> (8-bit)) | (byte << bit); //rotate left
+        
+        //dprintf("byte: %b\n", byte);
+                
         if (flag == TRUE){
                 byte = byte | 0x80;  //set first bit to 1 with (byte OR 10000000)
         } else {
-                byte = byte & 0x7F;  //set first bit to 0 with (byte AND 0111111) 
+                byte = byte & 0x7F;  //set first bit to 0 with (byte AND 01111111) 
         }
         
-        byte = byte >> bit;
+        //dprintf("byte: %b\n", byte);
+                
+        byte = (byte >> bit) | (byte << (8-bit)); //rotate right (back)
         
+        //dprintf("byte: %b\n\n", byte);
+                
         bmap[blk_nr / 8] = byte;
+}
+
+bool is_allocated_block(block_nr blk_nr)
+{
+       uint8 byte = bmap[blk_nr / 8];
+       uint8 bit  = blk_nr % 8;
+                        
+       byte = byte << bit;
+       byte = byte & 0x80;
+       
+       return (byte != 0);
 }
 
 /**
@@ -139,4 +160,17 @@ block_nr alloc_block(block_nr start){
         blk_nr = get_free_block(start);
         mark_block(blk_nr, TRUE);
         return blk_nr;
+}
+
+void dump_bmap()
+{
+        uint8 byte = 0; 
+        uint8 bit  = 0;
+        
+        for (block_nr blk_nr = BOOT_BLOCK; blk_nr < NUM_BLOCKS_ON_HD; blk_nr++){
+                if (is_allocated_block(blk_nr)){
+                        dprintf("block %d is used\n", blk_nr);
+                }
+                //if (bmap[blk_nr] != 0) dprintf("block group %d: %b\n", blk_nr, bmap[blk_nr]);
+        }
 }

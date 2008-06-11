@@ -36,6 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/stdlib.h"
 
+#include "../include/debug.h"
+#include "../include/assert.h"
+
 #include "fs_const.h"
 #include "fs_types.h"
 
@@ -54,25 +57,42 @@ void init_inode_table()
         }
 }
 
+void dump_inodes(){
+        for (int i = 0; i < NUM_INODES; i++){
+                dprintf("inode [%d]: num = %d; adr = %d; sip = %d; dip = %d\n", 
+                                inode_table[i].i_num, inode_table[i].i_adr,
+                                inode_table[i].i_single_indirect_pointer,
+                                inode_table[i].i_double_indirect_pointer);
+        }
+}
+
 void load_root()
 {
+        dprintf("load root inode from HD to inode table\n");
         //load root inode from HD to inode table
         rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, sizeof(m_inode));
         inode_table[ROOT_INODE].i_num = ROOT_INODE;
- 
+        
         root = &inode_table[ROOT_INODE];
+        
+        ASSERT(root != (m_inode*)0);
+        
 }
 
 void write_root()
 {
+        dprintf("write root inode to HD\n");
         //write root inode to HD
         wrt_block(ROOT_INODE_BLOCK, &inode_table[ROOT_INODE], sizeof(m_inode));
 }
 
 void create_root()
 {
-        m_inode *new_root = new_minode(ROOT_INODE, DIRECTORY, FALSE);
+        dprintf("create new root inode\n");
+        m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
+       
+        ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
 }
 
 /**

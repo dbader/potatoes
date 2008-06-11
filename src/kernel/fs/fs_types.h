@@ -41,7 +41,7 @@ typedef sint16 file_nr;
 /**
  * The directory entry.
  */
-typedef struct {
+typedef struct dir_entry{
         block_nr inode;
         char name[NAME_SIZE];
 } dir_entry;
@@ -50,7 +50,7 @@ typedef struct {
 /**
  * The inode on disk.
  */
-typedef struct {
+typedef struct d_inode{
         uint16 i_mode;                          /* file | directory */
         uint32 i_size;                          /* in byte */
         uint32 i_create_ts;
@@ -64,7 +64,7 @@ typedef struct {
 /**
  * The inode in memory.
  */
-typedef struct {
+typedef struct m_inode{
         inode_nr i_num;
         block_nr i_adr;
         uint16 i_mode;
@@ -80,7 +80,7 @@ typedef struct {
 /**
  * The global file descriptor.
  */
-typedef struct {
+typedef struct file{
         file_nr f_desc;                         /* file (f) descriptor */
         m_inode *f_inode;
         char *f_name;                           /* pointer to absolute file path */
@@ -91,7 +91,7 @@ typedef struct {
 /**
  * The process file descriptor.
  */
-typedef struct {
+typedef struct proc_file{
         file_nr pf_desc;                        /* process file (pf) descriptor */
         file_nr pf_f_desc;                      /* pointer to global file descriptor */
         uint32 pf_pos;                          /* position in file */

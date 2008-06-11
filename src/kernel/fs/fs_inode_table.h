@@ -50,6 +50,8 @@ m_inode *root;
 
 void init_inode_table();
 
+void dump_inodes();
+
 void load_root();
 
 void write_root();

@@ -48,6 +48,9 @@ void mark_block(block_nr blk_nr, bool flag);
 
 block_nr alloc_block(block_nr start);
 
+bool is_allocated_block(block_nr blk_nr);
+
+void dump_bmap();
 
 /**
  * Central block bitmap structure.

@@ -32,6 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 
+#include "../include/debug.h"
+#include "../include/assert.h"
+
 #include "fs_const.h"
 #include "fs_types.h"
 #include "fs_super.h"
@@ -78,14 +81,26 @@ void init_super_block()
         
 }
 
+void dump_super()
+{
+        ASSERT(super != NIL_SUPER);
+        
+        dprintf("HD_size = %d; #bmap_block = %d; FDB = %d; MFS = %d; *bmap = %d; *iroot = %d\n",
+                        super->s_HD_size, super->s_bmap_blocks, super->s_first_data_block, 
+                        super->s_max_file_size, super->s_bmap, super->s_iroot);
+}
+
 
 /**
  * Load the super block from HD.
  */
 void load_super_block()
 {
+        dprintf("read block number SUPER_BLOCK (1) to superblock struct");
         //read block number SUPER_BLOCK (1) to superblock struct
         rd_block(super, SUPER_BLOCK, sizeof(super_block));
+        
+        ASSERT(super != NIL_SUPER);
 }
 
 /**

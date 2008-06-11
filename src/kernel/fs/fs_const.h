@@ -36,14 +36,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define BLOCK_SIZE              512
+#define NAME_SIZE               28  
 #define DIR_ENTRY_SIZE          4 + NAME_SIZE                           //sizeof (struct dir_entry)
 #define DISK_INODE_SIZE         sizeof (struct d_inode)                 //2 + 5*4 + NUM_DIRECT_POINTER*4 
 #define MEM_INODE_SIZE          sizeof (struct m_inode)                 //2*2 + 6*4 + NUM_DIRECT_POINTER*4 
 #define SUPER_SIZE              sizeof (struct super_block)
 
-#define NAME_SIZE               28                                      
-
-#define INODES_PER_BLOCK        ((BLOCK_SIZE)/(DISK_INODE_SIZE))
+#define INODES_PER_BLOCK        1
 #define DIR_ENTRIES_PER_BLOCK   ((BLOCK_SIZE)/(DIR_ENTRY_SIZE))
 
 #define NUM_FILES               64                                      /* #entries in filp table */
@@ -59,7 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define NUM_BLOCKS_ON_HD        131072                                  /* 131072 * 512 byte = 64 MB */
-#define NUM_BMAP_BLOCKS         ((NUM_BLOCKS_ON_HD / BLOCK_SIZE) / 8) + 1   /* #blocks for the block bitmap (rounded)*/
+#define NUM_BMAP_BLOCKS         ((NUM_BLOCKS_ON_HD / BLOCK_SIZE) / 8)   /* #blocks for the block bitmap (rounded)*/
 
 #define BOOT_BLOCK              (block_nr) 0
 #define SUPER_BLOCK             (block_nr) 1

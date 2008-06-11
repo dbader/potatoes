@@ -40,8 +40,10 @@ bool fs_shutdown();
 bool load_fs();
 bool create_fs();
 
-bool do_read(void *buf, file_nr file, size_t num_bytes);
-bool do_write(file_nr file, void *buf, size_t num_bytes);
+void dump_consts();
+
+//bool do_read(void *buf, file_nr file, size_t num_bytes);
+//bool do_write(file_nr file, void *buf, size_t num_bytes);
 
 /* CREATE */
 

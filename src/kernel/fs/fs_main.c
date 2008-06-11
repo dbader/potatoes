@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/const.h"
 #include "../include/types.h"
+#include "../include/debug.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -48,11 +49,12 @@ extern void panic(char *msg);
  */
 void fs_init()
 {
-        /*if(!load_fs()){
+        if(!load_fs()){
+                dprintf("FS loading failed. trying to create a new one.");
                 if (!create_fs()){
                         panic("file system cannot be initialized!");
                 }
-        }*/
+        }
 }
 
 bool fs_shutdown()
@@ -86,14 +88,46 @@ bool load_fs()
         return super_block.s_used;
 }
 
+void test_bmap()
+{
+        printf("allocated 10?: %d\n", is_allocated_block(10));
+        printf("allocated 42?: %d\n", is_allocated_block(42));
+        printf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
+        printf("alloc new: %d\n", alloc_block(FIRST_DATA_BLOCK));
+        printf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
+        mark_block(42, TRUE);
+        printf("allocated 42?: %d\n", is_allocated_block(42));
+        mark_block(10, FALSE);
+        dump_bmap();
+}
+
 bool create_fs()
 {
+        dprintf("starting to create new FS\n");
+        dump_consts();
+        
         reset_bmap();
-        init_inode_table();
+        test_bmap();
+        /*init_inode_table();
+        dump_inodes();
         create_root();
         init_super_block();
-        
+        */
         return TRUE; //TODO: void?
+}
+
+void dump_consts()
+{
+        dprintf("NUM_BLOCKS_ON_HD = %d\nNUM_FILES = %d\nNUM_PROC_FILES = %d\nNUM_INODES = %d\n\n"
+                "SUPER_SIZE = %d\nDISK_INODE_SIZE = %d\nMEM_INODE_SIZE = %d\n\n"
+                "INODES_PER_BLOCK = %d\nDIR_ENTRIES_PER_BLOCK = %d\nADDRS_PER_BLOCK = %d\n"
+                "BYTES_DIRECT = %d\nBYTES_SINGLE_INDIRECT = %d\nBYTES_DOUBLE_INDIRECT = %d\n\n"
+                "NUM_BMAP_BLOCKS = %d\nROOT_INODE_BLOCK = %d\nFIRST_DATA_BLOCK = %d\n\n\n",
+                NUM_BLOCKS_ON_HD, NUM_FILES, NUM_PROC_FILES, NUM_INODES,
+                SUPER_SIZE, DISK_INODE_SIZE, MEM_INODE_SIZE,
+                INODES_PER_BLOCK, DIR_ENTRIES_PER_BLOCK, ADDRS_PER_BLOCK,
+                BYTES_DIRECT, BYTES_SINGLE_INDIRECT, BYTES_DOUBLE_INDIRECT,
+                NUM_BMAP_BLOCKS, ROOT_INODE_BLOCK, FIRST_DATA_BLOCK);
 }
 
 bool do_read(void *buf, file_nr file, size_t num_bytes)
