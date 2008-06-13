@@ -79,15 +79,17 @@ void init_super_block()
         
         super->s_dirt = FALSE;
         
+        super->s_used = TRUE; //assume that we use the FS now
+        
 }
 
 void dump_super()
 {
         ASSERT(super != NIL_SUPER);
-        
-        dprintf("HD_size = %d; #bmap_block = %d; FDB = %d; MFS = %d; *bmap = %d; *iroot = %d\n",
+        dprintf("\ndumping super: \n");
+        dprintf("HD_size = %d\n#bmap_block = %d\nFDB = %d\nMFS = %d\n*bmap = %d\n*iroot = %d\nused = %d\n\n",
                         super->s_HD_size, super->s_bmap_blocks, super->s_first_data_block, 
-                        super->s_max_file_size, super->s_bmap, super->s_iroot);
+                        super->s_max_file_size, super->s_bmap, super->s_iroot, super->s_used);
 }
 
 
@@ -98,7 +100,8 @@ void load_super_block()
 {
         dprintf("read block number SUPER_BLOCK (1) to superblock struct");
         //read block number SUPER_BLOCK (1) to superblock struct
-        rd_block(super, SUPER_BLOCK, sizeof(super_block));
+        rd_block(&super_block, SUPER_BLOCK, sizeof(super_block));
+        super = &super_block;
         
         ASSERT(super != NIL_SUPER);
 }

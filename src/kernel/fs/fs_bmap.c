@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void reset_bmap()
 {
-        dprintf("resetting bmap (size = %d)\n", sizeof(bmap));
+        dprintf("resetting bmap (size = %d)...", sizeof(bmap));
         
         bzero(bmap, sizeof(bmap));
         
@@ -58,7 +58,7 @@ void reset_bmap()
                 mark_block(i, TRUE);
         }
         
-        dprintf("bmap reset\n");
+        dprintf("done\n");
 }
 
 /**

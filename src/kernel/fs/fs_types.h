@@ -101,7 +101,7 @@ typedef struct proc_file{
 /**
  * A buffer for one block.
  */
-typedef struct {
+typedef struct block_buffer{
         block_nr block_nr;
         uint8 cache[BLOCK_SIZE];                /* BLOCK_SIZE * 1 byte = BLOCK_SIZE byte space for block content */
 } block_buffer;

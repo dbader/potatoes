@@ -52,15 +52,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void init_inode_table()
 {
+        dprintf("resetting inode_table...");
         for (int i = 0; i < NUM_INODES; i++){
                 inode_table[i].i_num = NIL_INODE;
         }
+        dprintf("done\n");
 }
 
 void dump_inodes(){
         for (int i = 0; i < NUM_INODES; i++){
                 dprintf("inode [%d]: num = %d; adr = %d; sip = %d; dip = %d\n", 
-                                inode_table[i].i_num, inode_table[i].i_adr,
+                                i, inode_table[i].i_num, inode_table[i].i_adr,
                                 inode_table[i].i_single_indirect_pointer,
                                 inode_table[i].i_double_indirect_pointer);
         }
@@ -91,7 +93,9 @@ void create_root()
         dprintf("create new root inode\n");
         m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
-       
+        
+        root = &inode_table[ROOT_INODE];
+        
         ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
 }
 

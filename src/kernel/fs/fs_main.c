@@ -50,9 +50,9 @@ extern void panic(char *msg);
 void fs_init()
 {
         if(!load_fs()){
-                dprintf("FS loading failed. trying to create a new one.");
+                dprintf("FS loading failed. trying to create a new one.\n");
                 if (!create_fs()){
-                        panic("file system cannot be initialized!");
+                        panic("file system cannot be initialized!\n");
                 }
         }
 }
@@ -84,21 +84,36 @@ bool load_fs()
         init_inode_table();
         load_root();
         load_super_block();
-        
+        //dump_inodes();
+        dump_super();
+
         return super_block.s_used;
 }
 
 void test_bmap()
 {
-        printf("allocated 10?: %d\n", is_allocated_block(10));
-        printf("allocated 42?: %d\n", is_allocated_block(42));
-        printf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
-        printf("alloc new: %d\n", alloc_block(FIRST_DATA_BLOCK));
-        printf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
+        dprintf("allocated 10?: %d\n", is_allocated_block(10));
+        dprintf("allocated 42?: %d\n", is_allocated_block(42));
+        dprintf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
+        dprintf("alloc new: %d\n", alloc_block(FIRST_DATA_BLOCK));
+        dprintf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
         mark_block(42, TRUE);
-        printf("allocated 42?: %d\n", is_allocated_block(42));
+        dprintf("allocated 42?: %d\n", is_allocated_block(42));
         mark_block(10, FALSE);
         dump_bmap();
+}
+
+void test_inode_table(){
+        dump_inodes();
+                
+        m_inode *mi = alloc_inode();
+        dprintf("allocacted inode: %d\n", mi->i_num);
+        dump_inodes();
+                
+        dprintf("free inode %d", mi->i_num);
+        free_inode(mi->i_num);
+        dprintf("done\n");
+        dump_inodes();
 }
 
 bool create_fs()
@@ -107,12 +122,14 @@ bool create_fs()
         dump_consts();
         
         reset_bmap();
-        test_bmap();
-        /*init_inode_table();
-        dump_inodes();
+        //test_bmap();
+        init_inode_table();
+
         create_root();
+        
         init_super_block();
-        */
+        dump_super();
+
         return TRUE; //TODO: void?
 }
 
