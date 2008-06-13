@@ -168,27 +168,44 @@ void grubstruct_test(struct multiboot *mboot_ptr)
 }
 
 // print a part of the main memory
-void mm_print_memory()
+void mm_print_memory(mm_header* mm_print_start)
 {
         mm_header *ptr;
-        for(ptr = mm_start; (uint32)ptr < 0x170000; ptr = (*ptr).next) {
-                printf("%s (0x%x)\n", (*ptr).name, (uint32)ptr);
-                printf("\t(*ptr).next: 0x%x\n", (*ptr).next);
-                printf("\t(*ptr).prev: 0x%x\n", (*ptr).prev);
-                printf("\t(*ptr).size: 0x%x\n", (*ptr).size);
+        for(ptr = (mm_header*) ((uint32)mm_print_start - sizeof(mm_header)); 
+                ptr != mm_end->next; 
+                ptr = ptr->next) {
+                printf("%s (0x%x)\n", ptr->name, (uint32)ptr);
+                printf("\tptr->next: 0x%x\n", ptr->next);
+                printf("\tptr->prev: 0x%x\n", ptr->prev);
+                printf("\tptr->size: 0x%x\n", ptr->size);
 
         }
 }
 
 void malloc_test()
 {
-        void *test2[10];
-        for (int i = 0; i <= 3; i++) {
-                test2[i] = mallocn(0x3BFFC,"name");
-                printf("allocating %d bytes... 0x%x\n", 0x3BFEC, test2[i]);
-        }
-
+        void *mm_test[10];
+        mm_test[1] = mallocn(100,"1");
+        printf("allocating 100 bytes...\n");
+        mm_test[2] = mallocn(100,"2");
+        printf("allocating 100 bytes...\n");  
+        mm_test[3] = mallocn(300,"3");
+        printf("allocating 300 bytes...\n");
+        mm_print_memory(mm_test[1]);
+        free(mm_test[2]);
+        printf("freeing 2 (100 bytes)...\n");
+        mm_print_memory(mm_test[1]);
+        mm_test[4] = mallocn(50,"4");
+        printf("allocating 50 bytes...\n"); 
+        mm_print_memory(mm_test[1]);
+        mm_test[5] = mallocn(50,"5");
+        printf("allocating 50 bytes...\n");
+        mm_print_memory(mm_test[1]);
+        mm_test[6] = mallocn(34,"6");
+        printf("allocating 34 bytes...\n");
+        mm_print_memory(mm_test[1]);
         printf("\n");
+        
 }
 
 void sleep_test()

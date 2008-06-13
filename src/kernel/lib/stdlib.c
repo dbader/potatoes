@@ -29,12 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev: 64 $
  */
 
-/*
- * date          stat
- * -----------------------------------------------
- * 10.05.08      first version with a very simple implementation of malloc
- */
-
 #include "../include/types.h"
 #include "../include/const.h"
 #include "../include/stdio.h"
@@ -107,5 +101,8 @@ void* malloc(uint32 size)
  */
 void free(void *start)
 {
-        ;
+        mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
+        // element is removed from the list (the allocated memory is not touched in any way)
+        (this->prev)-> next = this->next;
+        (this->next)->prev = this->prev;
 }
