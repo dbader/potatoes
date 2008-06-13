@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/const.h"
 #include "../include/stdio.h"
+#include "../include/string.h"
 #include "../mm/mm.h"
 
 /**
@@ -70,6 +71,21 @@ void* mallocn(uint32 size, char* name)
         return (void*) NULL;
 }
 
+/**
+ * allocates size bytes cleaned and additionally saves a name in the header of the block
+ * 
+ * @param size how much space shall be allocated
+ * @param name the name of the memory block (mainly for debugging purposes)
+ * @return pointer to the allocated space
+ */
+
+void* mallocn_clean(uint32 size, char* name)
+{
+        void *p = mallocn(size, name);
+        bzero(p, size);
+        return p;
+}
+
 /*void* malloc_name(uint32 size, char* name)
 {
 //        printf("allocation of %d bytes.0x%x\n", size, mm_occupied_top);
@@ -93,6 +109,20 @@ void* malloc(uint32 size)
 {
         return (void*) mallocn(size,"noname");
 }
+
+/** 
+ * allocates size bytes cleaned
+ * 
+ * @param size how much space shall be allocated
+ * @return pointer to the allocated space
+ */ 
+void* malloc_clean(uint32 size)
+{
+        void *p = malloc(size);
+        bzero(p, size);
+        return p;
+}
+
 
 /**
  * frees a memory block
