@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "types.h"
 
 void *malloc(uint32 size);
-void *malloc_name(uint32 size, char* name);
+void *mallocn(uint32 size, char* name);
 void free(void* start);
 
 #endif /* stdlib.h */

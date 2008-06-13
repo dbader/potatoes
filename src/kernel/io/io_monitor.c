@@ -87,10 +87,10 @@ void cursor_move(uint8 dir)
  */
 void monitor_init()
 {
-        up_buffer_start = malloc_name(io_bufsize, "scrolling buffer(up)");
+        up_buffer_start = mallocn(io_bufsize, "scrolling buffer(up)");
         ASSERT(up_buffer_start != NULL);
         bzero(up_buffer_start, io_bufsize);
-        down_buffer_start = malloc_name(io_bufsize, "scrolling buffer(down)");
+        down_buffer_start = mallocn(io_bufsize, "scrolling buffer(down)");
         ASSERT(down_buffer_start != NULL);
         bzero(down_buffer_start, io_bufsize);
 }

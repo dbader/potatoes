@@ -19,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+        
 /**
  * @file
  * Functions to allocate and free memory
@@ -48,25 +48,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return pointer to the allocated space
  */
 
-void* malloc_name(uint32 size, char* name)
+void* mallocn(uint32 size, char* name)
 {
         // search for a free block big enough: we start at the first block after mm_start, we stop after mm_end
         mm_header *ptr;
         mm_header *new_header;
-        for(ptr = (*mm_start).next; ptr != (*mm_end).next; ptr = (*ptr).next) {
+        for(ptr = mm_start->next; ptr != mm_end->next; ptr = (*ptr).next) {
                 // test if the free memory between the current and the previous block is big enough 
                 // (attention: the header of the previous block and the header of the new block must be considered)
-                if((uint32)ptr - ((uint32)((*ptr).prev) + (uint32)sizeof(mm_header) + (*((*ptr).prev)).size) >= (size + (uint32)sizeof(mm_header))) {
+                if((uint32)ptr - ((uint32)(ptr->prev) + (uint32)sizeof(mm_header) + (ptr->prev)->size)
+                         >= (size + (uint32)sizeof(mm_header))) {
                         // set header for the new block, update the header of the start block and return the adress of the block (after the header!)
-                        new_header = (mm_header*) ((uint32)((*ptr).prev) + (uint32)sizeof(mm_header) + (*((*ptr).prev)).size);
-//                        printf("\n(*ptr).prev: 0x%x\nsizeof(mm_header): 0x%x\n(*((*ptr).prev)).size: 0x%x\nnew_header: 0x%x\nnew_header2: 0x%x\n", (*ptr).prev, sizeof(mm_header), (*((*ptr).prev)).size, new_header, (uint32)(*ptr).prev + sizeof(mm_header) + (*((*ptr).prev)).size);
-                        (*new_header).prev = (*ptr).prev;
-                        (*new_header).next = ptr;
-                        (*new_header).name = name;
-                        (*new_header).size = size;
+                        new_header = (mm_header*) ((uint32)(ptr->prev) + 
+                                        (uint32)sizeof(mm_header) + (ptr->prev)->size);
+                        new_header->prev = (*ptr).prev;
+                        new_header->next = ptr;
+                        new_header->name = name;
+                        new_header->size = size;
                         
-                        (*(*ptr).prev).next = new_header;
-                        (*ptr).prev = new_header;
+                        (ptr->prev)->next = new_header;
+                        ptr->prev = new_header;
                         
                         return (void*) ((uint32)new_header + (uint32)sizeof(mm_header));
                 }
@@ -96,7 +97,7 @@ void* malloc_name(uint32 size, char* name)
  */ 
 void* malloc(uint32 size)
 {
-        return (void*) malloc_name(size,"noname");
+        return (void*) mallocn(size,"noname");
 }
 
 /**

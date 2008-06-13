@@ -184,7 +184,7 @@ void malloc_test()
 {
         void *test2[10];
         for (int i = 0; i <= 3; i++) {
-                test2[i] = malloc_name(0x3BFFC,"name");
+                test2[i] = mallocn(0x3BFFC,"name");
                 printf("allocating %d bytes... 0x%x\n", 0x3BFEC, test2[i]);
         }
 
