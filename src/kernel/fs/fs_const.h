@@ -45,9 +45,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define INODES_PER_BLOCK        1
 #define DIR_ENTRIES_PER_BLOCK   ((BLOCK_SIZE)/(DIR_ENTRY_SIZE))
 
-#define NUM_FILES               64                                      /* #entries in filp table */
+#define NUM_FILES               10                                      /* 64; #entries in filp table */
 #define NUM_PROC_FILES          20                                      /* #concurrently opened files per process */
-#define NUM_INODES              200                                     /* 200; max. num of opened inodes(files+dir) */
+#define NUM_INODES              10                                     /* 200; max. num of opened inodes(files+dir) */
 
 #define ADDR_SIZE               4
 #define ADDRS_PER_BLOCK         BLOCK_SIZE/ADDR_SIZE

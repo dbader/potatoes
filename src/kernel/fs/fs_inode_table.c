@@ -59,12 +59,22 @@ void init_inode_table()
         dprintf("done\n");
 }
 
-void dump_inodes(){
+
+void dump_inode(int i)
+{
+        dprintf("inode [%d]: num = %d; adr = %d; sip = %d; dip = %d\n", 
+                 i, inode_table[i].i_num, inode_table[i].i_adr,
+                 inode_table[i].i_single_indirect_pointer,
+                 inode_table[i].i_double_indirect_pointer);
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+                dprintf("dp[%d] = %d; ", i, inode_table[i].i_direct_pointer[i]);
+        }
+        dprintf("\n");
+}
+void dump_inodes()
+{
         for (int i = 0; i < NUM_INODES; i++){
-                dprintf("inode [%d]: num = %d; adr = %d; sip = %d; dip = %d\n", 
-                                i, inode_table[i].i_num, inode_table[i].i_adr,
-                                inode_table[i].i_single_indirect_pointer,
-                                inode_table[i].i_double_indirect_pointer);
+                dump_inode(i);
         }
 }
 
@@ -73,7 +83,6 @@ void load_root()
         dprintf("load root inode from HD to inode table\n");
         //load root inode from HD to inode table
         rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, sizeof(m_inode));
-        inode_table[ROOT_INODE].i_num = ROOT_INODE;
         
         root = &inode_table[ROOT_INODE];
         
@@ -95,6 +104,7 @@ void create_root()
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
         
         root = &inode_table[ROOT_INODE];
+        root->i_num = ROOT_INODE;
         
         ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
 }
@@ -143,7 +153,7 @@ void read_minode(m_inode *inode, block_nr inode_blk)
  * @param inode Pointer to the memory inode which should be written
  * @return boolean status of operation
  */
-bool write_inode(m_inode *inode)
+void write_inode(m_inode *inode)
 {
         cpy_minode_to_dinode(&d_inode_cache, inode);
         
@@ -152,9 +162,15 @@ bool write_inode(m_inode *inode)
         memcpy(write_cache.cache, &d_inode_cache, sizeof(d_inode));
                 
         wrt_cache(&write_cache, BLOCK_SIZE);
-        
-        return TRUE;
-}        
+}
+
+void write_inodes()
+{
+        //close all left inodes
+        for (int i = 0; i < NUM_INODES; i++){
+                write_inode(&inode_table[i]);
+        }
+}
 
 /**
  * Copy common content of a memory inode to a disk inode.
@@ -198,11 +214,11 @@ m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
         
         if (!to_inode_table){
                 mi = malloc(sizeof(m_inode));
+                mi->i_num  = 0;
         } else {
                 mi = alloc_inode();
         }
         
-        mi->i_num  = 0;
         mi->i_adr  = adr;
         mi->i_mode = mode;
         mi->i_size = 0;

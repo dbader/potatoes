@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/string.h"
+#include "../include/stdlib.h"
+#include "../include/debug.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -51,24 +53,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param path The file's absolute path
  * @return The result status of the create operation
  */
-bool fs_create(char *path, int data_type)
+bool fs_create(char *abs_path, int data_type)
 {
-        block_nr dir_inode_block = search_file(get_path(path)); //find dir
+        char *path = get_path(abs_path);
+        block_nr dir_inode_block;
+        
+        if (strcmp(path, "/") == 0){
+                dir_inode_block = ROOT_INODE_BLOCK;
+        } else {
+                dir_inode_block = search_file(path); //find dir
+        }
+        
+        dprintf("[fs_c_d] found dir_inode_block: %d\n", dir_inode_block);
         
         if (dir_inode_block == NOT_FOUND){
                 return FALSE;
         }
         
-        block_nr file_block = insert_file_into_dir(dir_inode_block, get_filename(path));
+        block_nr file_block = insert_file_into_dir(dir_inode_block, get_filename(abs_path));
         
         if (file_block == NOT_POSSIBLE){
                 return FALSE;
         }
         
         //create new inode and write it to HD
-        m_inode *inode = new_minode(file_block, data_type, TRUE); //TODO: to inode table?
+        m_inode *inode = new_minode(file_block, data_type, FALSE); //TODO: store in inode table?
         write_inode(inode);
-        free_inode(inode->i_num); 
+        free(inode); //free memory, load from HD if needed
+        //free_inode(inode->i_num); 
         
         return TRUE;
 }

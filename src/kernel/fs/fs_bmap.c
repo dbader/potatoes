@@ -66,6 +66,7 @@ void reset_bmap()
  */
 void load_bmap()
 {
+        dprintf("loading bmap from HD\n");
         int j = 0;
         for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
                 rd_block(&bmap[j*BLOCK_SIZE], i, BLOCK_SIZE);
@@ -78,6 +79,7 @@ void load_bmap()
  */
 void write_bmap()
 {
+        dprintf("writing bmap to HD\n");
         int j = 0;
         for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
                 wrt_block(i, &bmap[j*BLOCK_SIZE], BLOCK_SIZE); //TODO: test this!

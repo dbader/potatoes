@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/string.h"
 #include "../include/stdlib.h"
+#include "../include/debug.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -43,7 +44,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void init_file_table()
 {
         for(int i = 0; i < NUM_FILES; i++){
-                gft[i].f_desc = NIL_FILE;               //desc = NIL_FILE = -1 => desc not assigned => file not used
+                gft[i].f_desc  = NIL_FILE;               //desc = NIL_FILE = -1 => desc not assigned => file not used
+        }
+}
+
+void dump_file(file *f)
+{
+        dprintf("file %s:\nf_desc = %d\t f_inode (nr)= %d\t f_count = %d\t f_mode = %d\t\n\n",
+                 f->f_name, f->f_desc, (f->f_inode)->i_num, f->f_count, f->f_mode);
+}
+
+void dump_files(){
+        for (int i = 0; i < NUM_FILES; i++){
+                dump_file(&gft[i]);
         }
 }
 
@@ -53,7 +66,7 @@ void init_file_table()
 void init_proc_file_table(proc_file pft[NUM_PROC_FILES])  //TODO: proc_file_table *pft ? --> typedef proc_file_table
 {
         for(int i = 0; i < NUM_PROC_FILES; i++){
-                pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
+                pft[i].pf_desc   = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
         }
 }
 
@@ -239,8 +252,9 @@ file_nr name2desc(char *name) //in global filp table
 file_nr inode2desc(m_inode *inode)
 {
         for (int i = 0; i < NUM_FILES; i++){
-                if ( inode->i_num == (gft[i].f_inode)->i_num )
+                if ( inode->i_num == ((m_inode *)(gft[i].f_inode))->i_num ){
                         return gft[i].f_desc;
+                }
         } 
                
         return NOT_FOUND; 

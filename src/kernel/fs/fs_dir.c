@@ -52,6 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/string.h"
 #include "../include/stdlib.h"
+#include "../include/debug.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -72,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
-                if(strcmp(name, file_list[i].name) == 0){
+                if(strcmp(file_list[i].name, name) == 0){
                         return file_list[i].inode;
                 }
         }
@@ -86,12 +87,21 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         block_nr dir_entry_blk = 0;
         block_nr new_blk = 0;
         
-        m_inode *dir_inode = malloc(sizeof(m_inode)); //for fs_read()
-        read_minode(dir_inode, dir_inode_blk);
+        m_inode *dir_inode;
+        
+        if (dir_inode_blk == ROOT_INODE_BLOCK){
+                dir_inode = root; 
+        } else {
+                dir_inode = malloc(sizeof(m_inode)); //for fs_read()
+                read_minode(dir_inode, dir_inode_blk);
+        }
         
         //scan the directory successively until a free entry is found 
         do{
                 dir_entry_blk = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos);
+                
+                dprintf("[fs_dir] dir_entry_blk = %d\n", dir_entry_blk);
+                
                 if (dir_entry_blk == NOT_POSSIBLE){
                         return NOT_POSSIBLE; //problems during reading
                 }
@@ -110,10 +120,13 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
 
         } while(inserted == FALSE);
         
+        dprintf("[fs_dir] wrt_block(%d, dir_cache, %d)\n", dir_entry_blk, sizeof(dir_cache));
+        
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
         
         clear_block(new_blk); //reset new block
         
+        dprintf("[fs_dir] new_blk = %d\n", new_blk);
         return new_blk;
 }
 
@@ -121,6 +134,8 @@ bool insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
                 if (strcmp(file_list[i].name, "") == 0){
+                        dprintf("[fs_dir] found empty file list entry at %d!\n", i);
+                        
                         file_list[i].inode = blk_nr;
                         memcpy(file_list[i].name, name, NAME_SIZE);
                         return TRUE;
@@ -164,7 +179,10 @@ block_nr search_file(char *path)
         char *work_copy = copy;
         
         char *tok = strsep(&work_copy, delim); //(should) delete "/" at the beginning to the path
-        if (tok != NULL){
+
+        dprintf("[fs_dir] '%s' = strsep('%s', '/')\n", tok, path);
+        if (strcmp(tok, "") != 0){
+                dprintf("[fs_dir] first token != NULL! ('%s')\n", tok);
                 return NOT_POSSIBLE; //wrong format
         }
         
@@ -180,11 +198,16 @@ block_nr search_file(char *path)
  */
 block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
 {
+        dprintf("[fs_dir] processing path = '%s' | tok = '%s'\n", path, tok);
+        
         uint32 pos = 0;
+        
         rd_block(&d_inode_cache, crt_dir, BLOCK_SIZE); //read d_inode
+        
         block_nr read;
         
         do{
+                dprintf("[fs_dir] searching for filename '%s' in block %d...\n", tok, pos / BLOCK_SIZE);
                 cpy_dinode_to_minode(&m_inode_cache, &d_inode_cache); //convert d_inode to m_inode (for fs_read)
                 m_inode_cache.i_adr = crt_dir;
                 
@@ -220,24 +243,18 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
  */
 char* get_filename(char *abs_path)
 {
-        char delim[] = "/";
-        char *tok;
-        char *copy = strdup(abs_path);
-        char *work_copy = copy;
-        char *backup = malloc(NAME_SIZE);
-        char *pbackup = backup;
+        char delim = '/';
+        char *path = malloc(strlen(abs_path));
         
-        do {
-                if (tok != NULL){
-                         bzero(backup, NAME_SIZE);       //reset string 
-                         backup = strdup(tok);           //backup tok
-                }
-                tok = strsep(&work_copy, delim);
-        } while (tok != NULL);
+        int i = strlen(abs_path);
+              
+        while(abs_path[--i] != delim);
         
-        return pbackup;
+        memcpy(path, abs_path+i+1, strlen(abs_path)-i);
+        
+        printf("[fs_dir] extracted filename = %s\n", path);
+        return path;
 }
-
 
 /**
  * Extract the path WITHOUT the filename from the absolute path.
@@ -247,22 +264,17 @@ char* get_filename(char *abs_path)
  */
 char* get_path(char *abs_path)
 {
-        char delim[] = "/";
-        char *tok;
-        char *copy = strdup(abs_path);
-        char *work_copy = copy;
-        char *path = malloc(sizeof(*abs_path));
-        char *ppath = path;
+        char delim = '/';
+        char *path = malloc_clean(strlen(abs_path));//, "extract path from abs_path");
         
-        path = "/";
+        int i = strlen(abs_path);
+              
+        while(abs_path[--i] != delim);
+        if (i == 0) i++; //get at least '/'
         
-        do {
-                if (tok != NULL){
-                        memcpy(path, tok, sizeof(tok));
-                        path = "/";
-                }
-                tok = strsep(&work_copy, delim);
-        } while (tok != NULL);
+        memcpy(path, abs_path, i);
         
-        return ppath;
+        dprintf("[fs_dir] extracted path = %s\n", path);
+
+        return path;
 }

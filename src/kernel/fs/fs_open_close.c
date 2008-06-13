@@ -75,7 +75,7 @@ file_nr fs_open(char *path)
         
         fd = insert_file(inode, path, inode->i_mode);
         
-        file_nr proc_fd;// = insert_proc_file(get_active_process()->pft, fd); //TODO: enable after Daniel's implementation
+        file_nr proc_fd = fd;// = insert_proc_file(get_active_process()->pft, fd); //TODO: enable after Daniel's implementation
         
         return proc_fd;
 }

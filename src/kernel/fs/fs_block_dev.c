@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/const.h"
 #include "../include/types.h"
+#include "../include/debug.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -93,7 +94,7 @@ void clear_block(block_nr blk_nr)
 
 block_nr get_data_block(m_inode *inode, uint32 pos)
 {
-        
+        dprintf("[fs_block_dev] get_data_block(%d, %d)\n", inode->i_adr, pos);
         block_nr blk_nr;
         block_nr data_blk;
 
@@ -106,6 +107,8 @@ block_nr get_data_block(m_inode *inode, uint32 pos)
                         data_blk = alloc_block(inode->i_adr); //init inode's direct pointer
                         clear_block(data_blk);
                         inode->i_direct_pointer[blk_nr] = data_blk;
+                        
+                        dprintf("[fs_block_dev] dp == NULL --> dp[%d] = %d\n", blk_nr, data_blk);
                 }
                 
         } else if (pos < (BYTES_DIRECT + BYTES_SINGLE_INDIRECT)){ //data can be found by single indirect pointer
@@ -115,6 +118,8 @@ block_nr get_data_block(m_inode *inode, uint32 pos)
                         sip = alloc_block(inode->i_adr); //init inode's single indirect pointer
                         clear_block(sip);
                         inode->i_single_indirect_pointer = sip;
+                        
+                        dprintf("[fs_block_dev] sip == NULL --> sip = %d\n", sip);
                 }
                 
                 rd_block(addr_cache, inode->i_single_indirect_pointer, sizeof(addr_cache));
@@ -129,6 +134,8 @@ block_nr get_data_block(m_inode *inode, uint32 pos)
                         dip = alloc_block(inode->i_adr);
                         inode->i_double_indirect_pointer = dip;
                         clear_block(dip);
+                        
+                        dprintf("[fs_block_dev] dip == NULL --> dip = %d\n", dip);
                 }
                 
                 rd_block(addr_cache, inode->i_double_indirect_pointer, sizeof(addr_cache));
@@ -141,6 +148,8 @@ block_nr get_data_block(m_inode *inode, uint32 pos)
                         clear_block(new_addr_block);
                         addr_cache[addr_block] = new_addr_block;
                         wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
+                        
+                        dprintf("[fs_block_dev] addr_cach[%d] == NULL --> addr_cache[%d] = %d\n", addr_block, addr_block, new_addr_block);
                 }
                 rd_block(addr_cache, addr_cache[addr_block], sizeof(addr_cache));
                 

@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/string.h"
 #include "../include/stdlib.h"
+#include "../include/debug.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -43,6 +44,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos)
 {
         block_nr src_blk = get_data_block(inode, pos); //get_block() in block_dev.c
+        
+        dprintf("[fs_r_w] src_blk  = %d\n", src_blk);
+        
         if (src_blk == NOT_FOUND){
                 return NOT_POSSIBLE;
         }
@@ -50,6 +54,7 @@ block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos)
         cache_block(src_blk, BLOCK_SIZE);
         
         uint16 offset = pos % BLOCK_SIZE; //offset: 0..BLOCK_SIZE-1
+        dprintf("[fs_r_w] offset (%d) + num_bytes (%d) = %d\n", offset, num_bytes, offset + num_bytes);
         if (offset + num_bytes <= BLOCK_SIZE){
                 memcpy(buf, read_cache.cache + offset, num_bytes); //TODO: counter-check read_cache.cache + offset
         } else {

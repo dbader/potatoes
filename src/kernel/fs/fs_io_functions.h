@@ -51,6 +51,7 @@ extern void read_dinode(d_inode *inode, block_nr inode_blk);
 
 extern void read_minode(m_inode *inode, block_nr inode_blk);
 
-extern bool write_inode(m_inode *inode);
+extern void write_inode(m_inode *inode);
+
 
 #endif /*FS_IO_FUNCTIONS_H_*/

@@ -44,6 +44,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 extern void panic(char *msg);
 
+//tests
+extern void run_FS_tests();
+
 /**
  * Initializes the file system.
  */
@@ -55,6 +58,8 @@ void fs_init()
                         panic("file system cannot be initialized!\n");
                 }
         }
+        
+        
 }
 
 bool fs_shutdown()
@@ -66,10 +71,7 @@ bool fs_shutdown()
                 fs_close(gft[i].f_desc);
         }
         
-        //close all left inodes
-        for (int i = 0; i < NUM_INODES; i++){
-                write_inode(&inode_table[i]);
-        }
+
         
         write_bmap();
         write_super_block();
@@ -80,41 +82,15 @@ bool fs_shutdown()
 
 bool load_fs()
 {
+        dprintf("loading FS from HD\n");
         load_bmap();
         init_inode_table();
         load_root();
         load_super_block();
-        //dump_inodes();
-        dump_super();
 
         return super_block.s_used;
 }
 
-void test_bmap()
-{
-        dprintf("allocated 10?: %d\n", is_allocated_block(10));
-        dprintf("allocated 42?: %d\n", is_allocated_block(42));
-        dprintf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
-        dprintf("alloc new: %d\n", alloc_block(FIRST_DATA_BLOCK));
-        dprintf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
-        mark_block(42, TRUE);
-        dprintf("allocated 42?: %d\n", is_allocated_block(42));
-        mark_block(10, FALSE);
-        dump_bmap();
-}
-
-void test_inode_table(){
-        dump_inodes();
-                
-        m_inode *mi = alloc_inode();
-        dprintf("allocacted inode: %d\n", mi->i_num);
-        dump_inodes();
-                
-        dprintf("free inode %d", mi->i_num);
-        free_inode(mi->i_num);
-        dprintf("done\n");
-        dump_inodes();
-}
 
 bool create_fs()
 {
@@ -129,7 +105,9 @@ bool create_fs()
         
         init_super_block();
         dump_super();
-
+        
+        //run tests
+        run_FS_tests();
         return TRUE; //TODO: void?
 }
 
