@@ -58,4 +58,6 @@ mm_header *mm_end;
 
 void gdt_init();
 
+void mm_move_block(uint32 dest, mm_header *src);
+
 #endif /* __MM_H_ */

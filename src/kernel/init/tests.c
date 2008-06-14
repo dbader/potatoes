@@ -186,6 +186,8 @@ void mm_print_memory(mm_header* mm_print_start)
 void malloc_test()
 {
         void *mm_test[10];
+        uint32 free_start = free_memory();
+        // total allocation amount: 2535 bytes + 6 * 16 bytes
         mm_test[1] = mallocn(100,"1");
         printf("1: allocating 100 bytes...\n");
         mm_test[2] = mallocn(100,"2");
@@ -217,8 +219,15 @@ void malloc_test()
         printf("\n");
         char *p = malloc(2000);
         p = "abc";
-        printf("neu allokierter String: %s\n", p);
+        printf("new allocated string: %s\n", p);
         mm_print_memory(mm_test[6]);
+        uint32 free_end = free_memory();
+        printf("free memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes", 
+                free_end, free_start - free_end);
+        //free(mm_test[4]);
+        //mdefrag();
+        //mm_move_block(0x200000, (mm_header*)(mm_test[9] - sizeof(mm_header)));
+        //mm_print_memory(mm_test[1]);
         
 }
 

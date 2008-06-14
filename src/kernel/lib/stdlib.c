@@ -163,7 +163,6 @@ void* realloc(void *pointer, size_t size)
         // the free space after pointer is big enough for the new size 
         if((uint32)hdr->next >= (uint32)((uint32) pointer + size)) {
                 hdr->size = size;
-                printf("new size: 0x%x\nnext: 0x%x\nprev: 0x%x",hdr->size, (uint32)hdr->next, (uint32)hdr->prev);
                 return pointer;
         }
         void* new = mallocn(size, hdr->name);
@@ -173,5 +172,38 @@ void* realloc(void *pointer, size_t size)
         memmove(new, pointer, hdr->size);
         free(pointer);
         return new;
-}        
+}      
 
+/**
+ * function to return the free memory space
+ * 
+ * @return      free memory space in bytes
+ */  
+uint32 free_memory()
+{
+        mm_header *ptr;
+        uint32 free = 0;
+        for(ptr = mm_start->next; ptr != mm_end->next; ptr = (*ptr).next) {
+                free += (uint32)ptr - ((uint32)ptr->prev + sizeof(mm_header) + (ptr->prev)->size);
+        }
+        
+        return free;
+}
+
+/**
+ * defragments the memory.
+ * The function removes any free spaces between allocated blocks so that at the end all the free
+ * memory is between the latest allocated block and the end of the memory
+ * TODO: implementation
+ */
+void mdefrag()
+{
+        mm_header *ptr;
+        uint32 diff;
+        for(ptr = mm_start->next; ptr != mm_end; ptr = (*ptr).next) {
+                diff = (uint32)ptr - ((uint32)ptr->prev + sizeof(mm_header) + (ptr->prev)->size);
+                if(diff > 0) {
+                        printf("\n%s (0x%x) <-> %s (0x%x) (%d bytes)", (ptr->prev)->name, (uint32)ptr->prev, ptr->name, (uint32)ptr, diff);
+                }
+        }
+}        

@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/stdio.h"
 #include "../include/debug.h"
+#include "../include/string.h"
 #include "mm.h"
 #include "../io/io_virtual.h"
 
@@ -39,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Initializes memory management (including the GDT)
  * 
  * @param start the start of the part of the memory to be managed
- * @param end the end of the part of the memory to be managed
+ * @param end   the end of the part of the memory to be managed
  */
 void mm_init(uint32 start, uint32 end) 
 {      
@@ -50,15 +51,15 @@ void mm_init(uint32 start, uint32 end)
 //        mm_start2 = (mm_header*) (0x1F00000);
         
         // set the headers for mm_start and mm_end (both have size = 0; just needed for linked list stuff)
-        (*mm_start).next = mm_end;
-        (*mm_start).prev = mm_end;
-        (*mm_start).name = "start";
-        (*mm_start).size = 0;
+        mm_start->next = mm_end;
+        mm_start->prev = mm_end;
+        mm_start->name = "start";
+        mm_start->size = 0;
         
-        (*mm_end).next = mm_start;
-        (*mm_end).prev = mm_start;
-        (*mm_end).name = "end";
-        (*mm_end).size = 0;
+        mm_end->next = mm_start;
+        mm_end->prev = mm_start;
+        mm_end->name = "end";
+        mm_end->size = 0;
         
         start_vmonitor();
                 
@@ -77,4 +78,22 @@ void mm_init(uint32 start, uint32 end)
 //        dprintf("mm_end.size: %d\n",(*mm_end).size);
         
         dprintf("mm: memory 0x%x - 0x%x (%dmb)\n", start, end, (end - start) / (1024 * 1024));
+}
+
+
+/** 
+ * moves a block of memory (including the header)
+ * TODO implementation that keeps the entries sorted
+ * 
+ * @param dest  destination
+ * @param src   source
+ */
+void mm_move_block(uint32 dest, mm_header *src)
+{
+        mm_header* new_header = (mm_header*) dest;
+        
+        (src->prev)->next = new_header;
+        (src->next)->prev = new_header;
+        memcpy((void*)(new_header), (void*)src, (sizeof(mm_header) + src->size));
+        //printf("\n%s (0x%x)\nnext: 0x%x\nprev: 0x%x\nsize: %d\n", new_header->name, (uint32)new_header, (uint32)new_header->next, (uint32)new_header->prev, (uint32)new_header->size);
 }
