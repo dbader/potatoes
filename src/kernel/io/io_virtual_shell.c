@@ -1,4 +1,4 @@
-/* $Id: io_timer.c 119 2008-06-09 22:15:34Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Shell & monitor interface
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 119 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../include/stdio.h"

@@ -1,4 +1,4 @@
-/* $Id: io_timer->c 119 2008-06-09 22:15:34Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program->  If not, see <http://www->gnu->org/licenses/>->
  * Function used by virtual outputs. 
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 119 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #include "../include/stdlib.h"
 #include "../include/stdio.h"
@@ -82,7 +82,6 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
         uint32 i=0;
         uint32 temp;
         
-        //FIXME: Scrolling doesn't work properly
         if(vm->charnum >= 1999){
                 if(vm->scrollup_limit < (vm->size / 0xA0) - 25) vm->scrollup_limit++;
                 vm->vis_begin += 80; 
@@ -142,12 +141,15 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
  * @param fg foreground-color
  * @param bg background color
  */
-void virt_monitor_cputs(virt_monitor *vm, char *str, uint8 fg, uint8 bg)
+int virt_monitor_cputs(virt_monitor *vm, char *str, uint8 fg, uint8 bg)
 {
+        int res = 0;
         while(*str!=0){
                 virt_monitor_cputc(vm, *str, fg, bg);
                 str += 1;
+                res++;
         }
+        return res;
 }
 
 /**
@@ -167,9 +169,9 @@ void virt_monitor_putc(virt_monitor *vm, char ch)
  * @param *vm active virtual monitor
  * @param *str pointer to the string
  */
-void virt_monitor_puts(virt_monitor *vm, char *str)
+int virt_monitor_puts(virt_monitor *vm, char *str)
 {
-        virt_monitor_cputs(vm, str, WHITE, BLACK);
+       return virt_monitor_cputs(vm, str, WHITE, BLACK);
 }
 
 /**

@@ -56,7 +56,6 @@ int putchar(char c)
 
 /**
  * Writes a string to stdout.
- * @bug Does not return the number of characters written.
  * @bug Does not write a terminating newline character. A change in behavior breaks other things
  *      (namely printf()). Please leave it like that for now.
  * @param s the string
@@ -64,9 +63,8 @@ int putchar(char c)
  */
 int puts(char *s)
 {
-        virt_monitor_puts(get_active_virt_monitor(), s);
+        return virt_monitor_puts(get_active_virt_monitor(), s);
         //monitor_puts(s);
-        return 0; //TODO return number of chars written.
 }
 
 /**

@@ -1,4 +1,4 @@
-/* $Id: io_timer.c 119 2008-06-09 22:15:34Z dtraytel $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Header for the virtual monitor structure
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 119 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef __IO_VIRTUAL_H_
@@ -62,11 +62,11 @@ void virt_printf(virt_monitor vm, char *fmt, ...);
 //prints colored character
 void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg);
 //prints colored string
-void virt_monitor_cputs(virt_monitor *vm, char *str, uint8 fg, uint8 bg);
+int virt_monitor_cputs(virt_monitor *vm, char *str, uint8 fg, uint8 bg);
 //prints black character
 void virt_monitor_putc(virt_monitor *vm, char ch);
 //prints black string
-void virt_monitor_puts(virt_monitor *vm, char *str);
+int virt_monitor_puts(virt_monitor *vm, char *str);
 
 void start_vmonitor();
 void start_shell();
