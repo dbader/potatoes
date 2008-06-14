@@ -46,7 +46,7 @@ void io_init()
         printf("0x%p\n",(get_active_virt_monitor())->vis_begin);
         printf("0x%p\n",(get_active_virt_monitor())->begin+VIRTUAL_MONITOR_SIZE);
         //start_shell();
-        //monitor_init();               dprintf("io: monitor initialized\n");
+        monitor_init();                 dprintf("io: monitor initialized\n");
         timer_init(FREQUENCY);          dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
         set_interrupts();               dprintf("io: interrupts enabled\n");
         hd_init();                      dprintf("io: hard disk initialized\n");

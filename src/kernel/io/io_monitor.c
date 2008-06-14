@@ -87,12 +87,23 @@ void cursor_move(uint8 dir)
  */
 void monitor_init()
 {
-        up_buffer_start = mallocn(io_bufsize, "scrolling buffer(up)");
-        ASSERT(up_buffer_start != NULL);
-        bzero(up_buffer_start, io_bufsize);
-        down_buffer_start = mallocn(io_bufsize, "scrolling buffer(down)");
-        ASSERT(down_buffer_start != NULL);
-        bzero(down_buffer_start, io_bufsize);
+//        up_buffer_start = mallocn(io_bufsize, "scrolling buffer(up)");
+//        ASSERT(up_buffer_start != NULL);
+//        bzero(up_buffer_start, io_bufsize);
+//        down_buffer_start = mallocn(io_bufsize, "scrolling buffer(down)");
+//        ASSERT(down_buffer_start != NULL);
+//        bzero(down_buffer_start, io_bufsize);
+        
+        //disables the blinking mode
+        inb(0x3DA);
+        outb(0x3C0,0x10);
+        uint8 temp = inb(0x3C1);
+        outb(0x3C1,0x20);
+        inb(0x3DA);
+        outb(0x3C0,0x10);
+        outb(0x3C0,temp & 0xF7);
+        outb(0x3C0,0x20);
+        inb(0x3DA);
 }
 
 /**

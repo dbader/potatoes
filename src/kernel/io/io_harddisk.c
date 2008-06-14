@@ -47,8 +47,8 @@ volatile bool hd_interrupt = FALSE;
 void wait_on_hd_interrupt()
 {
         while(!hd_interrupt){
-                uint8 stat=inb(0x1F7);
-                if(stat & 0x58) break; //drdy dsc drq
+                uint8 stat=inb(0x3F6);
+                if(stat == 0x58){inb(0x1F7); break;} //drdy dsc drq
                 else if (stat & 1) panic("IDE-ERROR"); //error flag
                 halt();
         }
