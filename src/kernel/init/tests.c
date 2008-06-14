@@ -187,25 +187,38 @@ void malloc_test()
 {
         void *mm_test[10];
         mm_test[1] = mallocn(100,"1");
-        printf("allocating 100 bytes...\n");
+        printf("1: allocating 100 bytes...\n");
         mm_test[2] = mallocn(100,"2");
-        printf("allocating 100 bytes...\n");  
+        printf("2: allocating 100 bytes...\n");  
         mm_test[3] = mallocn(300,"3");
-        printf("allocating 300 bytes...\n");
+        printf("3: allocating 300 bytes...\n");
         mm_print_memory(mm_test[1]);
         free(mm_test[2]);
         printf("freeing 2 (100 bytes)...\n");
         mm_print_memory(mm_test[1]);
         mm_test[4] = mallocn(50,"4");
-        printf("allocating 50 bytes...\n"); 
+        printf("4: allocating 50 bytes...\n"); 
         mm_print_memory(mm_test[1]);
         mm_test[5] = mallocn(50,"5");
-        printf("allocating 50 bytes...\n");
+        printf("5: allocating 50 bytes...\n");
         mm_print_memory(mm_test[1]);
         mm_test[6] = mallocn(34,"6");
-        printf("allocating 34 bytes...\n");
+        printf("6: allocating 34 bytes...\n");
+        mm_print_memory(mm_test[1]);
+        printf("7: reallocating 3 to 300 bytes...\n");
+        mm_test[7] = realloc(mm_test[3], 300);
+        mm_print_memory(mm_test[1]);
+        printf("8: reallocating 3 to 200 bytes...\n");
+        mm_test[8] = realloc(mm_test[7], 200);
+        mm_print_memory(mm_test[1]);
+        printf("9: reallocating 3 to 301 bytes...\n");
+        mm_test[9] = realloc(mm_test[8], 301);
         mm_print_memory(mm_test[1]);
         printf("\n");
+        char *p = malloc(2000);
+        p = "abc";
+        printf("neu allokierter String: %s\n", p);
+        mm_print_memory(mm_test[6]);
         
 }
 

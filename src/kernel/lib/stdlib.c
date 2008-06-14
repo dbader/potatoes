@@ -36,14 +36,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../mm/mm.h"
 
 /**
- * allocates size bytes and additionally saves a name in the header of the block
+ * allocates size bytes and additionally saves a name in the header of the block.
+ * ATTENTION: if malloc fails (i.e. there is not enough free space), the return value is 
+ * (void*) NULL. So this should always be tested!
  * 
- * @param size how much space shall be allocated
- * @param name the name of the memory block (mainly for debugging purposes)
- * @return pointer to the allocated space
+ * @param size  how much space shall be allocated
+ * @param name  the name of the memory block (mainly for debugging purposes)
+ * @return      pointer to the allocated space
  */
 
-void* mallocn(uint32 size, char* name)
+void* mallocn(size_t size, char *name)
 {
         // search for a free block big enough: we start at the first block after mm_start, we stop after mm_end
         mm_header *ptr;
@@ -74,12 +76,12 @@ void* mallocn(uint32 size, char* name)
 /**
  * allocates size bytes cleaned and additionally saves a name in the header of the block
  * 
- * @param size how much space shall be allocated
- * @param name the name of the memory block (mainly for debugging purposes)
- * @return pointer to the allocated space
+ * @param size  how much space shall be allocated
+ * @param name  the name of the memory block (mainly for debugging purposes)
+ * @return      pointer to the allocated space
  */
 
-void* mallocn_clean(uint32 size, char* name)
+void* mallocn_clean(size_t size, char *name)
 {
         void *p = mallocn(size, name);
         bzero(p, size);
@@ -101,11 +103,13 @@ void* mallocn_clean(uint32 size, char* name)
 
 /** 
  * allocates size bytes
+ * ATTENTION: if malloc fails (i.e. there is not enough free space), the return value is 
+ * (void*) NULL. So this should always be tested!
  * 
- * @param size how much space shall be allocated
- * @return pointer to the allocated space
+ * @param size  how much space shall be allocated
+ * @return      pointer to the allocated space
  */ 
-void* malloc(uint32 size)
+void* malloc(size_t size)
 {
         return (void*) mallocn(size,"noname");
 }
@@ -113,16 +117,15 @@ void* malloc(uint32 size)
 /** 
  * allocates size bytes cleaned
  * 
- * @param size how much space shall be allocated
- * @return pointer to the allocated space
+ * @param size  how much space shall be allocated
+ * @return      pointer to the allocated space
  */ 
-void* malloc_clean(uint32 size)
+void* malloc_clean(size_t size)
 {
         void *p = malloc(size);
         bzero(p, size);
         return p;
 }
-
 
 /**
  * frees a memory block
@@ -133,6 +136,42 @@ void free(void *start)
 {
         mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
         // element is removed from the list (the allocated memory is not touched in any way)
-        (this->prev)-> next = this->next;
+        (this->prev)->next = this->next;
         (this->next)->prev = this->prev;
 }
+
+/**
+ * reallocates a memory block to size bytes
+ * ATTENTION: if realloc fails (i.e. there is not enough free space), the return value is 
+ * (void*) NULL. So this should always be tested! 
+ * Especially realloc() shouldn't be used like this:
+ * 
+ * int* p = malloc(50);
+ * p = realloc(100);
+ * 
+ * In this case, if realloc fails, p is overwritten by (void*) NULL. So, the memory allocated 
+ * for p is no longer accessible, which means that the data stored in p is lost and the memory
+ * allocated for p can't be used any more. 
+ * 
+ * @param pointer       pointer to the old allocated space
+ * @param size          the new size
+ * @return              pointer to the reallocated space
+ */
+void* realloc(void *pointer, size_t size)
+{
+        mm_header* hdr = (mm_header*)(pointer - sizeof(mm_header));
+        // the free space after pointer is big enough for the new size 
+        if((uint32)hdr->next >= (uint32)((uint32) pointer + size)) {
+                hdr->size = size;
+                printf("new size: 0x%x\nnext: 0x%x\nprev: 0x%x",hdr->size, (uint32)hdr->next, (uint32)hdr->prev);
+                return pointer;
+        }
+        void* new = mallocn(size, hdr->name);
+        if(new == (void*) NULL) {
+                return (void*) NULL;
+        }
+        memmove(new, pointer, hdr->size);
+        free(pointer);
+        return new;
+}        
+
