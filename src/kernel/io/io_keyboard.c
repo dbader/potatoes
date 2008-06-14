@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/assert.h"
 
 #include "../io/io.h"
+#include "../io/io_virtual.h"
 #include "../io/io_keyboard.h"
 #include "../pm/pm_input.h"
 
@@ -49,10 +50,12 @@ bool echo = TRUE; //accessible for PM
  */
 uint8 shcut_num = 0;
 
+#define SHORTCUTS_ARRAY_SIZE 300
+
 /**
  * the keyboard shortcuts struct
  */
-struct shortcut shortcuts[100];
+shortcut shortcuts[SHORTCUTS_ARRAY_SIZE];
 
 /**
  * Adds a shortcut to the system
@@ -68,7 +71,7 @@ void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*fu
         shortcuts[shcut_num].control = control_flag;
         shortcuts[shcut_num].super = super_flag;
         shortcuts[shcut_num].func = function;
-        if (shcut_num < 99) shcut_num++;
+        if (shcut_num + 1 < SHORTCUTS_ARRAY_SIZE) shcut_num++;
 }
 
 /**
@@ -90,14 +93,14 @@ void kb_handler()
         }   
         else if (shift) { //Key pressed while shift is pressed
                 if (kb_shift_map[scancode] != 0) {
-                        if(echo) monitor_putc(kb_shift_map[scancode]);
+                        if(echo) virt_monitor_putc(get_active_virt_monitor(), kb_shift_map[scancode]);
                         else pm_handle_input(kb_map[scancode]);
                 }
         }
         else if (alt) { //Key pressed while alt is pressed
-                if (scancode == 0x12) monitor_invert();
+                if (scancode == 0x12) virt_monitor_invert(get_active_virt_monitor());
                 if (kb_alt_map[scancode] != 0) {
-                        if(echo) monitor_putc(kb_alt_map[scancode]);
+                        if(echo) virt_monitor_putc(get_active_virt_monitor(), kb_alt_map[scancode]);
                         else pm_handle_input(kb_map[scancode]);
                 }
         }
@@ -138,32 +141,35 @@ void kb_handler()
                         super_button = 1;
                         break;
                 case CURSOR_UP:
-                        cursor_move(0);
+                        virt_cursor_move(get_active_virt_monitor(), 0);
                         break;
                 case CURSOR_DOWN:
-                        cursor_move(1);
+                        virt_cursor_move(get_active_virt_monitor(), 1);
                         break;
                 case CURSOR_LEFT:
-                        cursor_move(2);
+                        virt_cursor_move(get_active_virt_monitor(), 2);
                         break;
                 case CURSOR_RIGHT:
-                        cursor_move(3);
+                        virt_cursor_move(get_active_virt_monitor(), 3);
                         break;
-                case LSHIFT || RSHIFT:
-                shift = 1;
-                break;
+                case LSHIFT:
+                        shift = 1;
+                        break;
+                case RSHIFT:
+                        shift = 1;
+                        break;
                 case ALT:
                         alt = 1;
                         break;
                 case SCROLL_UP:
-                        monitor_scrollup();
+                        virt_monitor_scrollup(get_active_virt_monitor());
                         break;
                 case SCROLL_DOWN:
-                        monitor_scrolldown();
+                        virt_monitor_scrolldown(get_active_virt_monitor());
                         break;
                 default:
                         if (kb_map[scancode] != 0)
-                                if(echo) monitor_putc(kb_map[scancode]);
+                                if(echo) virt_monitor_putc(get_active_virt_monitor(), kb_map[scancode]);
                                 else pm_handle_input(kb_map[scancode]);
                 }
         }

@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/util.h"
 #include "../include/debug.h"
 
+#include "../io/io_virtual.h"
 #include "../io/io.h"
 #include "../mm/mm.h"
 
@@ -316,7 +317,7 @@ void ralph_wiggum()
 
 void do_tests()
 {
-        monitor_puts("\n\ndo_tests():\n");
+        printf("\n\ndo_tests():\n");
         //grubstruct_test(g_mboot_ptr);
         //strings_test();       
         //draw_test();
@@ -331,4 +332,5 @@ void do_tests()
         SHORTCUT_CTRL('m', malloc_test);
         SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
+
 }

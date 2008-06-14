@@ -464,11 +464,11 @@ static bool ctrl = 0;
 /**
  * Structure of a shortcut
  */
-struct shortcut{
+typedef struct{
         void (*func)();
         bool control;
         bool super;
         uint8 ch;
-};
+} shortcut;
 
 #endif /*__IO_KEYBOARD_H*/

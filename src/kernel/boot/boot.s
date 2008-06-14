@@ -60,6 +60,8 @@ mboot:
 start:
 
         ; Execute the kernel:
+        cli
+         
         ; Load multiboot information:
         push ebx
         

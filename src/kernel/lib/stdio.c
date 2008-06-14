@@ -33,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/string.h"
 
+#include "../io/io_virtual.h"
+
 void monitor_cputc(char ch, uint8 fg, uint8 bg);
 void monitor_cputs(char *str, uint8 fg, uint8 bg);
 void monitor_putc(char ch);
@@ -47,7 +49,8 @@ void monitor_puthex(uint8 ch);
  */
 int putchar(char c)
 {
-        monitor_putc(c);
+        virt_monitor_putc(get_active_virt_monitor(), c);
+        //monitor_putc(c);
         return c;
 }
 
@@ -61,7 +64,8 @@ int putchar(char c)
  */
 int puts(char *s)
 {
-        monitor_puts(s);
+        virt_monitor_puts(get_active_virt_monitor(), s);
+        //monitor_puts(s);
         return 0; //TODO return number of chars written.
 }
 

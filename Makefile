@@ -68,7 +68,7 @@ clean:
 	-@for file in $(OBJFILES) $(DEPFILES) $(GENFILES); do if [ -f $$file ]; then rm $$file; fi; done
 	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
-runbochs: fdimage hdimage
+runbochs: fdimage
 	@bochs -f src/tools/bochsrc
 	
 mac_runbochs: mac_image

@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/stdio.h"
 #include "../io/io.h"
+#include "../io/io_virtual.h"
 
 /**
  * Global pointer to multiboot structure
@@ -74,8 +75,6 @@ void panic(char *msg)
  */
 int main(struct multiboot *mboot_ptr)
 {
-        printf("etiOS - $Rev$ - "__DATE__" "__TIME__"\n");
-
         /* Some memory info. Most of this is of special importance to Johannes / MM. */
         g_mboot_ptr = mboot_ptr;
         /*
@@ -89,10 +88,11 @@ int main(struct multiboot *mboot_ptr)
         //printf("\n0x%x\n",0x100000 + mboot_ptr->mem_upper * 1024);
 
         mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
+
         io_init();      
         pm_init();
         fs_init();
-
+        
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
 
