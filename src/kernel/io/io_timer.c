@@ -45,12 +45,15 @@ static sint32 ticks = 0;
 /**
  * Handles a timer-interrupt by incrementing the ticks-counter and calling the PM.
  */
-void timer_handler(){
-        ticks++;
-        pm_schedule();
+uint32 timer_handler(uint32 context)
+{
+        ticks++;      
+        if (ticks == SINT32_MAX) 
+                ticks = 0;
+        
         update_virt_monitor(get_active_virt_monitor());
-        if(ticks == SINT32_MAX) ticks = 0;
-        //printf("%d\n",ticks);
+        
+        return pm_schedule(context);
 }
 
 /**

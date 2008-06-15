@@ -32,7 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/init.h"
 #include "../include/const.h"
 #include "../include/stdio.h"
+#include "../include/debug.h"
 #include "../io/io.h"
+#include "../pm/pm_main.h"
 #include "../io/io_virtual.h"
 
 /**
@@ -44,7 +46,8 @@ struct multiboot *g_mboot_ptr;
 
 /** 
  * The address of end is equal to the end of kernel code in memory + 1. 
- * This constant gets defined in the linker script link.ld. 
+ * This constant gets defined in the linker script link.ld.
+ * Example: mem_start = (uint32) &end; 
  */
 extern int end;
 
@@ -64,8 +67,11 @@ void panic(char *msg)
 {
         monitor_cputs("KERNEL PANIC: ", BLACK, RED);
         monitor_cputs(msg, BLACK, RED);
-        clear_interrupts();
-        for (;;) ;
+        
+        __asm__("cli");
+        
+        for (;;) 
+                __asm__("hlt");
 }
 
 /**
@@ -75,27 +81,21 @@ void panic(char *msg)
  */
 int main(struct multiboot *mboot_ptr)
 {
-        /* Some memory info. Most of this is of special importance to Johannes / MM. */
         g_mboot_ptr = mboot_ptr;
-        /*
-        printf("%d bytes lower memory starting at addr 0x0\n", g_mboot_ptr->mem_lower * 1024);
-        printf("%d bytes upper memory starting at addr 0x%x\n", g_mboot_ptr->mem_upper * 1024, 0x100000);
-        printf("kernel starts at 0x%x\n", &start);
-        printf("kernel ends at 0x%x\n", &end - 1);
-        printf("memory begins at 0x%x\n\n", &end); */
-
-        //printf("\n0x%x\n",mboot_ptr->mem_upper);
-        //printf("\n0x%x\n",0x100000 + mboot_ptr->mem_upper * 1024);
-
+         
         mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
-
         io_init();      
         pm_init();
-        fs_init();
+        //fs_init();
         
+        dprint_separator();
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
-
-        halt();
+       
+        // kernel idle loop
+        printf("main: entering idle loop\n");
+        for (;;)
+                __asm__("hlt");
+        
         return 0;
 }

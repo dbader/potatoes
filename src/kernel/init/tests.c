@@ -42,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io.h"
 #include "../mm/mm.h"
 #include "../fs/fs_main.h"
+#include "../pm/pm_main.h"
 
 /**
  * output-testing
@@ -262,7 +263,7 @@ void hd_test()
         //hd_write_sector(42,(uint16*)0xB8000);
         //hd_read_sector((uint16*)0xB85A0,42);
 }
-extern void _syscall(uint16 id, void *data);
+
 void syscall_test()
 {
         void* test1 = malloc(1);
@@ -343,6 +344,48 @@ void fs_tests()
         create_fs();
 }
 
+void isr_test()
+{
+        printf("isr_test: Raising int 3...\n");
+        __asm__ ("int $0x3");
+}
+
+void syscall_puts(char *str)
+{
+        while (*str)
+                _syscall(*str++, NULL);
+}
+
+void threadA()
+{
+        syscall_puts("hello from task A\n");
+        for(;;) {
+                for (int i = 0; i < 9999; i++) ;
+                _syscall('A', NULL);
+                //__asm__("hlt");
+        }
+}
+
+void threadB()
+{
+        syscall_puts("hello from task B\n");
+        for(;;) {
+                for (int i = 0; i < 9999; i++) ;
+                _syscall('B', NULL);
+                //__asm__("hlt");
+        }
+}
+
+void threadA_test()
+{
+        pm_create_thread("test-A", threadA, 4096);        
+}
+
+void threadB_test()
+{
+        pm_create_thread("test-B", threadB, 4096);        
+}
+
 void do_tests()
 {
         printf("\n\ndo_tests():\n");
@@ -357,12 +400,14 @@ void do_tests()
         //sleep_test();
         //hd_test();
         
-        
+        SHORTCUT_CTRL('i', isr_test);
         SHORTCUT_CTRL('1', assert_test);
         SHORTCUT_CTRL_SUPER('p', printf_test);
         SHORTCUT_CTRL('m', malloc_test);
         SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
         SHORTCUT_CTRL('f', fs_tests);
-        
+        SHORTCUT_CTRL('a', threadA_test);
+        SHORTCUT_CTRL('b', threadB_test);
+        //fs_tests();
 }

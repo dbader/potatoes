@@ -47,7 +47,8 @@ void monitor_puthex(uint8 ch);
  * @param c character to write
  * @return the character written
  */
-int putchar(char c)
+
+int putchar(int c)
 {
         virt_monitor_putc(get_active_virt_monitor(), c);
         //monitor_putc(c);
@@ -92,7 +93,6 @@ void printf(char *fmt, ...)
         char ch; 
         int character;
         char buf[40];
-        int base = 10;
         
         while ((ch = *fmt++) != '\0')
                 if (ch == '%') {

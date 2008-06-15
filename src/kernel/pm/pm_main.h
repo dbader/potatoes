@@ -34,11 +34,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/ringbuffer.h"
 
+typedef struct {
+        unsigned int gs, fs, es, ds;
+        unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+        unsigned int int_no, err_code;
+        unsigned int eip, cs, eflags, useresp, ss;    
+} /*__attribute__((__packed__))*/ cpu_state_t;
+
 /**
  * Process structure.
  * TODO: Maybe move this into pm_process.h
  */
-typedef struct {
+typedef struct process_t {
         /** process name */
         char *name;
         
@@ -46,7 +53,9 @@ typedef struct {
         uint32 pid;
         
         /** process state: running, dead, ... */ 
-        sint8 state;
+        uint8 state;
+        
+        uint32 stack;
         
         /** memory address */
         void *addr;
@@ -63,10 +72,12 @@ typedef struct {
         /* proc_file_table *pft; */
      
         /** linked list next ptr */
-        struct process *next; 
+        struct process_t *next; 
 } process_t;
 
 void pm_init();
-void pm_schedule();
+uint32 pm_schedule(uint32 context);
+uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize);
+extern void _syscall(uint32 id, void *data);
 
 #endif /* pm_main.h */

@@ -45,12 +45,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return      pointer to the allocated space
  */
 
+//
+// Enables a braindead memory "manager" for debugging purposes. (daniel)
+// Use this to make sure a bug is not related to MM.
+//
+//#define MEM_FAILSAFE
+
+#ifdef MEM_FAILSAFE
+        void* mem = (void*) 0x200000; // assume this is past the kernel code...
+#endif
+
 void* mallocn(size_t size, char *name)
 {
+#ifdef MEM_FAILSAFE        
+        void *ret = mem;
+        mem += size;
+        return ret;
+#endif  
+        
+        size++; // quickfix (tm) by daniel.
+        
         // search for a free block big enough: we start at the first block after mm_start, we stop after mm_end
         mm_header *ptr;
         mm_header *new_header;
-        for(ptr = mm_start->next; ptr != mm_end->next; ptr = (*ptr).next) {
+        for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
                 // test if the free memory between the current and the previous block is big enough 
                 // (attention: the header of the previous block and the header of the new block must be considered)
                 if((uint32)ptr - ((uint32)(ptr->prev) + (uint32)sizeof(mm_header) + (ptr->prev)->size)
@@ -58,12 +76,12 @@ void* mallocn(size_t size, char *name)
                         // set header for the new block, update the header of the start block and return the adress of the block (after the header!)
                         new_header = (mm_header*) ((uint32)(ptr->prev) + 
                                         (uint32)sizeof(mm_header) + (ptr->prev)->size);
-                        new_header->prev = (*ptr).prev;
+                        new_header->prev = ptr->prev;
                         new_header->next = ptr;
                         new_header->name = name;
                         new_header->size = size;
                         
-                        (ptr->prev)->next = new_header;
+                        ptr->prev->next = new_header;
                         ptr->prev = new_header;
                         
                         return (void*) ((uint32)new_header + (uint32)sizeof(mm_header));
@@ -134,6 +152,9 @@ void* malloc_clean(size_t size)
  */
 void free(void *start)
 {
+#ifdef MEM_FAILSAFE
+       return;
+#endif       
         mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
         // element is removed from the list (the allocated memory is not touched in any way)
         (this->prev)->next = this->next;

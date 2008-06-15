@@ -175,7 +175,7 @@ char* strncat(char *s1, char *s2, size_t n)
  */
 char* strsep(char **str_ptr, char *delims)
 {
-        //_printf("strsep(\"%s\") ", *str_ptr);
+        //printf("strsep(\"%s\") ", *str_ptr);
         
         if (*str_ptr == NULL)
                 return NULL;
@@ -187,6 +187,8 @@ char* strsep(char **str_ptr, char *delims)
                 *str_ptr = NULL;
                 return ret;
         }
+        
+        //printf("offs = '%s'\n", offs);
         
         *offs = '\0';
         *str_ptr = offs + 1;

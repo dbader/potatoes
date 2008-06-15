@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io.h"
 
 #define dprintf printf
+#define dprint_separator() dprintf("--------------------------------------------------------------------------------");
 
 #define SHORTCUT_CTRL(ch, func) add_shortcut(TRUE, FALSE, ch, func); \
         printf("SHORTCUT: CTRL + %c ==> %s()\n", ch, #func)

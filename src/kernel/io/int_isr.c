@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/stdio.h"
 #include "../include/init.h"
+#include "../pm/pm_main.h"
 
 extern void isr0();
 extern void isr1();
@@ -147,7 +148,8 @@ char *ex_messages[] = {
                 "reserved"       
 };
 
-void ex_handler(uint32 num)
+void isr_handler(cpu_state_t *cpu_state)
 {
-        panic(ex_messages[num]);
+        //printf("got isr %u\n", cpu_state.int_no);
+        panic(ex_messages[cpu_state->int_no]);
 }

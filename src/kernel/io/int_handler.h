@@ -30,5 +30,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 void kb_handler();
-void timer_handler();
+uint32 timer_handler(uint32 context);
 void hd_handler();

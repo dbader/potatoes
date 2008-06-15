@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 
 #include "../io/int_handler.h"
+#include "../pm/pm_main.h"
 
 extern void irq0();
 extern void irq1();
@@ -128,13 +129,15 @@ void reactivate_pic(bool slave)
 /**
  * Distributes the interrupts to their handlers.
  * 
- * @param num number of the occured interrupt
+ * @param cpu_state A snapshot of the cpu registers at the time of the interrupt.   
  */
-void hw_handler(uint32 num)
-{
-        switch (num-32){
+uint32 irq_handler(uint32 int_no, uint32 context)
+{        
+        uint32 ret = context;
+        
+        switch (int_no - 32){
         case 0:
-                timer_handler();
+                ret = timer_handler(context);
                 break;
         case 1:
                 kb_handler();
@@ -157,8 +160,10 @@ void hw_handler(uint32 num)
         case 15: break;
         }
 
-        if(num>40)
+        if(int_no > 40)
                 reactivate_pic(1);
         else
                 reactivate_pic(0);
+        
+        return ret;
 }

@@ -126,7 +126,7 @@ void test_create()
         char *p1 = malloc_clean(BLOCK_SIZE);
         rd_block(p1, 34, BLOCK_SIZE);
         for (int i = 0; i < BLOCK_SIZE; i++){
-                dprintf("%s", p1++);
+                dprintf("%c", *p1++);
                 
                 if (i% sizeof(dir_entry) == 0)
                         dprintf("\n");
