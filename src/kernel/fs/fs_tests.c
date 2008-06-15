@@ -2,6 +2,7 @@
 #include "../include/types.h"
 #include "../include/string.h"
 #include "../include/debug.h"
+#include "../include/stdlib.h"
 #include "../include/assert.h"
 
 #include "fs_const.h"
@@ -13,6 +14,7 @@
 #include "fs_bmap.h"
 #include "fs_main.h"
 #include "fs_buf.h"
+#include "fs_block_dev.h"
 
 
 
