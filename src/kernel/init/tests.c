@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io_virtual.h"
 #include "../io/io.h"
 #include "../mm/mm.h"
+#include "../fs/fs_main.h"
 
 /**
  * output-testing
@@ -337,9 +338,15 @@ void ralph_wiggum()
         printf(" +        W*                  WW                       W W         \n");
 }
 
+void fs_tests()
+{
+        create_fs();
+}
+
 void do_tests()
 {
         printf("\n\ndo_tests():\n");
+        //fs_tests();
         //grubstruct_test(g_mboot_ptr);
         //strings_test();       
         //draw_test();
@@ -349,10 +356,13 @@ void do_tests()
         //strsep_test();
         //sleep_test();
         //hd_test();
+        
+        
         SHORTCUT_CTRL('1', assert_test);
         SHORTCUT_CTRL_SUPER('p', printf_test);
         SHORTCUT_CTRL('m', malloc_test);
         SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
-
+        SHORTCUT_CTRL('f', fs_tests);
+        
 }
