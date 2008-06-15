@@ -73,6 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
+                dprintf("[fs_dir] strcmp(%s,%s)\n", file_list[i].name, name);
                 if(strcmp(file_list[i].name, name) == 0){
                         return file_list[i].inode;
                 }
@@ -94,11 +95,15 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         } else {
                 dir_inode = malloc(sizeof(m_inode)); //for fs_read()
                 read_minode(dir_inode, dir_inode_blk);
+                
+                /*if (dir_inode->i_mode != DIRECTORY){
+                        return NOT_POSSIBLE;
+                }*/
         }
         
         //scan the directory successively until a free entry is found 
         do{
-                dir_entry_blk = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos);
+                dir_entry_blk = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, TRUE);
                 
                 dprintf("[fs_dir] dir_entry_blk = %d\n", dir_entry_blk);
                 
@@ -198,29 +203,34 @@ block_nr search_file(char *path)
  */
 block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
 {
-        dprintf("[fs_dir] processing path = '%s' | tok = '%s'\n", path, tok);
+        dprintf("\n[fs_dir] processing path = '%s' | tok = '%s'\n", path, tok);
+        dprintf("[fs_dir] searching for filename '%s' in block %d...\n", tok, crt_dir);
         
         uint32 pos = 0;
-        
-        rd_block(&d_inode_cache, crt_dir, BLOCK_SIZE); //read d_inode
-        
         block_nr read;
+        block_nr file_blk;
+        m_inode *dir_inode;
+        
+        if (crt_dir != root->i_adr){
+                dprintf("reading dir_inode from block %d: \n", crt_dir);
+                read_minode(&m_inode_cache, crt_dir);
+                dir_inode = &m_inode_cache;
+        } else {
+                dprintf("dir_inode is root!\n");
+                dir_inode = root;
+        }
+        
+        dprintf("dir_inode in block %d:\n", crt_dir);
+        dump_inode(dir_inode);
         
         do{
-                dprintf("[fs_dir] searching for filename '%s' in block %d...\n", tok, pos / BLOCK_SIZE);
-                cpy_dinode_to_minode(&m_inode_cache, &d_inode_cache); //convert d_inode to m_inode (for fs_read)
-                m_inode_cache.i_adr = crt_dir;
-                
-                read = fs_read(dir_cache, &m_inode_cache, sizeof(dir_cache), pos); //read content = file list
-                
-                //pos += (ADDR_SIZE + NAME_SIZE) / 4;     //next dir_entry
+                read = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE); //read content = file list
                 pos += BLOCK_SIZE; //next data block with dir_entrys //TODO: pos += ?
+                file_blk = find_filename(dir_cache, tok);  //find current file in the directory cache
                 
-        } while(contains_filename(dir_cache, tok) == FALSE && read != NOT_POSSIBLE);
-                
-                
-        block_nr blk_nr = find_filename(dir_cache, tok); //find current file in the directory cache
-        if (blk_nr == NOT_FOUND){
+        } while(file_blk == NOT_FOUND && read != NOT_POSSIBLE);
+        
+        if (file_blk == NOT_FOUND){
                 return NOT_FOUND;
         }
         
@@ -229,9 +239,9 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
         tok = strsep(&path, delim);
         
         if (tok == NULL){ //end of path
-                return blk_nr;
+                return file_blk;
         } else {
-                return rfsearch(blk_nr, path, tok, delim);
+                return rfsearch(file_blk, path, tok, delim);
         }
 }
 

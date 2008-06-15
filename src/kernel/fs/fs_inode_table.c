@@ -60,21 +60,35 @@ void init_inode_table()
 }
 
 
-void dump_inode(int i)
+void dump_inode(m_inode *mi)
 {
-        dprintf("inode [%d]: num = %d; adr = %d; sip = %d; dip = %d\n", 
-                 i, inode_table[i].i_num, inode_table[i].i_adr,
-                 inode_table[i].i_single_indirect_pointer,
-                 inode_table[i].i_double_indirect_pointer);
+        dprintf("INODE: num = %d; adr = %d; sip = %d; dip = %d; mode = %d\n", 
+                 mi->i_num, mi->i_adr,
+                 mi->i_single_indirect_pointer,
+                 mi->i_double_indirect_pointer,
+                 mi->i_mode);
         for (int i = 0; i < NUM_DIRECT_POINTER; i++){
-                dprintf("dp[%d] = %d; ", i, inode_table[i].i_direct_pointer[i]);
+                dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
         }
         dprintf("\n");
 }
+
+void dump_dinode(d_inode *mi)
+{
+        dprintf("INODE: sip = %d; dip = %d; mode = %d\n", 
+                 mi->i_single_indirect_pointer,
+                 mi->i_double_indirect_pointer,
+                 mi->i_mode);
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+                dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
+        }
+        dprintf("\n");
+}
+
 void dump_inodes()
 {
         for (int i = 0; i < NUM_INODES; i++){
-                dump_inode(i);
+                dump_inode(&inode_table[i]);
         }
 }
 
@@ -140,6 +154,8 @@ void read_dinode(d_inode *inode, block_nr inode_blk)
 
 void read_minode(m_inode *inode, block_nr inode_blk)
 {
+        bzero(&d_inode_cache, sizeof(d_inode_cache));
+        
         read_dinode(&d_inode_cache, inode_blk);
         cpy_dinode_to_minode(inode, &d_inode_cache);
         inode->i_adr = inode_blk;
@@ -157,11 +173,7 @@ void write_inode(m_inode *inode)
 {
         cpy_minode_to_dinode(&d_inode_cache, inode);
         
-        clear_cache(&write_cache);                         //reset write cache
-        
-        memcpy(write_cache.cache, &d_inode_cache, sizeof(d_inode));
-                
-        wrt_cache(&write_cache, BLOCK_SIZE);
+        wrt_block(inode->i_adr, &d_inode_cache, sizeof(d_inode));
 }
 
 void write_inodes()

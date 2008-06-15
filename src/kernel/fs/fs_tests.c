@@ -12,6 +12,7 @@
 #include "fs_super.h"
 #include "fs_bmap.h"
 #include "fs_main.h"
+#include "fs_buf.h"
 
 
 
@@ -109,10 +110,33 @@ void test_reload()
 void test_create()
 {
         if (!fs_create("/dir1", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        if (!fs_create("/dir1/dir2/dir3", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        if (!fs_create("/dir1/dir4", DIRECTORY)) dprintf("creation unsuccessful!\n");
+                
         dprintf("\n");
-        dump_inode(ROOT_INODE);
+        
+        dump_inode(&inode_table[ROOT_INODE]);
         dprintf("\n");
-        if (!fs_create("/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        //if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
+
+        dprintf("\ncontent of dir_entry_block 34:\n");
+        char *p1 = malloc_clean(BLOCK_SIZE);
+        rd_block(p1, 34, BLOCK_SIZE);
+        for (int i = 0; i < BLOCK_SIZE; i++){
+                dprintf("%s", p1++);
+                
+                if (i% sizeof(dir_entry) == 0)
+                        dprintf("\n");
+        }
+        
+        /*dump_inode(root);
+        write_inode(root);
+        
+        read_minode(root, 33);
+        dump_inode(root);
+        */
+        
         //if (fs_open("/dir1") == -1) dprintf("opening unsuccessful!\n");
         //dump_inodes();
         //dump_files();

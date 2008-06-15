@@ -50,7 +50,7 @@ m_inode *root;
 
 void init_inode_table();
 
-void dump_inode(int i);
+void dump_inode(m_inode *i);
 
 void dump_inodes();
 

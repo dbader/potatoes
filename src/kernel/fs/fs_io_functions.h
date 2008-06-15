@@ -32,9 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef FS_IO_FUNCTIONS_H_
 #define FS_IO_FUNCTIONS_H_
 
-block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos);
+block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling);
 
-block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos);
+block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling);
 
 file_nr fs_open(char *path);
 

@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 bool fs_create(char *abs_path, int data_type)
 {
+        
         char *path = get_path(abs_path);
         block_nr dir_inode_block;
         
@@ -77,10 +78,11 @@ bool fs_create(char *abs_path, int data_type)
         }
         
         //create new inode and write it to HD
+        dprintf("create new inode (type = %d) and write it to block %d\n", data_type, file_block);
         m_inode *inode = new_minode(file_block, data_type, FALSE); //TODO: store in inode table?
         write_inode(inode);
+        //dump_inode(inode);
         free(inode); //free memory, load from HD if needed
-        //free_inode(inode->i_num); 
         
         return TRUE;
 }

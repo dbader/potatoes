@@ -41,15 +41,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_io_functions.h"
 
 
-block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos)
+block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling)
 {
-        block_nr src_blk = get_data_block(inode, pos); //get_block() in block_dev.c
+        block_nr src_blk = get_data_block(inode, pos, allow_scaling); //get_block() in block_dev.c
         
         dprintf("[fs_r_w] src_blk  = %d\n", src_blk);
         
-        if (src_blk == NOT_FOUND){
-                return NOT_POSSIBLE;
-        }
+        if (src_blk == NOT_FOUND) return NOT_POSSIBLE;
         
         cache_block(src_blk, BLOCK_SIZE);
         
@@ -61,15 +59,16 @@ block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos)
                 uint16 num_readable_bytes = BLOCK_SIZE - offset;
                 memcpy(buf, read_cache.cache + offset, num_readable_bytes);
                 
-                return fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes);
+                return fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes, allow_scaling);
         }
         
         return src_blk;
 }
 
-block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos)
+block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling)
 {
-        block_nr dest_blk = get_data_block(inode, pos); //get_block() in block_dev.c
+        block_nr dest_blk = get_data_block(inode, pos, allow_scaling); //get_block() in block_dev.c
+
         if (dest_blk == NOT_FOUND){
                 return NOT_POSSIBLE;
         }
@@ -88,7 +87,7 @@ block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos)
                 memcpy(read_cache.cache + offset, buf, num_writeable_bytes);
                 wrt_cache(&read_cache, BLOCK_SIZE);
                 
-                return fs_write(buf + num_writeable_bytes, inode, num_bytes - (num_writeable_bytes), pos + num_writeable_bytes);
+                return fs_write(buf + num_writeable_bytes, inode, num_bytes - (num_writeable_bytes), pos + num_writeable_bytes, allow_scaling);
         }
         
         return dest_blk;
