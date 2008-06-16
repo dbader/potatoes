@@ -110,8 +110,8 @@ char* strchr(char *str, char ch)
  */
 char* strdup(char* str)
 {
-        char *ret = (char*)mallocn(strlen(str), "strdup()");
-        
+        char *ret = (char*)mallocn(strlen(str) + 1, "strdup()");
+               
         if (ret == NULL)
                 return NULL;
         else
