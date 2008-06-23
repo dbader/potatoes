@@ -43,6 +43,5 @@ void* mallocn_clean(uint32 size, char *name);
 void free(void *start);
 void* realloc(void *pointer, size_t size);
 uint32 free_memory();
-void mdefrag();
 
 #endif /* stdlib.h */

@@ -61,10 +61,10 @@ void mm_init(uint32 start, uint32 end)
         mm_end->name = "end";
         mm_end->size = 0;
         
-//        dprintf("mm_start.next: 0x%x\n",(*mm_start).next);
-//        dprintf("mm_start.prev: 0x%x\n",(*mm_start).prev);
-//        dprintf("mm_start.name: %s\n",(*mm_start).name);
-//        dprintf("mm_start.size: %d\n",(*mm_start).size);
+//        dprintf("mm_start.next: 0x%x\n", mm_start->next);
+//        dprintf("mm_start.prev: 0x%x\n", mm_start->prev);
+//        dprintf("mm_start.name: %s\n", mm_start->name);
+//        dprintf("mm_start.size: %d\n", mm_start->size);
 
         // This would like to live in main()...
         start_vmonitor();
@@ -74,28 +74,10 @@ void mm_init(uint32 start, uint32 end)
         dprintf("mm: init\n");
         //dprintf("size of struct mm_header: %d\n",sizeof(mm_header));
         gdt_init(); dprintf("mm: GDT initialized\n");  
-//        dprintf("mm_end.next: 0x%x\n",(*mm_end).next);
-//        dprintf("mm_end.prev: 0x%x\n",(*mm_end).prev);
-//        dprintf("mm_end.name: %s\n",(*mm_end).name);
-//        dprintf("mm_end.size: %d\n",(*mm_end).size);
+//        dprintf("mm_end.next: 0x%x\n", mm_end->next);
+//        dprintf("mm_end.prev: 0x%x\n", mm_end->prev);
+//        dprintf("mm_end.name: %s\n", mm_end->name);
+//        dprintf("mm_end.size: %d\n", mm_end->size);
         
         dprintf("mm: memory 0x%x - 0x%x (%dmb)\n", start, end, (end - start) / (1024 * 1024));
-}
-
-
-/** 
- * moves a block of memory (including the header)
- * TODO implementation that keeps the entries sorted
- * 
- * @param dest  destination
- * @param src   source
- */
-void mm_move_block(uint32 dest, mm_header *src)
-{
-        mm_header* new_header = (mm_header*) dest;
-        
-        (src->prev)->next = new_header;
-        (src->next)->prev = new_header;
-        memcpy((void*)(new_header), (void*)src, (sizeof(mm_header) + src->size));
-        //printf("\n%s (0x%x)\nnext: 0x%x\nprev: 0x%x\nsize: %d\n", new_header->name, (uint32)new_header, (uint32)new_header->next, (uint32)new_header->prev, (uint32)new_header->size);
 }

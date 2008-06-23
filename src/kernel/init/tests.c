@@ -174,13 +174,11 @@ void grubstruct_test(struct multiboot *mboot_ptr)
 void mm_print_memory(mm_header* mm_print_start)
 {
         mm_header *ptr;
-        for(ptr = (mm_header*) ((uint32)mm_print_start - sizeof(mm_header)); 
-                ptr != mm_end->next; 
-                ptr = ptr->next) {
-                printf("%s (0x%x)\n", ptr->name, (uint32)ptr);
-                printf("\tptr->next: 0x%x\n", ptr->next);
-                printf("\tptr->prev: 0x%x\n", ptr->prev);
-                printf("\tptr->size: 0x%x\n", ptr->size);
+        for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
+                printf("%s (0x%x)", ptr->name, (uint32)ptr);
+                printf("\tnext: 0x%x", ptr->next);
+                printf("\tprev: 0x%x", ptr->prev);
+                printf("\tsize: 0x%x\n", ptr->size);
 
         }
 }
@@ -219,18 +217,10 @@ void malloc_test()
         mm_test[9] = realloc(mm_test[8], 301);
         mm_print_memory(mm_test[1]);
         printf("\n");
-        char *p = malloc(2000);
-        p = "abc";
-        printf("new allocated string: %s\n", p);
         mm_print_memory(mm_test[6]);
         uint32 free_end = free_memory();
         printf("free memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes", 
                 free_end, free_start - free_end);
-        //free(mm_test[4]);
-        //mdefrag();
-        //mm_move_block(0x200000, (mm_header*)(mm_test[9] - sizeof(mm_header)));
-        //mm_print_memory(mm_test[1]);
-        
 }
 
 void sleep_test()

@@ -63,19 +63,16 @@ void* mallocn(size_t size, char *name)
         return ret;
 #endif  
         
-        size++; // quickfix (tm) by daniel.
+        //size++; // quickfix (tm) by daniel.
         
-        // search for a free block big enough: we start at the first block after mm_start, we stop after mm_end
         mm_header *ptr;
         mm_header *new_header;
+        uint32 end_of_prev;
         for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
-                // test if the free memory between the current and the previous block is big enough 
-                // (attention: the header of the previous block and the header of the new block must be considered)
-                if((uint32)ptr - ((uint32)(ptr->prev) + (uint32)sizeof(mm_header) + (ptr->prev)->size)
-                         >= (size + (uint32)sizeof(mm_header))) {
-                        // set header for the new block, update the header of the start block and return the adress of the block (after the header!)
-                        new_header = (mm_header*) ((uint32)(ptr->prev) + 
-                                        (uint32)sizeof(mm_header) + (ptr->prev)->size);
+                end_of_prev = ((uint32)(ptr->prev) + (uint32)sizeof(mm_header) + (ptr->prev)->size);
+                if((uint32)ptr - end_of_prev >= (size + (uint32)sizeof(mm_header))) {
+                        
+                        new_header = (mm_header*) (end_of_prev + 1);
                         new_header->prev = ptr->prev;
                         new_header->next = ptr;
                         new_header->name = name;
@@ -210,21 +207,3 @@ uint32 free_memory()
         
         return free;
 }
-
-/**
- * defragments the memory.
- * The function removes any free spaces between allocated blocks so that at the end all the free
- * memory is between the latest allocated block and the end of the memory
- * TODO: implementation
- */
-void mdefrag()
-{
-        mm_header *ptr;
-        uint32 diff;
-        for(ptr = mm_start->next; ptr != mm_end; ptr = (*ptr).next) {
-                diff = (uint32)ptr - ((uint32)ptr->prev + sizeof(mm_header) + (ptr->prev)->size);
-                if(diff > 0) {
-                        printf("\n%s (0x%x) <-> %s (0x%x) (%d bytes)", (ptr->prev)->name, (uint32)ptr->prev, ptr->name, (uint32)ptr, diff);
-                }
-        }
-}        
