@@ -154,7 +154,7 @@ uint32 irq_handler(uint32 int_no, uint32 context)
         case 11: break;
         case 12: break;
         case 13: break;
-        case 14: 
+        case 14:
                 hd_handler();
                 break;
         case 15: break;

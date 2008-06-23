@@ -34,23 +34,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "io_virtual.h"
 
+bool inited;
 virt_monitor shell;
 virt_monitor vmonitor;
 
 void prompt()
 {
-        printf("user@etios>\n");
+        printf("user@etios>");
 }
 
 char* read_command()
 {
-        sleep_ticks(30);
-        return "printf \"test%d%d\" 4 2\n";
+        sleep(5);
+        inited=0;
+        return "\n\"test%d%d\" 4 2\n";
 }
 
 void execute(char* s)
 {
-        printf(s);
+        printf(s,42,23);
 }
 
 /**
@@ -59,6 +61,11 @@ void execute(char* s)
 void start_shell()
 {
         shell = new_virt_monitor();
+        inited=0;
+        while(1){
+                prompt();
+                execute(read_command());
+        }
 }
 
 /**
@@ -67,9 +74,10 @@ void start_shell()
 void start_vmonitor()
 {
         vmonitor = new_virt_monitor();
+        inited=1;
 }
 
 //FIXME: PM should provide the right virtual monitor
 virt_monitor* get_active_virt_monitor(){
-        return &vmonitor;
+        if(inited) return &vmonitor; else return &shell;
 }

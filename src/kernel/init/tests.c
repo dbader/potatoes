@@ -254,6 +254,57 @@ void hd_test()
         //hd_read_sector((uint16*)0xB85A0,42);
 }
 
+void hd_write_test()
+{
+        void *ptr = mallocn(512,"HD-Test"), *temp;
+        ASSERT(ptr!=0);
+        char ch=1;
+        for(temp = ptr; temp < ptr+512; temp++){
+                *(uint8*)temp = ch;
+                if(ch==127) ch=1;
+                else ch++;
+        }
+        hd_write_sector(500,ptr);
+                printf("written!\n");
+        free(ptr);
+}
+
+void hd_stresswrite_test()
+{
+        void *ptr = mallocn(512,"HD-Test"), *temp;
+        char ch=15;
+        for(temp = ptr; temp < ptr+512; temp++){
+                *(uint8*)temp = ch;
+                if(ch==127) ch=15;
+                else ch++;
+        }
+        ASSERT(ptr!=0);
+        int i;
+        for(i = 0; i < 100; i++){
+                hd_write_sector(i+500,ptr);
+                printf("written!\t%s\n\n",(char*)ptr);
+        }
+        free(ptr);
+}
+
+void hd_stressread_test()
+{
+        void *ptr = mallocn(512,"HD-Test"), *temp;
+        char ch=0;
+        for(temp = ptr; temp < ptr+512; temp++){
+                *(uint8*)temp = ch;
+                ch = (ch + 1) % 128;
+        }
+        ASSERT(ptr!=0);
+        int i;
+        for(i = 0; i < 100; i++){
+                hd_read_sector(ptr,i+500);
+                ((uint8*)ptr)[i+11]=0;
+                printf("%s\n\n",(char*)ptr);
+        }
+        free(ptr);
+}
+
 void syscall_test()
 {
         void* test1 = malloc(1);
@@ -389,11 +440,15 @@ void do_tests()
         //strsep_test();
         //sleep_test();
         //hd_test();
+        //hd_stresswrite_test();
+        //hd_stressread_test();
         
         SHORTCUT_CTRL('i', isr_test);
         SHORTCUT_CTRL('1', assert_test);
         SHORTCUT_CTRL_SUPER('p', printf_test);
         SHORTCUT_CTRL('m', malloc_test);
+        SHORTCUT_CTRL('h', hd_stresswrite_test);
+        SHORTCUT_CTRL_SUPER('h', hd_stressread_test);
         SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
         SHORTCUT_CTRL('f', fs_tests);

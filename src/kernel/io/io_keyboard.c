@@ -80,7 +80,9 @@ void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*fu
  */
 void kb_handler()
 {
+        set_interrupts();
         uint8 scancode = inb(0x60);
+//        if(scancode>128) return;
         if (scancode & 0x80) { //Key released
                 if ((scancode & (~0x80)) == LSHIFT || (scancode & (~0x80)) == RSHIFT)
                         shift = 0;

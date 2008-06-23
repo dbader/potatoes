@@ -126,11 +126,6 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
                         bg * 0x1000 + fg * 0x100 + ch; //print character to the display pointer
                 vm->charnum++;
         }
-        //Cursor update
-        outb(0x3D4, 0x0E);
-        outb(0x3D5, (vm->charnum) >> 8);
-        outb(0x3D4, 0x0F);
-        outb(0x3D5, (vm->charnum));
 }
 
 /**
@@ -220,6 +215,11 @@ void update_virt_monitor(virt_monitor *vm)
                                 (void*)(vm->begin),
                                 2*(0xFA0 - (vm->begin + vm->size / 2 - vm->vis_begin)));
         }
+        //Cursor update
+        outb(0x3D4, 0x0E);
+        outb(0x3D5, (vm->charnum) >> 8);
+        outb(0x3D4, 0x0F);
+        outb(0x3D5, (vm->charnum));
 }
 
 /**

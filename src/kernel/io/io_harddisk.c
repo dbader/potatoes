@@ -41,6 +41,14 @@ struct hd_info hd1;
 uint32 maxaddr;
 volatile bool hd_interrupt = FALSE;
 
+void dump_hd1(){
+        int i = 0;
+        for(;i<256;i++){
+                if(((uint16*)(&hd1))[i]!=0)printf("%d\t%u\n",i,((uint16*)(&hd1))[i]);
+        }
+        printf("\n");
+}
+
 /**
  * Waits on hard disk to set the hd_interrupt flag or the drive_ready flag in the status register 
  */
@@ -48,8 +56,9 @@ void wait_on_hd_interrupt()
 {
         while(!hd_interrupt){
                 uint8 stat=inb(0x3F6);
-                if(stat == 0x58){inb(0x1F7); break;} //drdy dsc drq
-                else if (stat & 1) panic("IDE-ERROR"); //error flag
+                //printf("0x%x\n", stat);
+                if(stat & 0x40){inb(0x1F7); break;} //drdy dsc drq
+                else if (stat == 1) panic("IDE-ERROR"); //error flag
                 halt();
         }
         hd_interrupt = FALSE;
@@ -79,7 +88,15 @@ uint32 get_hdsize()
  * Initializes the hard disk drive (IDE 0 master).
  */
 void hd_init()
-{
+{/*
+        outb(0x1F6,0xA0);
+        outb(0x1F7,0x10); //recalibrate
+        wait_on_hd_interrupt();
+        outb(0x1F6,0xA0);
+        outb(0x1F7,0x90); //execute drive diagnostics
+        wait_on_hd_interrupt();
+        uint8 stat = inb(0x1F1);
+        printf("error register: %x\n",stat);*/
         outb(0x1F6,0xA0); //select master drive
         outb(0x1F7,0xEC); //identify drive
         wait_on_hd_interrupt();
@@ -87,6 +104,7 @@ void hd_init()
         maxaddr = get_hdsize();
         printf("io: hard disk initialization:\n\t%u cylinders\n\t%u heads\n\t%u sectors per track\n\t---------------\n\t%d\tmaximal address\n"
                         ,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
+        //dump_hd1();
 }
 
 /**
@@ -98,6 +116,8 @@ void hd_init()
 void hd_write_sector(uint32 dest, void *src)
 {
         if(dest > maxaddr) return;
+        uint8 stat = inb(0x3F6);
+        if(stat & 0x80){printf("write error %x\n",stat); wait_on_hd_interrupt();}
         struct address addr = itoaddr(dest);
         outb(0x1F2,1);
         outb(0x1F3,addr.sector);
@@ -105,8 +125,8 @@ void hd_write_sector(uint32 dest, void *src)
         outb(0x1F5,addr.cyl >> 16);
         outb(0x1F6,0xA0+addr.head);
         outb(0x1F7,0x30); //write sector
-        repoutsw(0x1F0,src,256); //write buffer
         wait_on_hd_interrupt();
+        repoutsw(0x1F0,src,256); //write buffer
 }
 
 /**
@@ -118,6 +138,8 @@ void hd_write_sector(uint32 dest, void *src)
 void hd_read_sector(void *dest, uint32 src)
 {
         if(src > maxaddr) return;
+        uint8 stat = inb(0x3F6);
+        if(stat & 0x80){printf("read error %x\n",stat); wait_on_hd_interrupt();}
         struct address addr = itoaddr(src);
         outb(0x1F2,1);
         outb(0x1F3,addr.sector);
@@ -134,6 +156,9 @@ void hd_read_sector(void *dest, uint32 src)
  */
 void hd_handler(){
         uint8 stat = inb(0x1F7);
-        if (stat & 0x58) hd_interrupt = TRUE;
-        else panic("IDE ERROR");
+        //printf("int 0x%x\n", stat);
+        if (stat & 0x40) hd_interrupt = TRUE;
+        else if (stat == 1) panic("IDE ERROR");
+        else panic("NO IDEA WHY");
+        //set_interrupts();
 }

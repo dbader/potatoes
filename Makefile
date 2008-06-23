@@ -113,7 +113,7 @@ fdimage: kernel
 	
 	@sudo /sbin/losetup -d $(LOOPDEV)
 	
-hdimage: hda.img
+hdimage:
 	@echo " HDIMAGE hda.img"
 	@rm -f hda.img
 	@bximage -q -hd -mode=flat -size=$(HDASIZE) hda.img | grep ata0-master > temp
