@@ -100,6 +100,7 @@ bool create_fs()
         reset_bmap();
         //test_bmap();
         init_inode_table();
+        init_file_table();
 
         create_root();
         

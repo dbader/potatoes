@@ -55,7 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 bool fs_create(char *abs_path, int data_type)
 {
-        
+        dprintf("creating dir %s...\n", abs_path);
         char *path = get_path(abs_path);
         block_nr dir_inode_block;
         

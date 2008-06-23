@@ -75,6 +75,7 @@ block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
                 dprintf("[fs_dir] strcmp(%s,%s)\n", file_list[i].name, name);
                 if(strcmp(file_list[i].name, name) == 0){
+                        dprintf("[fs_dir] found file with inode on block %d\n", file_list[i].inode);
                         return file_list[i].inode;
                 }
         }
@@ -221,7 +222,7 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
         }
         
         dprintf("dir_inode in block %d:\n", crt_dir);
-        dump_inode(dir_inode);
+        //dump_inode(dir_inode);
         
         do{
                 read = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE); //read content = file list
@@ -231,6 +232,7 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
         } while(file_blk == NOT_FOUND && read != NOT_POSSIBLE);
         
         if (file_blk == NOT_FOUND){
+                dprintf("[fs_dir]file not found\n");
                 return NOT_FOUND;
         }
         

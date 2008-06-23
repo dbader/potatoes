@@ -80,12 +80,14 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode) //length: NUM_FILES
         file_nr old = name2desc(name);          //exists a file with the same path already?
         if (old != NOT_FOUND){
                 inc_count(old);                 //increment reference counter
+                dprintf("file already exists. returned old FD.\n");
                 return old;
         }
                 
         file *fd = alloc_file();
         
         if (fd == (file*) 0){
+                dprintf("new file could not be allocated!\n");
                 return NOT_POSSIBLE;
         }
 

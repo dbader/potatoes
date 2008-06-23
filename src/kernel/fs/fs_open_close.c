@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/stdlib.h"
+#include "../include/debug.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -63,17 +64,23 @@ file_nr fs_open(char *path)
         
         block_nr block = search_file(path);
         if (block == NOT_FOUND){
+                dprintf("block not found!\n");
                 return NOT_EXISTENT;
         }
         
         m_inode *inode = alloc_inode();
         if (inode == (m_inode*) 0){
+                dprintf("inode not allocateable!\n");
                 return NOT_POSSIBLE;
         }
         
         read_minode(inode, block); //read content from HD
         
         fd = insert_file(inode, path, inode->i_mode);
+        if (fd == NOT_FOUND){
+                dprintf("new file could not be inserted!\n");
+                return NOT_POSSIBLE;
+        }
         
         file_nr proc_fd = fd;// = insert_proc_file(get_active_process()->pft, fd); //TODO: enable after Daniel's implementation
         

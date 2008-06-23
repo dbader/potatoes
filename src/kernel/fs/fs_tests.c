@@ -111,8 +111,21 @@ void test_reload()
 
 void test_create()
 {
+        
+        char number[4];
+        char buf[5];
+        for (int i = 1; i < 1000; i++){
+                bzero(number, 4);
+                itoa(i, number, 10);
+                bzero(buf, 5);
+                strcat(buf, "/dir");
+                strcat(buf, number);
+                //dprintf("%\n", strcat("dir", "1"));
+                if (!fs_create(buf, DIRECTORY)) dprintf("creation unsuccessful!\n");
+        }
+        
+        
         if (!fs_create("/dir1", DIRECTORY)) dprintf("creation unsuccessful!\n");
-        if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
         if (!fs_create("/dir1/dir2/dir3", DIRECTORY)) dprintf("creation unsuccessful!\n");
         if (!fs_create("/dir1/dir4", DIRECTORY)) dprintf("creation unsuccessful!\n");
                 
@@ -146,10 +159,42 @@ void test_create()
 
 void test_read()
 {
+        char to_write[30] = "Hallo, ich war auf der HDD!";
+        if (!fs_create("/file1", DATA_FILE)){
+                dprintf("creation unsuccessful!\n");
+                return;
+        }
         
+        char to_read[100];
+        bzero(to_read, sizeof(to_read));
+        
+        if (fs_open("/file1") == NOT_POSSIBLE){
+                dprintf("opening unsuccessful!\n");
+                return;
+        }
+        
+        dump_inodes();
+        dump_files();
+        
+        //file *f = ;
+        m_inode *mi = get_file(name2desc("/file1"))->f_inode;
+        if (fs_write(mi, to_write, sizeof(to_write), 0, TRUE) == NOT_POSSIBLE){
+                dprintf("writing unsuccessful!\n");
+                return;
+        }
+        dprintf("written: %s\n", to_write);
+        
+        if (fs_read(to_read, mi, sizeof(to_read), 0, FALSE) == NOT_POSSIBLE){
+                dprintf("reading unsuccessful!\n");
+                return;   
+        }
+        
+        dprintf("read: %s\n", to_read);
+        
+        dump_inodes();
 }
 
 void run_FS_tests()
 {
-        test_create();
+        test_read();
 }

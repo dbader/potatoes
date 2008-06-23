@@ -58,7 +58,7 @@ block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool a
         } else {
                 uint16 num_readable_bytes = BLOCK_SIZE - offset;
                 memcpy(buf, read_cache.cache + offset, num_readable_bytes);
-                
+                dprintf("[fs_r_w] reading over block edge...\n");
                 return fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes, allow_scaling);
         }
         
