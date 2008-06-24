@@ -41,8 +41,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io_virtual.h"
 #include "../io/io.h"
 #include "../mm/mm.h"
-#include "../fs/fs_main.h"
 #include "../pm/pm_main.h"
+
 
 /**
  * output-testing
@@ -380,6 +380,7 @@ void ralph_wiggum()
         printf(" +        W*                  WW                       W W         \n");
 }
 
+extern bool create_fs();
 void fs_tests()
 {
         create_fs();
