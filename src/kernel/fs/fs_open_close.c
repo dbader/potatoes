@@ -53,16 +53,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return The process file descriptor
  * 
  */
-file_nr fs_open(char *path)
+file_nr fs_open(char *abs_path)
 {
-        file_nr fd;
-        
-        fd = name2desc(path); //get the file descriptor from file table if already existent
+        file_nr fd = name2desc(abs_path); //get the file descriptor from file table if already existent
         if (fd != NOT_FOUND){
+                inc_count(fd);
                 return fd; //file already exists
         }
         
-        block_nr block = search_file(path);
+        block_nr block = search_file(abs_path);
         if (block == NOT_FOUND){
                 dprintf("block not found!\n");
                 return NOT_EXISTENT;
@@ -76,15 +75,13 @@ file_nr fs_open(char *path)
         
         read_minode(inode, block); //read content from HD
         
-        fd = insert_file(inode, path, inode->i_mode);
+        fd = insert_file(inode, abs_path, inode->i_mode);
         if (fd == NOT_FOUND){
                 dprintf("new file could not be inserted!\n");
                 return NOT_POSSIBLE;
         }
         
-        file_nr proc_fd = fd;// = insert_proc_file(get_active_process()->pft, fd); //TODO: enable after Daniel's implementation
-        
-        return proc_fd;
+        return fd;
 }
 
 /**
@@ -92,11 +89,11 @@ file_nr fs_open(char *path)
  * 
  * @param fd The process file descriptor.
  */
-void fs_close(file_nr fd)
+bool fs_close(file_nr fd)
 {
         file *f = get_file(fd);
         if (f == NULL){
-                return; //file does not exist
+                return FALSE; //file does not exist
         }
         
         m_inode *inode = f->f_inode;
@@ -104,4 +101,6 @@ void fs_close(file_nr fd)
         write_inode(inode);
         
         free_file(fd);
+        
+        return TRUE;
 }

@@ -21,8 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
- * FS main.
+ * @file
+ * This is the central program dealing as an interface between FS and PM.
+ * 
  * 
  * @author Vincenz Doelle
  * @author $LastChangedBy$
@@ -55,15 +56,17 @@ void fs_init()
         if(!load_fs()){
                 dprintf("FS loading failed. trying to create a new one.\n");
                 if (!create_fs()){
-                        panic("file system cannot be initialized!\n");
+                        panic("FS cannot be initialized!\n");
                 }
         }
-        
-        
 }
 
-bool fs_shutdown()
+/**
+ * Shuts the file system down and writes all important information to HD.
+ */
+void fs_shutdown()
 {
+        dprintf("shutting down FS\n");
         write_root(); //TODO: intersection with "close all left inodes?"
         
         //close all open files
@@ -71,15 +74,14 @@ bool fs_shutdown()
                 fs_close(gft[i].f_desc);
         }
         
-
-        
         write_bmap();
         write_super_block();
 
-        
-        return TRUE; //TODO: void?
 }
 
+/**
+ * Loads the file system from HD.
+ */
 bool load_fs()
 {
         dprintf("loading FS from HD\n");
@@ -88,17 +90,18 @@ bool load_fs()
         load_root();
         load_super_block();
 
-        return super_block.s_used;
+        return (super_block.s_magic_number == MAGIC_NUMBER);
 }
 
-
+/**
+ * Creates a new file system.
+ */
 bool create_fs()
 {
-        dprintf("starting to create new FS\n");
+        dprintf("starting to create a new FS\n");
         dump_consts();
         
         reset_bmap();
-        //test_bmap();
         init_inode_table();
         init_file_table();
 
@@ -109,9 +112,55 @@ bool create_fs()
         
         //run tests
         run_FS_tests();
-        return TRUE; //TODO: void?
+        
+        return TRUE; 
 }
 
+/**
+ * do_X functions for handling the system calls.
+ * 
+ * TODO: adapt to C-lib standard!
+ */
+bool do_read(void *buf, file_nr fd, size_t num_bytes, uint32 pos)
+{
+        return (fs_read(buf, get_file(fd)->f_inode, num_bytes, pos, FALSE) != NOT_POSSIBLE);
+}
+
+bool do_write(file_nr fd, void *buf, size_t num_bytes, uint32 pos)
+{
+        return (fs_write(get_file(fd)->f_inode, buf, num_bytes, pos, TRUE) != NOT_POSSIBLE);
+}
+
+bool do_create(char *abs_path, uint8 mode)
+{
+        return (fs_create(abs_path, DIRECTORY));
+}
+
+file_nr do_open(char *abs_path)
+{
+        return (fs_open(abs_path));
+}
+
+bool do_mkdir(char *abs_path)
+{
+        return (do_create(abs_path, DATA_FILE));
+}
+
+bool do_mkfile(char *abs_path)
+{
+        return (do_create(abs_path, DIRECTORY));
+}
+
+bool do_close(file_nr fd)
+{
+        return (fs_close(fd));
+}
+
+
+/**
+ * Prints out all important constants concerning the file system.
+ * For debug purposes only.
+ */ 
 void dump_consts()
 {
         dprintf("NUM_BLOCKS_ON_HD = %d\nNUM_FILES = %d\nNUM_PROC_FILES = %d\nNUM_INODES = %d\n\n"
@@ -125,16 +174,3 @@ void dump_consts()
                 BYTES_DIRECT, BYTES_SINGLE_INDIRECT, BYTES_DOUBLE_INDIRECT,
                 NUM_BMAP_BLOCKS, ROOT_INODE_BLOCK, FIRST_DATA_BLOCK);
 }
-
-bool do_read(void *buf, file_nr file, size_t num_bytes)
-{
-        //TODO: do_read
-}
-
-bool do_write(file_nr file, void *buf, size_t num_bytes)
-{
-        //TODO: do_write
-}
-
-//TODO: implement other do_x functions for sys-calls
-

@@ -43,6 +43,8 @@ void init_proc_file_table(proc_file proc_filp[]);
 
 void dump_file(file *f);
 void dump_files();
+void dump_proc_file(proc_file *pf);
+void dump_proc_files();
 
 file_nr insert_file(m_inode *inode, char *name, uint8 mode);
 file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd);

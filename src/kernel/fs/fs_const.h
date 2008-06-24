@@ -79,4 +79,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define FD_OFFSET               10                                      /* offset for file descriptor numbers */
 
+#define MAGIC_NUMBER            280187
+
 #endif /*__FS_CONST_H_*/

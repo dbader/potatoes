@@ -33,33 +33,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __FS_MAIN_H_
 
 
-
 /* MKFS */
 void fs_init();
-bool fs_shutdown();
+void fs_shutdown();
+
 bool load_fs();
 bool create_fs();
 
-void dump_consts();
-
-//bool do_read(void *buf, file_nr file, size_t num_bytes);
-//bool do_write(file_nr file, void *buf, size_t num_bytes);
 
 /* CREATE */
+bool do_create(char *abs_path, uint8 mode);
+bool do_mkdir(char *abs_path);
+bool do_mkfile(char *abs_path);
 
 /* DELETE */
-
+//
 
 /* OPEN */
+file_nr do_open(char *abs_path);
 
 /* CLOSE */
-
+bool do_close(file_nr fd);
 
 /* READ */
+bool do_read(void *buf, file_nr fd, size_t num_bytes, uint32 pos);
 
 /* WRITE */
+bool do_write(file_nr fd, void *buf, size_t num_bytes, uint32 pos);
 
 
-/* PATH */
+
+/* DEBUG */
+void dump_consts();
 
 #endif /*__FS_MAIN_*/

@@ -113,7 +113,7 @@ void write_root()
 
 void create_root()
 {
-        dprintf("create new root inode\n");
+        dprintf("create new root inode...");
         m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
         
@@ -121,6 +121,8 @@ void create_root()
         root->i_num = ROOT_INODE;
         
         ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
+        
+        dprintf("done\n");
 }
 
 /**

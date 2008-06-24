@@ -36,9 +36,9 @@ block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool a
 
 block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling);
 
-file_nr fs_open(char *path);
+file_nr fs_open(char *abs_path);
 
-void fs_close(file_nr fd);
+bool fs_close(file_nr fd);
 
 bool fs_create(char *path, int data_type);
 

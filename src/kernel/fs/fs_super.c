@@ -79,7 +79,7 @@ void init_super_block()
         
         super->s_dirt = FALSE;
         
-        super->s_used = TRUE; //assume that we use the FS now
+        super->s_magic_number = MAGIC_NUMBER; //assume that we use the FS now
         
 }
 
@@ -89,7 +89,7 @@ void dump_super()
         dprintf("\ndumping super: \n");
         dprintf("HD_size = %d\n#bmap_block = %d\nFDB = %d\nMFS = %d\n*bmap = %p\n*iroot = %p\nused = %d\n\n",
                         super->s_HD_size, super->s_bmap_blocks, super->s_first_data_block, 
-                        super->s_max_file_size, super->s_bmap, super->s_iroot, super->s_used);
+                        super->s_max_file_size, super->s_bmap, super->s_iroot, super->s_magic_number);
 }
 
 

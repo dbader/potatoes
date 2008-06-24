@@ -157,7 +157,7 @@ void test_create()
         //dump_files();
 }
 
-void test_read()
+void test_rw_1() //quantitative
 {
         char to_write[30] = "Hallo, ich war auf der HDD!";
         if (!fs_create("/file1", DATA_FILE)){
@@ -165,7 +165,7 @@ void test_read()
                 return;
         }
         
-        char to_read[100];
+        char to_read[1000];
         bzero(to_read, sizeof(to_read));
         
         if (fs_open("/file1") == NOT_POSSIBLE){
@@ -173,16 +173,19 @@ void test_read()
                 return;
         }
         
-        dump_inodes();
-        dump_files();
+        //dump_inodes();
+        //dump_files();
         
-        //file *f = ;
-        m_inode *mi = get_file(name2desc("/file1"))->f_inode;
-        if (fs_write(mi, to_write, sizeof(to_write), 0, TRUE) == NOT_POSSIBLE){
-                dprintf("writing unsuccessful!\n");
-                return;
+        file *f = get_file(name2desc("/file1"));
+        m_inode *mi = f->f_inode;
+        for (int pos = 0; pos < 20000; pos += 20){
+                if (fs_write(mi, to_write, sizeof(to_write), pos, TRUE) == NOT_POSSIBLE){
+                        dprintf("writing unsuccessful!\n");
+                        return;
+                }
         }
-        dprintf("written: %s\n", to_write);
+
+        dprintf("written: %s\n\n", to_write);
         
         if (fs_read(to_read, mi, sizeof(to_read), 0, FALSE) == NOT_POSSIBLE){
                 dprintf("reading unsuccessful!\n");
@@ -192,9 +195,75 @@ void test_read()
         dprintf("read: %s\n", to_read);
         
         dump_inodes();
+        
+        rd_block(addr_cache, 61, BLOCK_SIZE);
+        dprintf("block 61: \n");
+        for (int i = 0; i< ADDRS_PER_BLOCK; i++){
+                dprintf("%d\n", addr_cache[i]);
+        }
+}
+
+void test_rw_2() //qualitativ
+{
+        char string[30] = "Hallo, ich war auf der HDD!!!!"; 
+        char to_write[2000];
+        
+        for (int i = 0; i < 30; i++){
+                strcat(to_write, string);
+        }
+
+        if (!fs_create("/file1", DATA_FILE)) {
+                dprintf("creation unsuccessful!\n");
+                return;
+        }
+
+
+        if (fs_open("/file1") == NOT_POSSIBLE) {
+                dprintf("opening unsuccessful!\n");
+                return;
+        }
+
+        m_inode *mi = get_file(name2desc("/file1"))->f_inode;
+        if (fs_write(mi, to_write, sizeof(to_write), 0, TRUE) == NOT_POSSIBLE) {
+                dprintf("writing unsuccessful!\n");
+                return;
+        }
+
+        char to_read[20];
+        bzero(to_read, 2000);
+
+        if (fs_read(to_read, mi, sizeof(to_read), 0, FALSE) == NOT_POSSIBLE){
+                dprintf("reading unsuccessful!\n");
+                return;   
+        } else {
+                dprintf("read: %s\n", to_read);
+        }
+}
+
+void test_PM()
+{
+        proc_file pft[NUM_PROC_FILES];
+        init_proc_file_table(pft);
+        
+        do_mkdir("/usr");
+        do_mkfile("/usr/myfile");
+        file_nr fd = do_open("/usr/myfile");
+        insert_proc_file(pft, fd);
+        
+        fd = do_open("/usr/myfile");       
+        insert_proc_file(pft, fd);
+        
+        lseek(pft, fd, 42);
+        
+        dump_files();
+        dump_proc_files();
+        
+        
+        
+        
 }
 
 void run_FS_tests()
 {
-        test_read();
+        test_PM();
 }

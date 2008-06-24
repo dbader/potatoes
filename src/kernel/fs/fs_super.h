@@ -54,7 +54,7 @@ struct super_block {
         uint32 s_modify_ts;
         uint16 s_read_only;                             /* TRUE or FALSE */
         uint16 s_dirt;                                  /* CLEAN or DIRTY */
-        bool s_used;          
+        uint32 s_magic_number;          
         
 } super_block;
 

@@ -44,13 +44,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void init_file_table()
 {
         for(int i = 0; i < NUM_FILES; i++){
-                gft[i].f_desc  = NIL_FILE;               //desc = NIL_FILE = -1 => desc not assigned => file not used
+                gft[i].f_desc = NIL_FILE;               //desc = NIL_FILE = -1 => desc not assigned => file not used
         }
 }
 
 void dump_file(file *f)
 {
-        dprintf("file %s:\nf_desc = %d\t f_inode (nr)= %d\t f_count = %d\t f_mode = %d\t\n\n",
+        dprintf("file %s:\nf_desc = %d\t f_inode (nr)= %d\t f_count = %d\t f_mode = %d\n",
                  f->f_name, f->f_desc, (f->f_inode)->i_num, f->f_count, f->f_mode);
 }
 
@@ -63,10 +63,22 @@ void dump_files(){
 /**
  * Initialize the process filp table with NULL elements
  */
-void init_proc_file_table(proc_file pft[NUM_PROC_FILES])  //TODO: proc_file_table *pft ? --> typedef proc_file_table
+void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 {
         for(int i = 0; i < NUM_PROC_FILES; i++){
-                pft[i].pf_desc   = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
+                pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
+        }
+}
+
+void dump_proc_file(proc_file *pf)
+{
+        dprintf("proc_file:\npf_desc = %d\t pf_f_desc %d\t pf_pos = %d\n",
+                 pf->pf_desc, pf->pf_f_desc, pf->pf_pos);
+}
+
+void dump_proc_files(proc_file pft[NUM_PROC_FILES]){
+        for (int i = 0; i < NUM_PROC_FILES; i++){
+                dump_proc_file(&pft[i]);
         }
 }
 
@@ -75,7 +87,7 @@ void init_proc_file_table(proc_file pft[NUM_PROC_FILES])  //TODO: proc_file_tabl
  * 
  * @return desc The assigned file descriptor
  */
-file_nr insert_file(m_inode *inode, char *name, uint8 mode) //length: NUM_FILES
+file_nr insert_file(m_inode *inode, char *name, uint8 mode)
 {
         file_nr old = name2desc(name);          //exists a file with the same path already?
         if (old != NOT_FOUND){
@@ -86,7 +98,7 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode) //length: NUM_FILES
                 
         file *fd = alloc_file();
         
-        if (fd == (file*) 0){
+        if (fd == (file*) NULL){
                 dprintf("new file could not be allocated!\n");
                 return NOT_POSSIBLE;
         }
@@ -108,13 +120,13 @@ file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length
 {
         proc_file *fd = alloc_proc_file(pft);
         
-        if (fd == (proc_file*) 0){
+        if (fd == (proc_file*) NULL){
                 return NOT_POSSIBLE;
         }
         
         fd->pf_f_desc = glo_fd;
         fd->pf_pos    = 0;
-        
+
         return fd->pf_desc;
 }
 
@@ -132,7 +144,7 @@ file* alloc_file()
                         return &gft[i];
                 }
         }
-        return (file*) 0;
+        return (file*) NULL;
 }
 
 /**
@@ -148,7 +160,7 @@ proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES])
                         return &pft[i];
                 }
         }
-        return (proc_file*) 0;
+        return (proc_file*) NULL;
 }
 
 /**
@@ -236,9 +248,9 @@ void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset)
  */
 file_nr name2desc(char *name) //in global filp table
 { 
-        int i;
-        for (i = 0; i < NUM_FILES; i++){
+        for (int i = 0; i < NUM_FILES; i++){
                 if (strcmp(name, gft[i].f_name) == 0) 
+                        dprintf("%s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
                         return gft[i].f_desc;
         } 
         
