@@ -86,7 +86,7 @@ int main(struct multiboot *mboot_ptr)
         mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
         io_init();      
         pm_init();
-        //fs_init();
+        fs_init();
         
         dprint_separator();
         printf("main: init complete at %d ticks.\n", get_ticks());
@@ -96,6 +96,8 @@ int main(struct multiboot *mboot_ptr)
         printf("main: entering idle loop\n");
         for (;;)
                 __asm__("hlt");
+        
+        fs_shutdown();
         
         return 0;
 }
