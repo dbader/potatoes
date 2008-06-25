@@ -73,7 +73,7 @@ void mm_init(uint32 start, uint32 end);
 void io_init();
 void pm_init();
 void fs_init();
-bool fs_shutdown();
+void fs_shutdown();
 
 void panic(char *msg);
 
