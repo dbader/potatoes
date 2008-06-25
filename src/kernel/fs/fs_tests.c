@@ -136,7 +136,8 @@ void test_create()
         //if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
 
         dprintf("\ncontent of dir_entry_block 34:\n");
-        char *p1 = malloc_clean(BLOCK_SIZE);
+        char *p1 = malloc(BLOCK_SIZE);
+        bzero(p1, BLOCK_SIZE);
         rd_block(p1, 34, BLOCK_SIZE);
         for (int i = 0; i < BLOCK_SIZE; i++){
                 dprintf("%c", *p1++);
@@ -247,18 +248,22 @@ void test_PM()
         
         do_mkdir("/usr");
         do_mkfile("/usr/myfile");
-        file_nr fd = do_open("/usr/myfile");
-        insert_proc_file(pft, fd);
         
-        fd = do_open("/usr/myfile");       
-        insert_proc_file(pft, fd);
-        
-        lseek(pft, fd, 42);
+        file_nr fd = do_open("/usr/myfile");       
+        file_nr pfd = insert_proc_file(pft, fd);
         
         dump_files();
         dump_proc_files();
         
+        char to_write[20] = "Hallo 42!";
+        do_write(fd, to_write, sizeof(to_write), 0);
         
+        char to_read[20];
+        bzero(to_read, sizeof(to_read));
+        
+        do_read(to_read, fd, sizeof(to_read), 6);
+        
+        dprintf("%s\n", to_read);
         
         
 }

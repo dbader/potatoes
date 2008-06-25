@@ -66,9 +66,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Find a filename within a block of directory entries; format(struct dir_entry): [block_nr, name].
  * 
- * @param file_list The directory's file list of type dir_entry
- * @param name      The file name which should be found
- * @return          The block_nr of the file if found
+ * @param file_list directory's file list of type dir_entry
+ * @param name      file name which should be found
+ * @return          block_nr of the file if found
  */
 block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
@@ -82,6 +82,13 @@ block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
         return NOT_FOUND;
 }
 
+/**
+ * Inserts a new filename into a directory.
+ * 
+ * @param dir_inode_blk block number of the directory's inode
+ * @param name          file name which should be inserted
+ * @return              number of the newly allocated inode block for 'filename'
+ */  
 block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
 {
         bool inserted = FALSE;
@@ -133,9 +140,19 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         clear_block(new_blk); //reset new block
         
         dprintf("[fs_dir] new_blk = %d\n", new_blk);
+        
+        free(dir_inode);
         return new_blk;
 }
 
+/**
+ * Inserts a new file into a directory.
+ * 
+ * @param file_list file list of type dir_entry
+ * @param blk_nr    block number of the new file
+ * @param name      name of the new file
+ * @return          status of insert operation
+ */    
 bool insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr, char *name)
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
@@ -150,6 +167,13 @@ bool insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr
         return FALSE;
 }
 
+/**
+ * Removes a file from a directory.
+ * 
+ * @param file_list file list of type dir_entry
+ * @param name      name of the file
+ * @return          status of remove operation
+ */    
 bool remove_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
@@ -175,8 +199,8 @@ bool contains_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 /**
  * Prepare recursive search according to strtok() definition.
  * 
- * @param path  The absolute file path
- * @return      The block number of the file's inode (if found)
+ * @param path  absolute path to file
+ * @return      block number of the file's inode (if found)
  */
 block_nr search_file(char *path)
 {
@@ -199,8 +223,8 @@ block_nr search_file(char *path)
 /**
  * recursive search for files
  * 
- * @param path The absolute file path
- * @return The block number of the file's inode (if found)
+ * @param path  absolute path to file
+ * @return      block number of the file's inode (if found)
  */
 block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
 {
@@ -222,7 +246,6 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
         }
         
         dprintf("dir_inode in block %d:\n", crt_dir);
-        //dump_inode(dir_inode);
         
         do{
                 read = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE); //read content = file list
@@ -236,8 +259,6 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
                 return NOT_FOUND;
         }
         
-        //rd_block(dir_cache, blk_nr, sizeof(dir_cache)); //read blk_nr to directory cache
-        
         tok = strsep(&path, delim);
         
         if (tok == NULL){ //end of path
@@ -250,13 +271,15 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
 /**
  * Extract the filename WITHOUT the path from the absolute path.
  * 
- * @param abs_path The absolute path
- * @return         The filename
+ * @param abs_path absolute path to file
+ * @return         only the filename
  */
 char* get_filename(char *abs_path)
 {
         char delim = '/';
         char *path = malloc(strlen(abs_path));
+        if (path == (void*) NULL) return (char*) NULL;
+        bzero(path, strlen(abs_path));
         
         int i = strlen(abs_path);
               
@@ -271,13 +294,17 @@ char* get_filename(char *abs_path)
 /**
  * Extract the path WITHOUT the filename from the absolute path.
  * 
- * @param abs_path The absolute path
- * @return         The path
+ * @param abs_path absolute path to file
+ * @return         only the path
  */
 char* get_path(char *abs_path)
 {
         char delim = '/';
-        char *path = malloc_clean(strlen(abs_path));//, "extract path from abs_path");
+        char *path = malloc(strlen(abs_path));//, "extract path from abs_path");
+        
+        if (path == (void*) NULL) return (char*) NULL;
+        
+        bzero(path, strlen(abs_path));
         
         int i = strlen(abs_path);
               

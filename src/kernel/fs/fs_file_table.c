@@ -234,10 +234,10 @@ void inc_count(file_nr fd)
  * @param fd     A file descriptor
  * @param offset The offset
  */
-void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset)
+void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin)
 {
         proc_file *pf = get_proc_file(pft, fd);
-        pf->pf_pos = pf->pf_pos + offset;
+        pf->pf_pos = origin + offset;
 }
 
 /**

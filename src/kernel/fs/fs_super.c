@@ -98,7 +98,7 @@ void dump_super()
  */
 void load_super_block()
 {
-        dprintf("read block number SUPER_BLOCK (1) to superblock struct");
+        dprintf("read block number SUPER_BLOCK (1) to superblock struct\n");
         //read block number SUPER_BLOCK (1) to superblock struct
         rd_block(&super_block, SUPER_BLOCK, sizeof(super_block));
         super = &super_block;

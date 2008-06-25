@@ -57,6 +57,7 @@ bool fs_create(char *abs_path, int data_type)
 {
         dprintf("creating dir %s...\n", abs_path);
         char *path = get_path(abs_path);
+        if (path == (char*) NULL) return FALSE;
         block_nr dir_inode_block;
         
         if (strcmp(path, "/") == 0){
@@ -71,7 +72,9 @@ bool fs_create(char *abs_path, int data_type)
                 return FALSE;
         }
         
-        block_nr file_block = insert_file_into_dir(dir_inode_block, get_filename(abs_path));
+        char *file_name = get_filename(abs_path);
+        if (file_name == (char*) NULL) return FALSE;
+        block_nr file_block = insert_file_into_dir(dir_inode_block, file_name);
         
         if (file_block == NOT_POSSIBLE){
                 return FALSE;
@@ -80,6 +83,7 @@ bool fs_create(char *abs_path, int data_type)
         //create new inode and write it to HD
         dprintf("create new inode (type = %d) and write it to block %d\n", data_type, file_block);
         m_inode *inode = new_minode(file_block, data_type, FALSE); //TODO: store in inode table?
+        if (inode == (m_inode*) NULL) return FALSE;
         write_inode(inode);
         //dump_inode(inode);
         free(inode); //free memory, load from HD if needed

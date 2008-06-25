@@ -115,6 +115,7 @@ void create_root()
 {
         dprintf("create new root inode...");
         m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
+        if (new_root == (m_inode*) NULL) return;
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
         
         root = &inode_table[ROOT_INODE];
@@ -228,6 +229,7 @@ m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
         
         if (!to_inode_table){
                 mi = malloc(sizeof(m_inode));
+                if (mi == (void*) NULL) return (m_inode *) NULL;
                 mi->i_num  = 0;
         } else {
                 mi = alloc_inode();
@@ -244,6 +246,8 @@ m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
         
         mi->i_single_indirect_pointer = NULL;
         mi->i_double_indirect_pointer = NULL;
+        
+        return mi;
 }
 
 /**
