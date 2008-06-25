@@ -96,13 +96,6 @@ void* mallocn(size_t size, char *name)
  * @return      pointer to the allocated space
  */
 
-void* mallocn_clean(size_t size, char *name)
-{
-        void *p = mallocn(size, name);
-        bzero(p, size);
-        return p;
-}
-
 /*void* malloc_name(uint32 size, char* name)
 {
 //        printf("allocation of %d bytes.0x%x\n", size, mm_occupied_top);
@@ -127,19 +120,6 @@ void* mallocn_clean(size_t size, char *name)
 void* malloc(size_t size)
 {
         return (void*) mallocn(size,"noname");
-}
-
-/** 
- * allocates size bytes cleaned
- * 
- * @param size  how much space shall be allocated
- * @return      pointer to the allocated space
- */ 
-void* malloc_clean(size_t size)
-{
-        void *p = malloc(size);
-        bzero(p, size);
-        return p;
 }
 
 /**
