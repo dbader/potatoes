@@ -43,9 +43,41 @@ volatile bool hd_interrupt = FALSE;
 
 void dump_hd1(){
         int i = 0;
-        for(;i<256;i++){
-                if(((uint16*)(&hd1))[i]!=0)printf("%d\t%u\n",i,((uint16*)(&hd1))[i]);
-        }
+        
+        printf("io: hard disk initialization:"
+                        "\n\t%u cylinders"
+                        "\n\t%u heads"
+                        "\n\t%u sectors per track"
+                        "\n\t---------------"
+                        "\n\t%d\tmaximal address\n"
+                ,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
+        
+        printf("\t---------------\n");
+
+        (hd1.buffer_type==3) ? printf("\tbuffer type:\ttwo way, cache possible\n") : 
+                ((hd1.buffer_type==1) ? printf("\tbuffer type:\tone way, single sector\n") : 
+                        printf("\tbuffer type:\ttwo way, multiple sectors\n"));
+        
+        printf("\tbuffer size:\t%d Bytes\n", hd1.buffer_size*512);      
+        
+        printf("\tserial:\t\t");
+        for(i=20; i<40; i++)
+                putchar(((uint8*)(&hd1))[i]);
+        printf("\n");
+        
+        printf("\tfirmware:\t");
+        for(i=46; i<54; i++)
+                putchar(((uint8*)(&hd1))[i]);
+        printf("\n");
+        
+        printf("\tmodel:\t\t");
+        for(i=54; i<94; i++)
+                putchar(((uint8*)(&hd1))[i]);
+        printf("\n");
+        
+        (hd1.lba_dma_flg & 0x100) ? printf("\tdma support:\tyes\n") : printf("\tdma support:\tno\n");
+        (hd1.lba_dma_flg & 0x200) ? printf("\tlba support:\tyes\n") : printf("\tlba support:\tno\n");        
+        
         printf("\n");
 }
 
@@ -81,7 +113,7 @@ struct address itoaddr(uint32 iaddr)
  */
 uint32 get_hdsize()
 {
-        return ((hd1.apparent_cyl*hd1.apparent_head+hd1.apparent_head)*hd1.apparent_sector_per_track + hd1.apparent_sector_per_track - 1); 
+        return hd1.apparent_capacity[1]*10+hd1.apparent_capacity[0]; 
 }
 
 /**
@@ -101,10 +133,8 @@ void hd_init()
         outb(0x1F7,0xEC); //identify drive
         wait_on_hd_interrupt();
         repinsw(0x1F0,(uint16*)&hd1,256); //read buffer
-        maxaddr = get_hdsize();
-        printf("io: hard disk initialization:\n\t%u cylinders\n\t%u heads\n\t%u sectors per track\n\t---------------\n\t%d\tmaximal address\n"
-                        ,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
-        //dump_hd1();
+        maxaddr = get_hdsize()-1;
+        dump_hd1();
 }
 
 /**
@@ -115,7 +145,7 @@ void hd_init()
  */
 void hd_write_sector(uint32 dest, void *src)
 {
-        if(dest > maxaddr) return;
+        if(dest > maxaddr) panic("hd: address too large");
         uint8 stat = inb(0x3F6);
         if(stat & 0x80){printf("write error %x\n",stat); wait_on_hd_interrupt();}
         struct address addr = itoaddr(dest);
@@ -137,9 +167,9 @@ void hd_write_sector(uint32 dest, void *src)
  */
 void hd_read_sector(void *dest, uint32 src)
 {
-        if(src > maxaddr) return;
+        if(src > maxaddr) panic("hd: address too large");
         uint8 stat = inb(0x3F6);
-        if(stat & 0x80){printf("read error %x\n",stat); wait_on_hd_interrupt();}
+        if(stat & 0x80){/*printf("read error %x\n",stat);*/ wait_on_hd_interrupt();}
         struct address addr = itoaddr(src);
         outb(0x1F2,1);
         outb(0x1F3,addr.sector);
@@ -160,5 +190,4 @@ void hd_handler(){
         if (stat & 0x40) hd_interrupt = TRUE;
         else if (stat == 1) panic("IDE ERROR");
         else panic("NO IDEA WHY");
-        //set_interrupts();
 }

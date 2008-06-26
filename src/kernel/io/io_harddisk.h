@@ -25,7 +25,7 @@ struct hd_info{
         uint16 type[20];
         uint16 rw_multiple_flg; //Bits 7-0
         uint16 dw_io_flg; //Bit 0
-        uint16 flg; //Bit 9 LBA supported, Bit 8 DMA supported
+        uint16 lba_dma_flg; //Bit 9 LBA supported, Bit 8 DMA supported
         uint16 reserved2;
         uint16 timingmode_pio; //Bits 15-8
         uint16 timingmode_dma; //Bits 15-8

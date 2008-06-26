@@ -65,13 +65,13 @@ extern int start;
  */
 void panic(char *msg)
 {
-        monitor_cputs("KERNEL PANIC: ", BLACK, RED);
-        monitor_cputs(msg, BLACK, RED);
+        virt_monitor_cputs(get_active_virt_monitor(), "KERNEL PANIC: ", BLACK, RED);
+        virt_monitor_cputs(get_active_virt_monitor(), msg, BLACK, RED);
+        update_virt_monitor();
         
-        __asm__("cli");
-        
+        clear_interrupts();
         for (;;) 
-                __asm__("hlt");
+                halt();
 }
 
 /**
@@ -95,7 +95,7 @@ int main(struct multiboot *mboot_ptr)
         // kernel idle loop
         printf("main: entering idle loop\n");
         for (;;)
-                __asm__("hlt");
+                halt();
         
         fs_shutdown();
         

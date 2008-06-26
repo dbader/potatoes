@@ -80,7 +80,6 @@ void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*fu
  */
 void kb_handler()
 {
-        set_interrupts();
         uint8 scancode = inb(0x60);
 //        if(scancode>128) return;
         if (scancode & 0x80) { //Key released
@@ -111,6 +110,7 @@ void kb_handler()
                 for(i; i<=shcut_num; i++)
                         if ( shortcuts[i].control && shortcuts[i].super  
                                         && shortcuts[i].ch == kb_map[scancode] ){
+                                set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }               
@@ -120,6 +120,7 @@ void kb_handler()
                 for(i; i<=shcut_num; i++)
                         if ( shortcuts[i].control && !shortcuts[i].super
                                         && shortcuts[i].ch == kb_map[scancode] ){
+                                set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }
@@ -129,6 +130,7 @@ void kb_handler()
                 for(i; i<=shcut_num; i++)
                         if ( shortcuts[i].super && !shortcuts[i].control
                                         && shortcuts[i].ch == kb_map[scancode] ){
+                                set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }

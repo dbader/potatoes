@@ -41,8 +41,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io_virtual.h"
 #include "../io/io.h"
 #include "../mm/mm.h"
+//#include "../fs/fs_main.h"
 #include "../pm/pm_main.h"
-
 
 /**
  * output-testing
@@ -284,6 +284,8 @@ void hd_stresswrite_test()
                 hd_write_sector(i+500,ptr);
                 printf("written!\t%s\n\n",(char*)ptr);
         }
+        hd_write_sector(maxaddr, ptr);
+        printf("written max\t%s\n\n",(char*)ptr);
         free(ptr);
 }
 
@@ -302,6 +304,9 @@ void hd_stressread_test()
                 ((uint8*)ptr)[i+11]=0;
                 printf("%s\n\n",(char*)ptr);
         }
+        hd_read_sector(ptr, maxaddr);
+        ((uint8*)ptr)[10]=0;
+        printf("read max\t%s\n\n",(char*)ptr);
         free(ptr);
 }
 
@@ -380,7 +385,8 @@ void ralph_wiggum()
         printf(" +        W*                  WW                       W W         \n");
 }
 
-extern bool create_fs();
+void create_fs();
+
 void fs_tests()
 {
         create_fs();
@@ -455,5 +461,4 @@ void do_tests()
         SHORTCUT_CTRL('f', fs_tests);
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);
-        
 }
