@@ -91,7 +91,7 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode)
 {
         file_nr old = name2desc(name);          //exists a file with the same path already?
         if (old != NOT_FOUND){
-                inc_count(old);                 //increment reference counter
+                //inc_count(old);                 //increment reference counter
                 dprintf("file already exists. returned old FD.\n");
                 return old;
         }
@@ -120,13 +120,20 @@ file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length
 {
         proc_file *fd = alloc_proc_file(pft);
         
-        if (fd == (proc_file*) NULL){
+        if (fd == (proc_file *) NULL){
                 return NOT_POSSIBLE;
         }
         
         fd->pf_f_desc = glo_fd;
         fd->pf_pos    = 0;
-
+        
+        
+        file *f = get_file(glo_fd);
+        
+        if (f != (file *) NULL){
+                inc_count(glo_fd);
+        }
+        
         return fd->pf_desc;
 }
 
@@ -139,12 +146,12 @@ file* alloc_file()
 {
         for(int i = 0; i < NUM_FILES; i++){
                 if (gft[i].f_desc == NIL_FILE){
-                        gft[i].f_desc = conv_desc(i);
-                        gft[i].f_count = 1;
+                        gft[i].f_desc = i;
+                        gft[i].f_count = 0;
                         return &gft[i];
                 }
         }
-        return (file*) NULL;
+        return (file *) NULL;
 }
 
 /**
@@ -156,11 +163,11 @@ proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES])
 {
         for(int i = 0; i < NUM_PROC_FILES; i++){
                 if (pft[i].pf_desc == NIL_PROC_FILE){
-                        pft[i].pf_desc = conv_desc(i);
+                        pft[i].pf_desc = i;
                         return &pft[i];
                 }
         }
-        return (proc_file*) NULL;
+        return (proc_file *) NULL;
 }
 
 /**
@@ -176,7 +183,7 @@ file* get_file(file_nr fd)
                         return &gft[i];
         } 
                
-        return (file*) 0;  
+        return (file *) NULL;  
 }
 
 /**
@@ -192,7 +199,7 @@ proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
                         return &pft[i];
         } 
                
-        return (proc_file*) 0;  
+        return (proc_file *) NULL;  
 }
 
 void free_file(file_nr fd)
@@ -282,15 +289,4 @@ file_nr inode2desc(m_inode *inode)
 bool contains_file(file_nr fd)
 {
         return ( get_file(fd) != (file *) 0);
-}
-
-/**
- * Convert a file table entry number to the real descriptor
- * 
- * @param  fd The file descriptor
- * @return fd = fd + FS_OFFSET
- */
-file_nr conv_desc(file_nr fd)
-{
-        return fd + FD_OFFSET;
 }

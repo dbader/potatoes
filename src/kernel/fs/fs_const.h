@@ -77,8 +77,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define NOT_FOUND               -1
 #define NOT_POSSIBLE            -1
 
-#define FD_OFFSET               10                                      /* offset for file descriptor numbers */
-
 #define MAGIC_NUMBER            280187
 
 #endif /*__FS_CONST_H_*/

@@ -54,6 +54,7 @@ file_nr do_open(char *abs_path);
 
 /* CLOSE */
 bool do_close(file_nr fd);
+bool do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd);
 
 /* READ */
 bool do_read(void *buf, file_nr fd, size_t num_bytes, uint32 pos);

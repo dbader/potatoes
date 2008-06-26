@@ -57,7 +57,7 @@ file_nr fs_open(char *abs_path)
 {
         file_nr fd = name2desc(abs_path); //get the file descriptor from file table if already existent
         if (fd != NOT_FOUND){
-                inc_count(fd);
+                //inc_count(fd);
                 return fd; //file already exists
         }
         
@@ -92,7 +92,8 @@ file_nr fs_open(char *abs_path)
 bool fs_close(file_nr fd)
 {
         file *f = get_file(fd);
-        if (f == NULL){
+
+        if (f == (file*) NULL || f->f_desc == NIL_FILE){
                 return FALSE; //file does not exist
         }
         

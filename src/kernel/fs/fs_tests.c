@@ -246,14 +246,15 @@ void test_PM()
         proc_file pft[NUM_PROC_FILES];
         init_proc_file_table(pft);
         
+        
         do_mkdir("/usr");
         do_mkfile("/usr/myfile");
         
         file_nr fd = do_open("/usr/myfile");       
         file_nr pfd = insert_proc_file(pft, fd);
         
-        dump_files();
-        dump_proc_files();
+        //dump_files();
+        //dump_proc_files();
         
         char to_write[20] = "Hallo 42!";
         do_write(fd, to_write, sizeof(to_write), 0);
@@ -264,11 +265,43 @@ void test_PM()
         do_read(to_read, fd, sizeof(to_read), 6);
         
         dprintf("%s\n", to_read);
+}
+
+void test_error()
+{
+        if (!do_mkdir("/usr")) dprintf("couldn't create file /usr!\n") ;
+        if (!do_mkdir("/usr/true")) dprintf("couldn't create file /usr/true!\n") ;
+        if (!do_mkdir("/usr/false/foo")) dprintf("couldn't create file /usr/false/foo!\n") ;
+               
+}
+
+void test_close()
+{
+        proc_file pft[NUM_PROC_FILES];
+        init_proc_file_table(pft);
         
+        do_mkdir("/usr");
+        do_mkdir("/usr/mydir");
+        do_mkfile("/usr/mydir/mydoc");
         
+        file_nr fd = do_open("/usr/mydir/mydoc");       
+        file_nr pfd1 = insert_proc_file(pft, fd);
+        file_nr pfd2 = insert_proc_file(pft, fd);
+        
+        dump_files();
+        dump_proc_files(pft);
+        
+        do_close_pf(pft, pfd2);
+        dump_files();
+        dump_proc_files(pft);
+        
+        do_close_pf(pft, pfd1);
+        dump_files();
+        dump_proc_files(pft);
+               
 }
 
 void run_FS_tests()
 {
-        test_PM();
+        test_close();
 }

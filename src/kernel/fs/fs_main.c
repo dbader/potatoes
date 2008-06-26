@@ -71,7 +71,7 @@ void fs_shutdown()
         
         //close all open files
         for(int i = 0; i < NUM_FILES; i++){
-                fs_close(gft[i].f_desc);
+                fs_close(gft[i].f_desc); //TODO: problem when count > 1 (e.g. not properly closed by PM)
         }
         
         write_bmap();
@@ -87,6 +87,7 @@ bool load_fs()
         dprintf("loading FS from HD\n");
         load_bmap();
         init_inode_table();
+        init_file_table();
         load_root();
         load_super_block();
 
@@ -104,14 +105,12 @@ bool create_fs()
         reset_bmap();
         init_inode_table();
         init_file_table();
-
         create_root();
-        
         init_super_block();
         dump_super();
         
         //run tests
-        //run_FS_tests();
+        run_FS_tests();
         
         return TRUE; 
 }
@@ -156,6 +155,17 @@ bool do_close(file_nr fd)
         return (fs_close(fd));
 }
 
+bool do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
+{
+        proc_file *pf = get_proc_file(pft, pfd);
+        if (do_close(pf->pf_f_desc)){
+                free_proc_file(pft, pfd);
+                return TRUE;
+        }
+        
+        return FALSE;
+}
+
 
 /**
  * Prints out all important constants concerning the file system.
@@ -163,7 +173,7 @@ bool do_close(file_nr fd)
  */ 
 void dump_consts()
 {
-        dprintf("NUM_BLOCKS_ON_HD = %d\nNUM_FILES = %d\nNUM_PROC_FILES = %d\nNUM_INODES = %d\n\n"
+        printf("NUM_BLOCKS_ON_HD = %d\nNUM_FILES = %d\nNUM_PROC_FILES = %d\nNUM_INODES = %d\n\n"
                 "SUPER_SIZE = %d\nDISK_INODE_SIZE = %d\nMEM_INODE_SIZE = %d\n\n"
                 "INODES_PER_BLOCK = %d\nDIR_ENTRIES_PER_BLOCK = %d\nADDRS_PER_BLOCK = %d\n"
                 "BYTES_DIRECT = %d\nBYTES_SINGLE_INDIRECT = %d\nBYTES_DOUBLE_INDIRECT = %d\n\n"
