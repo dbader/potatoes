@@ -110,7 +110,7 @@ bool create_fs()
         dump_super();
         
         //run tests
-        run_FS_tests();
+        //run_FS_tests();
         
         return TRUE; 
 }
