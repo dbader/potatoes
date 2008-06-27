@@ -50,7 +50,7 @@ void init_file_table()
 
 void dump_file(file *f)
 {
-        dprintf("file %s:\nf_desc = %d\t f_inode (nr)= %d\t f_count = %d\t f_mode = %d\n",
+        fs_dprintf("[fs_file_table] FILE: '%s': f_desc = %d; f_inode (nr)= %d; f_count = %d; f_mode = %d\n",
                  f->f_name, f->f_desc, (f->f_inode)->i_num, f->f_count, f->f_mode);
 }
 
@@ -72,7 +72,7 @@ void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 
 void dump_proc_file(proc_file *pf)
 {
-        dprintf("proc_file:\npf_desc = %d\t pf_f_desc %d\t pf_pos = %d\n",
+        fs_dprintf("[fs_file_table] PROC_FILE: pf_desc = %d; pf_f_desc %d; pf_pos = %d\n",
                  pf->pf_desc, pf->pf_f_desc, pf->pf_pos);
 }
 
@@ -92,14 +92,14 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode)
         file_nr old = name2desc(name);          //exists a file with the same path already?
         if (old != NOT_FOUND){
                 //inc_count(old);                 //increment reference counter
-                dprintf("file already exists. returned old FD.\n");
+                fs_dprintf("[fs_file_table] file already exists. returned old FD.\n");
                 return old;
         }
                 
         file *fd = alloc_file();
         
         if (fd == (file*) NULL){
-                dprintf("new file could not be allocated!\n");
+                fs_dprintf("[fs_file_table] new file could not be allocated!\n");
                 return NOT_POSSIBLE;
         }
 
@@ -257,7 +257,7 @@ file_nr name2desc(char *name) //in global filp table
 { 
         for (int i = 0; i < NUM_FILES; i++){
                 if (strcmp(name, gft[i].f_name) == 0) 
-                        dprintf("%s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
+                        fs_dprintf("[fs_file_table] %s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
                         return gft[i].f_desc;
         } 
         
@@ -288,5 +288,5 @@ file_nr inode2desc(m_inode *inode)
  */
 bool contains_file(file_nr fd)
 {
-        return ( get_file(fd) != (file *) 0);
+        return ( get_file(fd) != (file *) NULL);
 }

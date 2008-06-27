@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void reset_bmap()
 {
-        dprintf("resetting bmap (size = %d)...", sizeof(bmap));
+        fs_dprintf("[fs_bmap] resetting bmap (size = %d)\n", sizeof(bmap));
         
         bzero(bmap, sizeof(bmap));
         
@@ -57,8 +57,6 @@ void reset_bmap()
         for (block_nr i = 0; i < fdp; i++){
                 mark_block(i, TRUE);
         }
-        
-        dprintf("done\n");
 }
 
 /**
@@ -66,7 +64,7 @@ void reset_bmap()
  */
 void load_bmap()
 {
-        dprintf("loading bmap from HD\n");
+        fs_dprintf("[fs_bmap] loading bmap from HD\n");
         int j = 0;
         for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
                 rd_block(&bmap[j*BLOCK_SIZE], i, BLOCK_SIZE);
@@ -79,7 +77,7 @@ void load_bmap()
  */
 void write_bmap()
 {
-        dprintf("writing bmap to HD\n");
+        fs_dprintf("[fs_bmap] writing bmap to HD\n");
         int j = 0;
         for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
                 wrt_block(i, &bmap[j*BLOCK_SIZE], BLOCK_SIZE); //TODO: test this!
@@ -119,11 +117,11 @@ void mark_block(block_nr blk_nr, bool flag)
         uint8 byte = bmap[blk_nr / 8];
         uint8 bit  = blk_nr % 8;
         
-        //dprintf("byte: %b\n", byte);
+        //fs_dprintf("byte: %b\n", byte);
         
         byte = (byte >> (8-bit)) | (byte << bit); //rotate left
         
-        //dprintf("byte: %b\n", byte);
+        //fs_dprintf("byte: %b\n", byte);
                 
         if (flag == TRUE){
                 byte = byte | 0x80;  //set first bit to 1 with (byte OR 10000000)
@@ -131,15 +129,21 @@ void mark_block(block_nr blk_nr, bool flag)
                 byte = byte & 0x7F;  //set first bit to 0 with (byte AND 01111111) 
         }
         
-        //dprintf("byte: %b\n", byte);
+        //fs_dprintf("byte: %b\n", byte);
                 
         byte = (byte >> bit) | (byte << (8-bit)); //rotate right (back)
         
-        //dprintf("byte: %b\n\n", byte);
+        //fs_dprintf("byte: %b\n\n", byte);
                 
         bmap[blk_nr / 8] = byte;
 }
 
+/**
+ * Checks whether a block was already allocated before.
+ * 
+ * @param block number to check
+ * @return allocation status
+ */
 bool is_allocated_block(block_nr blk_nr)
 {
        uint8 byte = bmap[blk_nr / 8];
@@ -156,7 +160,6 @@ bool is_allocated_block(block_nr blk_nr)
  * 
  * @param start Search offset (start to search linear from block number "start")
  */
-
 block_nr alloc_block(block_nr start){
         block_nr blk_nr;
         blk_nr = get_free_block(start);
@@ -164,15 +167,19 @@ block_nr alloc_block(block_nr start){
         return blk_nr;
 }
 
+/**
+ * Dumps out the block bitmap.
+ */
 void dump_bmap()
 {
         uint8 byte = 0; 
         uint8 bit  = 0;
         
+        fs_dprintf("[fs_bmap] BMAP (used blocks): \n");
+        
         for (block_nr blk_nr = BOOT_BLOCK; blk_nr < NUM_BLOCKS_ON_HD; blk_nr++){
                 if (is_allocated_block(blk_nr)){
-                        dprintf("block %d is used\n", blk_nr);
+                        fs_dprintf("[%d] ", blk_nr);
                 }
-                //if (bmap[blk_nr] != 0) dprintf("block group %d: %b\n", blk_nr, bmap[blk_nr]);
         }
 }

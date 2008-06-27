@@ -52,37 +52,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void init_inode_table()
 {
-        dprintf("resetting inode_table...");
+        fs_dprintf("[fs_inode_table] resetting inode_table\n");
         for (int i = 0; i < NUM_INODES; i++){
                 inode_table[i].i_num = NIL_INODE;
         }
-        dprintf("done\n");
 }
 
 
 void dump_inode(m_inode *mi)
 {
-        dprintf("INODE: num = %d; adr = %d; sip = %d; dip = %d; mode = %d\n", 
+        fs_dprintf("[fs_inode_table] INODE: num = %d; adr = %d; sip = %d; dip = %d; mode = %d\n", 
                  mi->i_num, mi->i_adr,
                  mi->i_single_indirect_pointer,
                  mi->i_double_indirect_pointer,
                  mi->i_mode);
         for (int i = 0; i < NUM_DIRECT_POINTER; i++){
-                dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
+                fs_dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
         }
-        dprintf("\n");
+        fs_dprintf("\n");
 }
 
 void dump_dinode(d_inode *mi)
 {
-        dprintf("INODE: sip = %d; dip = %d; mode = %d\n", 
+        fs_dprintf("[fs_inode_table] INODE: sip = %d; dip = %d; mode = %d\n", 
                  mi->i_single_indirect_pointer,
                  mi->i_double_indirect_pointer,
                  mi->i_mode);
         for (int i = 0; i < NUM_DIRECT_POINTER; i++){
-                dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
+                fs_dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
         }
-        dprintf("\n");
+        fs_dprintf("\n");
 }
 
 void dump_inodes()
@@ -92,28 +91,32 @@ void dump_inodes()
         }
 }
 
+/**
+ * Load root inode from HD to inode table.
+ */
 void load_root()
 {
-        dprintf("load root inode from HD to inode table\n");
-        //load root inode from HD to inode table
+        fs_dprintf("[fs_inode_table] load root inode from HD to inode table\n");
+
         rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, sizeof(m_inode));
         
         root = &inode_table[ROOT_INODE];
         
-        ASSERT(root != (m_inode*)0);
+        ASSERT(root != (m_inode *) NULL);
         
 }
 
 void write_root()
 {
-        dprintf("write root inode to HD\n");
-        //write root inode to HD
+        fs_dprintf("[fs_inode_table] write root inode to HD\n");
+        
         wrt_block(ROOT_INODE_BLOCK, &inode_table[ROOT_INODE], sizeof(m_inode));
 }
 
 void create_root()
 {
-        dprintf("create new root inode...");
+        fs_dprintf("[fs_inode_table] create new root inode");
+        
         m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
         if (new_root == (m_inode*) NULL) return;
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
@@ -122,8 +125,6 @@ void create_root()
         root->i_num = ROOT_INODE;
         
         ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
-        
-        dprintf("done\n");
 }
 
 /**
@@ -139,7 +140,7 @@ m_inode* get_inode(inode_nr i_num)
                         return &inode_table[i];
                 }
         }
-        return (m_inode*) 0;
+        return (m_inode *) NULL;
 }
 
 /**
@@ -274,5 +275,5 @@ m_inode* alloc_inode(void)
                         return &inode_table[i];
                 }
         }
-        return (m_inode*) 0;
+        return (m_inode*) NULL;
 }

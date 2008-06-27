@@ -128,7 +128,7 @@ void sys_open(void *data)
         int fd = do_open(args->path);
         
         if (fd < 0)
-                do_create(args->path, 0);
+                do_create(args->path, 0); //TODO: '0' is neither DIRECTORY nor DATA_FILE!
         
         fd = do_open(args->path);
           

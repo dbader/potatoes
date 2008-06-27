@@ -301,7 +301,33 @@ void test_close()
                
 }
 
+void test_ls()
+{
+        dir_entry directory [DIR_ENTRIES_PER_BLOCK];
+        bzero(directory, sizeof(directory));
+        
+        do_create("/usr", DIRECTORY);
+        do_create("/usr/file1", DATA_FILE);
+        do_create("/usr/file2", DATA_FILE);
+        do_create("/usr/file3", DIRECTORY);
+        do_create("/usr/file4", DATA_FILE);
+        do_create("/usr/file5", DATA_FILE);
+        
+        file_nr fd = do_open("/usr");
+        
+        do_read(fd, directory, sizeof(directory), 0);
+        
+        /*
+         * TODO: replace '5' with (get_file(fd)->f_inode)->i_size
+         * when size is properly supported by CREATE
+         */
+        for (int i = 0; i < 5; i++){ 
+                if (directory[i].inode != 0)
+                        dprintf("[%d | %s]\n", directory[i].inode, directory[i].name);
+        }
+}
+
 void run_FS_tests()
 {
-        test_close();
+        test_PM();
 }

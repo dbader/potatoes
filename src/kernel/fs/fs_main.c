@@ -54,7 +54,7 @@ extern void run_FS_tests();
 void fs_init()
 {
         if(!load_fs()){
-                dprintf("FS loading failed. trying to create a new one.\n");
+                printf("FS loading failed. trying to create a new one.\n");
                 if (!create_fs()){
                         panic("FS cannot be initialized!\n");
                 }
@@ -66,7 +66,7 @@ void fs_init()
  */
 void fs_shutdown()
 {
-        dprintf("shutting down FS\n");
+        printf("shutting down FS\n");
         write_root(); //TODO: intersection with "close all left inodes?"
         
         //close all open files
@@ -84,7 +84,7 @@ void fs_shutdown()
  */
 bool load_fs()
 {
-        dprintf("loading FS from HD\n");
+        printf("loading FS from HD\n");
         load_bmap();
         init_inode_table();
         init_file_table();
@@ -99,9 +99,9 @@ bool load_fs()
  */
 bool create_fs()
 {
-        dprintf("starting to create a new FS\n");
+        fs_dprintf("starting to create a new FS\n");
         //dump_consts();
-        
+
         reset_bmap();
         init_inode_table();
         init_file_table();
@@ -110,7 +110,7 @@ bool create_fs()
         dump_super();
         
         //run tests
-       // run_FS_tests();
+        run_FS_tests();
         
         return TRUE; 
 }

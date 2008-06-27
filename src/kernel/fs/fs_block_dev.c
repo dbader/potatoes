@@ -95,7 +95,7 @@ void clear_block(block_nr blk_nr)
 
 block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling)
 {
-        dprintf("[fs_block_dev] get_data_block(%d, %d, %d)\n", inode->i_adr, pos, allow_scaling);
+        fs_dprintf("[fs_block_dev] get_data_block(%d, %d, %d)\n", inode->i_adr, pos, allow_scaling);
         block_nr blk_nr;
         block_nr data_blk;
 
@@ -108,7 +108,7 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling)
                         if (!allow_scaling) return NOT_EXISTENT;
                         data_blk = scale(&(inode->i_direct_pointer[blk_nr]), inode->i_adr);
 
-                        dprintf("[fs_block_dev] dp == NULL --> dp[%d] = %d /%d\n", blk_nr, data_blk, inode->i_direct_pointer[blk_nr]);
+                        fs_dprintf("[fs_block_dev] dp == NULL --> dp[%d] = %d\n", blk_nr, data_blk, inode->i_direct_pointer[blk_nr]);
                         
                 }
                 
@@ -119,7 +119,7 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling)
                         if (!allow_scaling) return NOT_EXISTENT;
                         sip = scale(&(inode->i_single_indirect_pointer), inode->i_adr);
 
-                        dprintf("[fs_block_dev] sip == NULL --> sip = %d\n", sip);
+                        fs_dprintf("[fs_block_dev] sip == NULL --> sip = %d\n", sip);
                 }
                 
                 rd_block(addr_cache, inode->i_single_indirect_pointer, sizeof(addr_cache));
@@ -133,7 +133,7 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling)
 
                         wrt_block(inode->i_single_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
                         
-                        dprintf("[fs_block_dev] addr_cache[%d] in %d == NULL --> addr_cache[%d] = %d\n", blk_nr, inode->i_single_indirect_pointer, blk_nr, data_blk);
+                        fs_dprintf("[fs_block_dev] addr_cache[%d] in %d == NULL --> addr_cache[%d] = %d\n", blk_nr, inode->i_single_indirect_pointer, blk_nr, data_blk);
                 }
                 
         } else if (pos < (BYTES_DIRECT + BYTES_SINGLE_INDIRECT + BYTES_DOUBLE_INDIRECT)){
@@ -143,7 +143,7 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling)
                         if (!allow_scaling) return NOT_EXISTENT;
                         dip = scale(&(inode->i_double_indirect_pointer), inode->i_adr);
 
-                        dprintf("[fs_block_dev] dip == NULL --> dip = %d\n", dip);
+                        fs_dprintf("[fs_block_dev] dip == NULL --> dip = %d\n", dip);
                 }
                 
                 rd_block(addr_cache, inode->i_double_indirect_pointer, sizeof(addr_cache));
@@ -157,7 +157,7 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling)
 
                         wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
                         
-                        dprintf("[fs_block_dev] addr_cache[%d] == NULL --> addr_cache[%d] = %d\n", addr_block, addr_block, new_addr_block);
+                        fs_dprintf("[fs_block_dev] addr_cache[%d] == NULL --> addr_cache[%d] = %d\n", addr_block, addr_block, new_addr_block);
                 }
                 rd_block(addr_cache, addr_cache[addr_block], sizeof(addr_cache));
                 
@@ -169,7 +169,7 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling)
                         
                         wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
                         
-                        dprintf("[fs_block_dev] addr_cache[%d \% ADDRS_PER_BLOCK] == NULL --> addr_cache[%d\% ADDRS_PER_BLOCK] = %d\n", blk_nr, blk_nr, data_blk);
+                        fs_dprintf("[fs_block_dev] addr_cache[%d \% ADDRS_PER_BLOCK] == NULL --> addr_cache[%d\% ADDRS_PER_BLOCK] = %d\n", blk_nr, blk_nr, data_blk);
                 }
 
         } else {

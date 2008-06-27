@@ -63,13 +63,13 @@ file_nr fs_open(char *abs_path)
         
         block_nr block = search_file(abs_path);
         if (block == NOT_FOUND){
-                dprintf("block not found!\n");
+                fs_dprintf("[fs_o_c] block not found!\n");
                 return NOT_EXISTENT;
         }
         
         m_inode *inode = alloc_inode();
         if (inode == (m_inode*) 0){
-                dprintf("inode not allocateable!\n");
+                fs_dprintf("[fs_o_c] inode not allocateable!\n");
                 return NOT_POSSIBLE;
         }
         
@@ -77,7 +77,7 @@ file_nr fs_open(char *abs_path)
         
         fd = insert_file(inode, abs_path, inode->i_mode);
         if (fd == NOT_FOUND){
-                dprintf("new file could not be inserted!\n");
+                fs_dprintf("[fs_o_c] new file could not be inserted!\n");
                 return NOT_POSSIBLE;
         }
         

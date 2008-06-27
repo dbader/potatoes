@@ -55,7 +55,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 bool fs_create(char *abs_path, int data_type)
 {
-        dprintf("creating dir %s...\n", abs_path);
+        fs_dprintf("[fs_c_d] creating dir %s...\n", abs_path);
+        
         char *path = get_path(abs_path);
         if (path == (char*) NULL) return FALSE;
         block_nr dir_inode_block;
@@ -66,7 +67,7 @@ bool fs_create(char *abs_path, int data_type)
                 dir_inode_block = search_file(path); //find dir
         }
         
-        dprintf("[fs_c_d] found dir_inode_block: %d\n", dir_inode_block);
+        fs_dprintf("[fs_c_d] found dir_inode_block: %d\n", dir_inode_block);
         
         if (dir_inode_block == NOT_FOUND){
                 return FALSE;
@@ -81,7 +82,7 @@ bool fs_create(char *abs_path, int data_type)
         }
         
         //create new inode and write it to HD
-        dprintf("create new inode (type = %d) and write it to block %d\n", data_type, file_block);
+        fs_dprintf("[fs_c_d] create new inode (type = %d) and write it to block %d\n", data_type, file_block);
         m_inode *inode = new_minode(file_block, data_type, FALSE); //TODO: store in inode table?
         if (inode == (m_inode*) NULL) return FALSE;
         write_inode(inode);
