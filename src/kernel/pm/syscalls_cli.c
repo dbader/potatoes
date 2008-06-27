@@ -58,11 +58,12 @@ int _getpid()
         return pid;
 }
 
-int _open(char *path, int oflag, ...)
+int _open(char *path, int oflag, int mode)
 {
         sc_open_args_t args;
         args.path = path;
         args.oflag = oflag;
+        args.mode = mode;
         _syscall(SYS_OPEN, &args);
         return args.fd;
 }
@@ -87,6 +88,13 @@ int _write(int fd, void *buf, int size)
         return args.rw_count;
 }
 
+int _close(int fd)
+{
+        sc_close_args_t args;
+        args.fd = fd;
+        _syscall(SYS_CLOSE, &args);
+        return args.success;
+}
 
 void* _malloc(size_t size)
 {

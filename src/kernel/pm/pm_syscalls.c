@@ -51,11 +51,12 @@ syscall_handler syscall_table[] = {
                 sys_exit,       // 1
                 sys_getpid,     // 2
                 sys_open,       // 3
-                sys_read,       // 4
-                sys_write,      // 5
-                sys_close,      // 6
-                sys_malloc,     // 7
-                sys_free        // 8
+                sys_close,      // 4
+                sys_read,       // 5
+                sys_write,      // 6
+                sys_seek,       // 7
+                sys_malloc,     // 8
+                sys_free        // 9
 };
 
 //#define MAX_SYSCALL (sizeof(syscall_table) / sizeof(syscall_handler)) - 1
@@ -121,7 +122,7 @@ void sys_getpid(void *data)
 void sys_open(void *data)
 {
         sc_open_args_t *args = (sc_open_args_t*) data;
-        SYSCALL_TRACE("SYS_OPEN(\"%s\", 0x%x)\n", args->path, args->oflag);
+        SYSCALL_TRACE("SYS_OPEN(\"%s\", 0x%x, 0x%x)\n", args->path, args->oflag, args->mode);
         
         // If opening fails attempt to create the file
         int fd = do_open(args->path);
@@ -130,11 +131,19 @@ void sys_open(void *data)
                 do_create(args->path, 0);
         
         fd = do_open(args->path);
-        
-//        char *buf = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//        printf("wrote %u bytes\n", do_write(fd, buf, strlen(buf), 0));
-//        
+          
         args->fd = insert_proc_file(active_proc->pft, fd);
+}
+
+void sys_close(void* data)
+{
+        sc_close_args_t *args = (sc_close_args_t*) data;
+        SYSCALL_TRACE("SYS_CLOSE(%d)\n", args->fd);
+        
+        if (do_close_pf(active_proc->pft, args->fd) == FALSE)
+                args->success = -1;
+        else
+                args->success = 0;
 }
 
 /**
@@ -172,10 +181,14 @@ void sys_write(void* data)
         pft_entry->pf_pos += args->rw_count;
 }
 
-void sys_close(void* data)
+void sys_seek(void* data)
 {
-        SYSCALL_TRACE("SYS_CLOSE(0x%x)\n", data);        
+        sc_seek_args_t *args = (sc_seek_args_t*) data;
+        SYSCALL_TRACE("SYS_SEEK(%d, %d, %d)\n", args->fd, args->offset, args->whence);
+        
+        // TODO
 }
+
 
 void sys_malloc(void *data)
 {

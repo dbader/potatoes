@@ -40,22 +40,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SYS_LOG         0 
 #define SYS_EXIT        1
 #define SYS_GETPID      2
-#define SYS_OPEN        3 
-#define SYS_READ        4
-#define SYS_WRITE       5
-#define SYS_CLOSE       6
-#define SYS_MALLOC      7
-#define SYS_FREE        8
+#define SYS_OPEN        3
+#define SYS_CLOSE       4
+#define SYS_READ        5
+#define SYS_WRITE       6
+#define SYS_SEEK        7
+#define SYS_MALLOC      8
+#define SYS_FREE        9
 
 /** The highest syscall id that is still valid. Be sure to update this! */
-#define MAX_SYSCALL     8
+#define MAX_SYSCALL     9
 
 /** Arguments for the OPEN syscall. */
 typedef struct sc_open_args_t {
         int fd; // return value
         char *path;
         int oflag;
+        int mode;
 } sc_open_args_t;
+
+/** Arguments for the CLOSE syscall. */
+typedef struct sc_close_args_t {
+        int success; // return value
+        int fd;
+} sc_close_args_t;
 
 /** Arguments for the READ and WRITE syscalls. */
 typedef struct sc_read_write_args_t {
@@ -64,6 +72,19 @@ typedef struct sc_read_write_args_t {
         void *buf;
         int size;
 } sc_read_write_args_t;
+
+// Definitions for seek()
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+
+/** Arguments for the SEEK syscall. */
+typedef struct sc_seek_args_t {
+        int pos; // return value  
+        int fd;
+        int offset;
+        int whence;
+} sc_seek_args_t;
 
 /** Arguments for the MALLOC syscall. */
 typedef struct sc_malloc_args_t {

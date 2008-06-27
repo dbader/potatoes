@@ -39,9 +39,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void _log(char* msg);
 void _exit(int status);
 int _getpid();
-int _open(char *path, int oflag, ...);
+int _open(char *path, int oflag, int mode);
 int _read(int fd, void *buf, int size);
 int _write(int fd, void *buf, int size);
+int _close(int fd);
 void* _malloc(size_t size);
 void _free(void *block);
 

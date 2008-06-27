@@ -98,6 +98,8 @@ int main(struct multiboot *mboot_ptr)
         do_tests();
         //fs_shutdown();
         
+        printf("%d", 42);
+        
         // kernel idle loop
         printf("main: entering idle loop\n");
         for (;;)

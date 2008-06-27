@@ -315,30 +315,34 @@ void hd_stressread_test()
 
 void syscall_test_thread()
 {
+        // log
         _log("log() test.\n");
         
+        // getpid
         printf("getpid() returns %u\n", _getpid());
         
-        int fd = _open("/test", 0);
+        // Test open, write, close
+        int fd = _open("/test", 0, 0);
         printf("fd = %u\n", fd);
-        
         char buf[] = "Hello, World.";
         _write(fd, buf, strlen(buf) + 1);
+        _close(fd);
         
+        // Test open, read, close
         char rbuf[50];
         memset(rbuf, 0, sizeof(rbuf));
-       
-        fd = _open("/test", 0);
+        fd = _open("/test", 0, 0);
         printf("fd = %u\n", fd);
         _read(fd, rbuf, 5);
-        
+        _close(fd);
         _log(rbuf);
         
-        
+        // malloc and free
         void *mem = _malloc(4096);
         printf("malloc() returns 0x%x\n", mem);
         _free(mem);
         
+        // exit
         _exit(0);
 }
 
@@ -427,7 +431,7 @@ void threadA()
 {
         _log("hello from task A\n");
         
-        printf("fd is 0x%x\n", _open("/usr/share/test.txt", 0x23));
+        printf("fd is 0x%x\n", _open("/usr/share/test.txt", 0x23, 0));
         
         void *mem = _malloc(512);
         printf("mem is at 0x%x", mem);
@@ -446,7 +450,7 @@ void threadB()
         _log("hello from task B\n"); // log()
         printf("my pid is %u\n", _getpid());
         
-        int fd = _open("/test", 0);
+        int fd = _open("/test", 0, 0);
         printf("fd = %u\n", fd);
         
         char buf[100];

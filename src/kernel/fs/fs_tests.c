@@ -262,7 +262,7 @@ void test_PM()
         char to_read[20];
         bzero(to_read, sizeof(to_read));
         
-        do_read(to_read, fd, sizeof(to_read), 6);
+        do_read(fd, to_read, sizeof(to_read), 6);
         
         dprintf("%s\n", to_read);
 }

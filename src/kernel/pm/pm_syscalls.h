@@ -36,9 +36,10 @@ void sys_log(void *data);
 void sys_exit(void *data);
 void sys_getpid(void *data);
 void sys_open(void *data);
+void sys_close(void* data);
 void sys_read(void* data);
 void sys_write(void* data);
-void sys_close(void* data);
+void sys_seek(void* data);
 void sys_malloc(void *data);
 void sys_free(void *data);
 
