@@ -34,6 +34,9 @@ ASFLAGS=-felf
 # The size of hda (in MB)
 HDASIZE=20
 
+# The name of the OS in virtualbox
+OSNAME=ETIOS
+
 # The loopback device for the image
 LOOPDEV=/dev/loop0
 
@@ -68,8 +71,11 @@ clean:
 	-@for file in $(OBJFILES) $(DEPFILES) $(GENFILES); do if [ -f $$file ]; then rm $$file; fi; done
 	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
-runbochs: fdimage
+runbochs: fdimage hdimage
 	@bochs -f src/tools/bochsrc
+
+runvirtualbox: fdimage	
+	@VBoxManage startvm $(OSNAME)
 	
 mac_runbochs: mac_image
 	@/Applications/bochs.app/Contents/MacOS/bochs -q -f src/tools/bochsrc
