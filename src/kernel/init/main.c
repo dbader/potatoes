@@ -95,11 +95,10 @@ int main(struct multiboot *mboot_ptr)
         fs_init();
         
         dprint_separator();
+        printf("%d bytes kernel stack\n", 0x300000 - (uint32)&end);
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
         //fs_shutdown();
-        
-        printf("%d", 42);
         
         // kernel idle loop
         printf("main: entering idle loop\n");

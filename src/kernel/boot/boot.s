@@ -60,13 +60,13 @@ mboot:
 start:
 
         ; Execute the kernel:
-        cli
+        ;cli
          
         ; Relocate the stack.
         ; FIXME: we should somehow choose a proper adress. Right now this is kind of a hack.
         mov esp, 0x300000
         mov ebp, esp 
-         
+        cli 
         ; Load multiboot information:
         push ebx
         
