@@ -520,5 +520,5 @@ void do_tests()
         SHORTCUT_CTRL('b', threadB_test);
         SHORTCUT_CTRL('n', nullptr_test);
         dprint_separator();
-        fs_tests();
+        //fs_tests();
 }
