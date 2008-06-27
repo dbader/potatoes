@@ -88,7 +88,8 @@ int main(struct multiboot *mboot_ptr)
 {
         g_mboot_ptr = mboot_ptr;
          
-        mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
+        //mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
+        mm_init(0x300001, 0x100000 + mboot_ptr->mem_upper * 1024);
         io_init();      
         pm_init();
         fs_init();
