@@ -120,9 +120,8 @@ void sys_getpid(void *data)
  */
 void sys_open(void *data)
 {
-        SYSCALL_TRACE("SYS_OPEN(0x%x)\n", data);
         sc_open_args_t *args = (sc_open_args_t*) data;
-        dprintf("open %s flags = 0x%x\n", args->path, args->oflag);
+        SYSCALL_TRACE("SYS_OPEN(\"%s\", 0x%x)\n", args->path, args->oflag);
         
         // If opening fails attempt to create the file
         int fd = do_open(args->path);
@@ -132,9 +131,9 @@ void sys_open(void *data)
         
         fd = do_open(args->path);
         
-        char *buf = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        printf("wrote %u bytes", do_write(fd, buf, strlen(buf), 0));
-        
+//        char *buf = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//        printf("wrote %u bytes\n", do_write(fd, buf, strlen(buf), 0));
+//        
         args->fd = insert_proc_file(active_proc->pft, fd);
 }
 
@@ -143,18 +142,34 @@ void sys_open(void *data)
  */
 void sys_read(void* data)
 {
-        SYSCALL_TRACE("SYS_READ(0x%x)\n", data);
-        sc_read_args_t *args = (sc_read_args_t*) data;
-        dprintf("read fd = %u buf = 0x%x size = %d\n", args->fd, args->buf, args->size);
+        sc_read_write_args_t *args = (sc_read_write_args_t*) data;
+        SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
         
-        proc_file *pft_entry = &active_proc->pft[args->fd]; 
-        args->read = do_read(args->buf, pft_entry->pf_desc, args->size, pft_entry->pf_pos);
-        pft_entry->pf_pos += args->read;
+        proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd); 
+        args->rw_count = do_read(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
+        
+        // Right now do_read() does not support partially successful reads.
+        // So we have to patch that up: 
+        if (args->rw_count != FALSE)
+                args->rw_count = args->size;
+        
+        pft_entry->pf_pos += args->rw_count;
 }
 
 void sys_write(void* data)
 {
-        SYSCALL_TRACE("SYS_WRITE(0x%x)\n", data);
+        sc_read_write_args_t *args = (sc_read_write_args_t*) data;
+        SYSCALL_TRACE("SYS_WRITE(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
+
+        proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd);  
+        args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
+
+        // Right now do_write() does not support partially successful writes.
+        // So we have to patch that up: 
+        if (args->rw_count != FALSE)
+                args->rw_count = args->size;
+
+        pft_entry->pf_pos += args->rw_count;
 }
 
 void sys_close(void* data)

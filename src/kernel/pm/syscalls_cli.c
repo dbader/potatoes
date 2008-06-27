@@ -69,13 +69,24 @@ int _open(char *path, int oflag, ...)
 
 int _read(int fd, void *buf, int size)
 {
-        sc_read_args_t args;
+        sc_read_write_args_t args;
         args.fd = fd;
         args.buf = buf;
         args.size = size;
         _syscall(SYS_READ, &args);
-        return args.read;
+        return args.rw_count;
 }
+
+int _write(int fd, void *buf, int size)
+{
+        sc_read_write_args_t args;
+        args.fd = fd;
+        args.buf = buf;
+        args.size = size;
+        _syscall(SYS_WRITE, &args);
+        return args.rw_count;
+}
+
 
 void* _malloc(size_t size)
 {

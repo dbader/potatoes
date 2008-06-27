@@ -41,6 +41,7 @@ void _exit(int status);
 int _getpid();
 int _open(char *path, int oflag, ...);
 int _read(int fd, void *buf, int size);
+int _write(int fd, void *buf, int size);
 void* _malloc(size_t size);
 void _free(void *block);
 

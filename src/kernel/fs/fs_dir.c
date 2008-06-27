@@ -73,9 +73,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
-                dprintf("[fs_dir] strcmp(%s,%s)\n", file_list[i].name, name);
+                //dprintf("[fs_dir] strcmp(%s,%s)\n", file_list[i].name, name);
                 if(strcmp(file_list[i].name, name) == 0){
-                        dprintf("[fs_dir] found file with inode on block %d\n", file_list[i].inode);
+//                        dprintf("[fs_dir] found file with inode on block %d\n", file_list[i].inode);
                         return file_list[i].inode;
                 }
         }
@@ -113,7 +113,7 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         do{
                 dir_entry_blk = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, TRUE);
                 
-                dprintf("[fs_dir] dir_entry_blk = %d\n", dir_entry_blk);
+//                dprintf("[fs_dir] dir_entry_blk = %d\n", dir_entry_blk);
                 
                 if (dir_entry_blk == NOT_POSSIBLE){
                         return NOT_POSSIBLE; //problems during reading
@@ -133,13 +133,13 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
 
         } while(inserted == FALSE);
         
-        dprintf("[fs_dir] wrt_block(%d, dir_cache, %d)\n", dir_entry_blk, sizeof(dir_cache));
+//        dprintf("[fs_dir] wrt_block(%d, dir_cache, %d)\n", dir_entry_blk, sizeof(dir_cache));
         
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
         
         clear_block(new_blk); //reset new block
         
-        dprintf("[fs_dir] new_blk = %d\n", new_blk);
+//        dprintf("[fs_dir] new_blk = %d\n", new_blk);
         
         free(dir_inode);
         return new_blk;
@@ -157,7 +157,7 @@ bool insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
                 if (strcmp(file_list[i].name, "") == 0){
-                        dprintf("[fs_dir] found empty file list entry at %d!\n", i);
+//                        dprintf("[fs_dir] found empty file list entry at %d!\n", i);
                         
                         file_list[i].inode = blk_nr;
                         memcpy(file_list[i].name, name, NAME_SIZE);
@@ -210,7 +210,7 @@ block_nr search_file(char *path)
         
         char *tok = strsep(&work_copy, delim); //(should) delete "/" at the beginning to the path
 
-        dprintf("[fs_dir] '%s' = strsep('%s', '/')\n", tok, path);
+//        dprintf("[fs_dir] '%s' = strsep('%s', '/')\n", tok, path);
         if (strcmp(tok, "") != 0){
                 dprintf("[fs_dir] first token != NULL! ('%s')\n", tok);
                 return NOT_POSSIBLE; //wrong format

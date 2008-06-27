@@ -100,7 +100,7 @@ bool load_fs()
 bool create_fs()
 {
         dprintf("starting to create a new FS\n");
-        dump_consts();
+        //dump_consts();
         
         reset_bmap();
         init_inode_table();
@@ -110,7 +110,7 @@ bool create_fs()
         dump_super();
         
         //run tests
-        run_FS_tests();
+       // run_FS_tests();
         
         return TRUE; 
 }
@@ -120,7 +120,7 @@ bool create_fs()
  * 
  * TODO: adapt to C-lib standard!
  */
-bool do_read(void *buf, file_nr fd, size_t num_bytes, uint32 pos)
+bool do_read(file_nr fd, void *buf, size_t num_bytes, uint32 pos)
 {
         return (fs_read(buf, get_file(fd)->f_inode, num_bytes, pos, FALSE) != NOT_POSSIBLE);
 }

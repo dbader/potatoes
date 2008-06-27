@@ -57,13 +57,13 @@ typedef struct sc_open_args_t {
         int oflag;
 } sc_open_args_t;
 
-/** Arguments for the READ syscall. */
-typedef struct sc_read_args_t {
-        int read; // return value
+/** Arguments for the READ and WRITE syscalls. */
+typedef struct sc_read_write_args_t {
+        int rw_count; // return value
         int fd;
         void *buf;
         int size;
-} sc_read_args_t;
+} sc_read_write_args_t;
 
 /** Arguments for the MALLOC syscall. */
 typedef struct sc_malloc_args_t {

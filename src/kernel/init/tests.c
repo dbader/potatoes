@@ -319,8 +319,21 @@ void syscall_test_thread()
         
         printf("getpid() returns %u\n", _getpid());
         
-        //int fd = _open("/test", 0);
-        //printf("fd = %u\n", fd);
+        int fd = _open("/test", 0);
+        printf("fd = %u\n", fd);
+        
+        char buf[] = "Hello, World.";
+        _write(fd, buf, strlen(buf) + 1);
+        
+        char rbuf[50];
+        memset(rbuf, 0, sizeof(rbuf));
+       
+        fd = _open("/test", 0);
+        printf("fd = %u\n", fd);
+        _read(fd, rbuf, 5);
+        
+        _log(rbuf);
+        
         
         void *mem = _malloc(4096);
         printf("malloc() returns 0x%x\n", mem);
