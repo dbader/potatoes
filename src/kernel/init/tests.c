@@ -43,6 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../mm/mm.h"
 //#include "../fs/fs_main.h"
 #include "../pm/pm_main.h"
+#include "../pm/syscalls_cli.h"
 
 /**
  * output-testing
@@ -114,14 +115,15 @@ void strings_test()
 {
         /* test some string stuff */
         char f[100];
-        char t[] = "This BLABLA";
-        char t2[] = "is a STRING.H";
-        char t3[] = " test.";
+        char t[] = "ThisBLABLA";
+        char t2[] = "isaSTRING.H";
+        char t3[] = "test.";
         bzero(f, sizeof(f));
         strncat(f, t, 5);
         strcat(f, t2);
         strcat(f, t3);
-        monitor_puts(f); monitor_puts("\n\n");
+        printf(f);
+        //monitor_puts(f); monitor_puts("\n\n");
 
 
 }
@@ -142,7 +144,8 @@ void strsep_test()
 
         printf("\ncopy = %p\n", copy);
         printf("work_copy = %p\n", work_copy);
-        monitor_puts("done.");
+     
+        // monitor_puts("done.");
 
         free(copy);
 }
@@ -310,16 +313,25 @@ void hd_stressread_test()
         free(ptr);
 }
 
+void syscall_test_thread()
+{
+        _log("log() test.\n");
+        
+        printf("getpid() returns %u\n", _getpid());
+        
+        //int fd = _open("/test", 0);
+        //printf("fd = %u\n", fd);
+        
+        void *mem = _malloc(4096);
+        printf("malloc() returns 0x%x\n", mem);
+        _free(mem);
+        
+        _exit(0);
+}
+
 void syscall_test()
 {
-        void* test1 = malloc(1);
-        void* test2 = malloc(2);
-        void* test3 = malloc(1);
-        printf("%p\t%p\t%p\n", test1, test2, test3);
-
-        _syscall(23, test1);
-        _syscall(42, test2);
-        _syscall(3, test3);
+        pm_create_thread("syscall_test", syscall_test_thread, 4096);
 }
 
 void ralph_wiggum()
@@ -398,29 +410,51 @@ void isr_test()
         __asm__ ("int $0x3");
 }
 
-void syscall_puts(char *str)
-{
-        while (*str)
-                _syscall(*str++, NULL);
-}
-
 void threadA()
 {
-        syscall_puts("hello from task A\n");
+        _log("hello from task A\n");
+        
+        printf("fd is 0x%x\n", _open("/usr/share/test.txt", 0x23));
+        
+        void *mem = _malloc(512);
+        printf("mem is at 0x%x", mem);
+        _free(mem);
+        
         for(;;) {
                 for (int i = 0; i < 9999; i++) ;
-                _syscall('A', NULL);
+                _log("A");
                 //__asm__("hlt");
+                _exit(0);
         }
 }
 
 void threadB()
 {
-        syscall_puts("hello from task B\n");
+        _log("hello from task B\n"); // log()
+        printf("my pid is %u\n", _getpid());
+        
+        int fd = _open("/test", 0);
+        printf("fd = %u\n", fd);
+        
+        char buf[100];
+        
+        memset(buf, 0, sizeof(buf));
+        _read(fd, buf, 15);        
+        _log(buf);
+        
+        memset(buf, 0, sizeof(buf));
+        _read(fd, buf, 15);        
+        _log(buf);
+        
+        memset(buf, 0, sizeof(buf));
+        _read(fd, buf, 15);        
+        _log(buf);
+        
         for(;;) {
                 for (int i = 0; i < 9999; i++) ;
-                _syscall('B', NULL);
+                _log("B");
                 //__asm__("hlt");
+                _exit(-1);
         }
 }
 
@@ -434,9 +468,15 @@ void threadB_test()
         pm_create_thread("test-B", threadB, 4096);        
 }
 
+void nullptr_test()
+{
+        uint32 *ptr = NULL;
+        putchar(*ptr);
+}
+
 void do_tests()
 {
-        printf("\n\ndo_tests():\n");
+        printf("\nGlobal keyboard shortcuts:\n");
         //fs_tests();
         //grubstruct_test(g_mboot_ptr);
         //strings_test();       
@@ -461,4 +501,7 @@ void do_tests()
         SHORTCUT_CTRL('f', fs_tests);
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);
+        SHORTCUT_CTRL('n', nullptr_test);
+        dprint_separator();
+        //fs_tests();
 }

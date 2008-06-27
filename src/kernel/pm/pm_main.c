@@ -36,15 +36,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/debug.h"
 #include "../include/ringbuffer.h"
+#include "../include/init.h"
 #include "../io/io.h"
+#include "../fs/fs_const.h"
+#include "../fs/fs_types.h"
+#include "../fs/fs_file_table.h"
 #include "pm_main.h"
-
+#include "pm_syscalls.h"
+#include "syscalls_shared.h"
 
 process_t *procs_head = NULL;
 process_t *active_proc = NULL;
 process_t *focus_proc = NULL;
-
 uint32 next_pid = 0;
+
+uint32 getpid()
+{
+        ASSERT(active_proc != NULL);
+        return active_proc->pid;
+}
 
 /**
  * Performs process management initializations.
@@ -58,11 +68,15 @@ void pm_init()
         procs_head = (process_t*) malloc(sizeof(process_t));
         
         procs_head->name = "kernel";
+        procs_head->state = PSTATE_ALIVE;
         procs_head->pid = next_pid++;
         procs_head->next = procs_head;
+        init_proc_file_table(procs_head->pft);
+        procs_head->stdin = rf_alloc(STDIN_QUEUE_SIZE);
         
         active_proc = procs_head;
         
+        dprintf("pm: %d syscalls registered\n", MAX_SYSCALL);
         dprintf("pm: scheduler initialized\n");
 }
 /**
@@ -75,33 +89,58 @@ uint32 pm_schedule(uint32 context)
                 return context;
         }
 
-        active_proc->stack = context;
+        active_proc->context = context;
+        
+        // Destroy all zombie processes
+        while (active_proc->next->state == PSTATE_DEAD) {
+                pm_destroy_thread(active_proc->next);
+                active_proc->next = active_proc->next->next;
+        }
+                
         active_proc = active_proc->next;
-        return active_proc->stack;
+        return active_proc->context;
 }
 
 uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 {
+        __asm__("cli");
+        
         ASSERT(active_proc != NULL);
         ASSERT(name != NULL);
         ASSERT(entry != NULL);
         
         process_t *proc = malloc(sizeof(process_t));
+        
+        if (proc == NULL)
+                panic("pm_create_thread: out of memory");
+        
         proc->name = strdup(name);
         proc->pid = next_pid++;
+        proc->state = PSTATE_ALIVE;
+        init_proc_file_table(proc->pft);
         proc->next = procs_head->next;
         procs_head->next = proc;
         
-        proc->stack = (uint32) malloc(stacksize) + stacksize; // Stack grows downwards
+        proc->stack_start = malloc(stacksize);
         
-        uint32 *stack = (uint32*) proc->stack;
+        if (proc->stack_start == NULL)
+                panic("pm_create_thread: could not allocate stack");
+        
+        proc->stdin = rf_alloc(STDIN_QUEUE_SIZE);
+        
+        if (proc->stdin == NULL)
+                panic("pm_create_thread: could not allocate stdin");
+        
+        proc->context = (uint32) proc->stack_start + stacksize; // Stack grows downwards
+        
+        uint32 *stack = (uint32*) proc->context;
         
         //
         // Setup the thread's initial stack
         //
         
         // Pushed by the cpu when an interrupt occurs
-        *--stack = 0x202;          // EFLAGS
+        *--stack = 0x202;          // EFLAGS (make sure that interrupts are enabled)
         *--stack = 0x08;           // CS
         *--stack = (uint32) entry; // EIP
         
@@ -113,7 +152,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         *--stack = 0;   // EDI
         *--stack = 0;   // ESI
         *--stack = 0;   // EBP
-        *--stack = 0;   // NULL
+        *--stack = 0;   // NULL (ESP?)
         *--stack = 0;   // EBX
         *--stack = 0;   // EDX
         *--stack = 0;   // ECX
@@ -125,18 +164,22 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         *--stack = 0x10; // FS
         *--stack = 0x10; // GS
 
-        proc->stack = (uint32) stack;
+        proc->context = (uint32) stack;
         
         dprintf("pm: created thread \"%s\"\n    entry at 0x%x, stack at 0x%x (%u bytes). pid = %u\n\n",
-                        proc->name, entry, proc->stack, stacksize, proc->pid);
+                        proc->name, entry, proc->context, stacksize, proc->pid);
+        
+        __asm__("sti");
         
         return proc->pid;
 }
 
-void pm_syscall(uint32 id, void* data)
+void pm_destroy_thread(process_t *proc)
 {
-        //dprintf("YIKES, SYSCALL! id %u, data 0x%x\n", id, data);
-        putchar(id);
+        dprintf("pm: destroy thread \"%s\" pid = %u\n", proc->name, proc->pid);
+        free(proc->name);
+        free(proc->stack_start);
+        free(proc);
 }
 
 void printhex(uint32 hex)

@@ -34,6 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __FS_TYPES_H_
 #define __FS_TYPES_H_
 
+#include "fs_const.h"
+
 typedef uint32 block_nr;
 typedef sint16 inode_nr;
 typedef sint16 file_nr;

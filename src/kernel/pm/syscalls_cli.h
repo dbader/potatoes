@@ -22,30 +22,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Debugging utility functions. This is work in progress so far. I plan on implementing
- * a small toolbox of useful debugging functions, eg debug printf, stack crawling etc.
+ * Header file for the "client" side syscall magic.
  *
  * @author dbader
  * @author $LastChangedBy$
  * @version $Rev$
  */
 
-#ifndef __DEBUG_H
-#define __DEBUG_H
+#ifndef __SYSCALLS_CLI_H
+#define __SYSCALLS_CLI_H
 
-#include "stdio.h"
-#include "../io/io.h"
+/*FIXME: These will be refactored to lose the leading underscore as soon
+ *       as we have external programs. Right now I want to minimize
+ *       naming conflicts.
+ */
+void _log(char* msg);
+void _exit(int status);
+int _getpid();
+int _open(char *path, int oflag, ...);
+int _read(int fd, void *buf, int size);
+void* _malloc(size_t size);
+void _free(void *block);
 
-#define dprintf printf
-#define dprint_separator() dprintf("--------------------------------------------------------------------------------");
-
-#define SHORTCUT_CTRL(ch, func) add_shortcut(TRUE, FALSE, ch, func); \
-        printf("\tCTRL + %c ==> %s()\n", ch, #func)
-
-#define SHORTCUT_SUPER(ch, func) add_shortcut(FALSE, TRUE, ch, func); \
-        printf("\tSUPER + %c ==> %s()\n", ch, #func)
-
-#define SHORTCUT_CTRL_SUPER(ch, func) add_shortcut(TRUE, TRUE, ch, func); \
-        printf("\tCTRL + SUPER + %c ==> %s()\n", ch, #func)
-
-#endif /* debug.h */
+#endif /* syscalls_cli.h */

@@ -65,11 +65,16 @@ extern int start;
  */
 void panic(char *msg)
 {
-        virt_monitor_cputs(get_active_virt_monitor(), "KERNEL PANIC: ", BLACK, RED);
-        virt_monitor_cputs(get_active_virt_monitor(), msg, BLACK, RED);
-        update_virt_monitor();
-        
         clear_interrupts();
+        
+        // This didnt work for me... (daniel)
+        //virt_monitor_cputs(get_active_virt_monitor(), "KERNEL PANIC: ", BLACK, RED);
+        //virt_monitor_cputs(get_active_virt_monitor(), msg, BLACK, RED);
+        //update_virt_monitor();
+        
+        monitor_cputs("KERNEL PANIC: ", BLACK, RED);
+        monitor_cputs(msg, BLACK, RED);
+        
         for (;;) 
                 halt();
 }
@@ -91,7 +96,8 @@ int main(struct multiboot *mboot_ptr)
         dprint_separator();
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
-       
+        //fs_shutdown();
+        
         // kernel idle loop
         printf("main: entering idle loop\n");
         for (;;)

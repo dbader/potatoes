@@ -29,10 +29,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
+//FIXME: This is a mess. Cleanup needed.
+
 #ifndef __PM_MAIN_H
 #define __PM_MAIN_H
 
 #include "../include/ringbuffer.h"
+#include "../fs/fs_types.h"
+#include "../fs/fs_const.h"
 
 typedef struct {
         unsigned int gs, fs, es, ds;
@@ -40,6 +44,9 @@ typedef struct {
         unsigned int int_no, err_code;
         unsigned int eip, cs, eflags, useresp, ss;    
 } /*__attribute__((__packed__))*/ cpu_state_t;
+
+#define PSTATE_ALIVE 0
+#define PSTATE_DEAD  1
 
 /**
  * Process structure.
@@ -55,7 +62,11 @@ typedef struct process_t {
         /** process state: running, dead, ... */ 
         uint8 state;
         
-        uint32 stack;
+        /** the memory area which constitutes the stack */
+        uint32 context;
+        
+        /** pointer to the beginning of the memory that holds the stack */
+        void *stack_start;
         
         /** memory address */
         void *addr;
@@ -66,18 +77,29 @@ typedef struct process_t {
         /** STDIN queue */
         ring_fifo *stdin;
         
-        /* machine_state ms; */
+        /** process file table */
+        proc_file pft[NUM_PROC_FILES];
+        
         /* xxx *stdout */
         /* llist *mem_blocks; */
-        /* proc_file_table *pft; */
      
         /** linked list next ptr */
         struct process_t *next; 
 } process_t;
 
+#define STDIN_QUEUE_SIZE 512
+
+extern process_t *procs_head;
+extern process_t *active_proc;
+extern process_t *focus_proc;
+
+uint32 getpid();
+
+
 void pm_init();
 uint32 pm_schedule(uint32 context);
 uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize);
+void pm_destroy_thread(process_t *proc);
 extern void _syscall(uint32 id, void *data);
 
 #endif /* pm_main.h */

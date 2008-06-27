@@ -132,7 +132,7 @@ bool do_write(file_nr fd, void *buf, size_t num_bytes, uint32 pos)
 
 bool do_create(char *abs_path, uint8 mode)
 {
-        return (fs_create(abs_path, DIRECTORY));
+        return (fs_create(abs_path, DATA_FILE));
 }
 
 file_nr do_open(char *abs_path)
@@ -142,7 +142,7 @@ file_nr do_open(char *abs_path)
 
 bool do_mkdir(char *abs_path)
 {
-        return (do_create(abs_path, DATA_FILE));
+        return (fs_create(abs_path, DIRECTORY));
 }
 
 bool do_mkfile(char *abs_path)

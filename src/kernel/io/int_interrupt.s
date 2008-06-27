@@ -142,11 +142,11 @@ isr_common_stub:
         pop ds
         popad
         add esp, 8
-        sti
         iret
 
 [EXTERN irq_handler]
 irq_common_stub:
+; TODO: draw stacklayout
         pushad                  ; Push EDI, ESI, EBP, ESP, EBX, EDX, ECX, EAX (32 bytes)
         
         push ds                 ; Push the segment registers (another 16 bytes)
@@ -170,8 +170,9 @@ irq_common_stub:
         popad                   ; Restore all general purpose registers
         
         add esp, 8              ; Remove interrupt number and error code from the stack
-        sti
-        iret 
+        
+        iret                    ; IRET will also reenable interrupts because EFLAGS
+                                ; will be restored to its state before the interrupt.
 
 ;********************************************************************************************
 [GLOBAL _syscall]
@@ -194,7 +195,6 @@ incoming_syscall:
         add esp, 8
         
         popad
-        sti
         iret
         
 [EXTERN printhex]
