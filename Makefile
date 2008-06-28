@@ -183,6 +183,19 @@ endif
 	@sudo umount $(LOOPMNT)
 	@echo "Done. etiOS successfully installed to $(TARGET_DEV)."
 
+LOC:
+	@cat $(SRCFILES) $(HDRFILES) | sh commentfilter.sh > temp
+	@sed '/^\s*\/\//d' temp > temp2
+	@sed '/^\s*\x24/d' temp2 > temp
+	@wc -l temp > temp2
+	@echo "ETIOS now has `sed "s/\s.*//1" temp2` LOCs"
+	@rm temp2
+	@read -p "Do you want to take a look on the code? [yes/no]: " REPLY;\
+	 case $$REPLY in\
+  		 j*|J*|y*|Y*) vim temp; rm temp ;;\
+  		 *) rm temp ;;\
+  	 esac\
+
 kernel: $(OBJFILES) Makefile
 	@echo " LD	src/kernel/kernel"
 	@$(LD) $(LDFLAGS) -Map src/kernel/kernel.map -o src/kernel/kernel $(OBJFILES)
