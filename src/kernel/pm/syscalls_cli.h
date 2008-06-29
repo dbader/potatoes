@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __SYSCALLS_CLI_H
 #define __SYSCALLS_CLI_H
 
+#include "../include/types.h"
+
 /*FIXME: These will be refactored to lose the leading underscore as soon
  *       as we have external programs. Right now I want to minimize
  *       naming conflicts.
@@ -40,9 +42,10 @@ void _log(char* msg);
 void _exit(int status);
 int _getpid();
 int _open(char *path, int oflag, int mode);
+int _close(int fd);
 int _read(int fd, void *buf, int size);
 int _write(int fd, void *buf, int size);
-int _close(int fd);
+int _seek(int fd, int offset, int whence);
 void* _malloc(size_t size);
 void _free(void *block);
 

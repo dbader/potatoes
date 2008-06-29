@@ -41,14 +41,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../fs/fs_const.h"
 #include "../fs/fs_types.h"
 #include "../fs/fs_file_table.h"
+#include "../fs/fs_main.h"
 #include "pm_main.h"
 #include "pm_syscalls.h"
 #include "syscalls_shared.h"
+#include "pm_devices.h"
 
 process_t *procs_head = NULL;
 process_t *active_proc = NULL;
 process_t *focus_proc = NULL;
 uint32 next_pid = 0;
+
+// Devices
+extern device_t dev_null;
+extern device_t dev_stdout;
+extern device_t dev_stdin;
 
 uint32 getpid()
 {
@@ -67,6 +74,8 @@ void pm_init()
         
         procs_head = (process_t*) malloc(sizeof(process_t));
         
+        memset(procs_head, 0, sizeof(process_t));
+        
         procs_head->name = "kernel";
         procs_head->state = PSTATE_ALIVE;
         procs_head->pid = next_pid++;
@@ -77,7 +86,15 @@ void pm_init()
         active_proc = procs_head;
         
         dprintf("pm: %d syscalls registered\n", MAX_SYSCALL);
+        
+        do_mkdir("/dev");
+        pm_register_device(&dev_null);
+        pm_register_device(&dev_stdout);
+        pm_register_device(&dev_stdin);
+       
         dprintf("pm: scheduler initialized\n");
+        
+        //test_ls();
 }
 /**
  * Reschedule if needed.
@@ -168,8 +185,11 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         
         dprintf("pm: created thread \"%s\"\n    entry at 0x%x, stack at 0x%x (%u bytes). pid = %u\n\n",
                         proc->name, entry, proc->context, stacksize, proc->pid);
+       
+        focus_proc = proc; //FIXME: hackhackhack
         
         __asm__("sti");
+       
         
         return proc->pid;
 }
@@ -177,6 +197,8 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 void pm_destroy_thread(process_t *proc)
 {
         dprintf("pm: destroy thread \"%s\" pid = %u\n", proc->name, proc->pid);
+        if (proc->stdin != NULL)
+                rf_free(proc->stdin);
         free(proc->name);
         free(proc->stack_start);
         free(proc);

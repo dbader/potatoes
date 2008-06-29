@@ -99,7 +99,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
         case '\a':
                 virt_monitor_invert(get_active_virt_monitor());
                 update_virt_monitor(get_active_virt_monitor());
-                sleep_ticks(15);
+                sleep_ticks(15); // FIXME: RACE CONDITION. Disable sleep altogether.
                 virt_monitor_invert(get_active_virt_monitor());
                 break;
         case '\n':

@@ -84,6 +84,7 @@ void panic(char *msg)
  * 
  * @param mboot_ptr The multiboot struct passed by the bootloader (grub). 
  */
+extern void shell_main();
 int main(struct multiboot *mboot_ptr)
 {
         g_mboot_ptr = mboot_ptr;
@@ -91,14 +92,16 @@ int main(struct multiboot *mboot_ptr)
         //mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
         mm_init(0x300001, 0x100000 + mboot_ptr->mem_upper * 1024);
         io_init();      
-        pm_init();
         fs_init();
+        pm_init();
         
         dprint_separator();
         printf("%d bytes kernel stack\n", 0x300000 - (uint32)&end);
         printf("main: init complete at %d ticks.\n", get_ticks());
         do_tests();
         //fs_shutdown();
+        
+        pm_create_thread("shell", shell_main, 4096);
         
         // kernel idle loop
         printf("main: entering idle loop\n");

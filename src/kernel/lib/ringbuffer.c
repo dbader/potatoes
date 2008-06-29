@@ -136,7 +136,7 @@ void rf_dump(ring_fifo *fifo)
  * @return Number of bytes written, -1 on error.
  */
 sint32 rf_write(ring_fifo *fifo, uint8 *buf, uint32 count)
-{
+{       
         if (fifo == NULL || buf == NULL)
                         return -1;
         
@@ -174,7 +174,6 @@ sint32 rf_read(ring_fifo *fifo, uint8 *buf, uint32 count)
         
         while (count-- > 0) {
                 if (fifo->len == 0) {
-                        printf("rf_read: buffer is empty.");
                         return read;
                 }
 

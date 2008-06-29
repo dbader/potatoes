@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Echo-mode flag
  */
-bool echo = TRUE; //accessible for PM
+bool echo = FALSE; //accessible for PM
 
 /**
  * Number of registered shortcuts
@@ -95,14 +95,14 @@ void kb_handler()
         else if (shift) { //Key pressed while shift is pressed
                 if (kb_shift_map[scancode] != 0) {
                         if(echo) virt_monitor_putc(get_active_virt_monitor(), kb_shift_map[scancode]);
-                        else pm_handle_input(kb_map[scancode]);
+                        else pm_handle_input(kb_shift_map[scancode]);
                 }
         }
         else if (alt) { //Key pressed while alt is pressed
                 if (scancode == 0x12) virt_monitor_invert(get_active_virt_monitor());
                 if (kb_alt_map[scancode] != 0) {
                         if(echo) virt_monitor_putc(get_active_virt_monitor(), kb_alt_map[scancode]);
-                        else pm_handle_input(kb_map[scancode]);
+                        else pm_handle_input(kb_alt_map[scancode]);
                 }
         }
         else if (ctrl && super_button) { //Key pressed while ctrl & super are pressed

@@ -73,7 +73,7 @@ typedef struct sc_read_write_args_t {
         int size;
 } sc_read_write_args_t;
 
-// Definitions for seek()
+// Definitions for seek() whence
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2

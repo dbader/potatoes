@@ -320,10 +320,18 @@ void test_ls()
         /*
          * TODO: replace '5' with (get_file(fd)->f_inode)->i_size
          * when size is properly supported by CREATE
+         * 
+         * FIXME: How do I find out whether sth is a file or a directory?
          */
-        for (int i = 0; i < 5; i++){ 
-                if (directory[i].inode != 0)
-                        dprintf("[%d | %s]\n", directory[i].inode, directory[i].name);
+        dprintf("inode\tname\n-------------------------------------\n");
+        int i = 0;
+        while (directory[i].inode != 0) {
+                dprintf("%d\t%s", directory[i].inode, directory[i].name);
+//                if (get_file(inode2desc(&directory[i].inode))->f_inode->i_mode == DIRECTORY)
+//                        dprintf("/ [DIR]\n");
+//                else
+//                        dprintf(" [FILE]\n");
+                i++;
         }
 }
 

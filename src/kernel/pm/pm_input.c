@@ -35,8 +35,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @version $Rev$
  */
 
+#include "../include/const.h"
 #include "../include/debug.h"
 #include "../io/io.h"
+#include "../include/ringbuffer.h"
+#include "pm_main.h"
 
 /**
  * Handles keyboard input. This gets called from the I/O code after a keypress was received
@@ -44,9 +47,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * process' input queue.
  * @param c input character
  */
-void pm_handle_input(char c)
+void pm_handle_input(int c)
 {
-        dprintf("pm_handle_input: %c @ %d\n", c, get_ticks());
-        //putchar(c);
+        //dprintf("pm_handle_input: %c @ %d. Writing to stdin of pid %d\n", c, get_ticks(), focus_proc->pid);
+        
+        if (focus_proc == NULL)
+                return;
+        
+        putchar(c); // Echo.
+        
+        if (rf_write(focus_proc->stdin, (uint8*)&c, sizeof(c)) != sizeof(c))
+                dprintf("error writing to stdin\n");
 }
 

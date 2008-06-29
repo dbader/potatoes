@@ -68,6 +68,14 @@ int _open(char *path, int oflag, int mode)
         return args.fd;
 }
 
+int _close(int fd)
+{
+        sc_close_args_t args;
+        args.fd = fd;
+        _syscall(SYS_CLOSE, &args);
+        return args.success;
+}
+
 int _read(int fd, void *buf, int size)
 {
         sc_read_write_args_t args;
@@ -88,12 +96,14 @@ int _write(int fd, void *buf, int size)
         return args.rw_count;
 }
 
-int _close(int fd)
+int _seek(int fd, int offset, int whence)
 {
-        sc_close_args_t args;
+        sc_seek_args_t args;
         args.fd = fd;
-        _syscall(SYS_CLOSE, &args);
-        return args.success;
+        args.offset = offset;
+        args.whence = whence;
+        _syscall(SYS_SEEK, &args);
+        return args.pos;
 }
 
 void* _malloc(size_t size)

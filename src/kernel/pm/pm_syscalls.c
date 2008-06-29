@@ -42,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../fs/fs_main.h"
 #include "../include/init.h"
 #include "pm_syscalls.h"
+#include "pm_devices.h"
 
 /** 
  * The system call table. Make sure this corresponds to the constants
@@ -61,7 +62,7 @@ syscall_handler syscall_table[] = {
 
 //#define MAX_SYSCALL (sizeof(syscall_table) / sizeof(syscall_handler)) - 1
 
-#define SYSCALL_TRACE dprintf("[%u] ", getpid()); dprintf
+#define SYSCALL_TRACE //dprintf("[%u] ", getpid()); dprintf
 
 void pm_syscall(uint32 id, void* data)
 {
@@ -124,15 +125,32 @@ void sys_open(void *data)
         sc_open_args_t *args = (sc_open_args_t*) data;
         SYSCALL_TRACE("SYS_OPEN(\"%s\", 0x%x, 0x%x)\n", args->path, args->oflag, args->mode);
         
-        // If opening fails attempt to create the file
-        int fd = do_open(args->path);
-        
-        if (fd < 0)
-                do_create(args->path, 0); //TODO: '0' is neither DIRECTORY nor DATA_FILE!
-        
-        fd = do_open(args->path);
-          
-        args->fd = insert_proc_file(active_proc->pft, fd);
+        device_t *dev = pm_name2device(args->path);
+        if (dev != NULL) {
+                // It's a device file
+                //dprintf("opening device %s\n", dev->name);
+                args->fd = dev->open(dev, args->path, args->oflag, args->mode);
+        } else {
+                // It's a real file.
+                // If opening fails attempt to create the file
+                int fd = do_open(args->path);
+
+                if (fd == NOT_POSSIBLE) {
+                        // See if it's a directory
+                        if (args->path[strlen(args->path)-1] == '/') {
+                                // Kill trailing slash.
+                                args->path[strlen(args->path)-1] = '\0';
+                                do_mkdir(args->path);
+                        } else
+                                do_create(args->path, 0);
+                }
+
+                fd = do_open(args->path);
+                if (fd == NOT_POSSIBLE) 
+                        args->fd = -1;
+                else
+                        args->fd = insert_proc_file(active_proc->pft, fd) + MAX_DEVICES;
+        }
 }
 
 void sys_close(void* data)
@@ -140,10 +158,24 @@ void sys_close(void* data)
         sc_close_args_t *args = (sc_close_args_t*) data;
         SYSCALL_TRACE("SYS_CLOSE(%d)\n", args->fd);
         
-        if (do_close_pf(active_proc->pft, args->fd) == FALSE)
+        if (args->fd < 0) {
                 args->success = -1;
-        else
-                args->success = 0;
+                return;
+        }
+        
+        if (args->fd < MAX_DEVICES) {
+                // It's a device file
+                device_t *dev = pm_fd2device(args->fd);
+                if (!dev)
+                        args->success = -1;
+                else
+                        args->success = dev->close(dev, args->fd);
+        } else {
+                if (do_close_pf(active_proc->pft, args->fd - MAX_DEVICES) == FALSE)
+                        args->success = -1;
+                else
+                        args->success = 0;
+        }
 }
 
 /**
@@ -152,17 +184,28 @@ void sys_close(void* data)
 void sys_read(void* data)
 {
         sc_read_write_args_t *args = (sc_read_write_args_t*) data;
-        SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
+        //SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
         
-        proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd); 
-        args->rw_count = do_read(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
-        
-        // Right now do_read() does not support partially successful reads.
-        // So we have to patch that up: 
-        if (args->rw_count != FALSE)
-                args->rw_count = args->size;
-        
-        pft_entry->pf_pos += args->rw_count;
+        if (args->fd < MAX_DEVICES) {
+                // It's a device file
+                device_t *dev = pm_fd2device(args->fd);
+                if (!dev)
+                        args->rw_count = -1;
+                else
+                        args->rw_count = dev->read(dev, args->fd, args->buf, args->size);
+        } else {
+ //               panic("mark one");
+                // It's a regular file
+                proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES); 
+                args->rw_count = do_read(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
+
+                // Right now do_read() does not support partially successful reads.
+                // So we have to patch that up: 
+                if (args->rw_count != FALSE)
+                        args->rw_count = args->size;
+
+                pft_entry->pf_pos += args->rw_count;
+        }
 }
 
 void sys_write(void* data)
@@ -170,15 +213,28 @@ void sys_write(void* data)
         sc_read_write_args_t *args = (sc_read_write_args_t*) data;
         SYSCALL_TRACE("SYS_WRITE(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
 
-        proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd);  
-        args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
+        //dprintf("writing to fd%d: ", args->fd);
+        if (args->fd < MAX_DEVICES) {
+                // It's a device file
+                device_t *dev = pm_fd2device(args->fd);
+                if (!dev)
+                        args->rw_count = -1;
+                else {
+                      //  dprintf("write func of %s is at 0x%x\n", dev->name, dev->write);
+                        args->rw_count = dev->write(dev, args->fd, args->buf, args->size);
+                }
+        } else {
+                // It's a regular file
+                proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);  
+                args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
 
-        // Right now do_write() does not support partially successful writes.
-        // So we have to patch that up: 
-        if (args->rw_count != FALSE)
-                args->rw_count = args->size;
+                // Right now do_write() does not support partially successful writes.
+                // So we have to patch that up: 
+                if (args->rw_count != FALSE)
+                        args->rw_count = args->size;
 
-        pft_entry->pf_pos += args->rw_count;
+                pft_entry->pf_pos += args->rw_count;
+        }
 }
 
 void sys_seek(void* data)
@@ -186,7 +242,28 @@ void sys_seek(void* data)
         sc_seek_args_t *args = (sc_seek_args_t*) data;
         SYSCALL_TRACE("SYS_SEEK(%d, %d, %d)\n", args->fd, args->offset, args->whence);
         
-        // TODO
+        if (args->fd < MAX_DEVICES) {
+                // It's a device file
+                device_t *dev = pm_fd2device(args->fd);
+                if (!dev)
+                        args->pos = -1;
+                else
+                        args->pos = dev->seek(dev, args->fd, args->offset, args->whence);
+        } else {
+                // It's a regular file
+                proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
+                
+                switch (args->whence) {
+                case SEEK_SET:  pft_entry->pf_pos = args->offset;
+                                break;
+                case SEEK_CUR:  pft_entry->pf_pos += args->offset;
+                                break;
+                case SEEK_END:  pft_entry->pf_pos = 0; //TODO: get_file_size() needed
+                                break;
+                }
+                
+                args->pos = pft_entry->pf_pos;
+        }
 }
 
 

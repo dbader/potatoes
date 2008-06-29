@@ -44,6 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#include "../fs/fs_main.h"
 #include "../pm/pm_main.h"
 #include "../pm/syscalls_cli.h"
+#include "../pm/syscalls_shared.h"
 
 /**
  * output-testing
@@ -313,6 +314,25 @@ void hd_stressread_test()
         free(ptr);
 }
 
+int fgetch(int fd)
+{
+        int ch;
+        while (_read(fd, &ch, sizeof(ch)) == 0)
+                halt();
+        return ch;
+}
+
+char* fgets(char *s, int n, int fd)
+{
+        char ch = 0;
+        while ((n-- > 0) && (ch != '\n')) {
+                ch = fgetch(fd);
+                *s++ = ch;
+        }
+        return s;
+                
+}
+
 void syscall_test_thread()
 {
         // log
@@ -326,6 +346,7 @@ void syscall_test_thread()
         printf("fd = %u\n", fd);
         char buf[] = "Hello, World.";
         _write(fd, buf, strlen(buf) + 1);
+        printf("current pos is %d\n", _seek(fd, SEEK_CUR, 0));
         _close(fd);
         
         // Test open, read, close
@@ -336,6 +357,28 @@ void syscall_test_thread()
         _read(fd, rbuf, 5);
         _close(fd);
         _log(rbuf);
+        
+        // Test device files
+        fd = _open("/dev/null", 0, 0);
+        printf("devnull fd = %u\n", fd);
+        uint32 data;
+        _read(fd, &data, sizeof(data));
+        printf("data = 0x%x\n", data);
+        printf("current pos is %d\n", _seek(fd, SEEK_CUR, 0));
+        
+        // stdout
+        int stdout = _open("/dev/stdout", 0, 0);
+        printf("stdout = %u\n", stdout);
+        _write(stdout, buf, strlen(buf) + 1);
+        
+        //stdin
+        int stdin = _open("/dev/stdin", 0, 0);
+        printf("please enter something: ");
+        char input[32];
+        memset(input, 0, sizeof(input));
+        fgets(input, sizeof(input), stdin);
+        printf("\nThank you. You entered: %s\n", input);
+        _close(stdin);
         
         // malloc and free
         void *mem = _malloc(4096);
