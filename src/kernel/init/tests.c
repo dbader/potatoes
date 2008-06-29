@@ -175,7 +175,7 @@ void grubstruct_test(struct multiboot *mboot_ptr)
 }
 
 // print a part of the main memory
-void mm_print_memory(mm_header* mm_print_start)
+void mm_print_memory()
 {
         mm_header *ptr;
         for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
@@ -189,7 +189,7 @@ void mm_print_memory(mm_header* mm_print_start)
 
 void malloc_test()
 {
-        void *mm_test[10];
+        void *mm_test[15];
         uint32 free_start = free_memory();
         // total allocation amount: 2535 bytes + 6 * 16 bytes
         mm_test[1] = mallocn(100,"1");
@@ -197,31 +197,46 @@ void malloc_test()
         mm_test[2] = mallocn(100,"2");
         printf("2: allocating 100 bytes...\n");  
         mm_test[3] = mallocn(300,"3");
-        printf("3: allocating 300 bytes...\n");
-        mm_print_memory(mm_test[1]);
+        printf("3: allocating 300 bytes...\n\n");
+        mm_print_memory();
         free(mm_test[2]);
-        printf("freeing 2 (100 bytes)...\n");
-        mm_print_memory(mm_test[1]);
+        printf("\nfreeing 2 (100 bytes)...\n\n");
+        mm_print_memory();
+        printf("\ntrying to free 2 again...\n\n");
+        free(mm_test[2]);
+        mm_print_memory();
+        printf("\ntrying to free the block at 3 + 10 bytes...\n\n");
+        free((void*)(mm_test[3] + 10));
+        mm_print_memory();
         mm_test[4] = mallocn(50,"4");
-        printf("4: allocating 50 bytes...\n"); 
-        mm_print_memory(mm_test[1]);
+        printf("\n4: allocating 50 bytes...\n\n"); 
+        mm_print_memory();
         mm_test[5] = mallocn(50,"5");
-        printf("5: allocating 50 bytes...\n");
-        mm_print_memory(mm_test[1]);
+        printf("\n5: allocating 50 bytes...\n\n");
+        mm_print_memory();
         mm_test[6] = mallocn(34,"6");
-        printf("6: allocating 34 bytes...\n");
-        mm_print_memory(mm_test[1]);
-        printf("7: reallocating 3 to 300 bytes...\n");
+        printf("\n6: allocating 34 bytes...\n\n");
+        mm_print_memory();
+        printf("\n7: reallocating 3 to 300 bytes...\n\n");
         mm_test[7] = realloc(mm_test[3], 300);
-        mm_print_memory(mm_test[1]);
-        printf("8: reallocating 3 to 200 bytes...\n");
+        mm_print_memory();
+        printf("\n8: reallocating 3 to 200 bytes...\n\n");
         mm_test[8] = realloc(mm_test[7], 200);
-        mm_print_memory(mm_test[1]);
-        printf("9: reallocating 3 to 301 bytes...\n");
+        mm_print_memory();
+        printf("\n9: reallocating 3 to 301 bytes...\n\n");
         mm_test[9] = realloc(mm_test[8], 301);
-        mm_print_memory(mm_test[1]);
+        mm_print_memory();
         printf("\n");
-        mm_print_memory(mm_test[6]);
+        mm_print_memory();
+        printf("\n10: callocn(5, sizeof(134), \"calloc\");\n\n");
+        mm_test[10] = callocn(5, sizeof(134), "calloc");
+        uint8* tmp;
+        printf("content of 10: ");
+        for(tmp = (uint8*)mm_test[10]; (uint32)tmp < (uint32)mm_test[10] + (5 * sizeof(134)); tmp++) {
+                printf("%d", *tmp);
+        }
+        printf("\n\n");
+        mm_print_memory();
         uint32 free_end = free_memory();
         printf("free memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes", 
                 free_end, free_start - free_end);

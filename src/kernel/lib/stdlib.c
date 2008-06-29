@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/stdio.h"
 #include "../include/string.h"
+#include "../include/debug.h"
 #include "../mm/mm.h"
 
 /**
@@ -62,8 +63,6 @@ void* mallocn(size_t size, char *name)
         mem += size;
         return ret;
 #endif  
-        
-        //size++; // quickfix (tm) by daniel.
         
         mm_header *ptr;
         mm_header *new_header;
@@ -123,6 +122,35 @@ void* malloc(size_t size)
 }
 
 /**
+ * allocates space for n elements of the same size and additionally saves a name in 
+ * the header of the block
+ * 
+ * @param n     number of elements
+ * @param size  size of each element
+ */
+void* callocn(size_t n, size_t size, char *name)
+{
+        void* ret = mallocn(n * size, name);
+        if(ret == (void*) NULL) {
+                return (void*) NULL;
+        }
+        mm_header* header = (mm_header*) ((uint32)ret - sizeof(mm_header));
+        bzero(ret, n * size);
+        return ret;
+}
+
+/**
+ * allocates space for n elements of the same size
+ * 
+ * @param n     number of elements
+ * @param size  size of each element
+ */
+void* calloc(size_t n, size_t size) 
+{
+        return callocn(n, size, "noname");
+}
+
+/**
  * frees a memory block
  * 
  * @param start pointer to the start of the block that shall be freed
@@ -131,11 +159,15 @@ void free(void *start)
 {
 #ifdef MEM_FAILSAFE
        return;
-#endif       
+#endif
         mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
-        // element is removed from the list (the allocated memory is not touched in any way)
-        (this->prev)->next = this->next;
-        (this->next)->prev = this->prev;
+        // check if there is a valid mm_header structure at start
+        if((this->next)->prev == this) {
+                (this->prev)->next = this->next;
+                (this->next)->prev = this->prev;
+                return;
+        }
+        dprintf("no header structure found at the specified place -> no memory was freed.\n");
 }
 
 /**

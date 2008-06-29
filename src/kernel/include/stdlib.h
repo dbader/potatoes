@@ -38,6 +38,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void* malloc(uint32 size);
 void* mallocn(uint32 size, char *name);
+void* calloc(size_t elements, size_t size);
+void* callocn(size_t elements, size_t size, char* name);
 void free(void *start);
 void* realloc(void *pointer, size_t size);
 uint32 free_memory();
