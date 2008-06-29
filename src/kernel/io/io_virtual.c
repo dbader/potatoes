@@ -123,7 +123,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
                 break;
         default:
                 *(vm->begin + (vm->vis_begin - vm->begin + vm->charnum) % (vm->size / 2)) = 
-                        bg * 0x1000 + fg * 0x100 + ch; //print character to the display pointer
+                        bg * 0x1000 + fg * 0x100 + (ch & 0xFF); //print character to the display pointer
                 vm->charnum++;
         }
 }
