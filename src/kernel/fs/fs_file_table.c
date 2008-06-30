@@ -104,7 +104,7 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode)
         }
 
         fd->f_inode = inode;
-        fd->f_name  = name;
+        fd->f_name  = name; 
         fd->f_mode  = mode;
         
         return fd->f_desc;
@@ -256,9 +256,10 @@ void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 orig
 file_nr name2desc(char *name) //in global filp table
 { 
         for (int i = 0; i < NUM_FILES; i++){
-                if (strcmp(name, gft[i].f_name) == 0) 
+                if (strcmp(name, gft[i].f_name) == 0) { 
                         fs_dprintf("[fs_file_table] %s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
                         return gft[i].f_desc;
+                }
         } 
         
         return NOT_FOUND; 

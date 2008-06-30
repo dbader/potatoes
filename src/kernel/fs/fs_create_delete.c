@@ -88,6 +88,7 @@ bool fs_create(char *abs_path, int data_type)
         write_inode(inode);
         //dump_inode(inode);
         free(inode); //free memory, load from HD if needed
+        free(file_name);
         
         return TRUE;
 }

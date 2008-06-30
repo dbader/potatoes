@@ -88,7 +88,7 @@ void pm_init()
         
         dprintf("%{pm:} %d syscalls registered\n", VIOLET, MAX_SYSCALL);
         
-        dprintf("pm: creating /dev\n");
+        dprintf("%{pm:} creating /dev\n", VIOLET);
         do_mkdir("/dev");
         
         pm_register_device(&dev_null);

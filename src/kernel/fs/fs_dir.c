@@ -91,7 +91,7 @@ block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
  */  
 block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
 {
-        bool inserted = FALSE;
+        uint32 inserted = NOT_POSSIBLE;
         uint32 pos = 0; //points to start of block 0, 1, 2, ...
         block_nr dir_entry_blk = 0;
         block_nr new_blk = 0;
@@ -129,13 +129,17 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
                 new_blk = alloc_block(dir_entry_blk);
                 inserted = insert_filename(dir_cache, new_blk, name);
                 
-                if (inserted == FALSE){ //no free dir_entry
+                if (inserted == NOT_POSSIBLE){ //no free dir_entry
                         mark_block(new_blk, FALSE);
                         pos += BLOCK_SIZE; //to read the next block if not inserted successfully
                 }
 
-        } while(inserted == FALSE);
+        } while(inserted == NOT_POSSIBLE);
         
+//        if (dir_inode->i_size < (pos + inserted)){
+//                dir_inode->i_size = pos + inserted;
+//                wrt_block(dir_inode_blk, dir_inode, BLOCK_SIZE);
+//        }
         fs_dprintf("[fs_dir] wrt_block(%d, dir_cache, %d)\n", dir_entry_blk, sizeof(dir_cache));
         
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
@@ -160,16 +164,16 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
  * @param name      name of the new file
  * @return          status of insert operation
  */    
-bool insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr, char *name)
+uint32 insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr, char *name)
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++){
                 if (strcmp(file_list[i].name, "") == 0){
                         file_list[i].inode = blk_nr;
                         memcpy(file_list[i].name, name, NAME_SIZE);
-                        return TRUE;
+                        return sizeof(dir_entry);
                 }
         }
-        return FALSE;
+        return NOT_POSSIBLE;
 }
 
 /**
@@ -220,8 +224,9 @@ block_nr search_file(char *path)
                 return NOT_POSSIBLE; //wrong format
         }
         
-        return rfsearch(root->i_adr, work_copy, strsep(&work_copy, delim), delim);
-        
+        block_nr ret = rfsearch(root->i_adr, work_copy, strsep(&work_copy, delim), delim);
+        free(copy);
+        return ret;
 }
 
 /**
@@ -279,6 +284,7 @@ char* get_filename(char *abs_path)
 {
         char delim = '/';
         char *path = malloc(strlen(abs_path));
+
         if (path == (void*) NULL) return (char*) NULL;
         bzero(path, strlen(abs_path));
         

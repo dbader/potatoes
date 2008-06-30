@@ -43,6 +43,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling)
 {
+        if (pos > inode->i_size) {
+                return NOT_POSSIBLE;
+        }
+        
         block_nr data_blk = get_data_block(inode, pos, allow_scaling); //see block_dev.c
         
         fs_dprintf("[fs_r_w] found block to read content from: %d\n", data_blk);

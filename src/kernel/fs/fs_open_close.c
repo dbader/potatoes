@@ -59,6 +59,8 @@ file_nr fs_open(char *abs_path)
         file_nr fd;
         m_inode *inode;
         
+        abs_path = strdup(abs_path);
+                
         if (strcmp(abs_path, "/") != 0){ //not the root directory
                 fd = name2desc(abs_path); //get the file descriptor from file table if already existent
                 if (fd != NOT_FOUND){

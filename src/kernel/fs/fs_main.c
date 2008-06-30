@@ -53,12 +53,13 @@ extern void run_FS_tests();
  */
 void fs_init()
 {
-        if(!load_fs()){
+        //if(!load_fs()){
                 printf("FS loading failed. trying to create a new one.\n");
                 if (!create_fs()){
                         panic("FS cannot be initialized!\n");
                 }
-        }
+        //}
+                
 }
 
 /**
@@ -108,7 +109,7 @@ bool create_fs()
         create_root();
         init_super_block();
         dump_super();
-     
+        
         //run tests
         //run_FS_tests();
         

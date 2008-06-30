@@ -96,19 +96,20 @@ int main(struct multiboot *mboot_ptr)
         pm_init();
         
         dprint_separator();
-        printf("%d bytes kernel stack\n", 0x300000 - (uint32)&end);
+        printf("%{main:} %d bytes kernel stack\n", RED, 0x300000 - (uint32)&end);
         printf("%{main:} init complete at %d ticks.\n", RED, get_ticks());
+        
         do_tests();
         //fs_shutdown();
         
-        // kernel idle loop
         printf("%{main:} entering idle loop\n", RED);
         
+        // launch the shell.
         pm_create_thread("SHELL", shell_main, 4096);
+        
+        // kernel idle loop              
         for (;;)
                 halt();
-        
-        fs_shutdown();
         
         return 0;
 }

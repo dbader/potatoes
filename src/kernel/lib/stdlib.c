@@ -64,6 +64,8 @@ void* mallocn(size_t size, char *name)
         return ret;
 #endif  
         
+        //size += 100;
+        
         mm_header *ptr;
         mm_header *new_header;
         uint32 end_of_prev;

@@ -79,5 +79,5 @@ void pm_register_device(device_t *dev)
         
         do_create(dev->name, 0); 
         
-        dprintf("pm: registered device %s\n", dev->name);
+        dprintf("%{pm:} registered device %s\n", VIOLET, dev->name);
 }

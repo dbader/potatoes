@@ -102,6 +102,8 @@ void load_root()
         
         root = &inode_table[ROOT_INODE];
         
+        dprintf("root: %d\n", root->i_adr);
+        
         ASSERT(root != (m_inode *) NULL);
         
 }

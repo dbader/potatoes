@@ -42,6 +42,7 @@ typedef struct mm_header {
         struct mm_header *next;         // pointer to the header of the next occupied block
         char *name;                     // name of the block
         uint32 size;                    // size of the current block
+       // uint8 pad[100];
 } mm_header;
 
 /**

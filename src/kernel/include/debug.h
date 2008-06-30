@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define dprintf printf
 #define dprint_separator() dprintf("%{--------------------------------------------------------------------------------}", 2);
-#define fs_dprintf dprintf
+#define fs_dprintf //dprintf("%s ln %d%{:} ", __FILE__, __LINE__, RED); dprintf
 
 #define SHORTCUT_CTRL(ch, func) add_shortcut(TRUE, FALSE, ch, func); \
         printf("\tCTRL + %c ==> %s()\n", ch, #func)

@@ -25,6 +25,8 @@ int _fgetch(int fd)
 
 char* _fgets(char *s, int n, int fd)
 {
+        // FIXME: This is ugly.
+        
         char *start = s;
         int count = 0;
         char ch = 0;
@@ -58,7 +60,6 @@ char* _fgets(char *s, int n, int fd)
         return s;
                 
 }
-
 
 int _fputs(char *s, int fd)
 {
@@ -125,18 +126,27 @@ void _printf(char *fmt, ...)
 
 typedef void (*shell_cmd_func)(int argc, char *argv[]);
 
+/** A single shell commmand. */
 typedef struct shell_cmd_t {
         char name[16];
         shell_cmd_func cmd;
         char desc[100];
 } shell_cmd_t;
 
-struct shell_cmd_t shell_cmds[];
+struct shell_cmd_t shell_cmds[]; // Forward declaration.
 
+/** The current working directory. All relative paths are relative to this. */
 char cwd[255];
 
+/** A buffer for shell_makepath() */
 char path_buf[sizeof(cwd)];
 
+/**
+ * Makes a given path absolute if needed. shell_makepath checks for a leading slash
+ * in path to decide whether a given path is already absolute. If the path is not absolute
+ * it will be appended to the current working directory.
+ * Calling this will invalidate the last result.
+ */
 char* shell_makepath(char *path)
 {
         strcpy(path_buf, cwd);
@@ -190,20 +200,21 @@ void shell_cmd_ls(int argc, char *argv[])
         bzero(directory, sizeof(directory));
         
         int fd = -1;
-        
+
         if (argc < 2)
-                // current directory
-                fd = _open(cwd, 0, 0);
-        else {
+                fd = _open(cwd, 0, 0);   // current directory
+        else
                 fd = _open(shell_makepath(argv[1]), 0, 0);
-        }
         
         if (fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
         
-        _read(fd, directory, sizeof(directory));
+        if (_read(fd, directory, sizeof(directory)) != sizeof(directory)) {
+                _close(fd);
+                _printf("%s: Error reading directory\n", argv[0]);
+        }
 
         int i = 0;
         while (directory[i].inode != 0) {
@@ -224,7 +235,6 @@ void shell_cmd_touch(int argc, char *argv[])
         char *path = shell_makepath(argv[1]);
         
         int fd = _open(path, O_CREAT, 0);
-        
         if (fd >= 0)
                 _printf("Created regular file %s\n", path);
         else
@@ -242,11 +252,12 @@ void shell_cmd_mkdir(int argc, char *argv[])
 
         char *path = shell_makepath(argv[1]);
         
+        // Append a trailing slash to let open() know we want to
+        // create a directory.
         if (path[strlen(path)] != '/')
                 strcat(path, "/");
         
         int fd = _open(path, O_CREAT, 0);
-        
         if (fd >= 0)
                 _printf("Created directory %s\n", argv[1]);
         else
@@ -272,6 +283,8 @@ void shell_cmd_cat(int argc, char *argv[])
         while (_read(fd, &ch, sizeof(ch)) != 0)
                 _fputch(ch, STDOUT);
         
+        _fputch('\n', STDOUT);
+        
         _close(fd);
 }
 
@@ -292,10 +305,9 @@ void shell_cmd_write(int argc, char *argv[])
                 _write(fd, argv[i], strlen(argv[i]));
                 _write(fd, " ", 1);
         }
-        _write(fd, "", 1);
         
-        _printf("wrote %d bytes.\n", _seek(fd, 0, SEEK_CUR));
-        
+        _write(fd, "", 1); // append \0
+        _printf("wrote %d bytes.\n", _seek(fd, 0, SEEK_CUR));       
         _close(fd);
 }
 
@@ -308,21 +320,19 @@ void shell_cmd_cd(int argc, char *argv[])
         
         /*
          * TODO:
-         * - handle cd . and cd ..
-         * - handle absolute paths
+         * - handle cd . and cd .. (ideally the fs includes these as dummy directories)
          */
         
         char *new_dir = shell_makepath(argv[1]);
         
-        int fd = _open(cwd, 0, 0);
-
+        int fd = _open(new_dir, 0, 0);
         if (fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
-                //cwd[strlen(cwd) - strlen(argv[1])] = '\0';
+                return;
         }
         
+        // It exists, change the cwd.
         strcpy(cwd, new_dir);
-
         _close(fd);
 }
 
@@ -332,8 +342,14 @@ void shell_cmd_clear(int argc, char *argv[])
                 _fputs("\b", STDOUT);
 }
 
+extern void fs_shutdown();
+extern void fs_init();
+extern bool create_fs();
+
 void shell_cmd_sync(int argc, char *argv[])
 {
+        fs_shutdown();
+        create_fs();
         fs_shutdown();
         fs_init();
 }
@@ -349,6 +365,8 @@ void shell_cmd_sync(int argc, char *argv[])
  * ps
  * kill
  * df 
+ * exit
+ * exec
  */
 
 
@@ -390,7 +408,11 @@ void shell_handle_command(char *cmd)
         char *argv[16];
         
         while((tok = strsep(&work_copy, delim)) != NULL) {
-                argv[argc++] = strdup(tok);
+                if (argc >= (sizeof(argv) / sizeof(char*))) {
+                        _printf("- shell: argument overflow. Last argument: %s\n", argv[argc-1]);
+                        break;
+                }
+                argv[argc++] = strdup(tok);                
         }
 
         _free(copy);
