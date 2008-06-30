@@ -1,7 +1,6 @@
 #include "syscalls_shared.h"
 #include "syscalls_cli.h"
 #include "../io/io.h"
-#include "../io/io_virtual.h"
 #include "../include/string.h"
 #include "../include/const.h"
 #include "../include/stdlib.h"
@@ -54,6 +53,63 @@ int _fputs(char *s, int fd)
 int STDIN = -1;
 int STDOUT = -1;
 
+void _printf(char *fmt, ...)
+{
+        if (fmt == NULL)
+                return;
+        
+        char **arg = &fmt + 1;
+        char ch; 
+        int character;
+        char buf[40];
+        
+        while ((ch = *fmt++) != '\0')
+                if (ch == '%') {
+                        ch = *fmt++;
+                        switch (ch) {
+                        case '%': // print '%' 
+                                _fputch(ch, STDOUT); 
+                                break;
+                        case 'i': // signed integer
+                        case 'd':
+                                _fputs(itoa((sint32)*arg++, buf, 10), STDOUT);
+                                break;
+                        case 'u': // unsigned integer
+                                _fputs(itoa((uint32)*arg++, buf, 10), STDOUT);
+                                break;
+                        case 'o': // octal
+                                _fputs(itoa((uint32)*arg++, buf, 8), STDOUT);
+                                break;
+                        case 'b': // binary
+                                _fputs(itoa((uint32)*arg++, buf, 2), STDOUT);
+                                break;
+                        case 'c': // character
+                                /* This is a bit peculiar but needed to shut up the
+                                 * "cast from pointer to integer of different size"
+                                 * compiler warning.
+                                 * Code was: putchar((char)*arg++);
+                                 */
+                                character = (int) *arg++;
+                                _fputch((char)character, STDOUT);
+                                break;
+                        case 's': // string
+                                if (*arg != NULL) {
+                                        while ((ch = *(*arg)++) != '\0')
+                                                _fputch(ch, STDOUT);
+                                } else {
+                                        _fputs("(null)", STDOUT);
+                                }
+                                *arg++;
+                                break;
+                        case 'x': // hexadecimal integer
+                        case 'p': // pointer
+                                _fputs(itoa((uint32)*arg++, buf, 16), STDOUT);
+                                break;
+                        }
+                } else
+                        _fputch(ch, STDOUT);
+}
+
 typedef void (*shell_cmd_func)(int argc, char *argv[]);
 
 typedef struct shell_cmd_t {
@@ -69,39 +125,33 @@ struct shell_cmd_t shell_cmds[];
 void shell_cmd_test(int argc, char *argv[])
 {
         for (int i = 0; i < argc; i++)
-                printf("argv[%d] = '%s'\n", i, argv[i]); // doesnt go to STDOUT...
+                _printf("argv[%d] = '%s'\n", i, argv[i]);
 }
 
 void shell_cmd_cmdlist(int argc, char *argv[])
 {
-        _fputs("Available commands are:\n", STDOUT);
+        _printf("Available commands are:\n", STDOUT);
         shell_cmd_t *cmd;
         int i = 0;
         
         // I dont think this is very cute.
-        while ((cmd = &shell_cmds[i++])->cmd != NULL) {
-                _fputs("\t", STDOUT);
-                _fputs(cmd->name, STDOUT);
-                _fputs("\t\t- ", STDOUT);
-                _fputs(cmd->desc, STDOUT);
-                _fputs("\n", STDOUT);
-        }
+        while ((cmd = &shell_cmds[i++])->cmd != NULL)
+                _printf("\t%s\t\t- %s\n", cmd->name, cmd->desc, STDOUT);
 }
 
 void shell_cmd_echo(int argc, char *argv[])
 {
-        for (int i = 1; i < argc; i++) {
-                _fputs(argv[i], STDOUT);
-                _fputs(" ", STDOUT);
-        }
-        _fputs("\n", STDOUT);
+        for (int i = 1; i < argc; i++)
+                _printf("%s ", argv[i]);
+
+        _printf("\n");
 }
 
 
 void shell_cmd_ls(int argc, char *argv[])
 {
         if (argc < 2) {
-                _fputs("Usage: ls [path]\n", STDOUT);
+                _printf("Usage: ls [path]\n");
                 return;
         }
         
@@ -111,9 +161,7 @@ void shell_cmd_ls(int argc, char *argv[])
         int fd = _open(argv[1], 0, 0);
         
         if (fd < 0) {
-                _fputs("ls: ", STDOUT);
-                _fputs(argv[1], STDOUT);
-                _fputs(" No such file or directory\n", STDOUT);
+                _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
         
@@ -121,8 +169,7 @@ void shell_cmd_ls(int argc, char *argv[])
 
         int i = 0;
         while (directory[i].inode != 0) {
-                _fputs(directory[i].name, STDOUT);
-                _fputs("\n", STDOUT);
+                _printf("%s\n", directory[i].name);
                 i++;
         }
         
@@ -132,25 +179,24 @@ void shell_cmd_ls(int argc, char *argv[])
 void shell_cmd_touch(int argc, char *argv[])
 {
         if (argc < 2) {
-                _fputs("Usage: touch [file]\n", STDOUT);
+                _printf("Usage: touch [file]\n");
                 return;
         }
         
         int fd = _open(argv[1], 0, 0);
         
         if (fd >= 0)
-                _fputs("Created regular file ", STDOUT);
+                _printf("Created regular file %s\n", argv[1]);
         else
-                _fputs("Failed to create regular file ", STDOUT);
-        _fputs(argv[1], STDOUT);
-        _fputs("\n", STDOUT);
+                _printf("Failed to create regular file %s\n", argv[1]);
+
         _close(fd);
 }
 
 void shell_cmd_mkdir(int argc, char *argv[])
 {
         if (argc < 2) {
-                _fputs("Usage: mkdir [path]\n", STDOUT);
+                _printf("Usage: mkdir [path]\n", STDOUT);
                 return;
         }
 
@@ -161,12 +207,9 @@ void shell_cmd_mkdir(int argc, char *argv[])
         int fd = _open(path, 0, 0);
         
         if (fd >= 0)
-                _fputs("Created directory ", STDOUT);
+                _printf("Created directory %s\n", argv[1]);
         else
-                _fputs("Failed to create directory ", STDOUT);
-        
-        _fputs(path, STDOUT);
-        _fputs("\n", STDOUT);
+                _printf("Failed to create directory %s\n", argv[1]);
         
         _close(fd);
 }
@@ -174,15 +217,13 @@ void shell_cmd_mkdir(int argc, char *argv[])
 void shell_cmd_cat(int argc, char *argv[])
 {
         if (argc < 2) {
-                _fputs("Usage: cat [file]\n", STDOUT);
+                _printf("Usage: cat [file]\n");
                 return;
         }
         
         int fd = _open(argv[1], 0, 0);
         if (fd < 0) {
-                _fputs("cat: ", STDOUT);
-                _fputs(argv[1], STDOUT);
-                _fputs(" No such file or directory\n", STDOUT);
+                _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
         
@@ -201,15 +242,13 @@ void shell_cmd_cat(int argc, char *argv[])
 void shell_cmd_write(int argc, char *argv[])
 {
         if (argc < 3) {
-                _fputs("Usage: write [file] [text]\n", STDOUT);
+                _printf("Usage: write [file] [text]\n");
                 return;
         }
         
         int fd = _open(argv[1], 0, 0);
         if (fd < 0) {
-                _fputs("write: ", STDOUT);
-                _fputs(argv[1], STDOUT);
-                _fputs(" No such file or directory\n", STDOUT);
+                _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
         
@@ -222,7 +261,7 @@ void shell_cmd_write(int argc, char *argv[])
         }
         _write(fd, "", 1);
         
-        printf("wrote %d bytes.\n", _seek(fd, 0, SEEK_CUR));
+        _printf("wrote %d bytes.\n", _seek(fd, 0, SEEK_CUR));
         
         _close(fd);
 }
@@ -294,12 +333,12 @@ void shell_main()
         STDIN = _open("/dev/stdin", 0, 0);
         STDOUT = _open("/dev/stdout", 0, 0);
         
-        _fputs("Welcome to etiOS!\n", STDOUT);
-        _fputs("Try \"cmdlist\" for a list of commands.\n\n", STDOUT);
+        _printf("\n\nWelcome to etiOS!\n");
+        _printf("Try \"cmdlist\" for a list of commands.\n\n");
         
         // Prompt
         while (1) {
-                _fputs("$ ", STDOUT);
+                _printf("$ ");
                 char cmd[512];
                 memset(cmd, 0, sizeof(cmd));
                 _fgets(cmd, sizeof(cmd), STDIN);

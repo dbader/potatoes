@@ -167,7 +167,7 @@ void free(void *start)
                 (this->next)->prev = this->prev;
                 return;
         }
-        dprintf("no header structure found at the specified place -> no memory was freed.\n");
+        dprintf("ERROR: free(): attempt to free unallocated block 0x%x\n", start);
 }
 
 /**
