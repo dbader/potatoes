@@ -12,6 +12,8 @@ void keyboard_init();
 void hd_init();
 sint32 get_ticks();
 
+void set_disp(uint32 addr);
+
 void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*function)());
 
 /**

@@ -1,6 +1,7 @@
 #include "syscalls_shared.h"
 #include "syscalls_cli.h"
 #include "../io/io.h"
+#include "../io/io_virtual.h"
 #include "../include/string.h"
 #include "../include/const.h"
 #include "../include/stdlib.h"
@@ -293,7 +294,7 @@ void shell_main()
         STDIN = _open("/dev/stdin", 0, 0);
         STDOUT = _open("/dev/stdout", 0, 0);
         
-        _fputs("\n\nWelcome to etiOS!\n", STDOUT);
+        _fputs("Welcome to etiOS!\n", STDOUT);
         _fputs("Try \"cmdlist\" for a list of commands.\n\n", STDOUT);
         
         // Prompt

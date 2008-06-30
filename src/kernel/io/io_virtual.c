@@ -39,6 +39,12 @@ along with this program->  If not, see <http://www->gnu->org/licenses/>->
 #include "io.h"
 #include "io_virtual.h"
 
+const uint8 line_width = 80;
+const uint16 vmonitor_height = 0xF00;
+const uint32 monitor_start = 0xB80A0;
+const uint8 cursor_offset = 80;
+
+
 /**
  * Creates a new virtual output.
  */
@@ -46,9 +52,9 @@ virt_monitor new_virt_monitor(){
         virt_monitor *mon_ptr = 
                 (virt_monitor*)mallocn(sizeof(virt_monitor),"virtual monitor pointer");
         ASSERT(mon_ptr!=0);
-        void *mon = mallocn(VIRTUAL_MONITOR_SIZE,"virtual monitor");
+        void *mon = mallocn(VIRTUAL_MONITOR_SIZE, "virtual monitor");
         ASSERT(mon!=0);
-        for(uint16 *temp = mon; temp < (uint16*)mon + 0xFA0; temp++){
+        for(uint16 *temp = mon; temp < (uint16*)mon + vmonitor_height; temp++){
                         *temp = 0xF00;
         }
         mon_ptr->begin = (uint16*)mon;
@@ -82,18 +88,19 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
         uint32 i=0;
         uint32 temp;
         
-        if(vm->charnum >= 1999){
+        if(vm->charnum >= (vmonitor_height / 2 - 1)){
                 if(vm->scrollup_limit < (vm->size / 0xA0) - 25) vm->scrollup_limit++;
-                vm->vis_begin += 80; 
+                vm->vis_begin += line_width; 
                 if (vm->vis_begin >= vm->begin + vm->size / 2){
                         vm->vis_begin = vm->begin;                        
                 }
                 //scroll, if outside of display-memory
-                uint16 *ptr = vm->begin + (vm->vis_begin + (0xF00 / 2) - vm->begin) % (vm->size / 2),
+                uint16 *ptr = vm->begin + (vm->vis_begin + ((vmonitor_height - 1) / 2) - vm->begin)
+                                % (vm->size / 2),
                        *tmpptr;
-                for (tmpptr = ptr; tmpptr < ptr + 80; tmpptr++)
+                for (tmpptr = ptr; tmpptr < ptr + line_width; tmpptr++)
                        *tmpptr = 0xF00;
-                vm->charnum -= 80;
+                vm->charnum -= line_width;
         }
         switch(ch){
         case '\a':
@@ -103,7 +110,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
                 virt_monitor_invert(get_active_virt_monitor());
                 break;
         case '\n':
-                temp= 80 - (vm->charnum % 80);
+                temp= line_width - (vm->charnum % line_width);
                 while(i++ < temp){ //calculating the "new line" starting position
                         virt_monitor_cputc(vm, ' ',fg,bg);
                 }
@@ -179,23 +186,26 @@ void virt_cursor_move(virt_monitor *vm, uint8 dir)
 {
         switch (dir){
         case 0: 
-                vm->charnum = (vm->charnum + 2000 - 80) % 2000; 
+                vm->charnum = 
+                        (vm->charnum + (vmonitor_height / 2) - line_width) % (vmonitor_height / 2); 
                 break;
         case 1: 
-                vm->charnum = (vm->charnum + 80) % 2000; 
+                vm->charnum = (vm->charnum + line_width) % (vmonitor_height / 2); 
                 break;
         case 2: 
-                vm->charnum = (vm->charnum - vm->charnum % 80) + (vm->charnum % 80 +80 - 1) % 80;
+                vm->charnum = (vm->charnum - vm->charnum % line_width) + 
+                                        (vm->charnum % line_width +80 - 1) % line_width;
                 break;
         case 3: 
-                vm->charnum = (vm->charnum - vm->charnum % 80) + (vm->charnum +1) % 80;
+                vm->charnum = 
+                        (vm->charnum - vm->charnum % line_width) + (vm->charnum +1) % line_width;
                 break;
         }
         //Cursor update
         outb(0x3D4, 0x0E);
-        outb(0x3D5, (vm->charnum) >> 8);
+        outb(0x3D5, (vm->charnum + cursor_offset) >> 8);
         outb(0x3D4, 0x0F);
-        outb(0x3D5, (vm->charnum));
+        outb(0x3D5, (vm->charnum + cursor_offset));
 }
 
 /**
@@ -205,21 +215,24 @@ void virt_cursor_move(virt_monitor *vm, uint8 dir)
  */
 void update_virt_monitor(virt_monitor *vm)
 {
-        if((vm->begin + vm->size / 2) - vm->vis_begin >= 0xFA0){
-                memcpy((void*)0xB8000, (void*)(vm->vis_begin), 0xFA0);
+        set_disp(0xB8000);
+        monitor_cputs(get_active_virt_monitor_name(), GREEN, BLACK);
+                
+        if((vm->begin + vm->size / 2) - vm->vis_begin >= vmonitor_height){
+                memcpy((void*)monitor_start, (void*)(vm->vis_begin), vmonitor_height);
         }
         else{
-                memcpy((void*)0xB8000, (void*)(vm->vis_begin), 
+                memcpy((void*)monitor_start, (void*)(vm->vis_begin), 
                                 2*(vm->begin + vm->size / 2 - vm->vis_begin));
-                memcpy((void*)0xB8000 + 2*(vm->begin + vm->size / 2 - vm->vis_begin),
+                memcpy((void*)monitor_start + 2*(vm->begin + vm->size / 2 - vm->vis_begin),
                                 (void*)(vm->begin),
-                                2*(0xFA0 - (vm->begin + vm->size / 2 - vm->vis_begin)));
+                                2*(vmonitor_height - (vm->begin + vm->size / 2 - vm->vis_begin)));
         }
         //Cursor update
         outb(0x3D4, 0x0E);
-        outb(0x3D5, (vm->charnum) >> 8);
+        outb(0x3D5, (vm->charnum + cursor_offset) >> 8);
         outb(0x3D4, 0x0F);
-        outb(0x3D5, (vm->charnum));
+        outb(0x3D5, (vm->charnum + cursor_offset));
 }
 
 /**
@@ -231,8 +244,8 @@ void virt_monitor_scrollup(virt_monitor *vm)
 {
         if(vm->scrollup_limit){
                 vm->scrollup_limit--;
-                if(vm->vis_begin > vm->begin) vm->vis_begin -= 80;
-                else vm->vis_begin = vm->begin + (vm->size / 2) - 80;
+                if(vm->vis_begin > vm->begin) vm->vis_begin -= line_width;
+                else vm->vis_begin = vm->begin + (vm->size / 2) - line_width;
                 vm->scrolldown_limit++;
         }
 }
@@ -246,7 +259,7 @@ void virt_monitor_scrolldown(virt_monitor *vm)
 {
         if(vm->scrolldown_limit){
                 vm->scrolldown_limit--;
-                if(vm->vis_begin < vm->begin + (vm->size / 2)) vm->vis_begin += 80;
+                if(vm->vis_begin < vm->begin + (vm->size / 2)) vm->vis_begin += line_width;
                 else vm->vis_begin = vm->begin;
                 vm->scrollup_limit++;
         }
@@ -255,6 +268,6 @@ void virt_monitor_scrolldown(virt_monitor *vm)
 void virt_monitor_invert(virt_monitor *vm)
 {
         for(uint8 *temp = (uint8*)vm->vis_begin + 1;
-                        temp <= (uint8*)(vm->vis_begin + 80 * 25); temp+=2)
+                        temp <= (uint8*)(vm->vis_begin + line_width * 25); temp+=2)
                 *temp = 0xFF - *temp;
 }

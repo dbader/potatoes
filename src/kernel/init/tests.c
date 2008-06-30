@@ -577,6 +577,8 @@ void do_tests()
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);
         SHORTCUT_CTRL('n', nullptr_test);
+        SHORTCUT_CTRL('+', switch_monitor_up);
+        SHORTCUT_CTRL('-', switch_monitor_down);
         dprint_separator();
         //fs_tests();
 }

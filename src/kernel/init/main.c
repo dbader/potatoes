@@ -101,10 +101,10 @@ int main(struct multiboot *mboot_ptr)
         do_tests();
         //fs_shutdown();
         
-        pm_create_thread("shell", shell_main, 4096);
-        
         // kernel idle loop
         printf("main: entering idle loop\n");
+        
+        pm_create_thread("SHELL", shell_main, 4096);
         for (;;)
                 halt();
         

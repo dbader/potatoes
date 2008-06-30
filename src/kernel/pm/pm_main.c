@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/ringbuffer.h"
 #include "../include/init.h"
 #include "../io/io.h"
+#include "../io/io_virtual.h"
 #include "../fs/fs_const.h"
 #include "../fs/fs_types.h"
 #include "../fs/fs_file_table.h"
@@ -120,7 +121,7 @@ uint32 pm_schedule(uint32 context)
 
 uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 {
-        __asm__("cli");
+        clear_interrupts();
         
         ASSERT(active_proc != NULL);
         ASSERT(name != NULL);
@@ -188,7 +189,9 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
        
         focus_proc = proc; //FIXME: hackhackhack
         
-        __asm__("sti");
+        start_vmonitor(name);
+        
+        set_interrupts();
        
         
         return proc->pid;

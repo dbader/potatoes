@@ -46,6 +46,7 @@ typedef struct{
 }virt_monitor;
 
 virt_monitor* get_active_virt_monitor();
+char* get_active_virt_monitor_name();
 
 virt_monitor new_virt_monitor();
 void free_virt_monitor(virt_monitor *vm);
@@ -68,6 +69,9 @@ void virt_monitor_putc(virt_monitor *vm, char ch);
 //prints black string
 int virt_monitor_puts(virt_monitor *vm, char *str);
 
+void init_vmonitors();
 void start_vmonitor();
-void start_shell();
+
+void switch_monitor_down();
+void switch_monitor_up();
 #endif /*__IO_VIRTUAL_H_*/

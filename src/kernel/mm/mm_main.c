@@ -67,7 +67,7 @@ void mm_init(uint32 start, uint32 end)
 //        dprintf("mm_start.size: %d\n", mm_start->size);
 
         // This would like to live in main()...
-        start_vmonitor();
+        init_vmonitors();
         printf("etiOS - $Rev: 119 $ - "__DATE__" "__TIME__"\n");
         dprint_separator();
 
