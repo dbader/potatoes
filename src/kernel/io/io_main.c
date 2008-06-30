@@ -37,11 +37,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void io_init()
 {        
         dprint_separator();
-        dprintf("io: init\n");
+        dprintf("%{io:} init\n", YELLOW);
         
-        idt_init();                     dprintf("io: IDT initialized\n");
-        isr_init();                     dprintf("io: ISRs initialized\n");
-        irq_init();                     dprintf("io: IRQs initialized\n");
+        idt_init();                     dprintf("%{io:} IDT initialized\n", YELLOW);
+        isr_init();                     dprintf("%{io:} ISRs initialized\n", YELLOW);
+        irq_init();                     dprintf("%{io:} IRQs initialized\n", YELLOW);
 
         //dprintf("0x%p\n",(get_active_virt_monitor())->begin);
         //dprintf("0x%p\n",(get_active_virt_monitor())->vis_begin);
@@ -49,9 +49,9 @@ void io_init()
         
         
 //        monitor_init();                 dprintf("io: monitor initialized\n");
-        timer_init(FREQUENCY);          dprintf("io: timer initialized (%dHz)\n", FREQUENCY);
-        set_interrupts();               dprintf("io: interrupts enabled\n");
-        hd_init();                      dprintf("io: hard disk initialized\n");
+        timer_init(FREQUENCY);          dprintf("%{io:} timer initialized (%dHz)\n", YELLOW, FREQUENCY);
+        set_interrupts();               dprintf("%{io:} interrupts enabled\n", YELLOW);
+        hd_init();                      dprintf("%{io:} hard disk initialized\n", YELLOW);
         
-        dprintf("io: initialized\n");
+        dprintf("%{io:} initialized\n", YELLOW);
 }

@@ -70,8 +70,8 @@ uint32 getpid()
 void pm_init()
 {
         dprint_separator();
-        dprintf("pm: init\n");
-        dprintf("pm: setting up kernel task...\n");
+        dprintf("%{pm:} init\n", VIOLET);
+        dprintf("%{pm:} setting up kernel task...\n", VIOLET);
         
         procs_head = (process_t*) malloc(sizeof(process_t));
         
@@ -86,14 +86,14 @@ void pm_init()
         
         active_proc = procs_head;
         
-        dprintf("pm: %d syscalls registered\n", MAX_SYSCALL);
+        dprintf("%{pm:} %d syscalls registered\n", VIOLET, MAX_SYSCALL);
         
         do_mkdir("/dev");
         pm_register_device(&dev_null);
         pm_register_device(&dev_stdout);
         pm_register_device(&dev_stdin);
        
-        dprintf("pm: scheduler initialized\n");
+        dprintf("%{pm:} scheduler initialized\n", VIOLET);
         
         //test_ls();
 }
@@ -184,8 +184,9 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 
         proc->context = (uint32) stack;
         
-        dprintf("pm: created thread \"%s\"\n    entry at 0x%x, stack at 0x%x (%u bytes). pid = %u\n\n",
-                        proc->name, entry, proc->context, stacksize, proc->pid);
+        dprintf("%{pm:} created thread \"%s\"\n    "
+                        "entry at 0x%x, stack at 0x%x (%u bytes). pid = %u\n\n",
+                        VIOLET, proc->name, entry, proc->context, stacksize, proc->pid);
        
         focus_proc = proc; //FIXME: hackhackhack
         
@@ -199,7 +200,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 
 void pm_destroy_thread(process_t *proc)
 {
-        dprintf("pm: destroy thread \"%s\" pid = %u\n", proc->name, proc->pid);
+        dprintf("%{pm:} destroy thread \"%s\" pid = %u\n", VIOLET, proc->name, proc->pid);
         if (proc->stdin != NULL)
                 rf_free(proc->stdin);
         free(proc->name);

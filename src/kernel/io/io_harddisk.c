@@ -44,15 +44,19 @@ volatile bool hd_interrupt = FALSE;
 void dump_hd1(){
         int i = 0;
         
-        printf("io: hard disk initialization:"
+        printf("%{io:} hard disk initialization:"
                         "\n\t%u cylinders"
                         "\n\t%u heads"
                         "\n\t%u sectors per track"
-                        "\n\t---------------"
-                        "\n\t%d\tmaximal address\n"
-                ,hd1.apparent_cyl,hd1.apparent_head,hd1.apparent_sector_per_track,maxaddr);
+                        "\n%{\t---------------}"
+                        "\n\t%d\tmaximal address\n", YELLOW
+                ,hd1.apparent_cyl
+                ,hd1.apparent_head
+                ,hd1.apparent_sector_per_track
+                ,YELLOW
+                ,maxaddr);
         
-        printf("\t---------------\n");
+        printf("%{\t---------------\n", YELLOW);
 
         (hd1.buffer_type==3) ? printf("\tbuffer type:\ttwo way, cache possible\n") : 
                 ((hd1.buffer_type==1) ? printf("\tbuffer type:\tone way, single sector\n") : 
@@ -113,7 +117,7 @@ struct address itoaddr(uint32 iaddr)
  */
 uint32 get_hdsize()
 {
-        return hd1.apparent_capacity[1]*10+hd1.apparent_capacity[0]; 
+        return (hd1.apparent_capacity[1] << 16) + hd1.apparent_capacity[0]; 
 }
 
 /**

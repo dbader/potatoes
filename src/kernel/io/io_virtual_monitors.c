@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdlib.h"
 #include "../include/string.h"
 #include "../include/util.h"
+#include "../include/assert.h"
 
 #include "io_virtual.h"
 
@@ -54,9 +55,12 @@ void switch_monitor_down()
 
 void init_vmonitors()
 {
-        vmonitor_names = (char*) malloc(num_vmonitor_limit*81*sizeof(char));
-        bzero(vmonitor_names, num_vmonitor_limit*81*sizeof(char));
-        vmonitors = (virt_monitor*)malloc(num_vmonitor_limit*sizeof(virt_monitor));
+        vmonitor_names = 
+                (char*) callocn(num_vmonitor_limit*81, sizeof(char), "vmonitor names array");
+        ASSERT(vmonitor_names != 0);
+        vmonitors = 
+                (virt_monitor*)callocn(num_vmonitor_limit, sizeof(virt_monitor), "vmonitors array");
+        ASSERT(vmonitors != 0);
         start_vmonitor("DEBUG MONITOR");
 }
 
@@ -76,7 +80,6 @@ void start_vmonitor(char *name)
         *(vmonitor_names + 81 * active_monitor + 1 + strlen(name) + 1) = ' ';
 }
 
-//FIXME: PM should provide the right virtual monitor
 virt_monitor* get_active_virt_monitor(){
         return &(vmonitors[active_monitor]);
 }

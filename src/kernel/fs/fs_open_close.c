@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/stdlib.h"
+#include "../include/string.h"
 #include "../include/debug.h"
 
 #include "fs_const.h"

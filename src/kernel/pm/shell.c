@@ -227,7 +227,7 @@ void shell_cmd_cat(int argc, char *argv[])
                 return;
         }
         
-        int ch;
+        char ch;
         while (_read(fd, &ch, sizeof(ch)) != 0)
                 _fputch(ch, STDOUT);
         

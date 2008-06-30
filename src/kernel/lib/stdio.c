@@ -32,15 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/const.h"
 #include "../include/string.h"
+#include "../include/stdio.h"
 
 #include "../io/io_virtual.h"
-
-void monitor_cputc(char ch, uint8 fg, uint8 bg);
-void monitor_cputs(char *str, uint8 fg, uint8 bg);
-void monitor_putc(char ch);
-void monitor_puts(char *str);
-void monitor_puti(sint32 x);
-void monitor_puthex(uint8 ch);
 
 /**
  * Writes a character to stdout.
@@ -48,11 +42,16 @@ void monitor_puthex(uint8 ch);
  * @return the character written
  */
 
-int putchar(int c)
+int putchar(char c)
 {
         virt_monitor_putc(get_active_virt_monitor(), c);
         //monitor_putc(c);
         return c;
+}
+
+int cputchar(char c, uint8 fg, uint8 bg)
+{
+        virt_monitor_cputc(get_active_virt_monitor(), c, fg, bg);
 }
 
 /**
@@ -68,6 +67,11 @@ int puts(char *s)
         //monitor_puts(s);
 }
 
+int cputs(char *s, uint8 fg, uint8 bg)
+{
+        return virt_monitor_cputs(get_active_virt_monitor(), s, fg, bg);
+}
+
 /**
  * Prints formatted output. The following format specifiers are supported:
  *      %% - prints the % character.
@@ -80,6 +84,7 @@ int puts(char *s)
  *      %c - prints a single character.
  *      %s - prints a string. "(null)" if argument is NULL.
  *      %p - prints a pointer (base 16).
+ *      %{ - prints the string until } colored
  * All other format specifiers are ignored.
  * @param fmt format string
  * @param ... variable number of arguments
@@ -92,12 +97,19 @@ void printf(char *fmt, ...)
         char **arg = &fmt + 1;
         char ch; 
         int character;
+        int color;
         char buf[40];
         
         while ((ch = *fmt++) != '\0')
                 if (ch == '%') {
                         ch = *fmt++;
                         switch (ch) {
+                        case '{': //print colored until }
+                                color = (int)*arg++;
+                                while((ch = *fmt++) != '}' && ch != '\0'){
+                                        cputchar(ch, color, BLACK);
+                                }
+                                break;
                         case '%': // print '%' 
                                 putchar(ch); 
                                 break;

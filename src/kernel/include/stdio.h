@@ -73,7 +73,9 @@ void monitor_scrollup();
 void monitor_scrolldown();
 
 int putchar(char c);
+int cputchar(char c, uint8 fg, uint8 bg);
 int puts(char *s);
+int cputs(char *s, uint8 fg, uint8 bg);
 void printf(char *fmt, ...);
 
 void hd_write_sector(uint32 dest, void* src);

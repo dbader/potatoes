@@ -145,15 +145,19 @@ void kb_handler()
                         super_button = 1;
                         break;
                 case CURSOR_UP:
+                        //FIXME: Daniel you should call here your UP/DOWN/LEFT/RIGHT-handler
                         virt_cursor_move(get_active_virt_monitor(), 0);
                         break;
                 case CURSOR_DOWN:
+                        //FIXME: Daniel you should call here your UP/DOWN/LEFT/RIGHT-handler
                         virt_cursor_move(get_active_virt_monitor(), 1);
                         break;
                 case CURSOR_LEFT:
+                        //FIXME: Daniel you should call here your UP/DOWN/LEFT/RIGHT-handler
                         virt_cursor_move(get_active_virt_monitor(), 2);
                         break;
                 case CURSOR_RIGHT:
+                        //FIXME: Daniel you should call here your UP/DOWN/LEFT/RIGHT-handler
                         virt_cursor_move(get_active_virt_monitor(), 3);
                         break;
                 case LSHIFT:

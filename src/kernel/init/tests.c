@@ -551,7 +551,7 @@ void nullptr_test()
 
 void do_tests()
 {
-        printf("\nGlobal keyboard shortcuts:\n");
+        printf("\n%{Global keyboard shortcuts:}\n", LIGHTGREEN);
         //fs_tests();
         //grubstruct_test(g_mboot_ptr);
         //strings_test();       

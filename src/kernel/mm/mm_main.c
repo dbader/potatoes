@@ -68,16 +68,17 @@ void mm_init(uint32 start, uint32 end)
 
         // This would like to live in main()...
         init_vmonitors();
-        printf("etiOS - $Rev: 119 $ - "__DATE__" "__TIME__"\n");
+        printf("%{etiOS - $Rev: 119 $ - "__DATE__" "__TIME__"\n", LIGHTGREEN);
         dprint_separator();
 
-        dprintf("mm: init\n");
+        dprintf("%{mm:} init\n", LIGHTBLUE);
         //dprintf("size of struct mm_header: %d\n",sizeof(mm_header));
-        gdt_init(); dprintf("mm: GDT initialized\n");  
+        gdt_init(); dprintf("%{mm:} GDT initialized\n", LIGHTBLUE);  
 //        dprintf("mm_end.next: 0x%x\n", mm_end->next);
 //        dprintf("mm_end.prev: 0x%x\n", mm_end->prev);
 //        dprintf("mm_end.name: %s\n", mm_end->name);
 //        dprintf("mm_end.size: %d\n", mm_end->size);
         
-        dprintf("mm: memory 0x%x - 0x%x (%dmb)\n", start, end, (end - start) / (1024 * 1024));
+        dprintf("%{mm:} memory 0x%x - 0x%x (%dmb)\n",
+                        LIGHTBLUE, start, end, (end - start) / (1024 * 1024));
 }
