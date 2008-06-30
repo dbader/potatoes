@@ -55,25 +55,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 file_nr fs_open(char *abs_path)
 {
-        file_nr fd = name2desc(abs_path); //get the file descriptor from file table if already existent
-        if (fd != NOT_FOUND){
-                //inc_count(fd);
-                return fd; //file already exists
-        }
+        file_nr fd;
+        m_inode *inode;
         
-        block_nr block = search_file(abs_path);
-        if (block == NOT_FOUND){
-                fs_dprintf("[fs_o_c] block not found!\n");
-                return NOT_EXISTENT;
+        if (strcmp(abs_path, "/") != 0){ //not the root directory
+                fd = name2desc(abs_path); //get the file descriptor from file table if already existent
+                if (fd != NOT_FOUND){
+                        //inc_count(fd);
+                        return fd; //file already exists
+                }
+                
+                block_nr block = search_file(abs_path);
+                if (block == NOT_FOUND){
+                        fs_dprintf("[fs_o_c] block not found!\n");
+                        return NOT_EXISTENT;
+                }
+                
+                inode = alloc_inode();
+                if (inode == (m_inode*) 0){
+                        fs_dprintf("[fs_o_c] inode not allocateable!\n");
+                        return NOT_POSSIBLE;
+                }
+                
+                read_minode(inode, block); //read content from HD
         }
-        
-        m_inode *inode = alloc_inode();
-        if (inode == (m_inode*) 0){
-                fs_dprintf("[fs_o_c] inode not allocateable!\n");
-                return NOT_POSSIBLE;
+        else {
+              inode = root;  
         }
-        
-        read_minode(inode, block); //read content from HD
         
         fd = insert_file(inode, abs_path, inode->i_mode);
         if (fd == NOT_FOUND){

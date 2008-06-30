@@ -145,7 +145,10 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         
         fs_dprintf("[fs_dir] new block allocated for inode: %d\n", new_blk);
         
-        free(dir_inode);
+        if (dir_inode_blk != ROOT_INODE_BLOCK){
+                free(dir_inode);
+        }
+        
         return new_blk;
 }
 
