@@ -45,7 +45,7 @@ static uint16 *disp = (uint16*)0xB8000; //display pointer
 
 void set_disp(uint32 addr)
 {
-        disp = addr;
+        disp = (uint16*)addr;
 }
 //void *up_buffer_start;
 //void *down_buffer_start;
