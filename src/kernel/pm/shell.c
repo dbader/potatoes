@@ -7,6 +7,14 @@
 #include "../include/stdio.h"
 #include "../fs/fs_types.h"
 
+int STDIN = -1;
+int STDOUT = -1;
+
+int _fputch(char ch, int fd)
+{
+        return _write(fd, &ch, sizeof(ch));
+}
+
 int _fgetch(int fd)
 {
         int ch;
@@ -17,30 +25,38 @@ int _fgetch(int fd)
 
 char* _fgets(char *s, int n, int fd)
 {
+        char *start = s;
         int count = 0;
         char ch = 0;
         while ((n-- > 0) && (ch != '\n')) {
                 ch = _fgetch(fd);
                 
+                // Tab
+                if (ch == '\t') {
+                        *s++ = ch;
+                        break;
+                }
+                
                 // Handle backspace
                 if (ch != '\b') {
                         *s++ = ch;
                         count++;
-                } else
+                        _fputch(ch, STDOUT);
+                } else {
                         if (count > 0) {
                                 *s-- = '\0';
                                 count--;
+                                _fputch(ch, STDOUT);
                         }
+                }
                 
         }
+        
+        if (ch == '\n')
+                *s++ = ch;
+        
         return s;
                 
-}
-
-
-int _fputch(char ch, int fd)
-{
-        return _write(fd, &ch, sizeof(ch));
 }
 
 
@@ -49,9 +65,6 @@ int _fputs(char *s, int fd)
         int count = strlen(s);
         return _write(fd, s, count);
 }
-
-int STDIN = -1;
-int STDOUT = -1;
 
 void _printf(char *fmt, ...)
 {
@@ -120,6 +133,29 @@ typedef struct shell_cmd_t {
 
 struct shell_cmd_t shell_cmds[];
 
+char cwd[255];
+
+char path_buf[sizeof(cwd)];
+
+char* shell_makepath(char *path)
+{
+        strcpy(path_buf, cwd);
+        
+        if (path[0] == '/') {
+                // absolute path
+                return path;
+        } else {
+                // Relative path.
+                
+                // Append trailing slash
+                if (path_buf[strlen(path_buf)-1] != '/')
+                        strcat(path_buf, "/");
+        
+                strcat(path_buf, path);
+                return path_buf;
+        }
+}
+
 // THE COMMANDS
 
 void shell_cmd_test(int argc, char *argv[])
@@ -150,15 +186,17 @@ void shell_cmd_echo(int argc, char *argv[])
 
 void shell_cmd_ls(int argc, char *argv[])
 {
-        if (argc < 2) {
-                _printf("Usage: ls [path]\n");
-                return;
-        }
-        
         dir_entry directory [DIR_ENTRIES_PER_BLOCK];
         bzero(directory, sizeof(directory));
         
-        int fd = _open(argv[1], 0, 0);
+        int fd = -1;
+        
+        if (argc < 2)
+                // current directory
+                fd = _open(cwd, 0, 0);
+        else {
+                fd = _open(shell_makepath(argv[1]), 0, 0);
+        }
         
         if (fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
@@ -183,12 +221,14 @@ void shell_cmd_touch(int argc, char *argv[])
                 return;
         }
         
-        int fd = _open(argv[1], 0, 0);
+        char *path = shell_makepath(argv[1]);
+        
+        int fd = _open(path, O_CREAT, 0);
         
         if (fd >= 0)
-                _printf("Created regular file %s\n", argv[1]);
+                _printf("Created regular file %s\n", path);
         else
-                _printf("Failed to create regular file %s\n", argv[1]);
+                _printf("Failed to create regular file %s\n", path);
 
         _close(fd);
 }
@@ -200,11 +240,12 @@ void shell_cmd_mkdir(int argc, char *argv[])
                 return;
         }
 
-        char path[255];
-        strncpy(path, argv[1], sizeof(path) - 2);
-        strcat(path, "/");
+        char *path = shell_makepath(argv[1]);
         
-        int fd = _open(path, 0, 0);
+        if (path[strlen(path)] != '/')
+                strcat(path, "/");
+        
+        int fd = _open(path, O_CREAT, 0);
         
         if (fd >= 0)
                 _printf("Created directory %s\n", argv[1]);
@@ -221,7 +262,7 @@ void shell_cmd_cat(int argc, char *argv[])
                 return;
         }
         
-        int fd = _open(argv[1], 0, 0);
+        int fd = _open(shell_makepath(argv[1]), 0, 0);
         if (fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
@@ -231,11 +272,6 @@ void shell_cmd_cat(int argc, char *argv[])
         while (_read(fd, &ch, sizeof(ch)) != 0)
                 _fputch(ch, STDOUT);
         
-//        char buf[50];
-//        memset(buf, 0, sizeof(buf));
-//        _read(fd, buf, 5);
-//        _fputs(buf, STDOUT);
-//        
         _close(fd);
 }
 
@@ -246,15 +282,12 @@ void shell_cmd_write(int argc, char *argv[])
                 return;
         }
         
-        int fd = _open(argv[1], 0, 0);
+        int fd = _open(shell_makepath(argv[1]), 0, 0);
         if (fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
-        
-        //char buf[] = "HELLO WORLD.";
-        //_write(fd, buf, 5);
-        
+                
         for (int i = 2; i < argc; i++) {
                 _write(fd, argv[i], strlen(argv[i]));
                 _write(fd, " ", 1);
@@ -266,6 +299,58 @@ void shell_cmd_write(int argc, char *argv[])
         _close(fd);
 }
 
+void shell_cmd_cd(int argc, char *argv[])
+{
+        if (argc < 2) {
+                _printf("Usage: cd [path]\n");
+                return;
+        }
+        
+        /*
+         * TODO:
+         * - handle cd . and cd ..
+         * - handle absolute paths
+         */
+        
+        char *new_dir = shell_makepath(argv[1]);
+        
+        int fd = _open(cwd, 0, 0);
+
+        if (fd < 0) {
+                _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
+                //cwd[strlen(cwd) - strlen(argv[1])] = '\0';
+        }
+        
+        strcpy(cwd, new_dir);
+
+        _close(fd);
+}
+
+void shell_cmd_clear(int argc, char *argv[])
+{
+        for (int i = 0; i < 25 * 80; i++)
+                _fputs("\b", STDOUT);
+}
+
+void shell_cmd_sync(int argc, char *argv[])
+{
+        fs_shutdown();
+        fs_init();
+}
+
+// TODO: nice to have:
+/*
+ * tab completion
+ * repeat last command
+ * pwd
+ * cp
+ * rm
+ * mv
+ * ps
+ * kill
+ * df 
+ */
+
 
 struct shell_cmd_t shell_cmds[] = {
                 {"test",        shell_cmd_test,         "Test argument parsing"},
@@ -276,19 +361,23 @@ struct shell_cmd_t shell_cmds[] = {
                 {"mkdir",       shell_cmd_mkdir,        "Create directory"},
                 {"cat",         shell_cmd_cat,          "Print file contents"},
                 {"write",       shell_cmd_write,        "Write text to file"},
+                {"cd",          shell_cmd_cd,           "Change directory"},
+                {"clear",       shell_cmd_clear,        "Clear the screen"},
+                {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
                 {"",            NULL,                   ""} // The Terminator
 };
 
 #define NUM_SHELL_COMMANDS (sizeof(shell_cmds) / sizeof(shell_cmd_t)) - 1 
 
 void shell_handle_command(char *cmd) 
-{
-        // Kill the trailing line feed.
-        cmd[strlen(cmd)-1] = '\0';
+{       
+        if (strlen(cmd) == 1)
+                return;
         
-//        _fputs("- shell: cmd = ", STDOUT);
-//        _fputs(cmd, STDOUT);
-//        _fputs("\n", STDOUT);
+        // Kill the trailing line feed.
+        // FIXME: Dont know why we get that twice. ???
+        cmd[strlen(cmd)-1] = '\0';
+        cmd[strlen(cmd)-1] = '\0';
         
         // Parsing setup
         char delim[] = " ";
@@ -318,14 +407,37 @@ void shell_handle_command(char *cmd)
         // Execute it if possible
         if (command)
                 command->cmd(argc, argv);
-        else {
-                _fputs("- shell: ", STDOUT);
-                _fputs(argv[0], STDOUT);
-                _fputs(": command not found\n", STDOUT);
-        }
+        else
+                _printf("- shell: %s: command not found\n", argv[0]);
         
         for (int i = 0; i < argc; i++)
                 _free(argv[i]);
+}
+
+void shell_autocomplete(char *partial, int n)
+{
+        partial[strlen(partial)-1] = '\0';
+        //_printf("\ncomplete: %s", partial);
+        
+        shell_cmd_t *cmd;
+        int i = 0;
+        char cmd_name[16];
+        
+        if (strlen(partial) > 15)
+                return;
+        
+        while ((cmd = &shell_cmds[i++])->cmd != NULL) {
+                memset(cmd_name, 0, sizeof(cmd_name));
+                strncpy(cmd_name, cmd->name, strlen(partial));
+                //_printf("%s vs %s = %d\n", partial, cmd_name, strcmp(partial, cmd_name));
+                if (strcmp(partial, cmd_name) == 0) {
+                        //_printf("best match is %s\n", cmd->name);
+                        _fputs(cmd->name + strlen(partial), STDOUT);
+                        strcat(partial, cmd->name + strlen(partial));
+                        return;
+                }
+        }
+
 }
 
 void shell_main()
@@ -336,12 +448,22 @@ void shell_main()
         _printf("Welcome to etiOS!\n");
         _printf("Try \"cmdlist\" for a list of commands.\n\n");
         
+        strcpy(cwd, "/");
+        
         // Prompt
         while (1) {
-                _printf("$ ");
+                _printf("%s$ ", cwd);
                 char cmd[512];
                 memset(cmd, 0, sizeof(cmd));
-                _fgets(cmd, sizeof(cmd), STDIN);
+                
+                while ((cmd[strlen(cmd)-1] != '\n')) {
+                        _fgets(cmd + strlen(cmd), sizeof(cmd) - strlen(cmd), STDIN);
+                        
+                        if (cmd[strlen(cmd)-1] == '\t') {
+                                shell_autocomplete(cmd, sizeof(cmd));
+                        }
+                }
+                
                 shell_handle_command(cmd);
         }
         

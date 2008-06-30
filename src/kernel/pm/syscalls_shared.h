@@ -51,6 +51,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /** The highest syscall id that is still valid. Be sure to update this! */
 #define MAX_SYSCALL     9
 
+#define O_CREAT 1
+
 /** Arguments for the OPEN syscall. */
 typedef struct sc_open_args_t {
         int fd; // return value

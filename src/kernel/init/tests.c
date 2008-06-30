@@ -488,48 +488,20 @@ void isr_test()
 void threadA()
 {
         _log("hello from task A\n");
-        
-        printf("fd is 0x%x\n", _open("/usr/share/test.txt", 0x23, 0));
-        
-        void *mem = _malloc(512);
-        printf("mem is at 0x%x", mem);
-        _free(mem);
-        
+                
         for(;;) {
                 for (int i = 0; i < 9999; i++) ;
                 _log("A");
-                //__asm__("hlt");
-                _exit(0);
         }
 }
 
 void threadB()
 {
         _log("hello from task B\n"); // log()
-        printf("my pid is %u\n", _getpid());
-        
-        int fd = _open("/test", 0, 0);
-        printf("fd = %u\n", fd);
-        
-        char buf[100];
-        
-        memset(buf, 0, sizeof(buf));
-        _read(fd, buf, 15);        
-        _log(buf);
-        
-        memset(buf, 0, sizeof(buf));
-        _read(fd, buf, 15);        
-        _log(buf);
-        
-        memset(buf, 0, sizeof(buf));
-        _read(fd, buf, 15);        
-        _log(buf);
         
         for(;;) {
                 for (int i = 0; i < 9999; i++) ;
                 _log("B");
-                //__asm__("hlt");
-                _exit(-1);
         }
 }
 

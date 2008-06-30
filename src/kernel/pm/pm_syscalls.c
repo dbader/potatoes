@@ -135,7 +135,7 @@ void sys_open(void *data)
                 // If opening fails attempt to create the file
                 int fd = do_open(args->path);
 
-                if (fd == NOT_POSSIBLE) {
+                if (fd == NOT_POSSIBLE && args->oflag == O_CREAT) {
                         // See if it's a directory
                         if (args->path[strlen(args->path)-1] == '/') {
                                 // Kill trailing slash.
@@ -143,9 +143,10 @@ void sys_open(void *data)
                                 do_mkdir(args->path);
                         } else
                                 do_create(args->path, 0);
+                        
+                        fd = do_open(args->path);
                 }
-
-                fd = do_open(args->path);
+                
                 if (fd == NOT_POSSIBLE) 
                         args->fd = -1;
                 else
@@ -196,6 +197,7 @@ void sys_read(void* data)
         } else {
  //               panic("mark one");
                 // It's a regular file
+                SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES); 
                 args->rw_count = do_read(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
 

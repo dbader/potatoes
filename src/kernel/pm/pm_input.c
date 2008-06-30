@@ -54,7 +54,7 @@ void pm_handle_input(int c)
         if (focus_proc == NULL)
                 return;
         
-        putchar(c); // Echo.
+        //putchar(c); // Echo.
         
         if (rf_write(focus_proc->stdin, (uint8*)&c, sizeof(c)) != sizeof(c))
                 dprintf("error writing to stdin\n");
