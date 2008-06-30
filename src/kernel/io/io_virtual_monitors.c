@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 uint16 active_monitor = -1;
 uint16 maxvmonitor = -1;
 virt_monitor *vmonitors;
-uint16 num_vmonitor_limit = 100;
+uint16 num_vmonitor_limit = 1000;
 char *vmonitor_names;
 
 void switch_monitor_up()
@@ -66,9 +66,9 @@ void init_vmonitors()
 void start_vmonitor(char *name)
 {
         virt_monitor vmonitor = new_virt_monitor();
-        active_monitor++;
         maxvmonitor++;
-        vmonitors[active_monitor] = vmonitor;
+        active_monitor=maxvmonitor;
+        vmonitors[maxvmonitor] = vmonitor;
         memset(vmonitor_names + 81 * active_monitor, '=', 74);
         memcpy(vmonitor_names + 81 * active_monitor + 74, " ETIOS", 6);
         memcpy(vmonitor_names + 81 * active_monitor + 2, name, strlen(name));

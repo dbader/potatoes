@@ -333,7 +333,7 @@ void shell_main()
         STDIN = _open("/dev/stdin", 0, 0);
         STDOUT = _open("/dev/stdout", 0, 0);
         
-        _printf("\n\nWelcome to etiOS!\n");
+        _printf("Welcome to etiOS!\n");
         _printf("Try \"cmdlist\" for a list of commands.\n\n");
         
         // Prompt
