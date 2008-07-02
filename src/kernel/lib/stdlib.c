@@ -179,7 +179,7 @@ void free(void *start)
         //dprintf("free 0x%x\n", start);
         mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
         // check if there is a valid mm_header structure at start
-        if((this->next)->prev == this) {
+        if((this->prev)->next == this) {
                 (this->prev)->next = this->next;
                 (this->next)->prev = this->prev;
                 return;
