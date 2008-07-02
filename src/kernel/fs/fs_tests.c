@@ -22,12 +22,13 @@ void test_bmap() /* [successful] */
 {
         dprintf("allocated 10?: %d\n", is_allocated_block(10));
         dprintf("allocated 42?: %d\n", is_allocated_block(42));
-        dprintf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
-        dprintf("alloc new: %d\n", alloc_block(FIRST_DATA_BLOCK));
-        dprintf("first free %d\n", get_free_block(FIRST_DATA_BLOCK));
+        dprintf("first free %d\n", get_free_block(super_block.s_first_data_block));
+        dprintf("alloc new: %d\n", alloc_block(super_block.s_first_data_block));
+        dprintf("first free %d\n", get_free_block(super_block.s_first_data_block));
         mark_block(42, TRUE);
         dprintf("allocated 42?: %d\n", is_allocated_block(42));
-        mark_block(10, FALSE);
+        mark_block(42, FALSE);
+        mark_block(100, TRUE);
         dump_bmap();
 }
 
@@ -337,5 +338,5 @@ void test_ls()
 
 void run_FS_tests()
 {
-        test_PM();
+        test_bmap();
 }

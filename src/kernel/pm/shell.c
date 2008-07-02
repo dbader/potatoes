@@ -67,7 +67,7 @@ int _fputs(char *s, int fd)
         return _write(fd, s, count);
 }
 
-void _printf(char *fmt, ...)
+void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution possible?
 {
         if (fmt == NULL)
                 return;
@@ -308,7 +308,7 @@ void shell_cmd_write(int argc, char *argv[])
         }
         
         _write(fd, "", 1); // append \0
-        _printf("wrote %d bytes.\n", _seek(fd, 0, SEEK_CUR));       
+        _printf("wrote %d bytes.\n", _seek(fd, 0, SEEK_CUR));
         _close(fd);
 }
 
@@ -335,9 +335,7 @@ void shell_cmd_cd(int argc, char *argv[])
         // It exists, change the cwd.
         strcpy(cwd, new_dir);
         
-        //dump_files();
-        _close(fd); //TODO: FIXME!?
-        dump_files();
+        _close(fd);
 }
 
 void shell_cmd_clear(int argc, char *argv[])
@@ -350,7 +348,7 @@ extern void fs_shutdown();
 extern void fs_init();
 extern bool create_fs();
 
-void shell_cmd_sync(int argc, char *argv[])
+void shell_cmd_sync(int argc, char *argv[]) //TODO: @Daniel: strange intention... every thing will be reset
 {
         fs_shutdown();
         create_fs();
@@ -425,7 +423,6 @@ void shell_handle_command(char *cmd)
                 }
                 argv[argc++] = strdup(tok);                
         }
-
         _free(copy);
         
         shell_cmd_t *command = NULL;
@@ -443,8 +440,9 @@ void shell_handle_command(char *cmd)
         else
                 _printf("- shell: %s: command not found\n", argv[0]);
         
-        for (int i = 0; i < argc; i++)
+        for (int i = 0; i < argc; i++){
                 _free(argv[i]);
+        }
 }
 
 void shell_autocomplete(char *partial, int n)

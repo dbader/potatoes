@@ -34,10 +34,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdlib.h"
 #include "../include/debug.h"
 
+
 #include "fs_const.h"
 #include "fs_types.h"
 #include "fs_file_table.h"
-
+#include "fs_inode_table.h"
 /**
  * Initialize the global filp table with NULL elements
  */
@@ -65,7 +66,7 @@ void dump_files(){
  */
 void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 {
-        fs_dprintf("initialize proc_file_table at 0x%d\n", pft);
+        fs_dprintf("[fs_file_table] initialize proc_file_table at 0x%d\n", pft);
         for(int i = 0; i < NUM_PROC_FILES; i++){
                 pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
         }
@@ -133,7 +134,8 @@ file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length
         fd->pf_f_desc = glo_fd;
         fd->pf_pos    = 0;
         
-        
+        //fs_dprintf("[fs_file_table] inserting new proc file num = %d, glo_fd = %d \n", fd->pf_desc, fd->pf_f_desc);
+              
         file *f = get_file(glo_fd);
         
         if (f != (file *) NULL){
@@ -214,7 +216,6 @@ void free_file(file_nr fd)
         f->f_count--;
         if (f->f_count == 0){
                 f->f_desc = NIL_FILE;
-                //bzero(f->f_name, sizeof(f->f_name)); //TODO: necessary?
                 free(f->f_name);
                 f->f_name = (char *) NULL;
                 
@@ -265,7 +266,7 @@ void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 orig
 file_nr name2desc(char *name) //in global filp table
 { 
         for (int i = 0; i < NUM_FILES; i++){
-                fs_dprintf("%s on 0x%d\n\n", gft[i].f_name, &gft[i].f_name);
+                //fs_dprintf("%s on 0x%d\n\n", gft[i].f_name, &gft[i].f_name);
                 if (gft[i].f_name != (char *) NULL && strcmp(name, gft[i].f_name) == 0) { 
                         fs_dprintf("[fs_file_table] %s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
                         return gft[i].f_desc;

@@ -93,7 +93,6 @@ file_nr fs_open(char *abs_path)
                 fs_dprintf("[fs_o_c] new file could not be inserted!\n");
                 return NOT_POSSIBLE;
         }
-        
         return fd;
 }
 

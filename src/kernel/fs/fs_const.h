@@ -57,15 +57,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define BYTES_DOUBLE_INDIRECT   ADDRS_PER_BLOCK * ADDRS_PER_BLOCK * BLOCK_SIZE
 
 
-#define NUM_BLOCKS_ON_HD        131072                                  /* 131072 * 512 byte = 64 MB */
-#define NUM_BMAP_BLOCKS         ((NUM_BLOCKS_ON_HD / BLOCK_SIZE) / 8)   /* #blocks for the block bitmap (rounded)*/
+//#define NUM_BLOCKS_ON_HD        131072                                  /* 131072 * 512 byte = 64 MB */
+//#define NUM_BMAP_BLOCKS         ((NUM_BLOCKS_ON_HD / BLOCK_SIZE) / 8)   /* #blocks for the block bitmap (rounded)*/
 
 #define BOOT_BLOCK              (block_nr) 0
 #define SUPER_BLOCK             (block_nr) 1
-#define FIRST_BMAP_BLOCK        (block_nr) 2
 #define ROOT_INODE              (inode_nr) 0
-#define ROOT_INODE_BLOCK        (block_nr) (SUPER_BLOCK + (NUM_BMAP_BLOCKS))
-#define FIRST_DATA_BLOCK        ROOT_INODE_BLOCK + 1
+#define ROOT_INODE_BLOCK        (block_nr) 2 //(SUPER_BLOCK + (NUM_BMAP_BLOCKS))
+#define FIRST_BMAP_BLOCK        (block_nr) 3
+//#define FIRST_DATA_BLOCK        ROOT_INODE_BLOCK + 1
 
 #define DATA_FILE               1
 #define DIRECTORY               2

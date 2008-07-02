@@ -98,7 +98,7 @@ void load_root()
 {
         fs_dprintf("[fs_inode_table] load root inode from block %d to inode table\n", ROOT_INODE_BLOCK);
 
-        rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, sizeof(m_inode));
+        rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, BLOCK_SIZE);
         root = &inode_table[ROOT_INODE];
         root->i_adr = ROOT_INODE_BLOCK;
         root->i_num = ROOT_INODE;
@@ -111,9 +111,9 @@ void load_root()
 
 void write_root()
 {
-        fs_dprintf("[fs_inode_table] write root inode to block %d\n", root->i_adr);
+        fs_dprintf("[fs_inode_table] write root inode to block %d\n", ROOT_INODE_BLOCK);
         
-        wrt_block(ROOT_INODE_BLOCK, &inode_table[ROOT_INODE], sizeof(m_inode));
+        wrt_block(ROOT_INODE_BLOCK, root, sizeof(root));
 }
 
 void create_root()

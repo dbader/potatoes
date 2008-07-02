@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/debug.h"
+#include "../include/stdlib.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -53,8 +54,11 @@ extern void run_FS_tests();
  */
 void fs_init()
 {
+        dprint_separator();
+        dprintf("%{FS:} init\n", GREEN);
+        
         if(!load_fs()){
-                printf("FS loading failed. trying to create a new one.\n");
+                printf("%{FS:} %{FS loading failed.}\n", GREEN, RED);
                 if (!create_fs()){
                         panic("FS cannot be initialized!\n");
                 }
@@ -67,7 +71,7 @@ void fs_init()
  */
 void fs_shutdown()
 {
-        printf("shutting down FS\n");
+        printf("%{FS:} shutting down FS..\n", GREEN);
         write_root(); //TODO: intersection with "close all left inodes?"
         
         //close all open files
@@ -77,7 +81,7 @@ void fs_shutdown()
         
         write_bmap();
         write_super_block();
-
+        free(bmap);
 }
 
 /**
@@ -85,7 +89,7 @@ void fs_shutdown()
  */
 bool load_fs()
 {
-        printf("loading FS from HD\n");
+        printf("%{FS:} loading FS from HD..\n", GREEN);
         load_bmap();
         init_inode_table();
         init_file_table();
@@ -100,10 +104,10 @@ bool load_fs()
  */
 bool create_fs()
 {
-        fs_dprintf("starting to create a new FS\n");
+        printf("%{FS:} creating new FS...\n", GREEN);
         //dump_consts();
 
-        reset_bmap();
+        init_bmap();
         init_inode_table();
         init_file_table();
         create_root();
@@ -153,14 +157,12 @@ bool do_mkfile(char *abs_path)
 
 bool do_close(file_nr fd)
 {
-        dprintf("closing file num %d\n",fd);
         return (fs_close(fd));
 }
 
 bool do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
 {
         proc_file *pf = get_proc_file(pft, pfd);
-        fs_dprintf("closing procfile num %d\n", pfd);
         if (do_close(pf->pf_f_desc)){
                 free_proc_file(pft, pfd);
                 return TRUE;
@@ -176,14 +178,15 @@ bool do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
  */ 
 void dump_consts()
 {
-        printf("NUM_BLOCKS_ON_HD = %d\nNUM_FILES = %d\nNUM_PROC_FILES = %d\nNUM_INODES = %d\n\n"
+        printf("NUM_FILES = %d\nNUM_PROC_FILES = %d\nNUM_INODES = %d\n\n"
                 "SUPER_SIZE = %d\nDISK_INODE_SIZE = %d\nMEM_INODE_SIZE = %d\n\n"
                 "INODES_PER_BLOCK = %d\nDIR_ENTRIES_PER_BLOCK = %d\nADDRS_PER_BLOCK = %d\n"
                 "BYTES_DIRECT = %d\nBYTES_SINGLE_INDIRECT = %d\nBYTES_DOUBLE_INDIRECT = %d\n\n"
-                "NUM_BMAP_BLOCKS = %d\nROOT_INODE_BLOCK = %d\nFIRST_DATA_BLOCK = %d\n\n\n",
-                NUM_BLOCKS_ON_HD, NUM_FILES, NUM_PROC_FILES, NUM_INODES,
+                "ROOT_INODE_BLOCK = %d\n\n\n",
+                NUM_FILES, NUM_PROC_FILES, NUM_INODES,
                 SUPER_SIZE, DISK_INODE_SIZE, MEM_INODE_SIZE,
                 INODES_PER_BLOCK, DIR_ENTRIES_PER_BLOCK, ADDRS_PER_BLOCK,
                 BYTES_DIRECT, BYTES_SINGLE_INDIRECT, BYTES_DOUBLE_INDIRECT,
-                NUM_BMAP_BLOCKS, ROOT_INODE_BLOCK, FIRST_DATA_BLOCK);
+                ROOT_INODE_BLOCK);
 }
+

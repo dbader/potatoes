@@ -39,12 +39,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_types.h"
 #include "fs_super.h"
 #include "fs_block_dev.h"
+#include "fs_bmap.h"
 
 /**
  * Time function.
  * @return current system time.
  */
 extern uint32 get_time();
+extern uint32 get_hdsize();
 
 /**
  * Pointer to super block structure.
@@ -58,11 +60,11 @@ void init_super_block()
 {
         super = &super_block;
         
-        super->s_HD_size = NUM_BLOCKS_ON_HD;
+        super->s_HD_size = get_hdsize();
         
-        super->s_bmap_blocks = NUM_BMAP_BLOCKS;
+        super->s_bmap_blocks = num_bmap_blocks;
         
-        super->s_first_data_block = FIRST_DATA_BLOCK;
+        super->s_first_data_block = first_data_block;
         
         /* with 32 Bit addresses and a block size of 512: 16MB */
         super->s_max_file_size = (NUM_DIRECT_POINTER + BLOCK_SIZE*8/32 + (BLOCK_SIZE*8/32)*(BLOCK_SIZE*8/32)) * BLOCK_SIZE;
@@ -87,7 +89,7 @@ void dump_super()
 {
         ASSERT(super != NIL_SUPER);
         fs_dprintf("\nSUPER: \n");
-        fs_dprintf("HD_size = %d\n#bmap_block = %d\nFDB = %d\nMFS = %d\n*bmap = %p\n*iroot = %p\nused = %d\n\n",
+        fs_dprintf("HD_size = %d\n#bmap_blocks = %d\nFDB = %d\nMFS = %d\n*bmap = 0x%p\n*iroot = 0x%p\nmagic = %d\n\n",
                         super->s_HD_size, super->s_bmap_blocks, super->s_first_data_block, 
                         super->s_max_file_size, super->s_bmap, super->s_iroot, super->s_magic_number);
 }

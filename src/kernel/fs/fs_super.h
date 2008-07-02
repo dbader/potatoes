@@ -33,11 +33,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __SUPER_H_
 
 /**
- * extern deklaration of the block bitmap
- */
-extern uint8 bmap[NUM_BMAP_BLOCKS * BLOCK_SIZE];
-
-/**
  * extern deklaration of root inode
  */
 extern m_inode *root;

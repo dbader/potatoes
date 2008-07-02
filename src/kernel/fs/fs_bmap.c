@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/debug.h"
 #include "../include/string.h"
+#include "../include/stdlib.h"
 
 #include "fs_const.h"
 #include "fs_types.h"
@@ -41,20 +42,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_bmap.h"
 #include "fs_block_dev.h"
 
-
+extern uint32 get_hdsize();
 /**
  * Resets the block bitmap.
  * Set boot block, super block, ... (until first "real" data block) as used.
  */
-void reset_bmap()
+void init_bmap()
 {
-        fs_dprintf("[fs_bmap] resetting bmap (size = %d)\n", sizeof(bmap));
+        uint32 size =  get_hdsize() / 8;
+        num_bmap_blocks = size / BLOCK_SIZE + 1;
+        first_data_block = ROOT_INODE_BLOCK + num_bmap_blocks + 1;
         
-        bzero(bmap, sizeof(bmap));
+        bmap = mallocn(size, "block bitmap");
         
-        block_nr fdp = FIRST_DATA_BLOCK;
+        bzero(bmap, size);
         
-        for (block_nr i = 0; i < fdp; i++){
+        fs_dprintf("[fs_bmap] initializing bmap (size = %d)\n", size);
+        
+        for (block_nr i = 0; i < first_data_block; i++){
                 mark_block(i, TRUE);
         }
 }
@@ -66,7 +71,7 @@ void load_bmap()
 {
         fs_dprintf("[fs_bmap] loading bmap from HD\n");
         int j = 0;
-        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
+        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + num_bmap_blocks; i++){
                 rd_block(&bmap[j*BLOCK_SIZE], i, BLOCK_SIZE);
                 j++;
         }
@@ -79,7 +84,7 @@ void write_bmap()
 {
         fs_dprintf("[fs_bmap] writing bmap to HD\n");
         int j = 0;
-        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + NUM_BMAP_BLOCKS; i++){
+        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + num_bmap_blocks; i++){
                 wrt_block(i, &bmap[j*BLOCK_SIZE], BLOCK_SIZE); //TODO: test this!
                 j++;
         }
@@ -96,7 +101,7 @@ block_nr get_free_block(block_nr start)
 {
         block_nr blk = start;
         
-        while(blk < NUM_BLOCKS_ON_HD){
+        while(blk < get_hdsize()){
                if (is_allocated_block(blk) == FALSE){
                        return blk;
                }
@@ -177,9 +182,10 @@ void dump_bmap()
         
         fs_dprintf("[fs_bmap] BMAP (used blocks): \n");
         
-        for (block_nr blk_nr = BOOT_BLOCK; blk_nr < NUM_BLOCKS_ON_HD; blk_nr++){
+        for (block_nr blk_nr = BOOT_BLOCK; blk_nr < get_hdsize(); blk_nr++){
                 if (is_allocated_block(blk_nr)){
                         fs_dprintf("[%d] ", blk_nr);
                 }
         }
+        fs_dprintf("\n");
 }

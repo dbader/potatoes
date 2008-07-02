@@ -68,7 +68,7 @@ void pm_syscall(uint32 id, void* data)
 {
         if (id > MAX_SYSCALL)
                 panic("pm_syscall: id > MAX_SYSCALL"); // more verbosity, ie pid, name, regs, stack
-        
+       
         syscall_table[id](data);
 }
 
@@ -279,5 +279,6 @@ void sys_malloc(void *data)
 void sys_free(void *data)
 {
         SYSCALL_TRACE("SYS_FREE(0x%x)\n", data);
+        printf("SYS_FREE(0x%x)\n", data); //TODO: @Daniel: FIXME!! this argument is another than from _free
         free(data);
 }
