@@ -23,7 +23,7 @@ int dev_null_read(void *dev, int fd, void *buf, int size)
 
 int dev_null_write(void *dev, int fd, void *buf, int size)
 {
-        dprintf("writing %d bytes to devnull\n", size);
+        dprintf("writing %d bytes to /dev/null\n", size);
         return size;
 }
 

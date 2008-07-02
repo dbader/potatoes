@@ -17,7 +17,7 @@ int _fputch(char ch, int fd)
 
 int _fgetch(int fd)
 {
-        int ch;
+        char ch;
         while (_read(fd, &ch, sizeof(ch)) == 0)
                 halt();
         return ch;

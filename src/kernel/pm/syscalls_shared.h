@@ -51,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /** The highest syscall id that is still valid. Be sure to update this! */
 #define MAX_SYSCALL     9
 
+// Definitions for open()'s oflag argument
 #define O_CREAT 1
 
 /** Arguments for the OPEN syscall. */
@@ -75,7 +76,7 @@ typedef struct sc_read_write_args_t {
         int size;
 } sc_read_write_args_t;
 
-// Definitions for seek() whence
+// Definitions for seek()'s whence argument
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
