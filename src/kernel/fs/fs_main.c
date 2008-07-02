@@ -53,12 +53,12 @@ extern void run_FS_tests();
  */
 void fs_init()
 {
-        //if(!load_fs()){
+        if(!load_fs()){
                 printf("FS loading failed. trying to create a new one.\n");
                 if (!create_fs()){
                         panic("FS cannot be initialized!\n");
                 }
-        //}
+        }
                 
 }
 
@@ -153,12 +153,14 @@ bool do_mkfile(char *abs_path)
 
 bool do_close(file_nr fd)
 {
+        dprintf("closing file num %d\n",fd);
         return (fs_close(fd));
 }
 
 bool do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
 {
         proc_file *pf = get_proc_file(pft, pfd);
+        fs_dprintf("closing procfile num %d\n", pfd);
         if (do_close(pf->pf_f_desc)){
                 free_proc_file(pft, pfd);
                 return TRUE;

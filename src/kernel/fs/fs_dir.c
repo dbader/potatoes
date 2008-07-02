@@ -112,8 +112,6 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         
         //scan the directory successively until a free entry is found 
         do{
-                bzero(dir_cache, sizeof(dir_cache));
-                
                 dir_entry_blk = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, TRUE);
                 
                 fs_dprintf("[fs_dir] directory inode block: %d\n", dir_entry_blk);
@@ -143,7 +141,6 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         fs_dprintf("[fs_dir] wrt_block(%d, dir_cache, %d)\n", dir_entry_blk, sizeof(dir_cache));
         
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
-        bzero(dir_cache, sizeof(dir_cache));
         
         clear_block(new_blk); //reset new block
         

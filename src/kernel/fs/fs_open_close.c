@@ -59,12 +59,14 @@ file_nr fs_open(char *abs_path)
         file_nr fd;
         m_inode *inode;
         
-        abs_path = strdup(abs_path);
-                
+        fs_dprintf("[fs_o_c] trying to open %s\n", abs_path);
+        dump_inode(root);
+        
         if (strcmp(abs_path, "/") != 0){ //not the root directory
                 fd = name2desc(abs_path); //get the file descriptor from file table if already existent
                 if (fd != NOT_FOUND){
                         //inc_count(fd);
+                        fs_dprintf("[fs_o_c] file already exists!\n");
                         return fd; //file already exists
                 }
                 
@@ -75,7 +77,7 @@ file_nr fs_open(char *abs_path)
                 }
                 
                 inode = alloc_inode();
-                if (inode == (m_inode*) 0){
+                if (inode == (m_inode*) NULL){
                         fs_dprintf("[fs_o_c] inode not allocateable!\n");
                         return NOT_POSSIBLE;
                 }
@@ -108,10 +110,7 @@ bool fs_close(file_nr fd)
                 return FALSE; //file does not exist
         }
         
-        m_inode *inode = f->f_inode;
-        
-        write_inode(inode);
-        
+        write_inode(f->f_inode);
         free_file(fd);
         
         return TRUE;

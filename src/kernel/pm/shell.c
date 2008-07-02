@@ -162,6 +162,7 @@ char* shell_makepath(char *path)
                         strcat(path_buf, "/");
         
                 strcat(path_buf, path);
+                path_buf[strlen(path_buf)] = '\0';
                 return path_buf;
         }
 }
@@ -214,6 +215,7 @@ void shell_cmd_ls(int argc, char *argv[])
         if (_read(fd, directory, sizeof(directory)) != sizeof(directory)) {
                 _close(fd);
                 _printf("%s: Error reading directory\n", argv[0]);
+                return;
         }
 
         int i = 0;
@@ -221,7 +223,6 @@ void shell_cmd_ls(int argc, char *argv[])
                 _printf("%s\n", directory[i].name);
                 i++;
         }
-        
         _close(fd);
 }
 
@@ -333,7 +334,10 @@ void shell_cmd_cd(int argc, char *argv[])
         
         // It exists, change the cwd.
         strcpy(cwd, new_dir);
-        _close(fd);
+        
+        //dump_files();
+        _close(fd); //TODO: FIXME!?
+        dump_files();
 }
 
 void shell_cmd_clear(int argc, char *argv[])

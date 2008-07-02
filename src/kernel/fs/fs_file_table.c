@@ -65,6 +65,7 @@ void dump_files(){
  */
 void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 {
+        fs_dprintf("initialize proc_file_table at 0x%d\n", pft);
         for(int i = 0; i < NUM_PROC_FILES; i++){
                 pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
         }
@@ -89,10 +90,13 @@ void dump_proc_files(proc_file pft[NUM_PROC_FILES]){
  */
 file_nr insert_file(m_inode *inode, char *name, uint8 mode)
 {
+        name = strdup(name);
+        
         file_nr old = name2desc(name);          //exists a file with the same path already?
         if (old != NOT_FOUND){
                 //inc_count(old);                 //increment reference counter
                 fs_dprintf("[fs_file_table] file already exists. returned old FD.\n");
+                free(name);
                 return old;
         }
                 
@@ -100,6 +104,7 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode)
         
         if (fd == (file*) NULL){
                 fs_dprintf("[fs_file_table] new file could not be allocated!\n");
+                free(name);
                 return NOT_POSSIBLE;
         }
 
@@ -121,6 +126,7 @@ file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length
         proc_file *fd = alloc_proc_file(pft);
         
         if (fd == (proc_file *) NULL){
+                fs_dprintf("allocation of new proc_file not possible!\n");
                 return NOT_POSSIBLE;
         }
         
@@ -208,7 +214,12 @@ void free_file(file_nr fd)
         f->f_count--;
         if (f->f_count == 0){
                 f->f_desc = NIL_FILE;
+                //bzero(f->f_name, sizeof(f->f_name)); //TODO: necessary?
                 free(f->f_name);
+                f->f_name = (char *) NULL;
+                
+                if (f->f_inode->i_adr != ROOT_INODE_BLOCK)
+                        free_inode(f->f_inode->i_num);
         }
 }
 
@@ -218,8 +229,6 @@ void free_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
         
         pf->pf_desc = NIL_PROC_FILE;
         pf->pf_pos = 0;
-        
-        free_file(pf->pf_desc);
         pf->pf_f_desc = NIL_FILE;
 }
 
@@ -256,7 +265,8 @@ void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 orig
 file_nr name2desc(char *name) //in global filp table
 { 
         for (int i = 0; i < NUM_FILES; i++){
-                if (strcmp(name, gft[i].f_name) == 0) { 
+                fs_dprintf("%s on 0x%d\n\n", gft[i].f_name, &gft[i].f_name);
+                if (gft[i].f_name != (char *) NULL && strcmp(name, gft[i].f_name) == 0) { 
                         fs_dprintf("[fs_file_table] %s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
                         return gft[i].f_desc;
                 }

@@ -149,8 +149,9 @@ void sys_open(void *data)
                 
                 if (fd == NOT_POSSIBLE) 
                         args->fd = -1;
-                else
+                else{
                         args->fd = insert_proc_file(active_proc->pft, fd) + MAX_DEVICES;
+                }
         }
 }
 

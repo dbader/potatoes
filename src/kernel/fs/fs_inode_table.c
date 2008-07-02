@@ -96,13 +96,14 @@ void dump_inodes()
  */
 void load_root()
 {
-        fs_dprintf("[fs_inode_table] load root inode from HD to inode table\n");
+        fs_dprintf("[fs_inode_table] load root inode from block %d to inode table\n", ROOT_INODE_BLOCK);
 
         rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, sizeof(m_inode));
-        
         root = &inode_table[ROOT_INODE];
-        
-        dprintf("root: %d\n", root->i_adr);
+        root->i_adr = ROOT_INODE_BLOCK;
+        root->i_num = ROOT_INODE;
+
+        fs_dprintf("[fs_inode_table] root block: %d\n", root->i_adr);
         
         ASSERT(root != (m_inode *) NULL);
         
@@ -110,7 +111,7 @@ void load_root()
 
 void write_root()
 {
-        fs_dprintf("[fs_inode_table] write root inode to HD\n");
+        fs_dprintf("[fs_inode_table] write root inode to block %d\n", root->i_adr);
         
         wrt_block(ROOT_INODE_BLOCK, &inode_table[ROOT_INODE], sizeof(m_inode));
 }
@@ -233,7 +234,7 @@ m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
         if (!to_inode_table){
                 mi = malloc(sizeof(m_inode));
                 if (mi == (void*) NULL) return (m_inode *) NULL;
-                mi->i_num  = 0;
+                mi->i_num = NIL_INODE; //TODO: changed...
         } else {
                 mi = alloc_inode();
         }
