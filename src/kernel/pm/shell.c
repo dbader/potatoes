@@ -359,12 +359,43 @@ void shell_cmd_sync(int argc, char *argv[]) //TODO: @Daniel: strange intention..
 extern void mem_dump();
 void shell_cmd_memdump(int argc, char *argv[])
 {
+//        printf("%{mm:} malloc testing - 0x%x\n", LIGHTBLUE, mallocn(1,"test1"));
+//        printf("%{mm:} malloc testing - 0x%x\n", LIGHTBLUE, mallocn(2,"test2"));
+//        printf("%{mm:} malloc testing - 0x%x\n", LIGHTBLUE, mallocn(3,"test3"));
         mem_dump();
 }
 
 void shell_cmd_pwd(int argc, char *argv[])
 {
         _printf("%s\n",cwd);
+}
+
+void shell_cmd_cp(int argc, char *argv[])
+{
+        if (argc < 3) {
+                _printf("Usage: cp [source] [target]\n");
+                return;
+        }
+        
+        int src_fd = _open(shell_makepath(argv[1]), 0, 0);       
+        if (src_fd < 0) {
+                _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
+                return;   
+        }
+        
+        int target_fd = _open(shell_makepath(argv[2]), O_CREAT, 0);
+        if (src_fd < 0) {
+                _printf("%s: %s: Could not create target file\n", argv[0], argv[2]);
+                _close(src_fd);
+                return;   
+        }
+        
+        char ch;
+        while (_read(src_fd, &ch, sizeof(ch)) != 0)
+                _fputch(ch, target_fd);
+        
+        _close(src_fd);
+        _close(target_fd);
 }
 
 // TODO: nice to have:
@@ -395,7 +426,8 @@ struct shell_cmd_t shell_cmds[] = {
                 {"clear",       shell_cmd_clear,        "Clear the screen"},
                 {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
                 {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
-                {"pwd",         shell_cmd_pwd,          "Prints working directory"},
+                {"pwd",         shell_cmd_pwd,          "Print working directory"},
+                {"cp",          shell_cmd_cp,           "Copy files"},
                 {"",            NULL,                   ""} // The Terminator
 };
 
@@ -415,7 +447,7 @@ void shell_handle_command(char *cmd)
         char delim[] = " ";
         char *tok;
         char *copy = strdup(cmd); // uses kernel malloc
-        printf("malloc by strdup (copy): 0x%x\n", copy);
+        //printf("malloc by strdup (copy): 0x%x\n", copy);
         char *work_copy = copy;
 
         // For the command
@@ -428,9 +460,9 @@ void shell_handle_command(char *cmd)
                         break;
                 }
                 argv[argc++] = strdup(tok);
-                printf("malloc by strdup (argv[i]): 0x%x\n", argv[argc-1]);
+                //printf("malloc by strdup (argv[i]): 0x%x\n", argv[argc-1]);
         }
-        printf("_free(copy): 0x%x\n", copy);
+        //printf("_free(copy): 0x%x\n", copy);
         _free(copy);
         
         shell_cmd_t *command = NULL;
@@ -449,7 +481,7 @@ void shell_handle_command(char *cmd)
                 _printf("- shell: %s: command not found\n", argv[0]);
         
         for (int i = 0; i < argc; i++){
-                printf("_free(argv[i]): 0x%x\n", argv[i]);
+                //printf("_free(argv[i]): 0x%x\n", argv[i]);
                 _free(argv[i]);
         }
 }
