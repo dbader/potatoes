@@ -56,7 +56,7 @@ void dump_hd1(){
                 ,YELLOW
                 ,maxaddr);
         
-        printf("%{\t---------------\n", YELLOW);
+        printf("%{\t---------------}\n", YELLOW);
 
         (hd1.buffer_type==3) ? printf("\tbuffer type:\ttwo way, cache possible\n") : 
                 ((hd1.buffer_type==1) ? printf("\tbuffer type:\tone way, single sector\n") : 
