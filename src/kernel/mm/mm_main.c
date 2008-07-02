@@ -53,12 +53,12 @@ void mm_init(uint32 start, uint32 end)
         // set the headers for mm_start and mm_end (both have size = 0; just needed for linked list stuff)
         mm_start->next = mm_end;
         mm_start->prev = mm_end;
-        mm_start->name = "start";
+        strncpy(mm_start->name, "start", sizeof(mm_start->name) - 1);
         mm_start->size = 0;
         
         mm_end->next = mm_start;
         mm_end->prev = mm_start;
-        mm_end->name = "end";
+        strncpy(mm_end->name, "end", sizeof(mm_end->name) - 1);
         mm_end->size = 0;
         
 //        dprintf("mm_start.next: 0x%x\n", mm_start->next);

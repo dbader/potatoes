@@ -354,6 +354,12 @@ void shell_cmd_sync(int argc, char *argv[])
         fs_init();
 }
 
+extern void mem_dump();
+void shell_cmd_memdump(int argc, char *argv[])
+{
+        mem_dump();
+}
+
 // TODO: nice to have:
 /*
  * tab completion
@@ -382,6 +388,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"cd",          shell_cmd_cd,           "Change directory"},
                 {"clear",       shell_cmd_clear,        "Clear the screen"},
                 {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
+                {"memdump",     shell_cmd_memdump,     "Dump allocated blocks"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

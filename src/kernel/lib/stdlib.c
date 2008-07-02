@@ -76,7 +76,7 @@ void* mallocn(size_t size, char *name)
                         new_header = (mm_header*) (end_of_prev + 1);
                         new_header->prev = ptr->prev;
                         new_header->next = ptr;
-                        new_header->name = name;
+                        strncpy(new_header->name, name, sizeof(new_header->name) - 1);
                         new_header->size = size;
                         
                         ptr->prev->next = new_header;
@@ -152,6 +152,20 @@ void* calloc(size_t n, size_t size)
         return callocn(n, size, "noname");
 }
 
+void mem_dump() 
+{
+        mm_header *ptr;
+        int total_bytes = 0;
+        int total_blocks = 0;
+        for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
+                dprintf("%d bytes \"%s\" at 0x%x\n", ptr->size, ptr->name, ptr + sizeof(mm_header));
+                total_blocks++;
+                total_bytes += ptr->size;
+        }
+        
+        dprintf("Total %d blocks (%d bytes)\n", total_blocks, total_bytes);
+}
+
 /**
  * frees a memory block
  * 
@@ -162,6 +176,7 @@ void free(void *start)
 #ifdef MEM_FAILSAFE
        return;
 #endif
+        //dprintf("free 0x%x\n", start);
         mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
         // check if there is a valid mm_header structure at start
         if((this->next)->prev == this) {
