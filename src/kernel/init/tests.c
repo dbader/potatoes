@@ -472,11 +472,13 @@ void ralph_wiggum()
         printf(" +        W*                  WW                       W W         \n");
 }
 
-void create_fs();
-
+extern void create_fs();
+extern void test_PM();
 void fs_tests()
 {
-        create_fs();
+        //create_fs();
+        test_PM();
+        
 }
 
 void isr_test()
@@ -490,8 +492,9 @@ void threadA()
         _log("hello from task A\n");
                 
         for(;;) {
-                for (int i = 0; i < 9999; i++) ;
+                //for (int i = 0; i < 9999; i++) ;
                 _log("A");
+                halt();
         }
 }
 
@@ -500,8 +503,9 @@ void threadB()
         _log("hello from task B\n"); // log()
         
         for(;;) {
-                for (int i = 0; i < 9999; i++) ;
+                //for (int i = 0; i < 9999; i++) ;
                 _log("B");
+                halt();
         }
 }
 

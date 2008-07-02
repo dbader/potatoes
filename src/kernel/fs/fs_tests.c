@@ -247,8 +247,40 @@ void test_PM()
         proc_file pft[NUM_PROC_FILES];
         init_proc_file_table(pft);
         
+        int fd = -1;
         
-        do_mkdir("/usr");
+        // mkdir dir
+        dprintf("\n\n--- mkdir dir\n");
+        do_mkdir("/dir");
+        fd = do_open("/dir");
+        fd = insert_proc_file(pft, fd);
+        do_close_pf(pft, fd);
+        
+        //cd dir
+        dprintf("\n\n--- cd dir\n");
+        fd = do_open("/dir");
+        fd = insert_proc_file(pft, fd);
+        do_close_pf(pft, fd);
+        
+        //touch file
+        dprintf("\n\n--- touch file\n");
+        fd = do_create("/dir/file", 0);
+        fd = insert_proc_file(pft, fd);
+        do_close_pf(pft, fd);
+        
+        //ls
+        dprintf("\n\n--- ls\n");
+        fd = do_open("/dir");
+        fd = insert_proc_file(pft, fd);
+        
+        dir_entry directory [DIR_ENTRIES_PER_BLOCK];
+        bzero(directory, sizeof(directory));
+        
+        proc_file *pft_entry = get_proc_file(pft, fd);
+        do_read(pft_entry->pf_f_desc, directory, sizeof(directory), 0);        
+        do_close_pf(pft, fd);
+        
+        /*
         do_mkfile("/usr/myfile");
         
         file_nr fd = do_open("/usr/myfile");       
@@ -266,6 +298,7 @@ void test_PM()
         do_read(fd, to_read, sizeof(to_read), 6);
         
         dprintf("%s\n", to_read);
+        */
 }
 
 void test_error()

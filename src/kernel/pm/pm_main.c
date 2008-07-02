@@ -210,6 +210,18 @@ void pm_destroy_thread(process_t *proc)
         free(proc);
 }
 
+void pm_dump()
+{
+        dprintf("PID\tNAME\t\tCONTEXT\n");
+        dprintf("----------------------------------\n");
+        process_t *p = procs_head;
+        do {
+                dprintf("%d\t%s\t\t0x%x\n", p->pid, p->name, p->context);
+                p = p->next;
+        } while (p != procs_head);
+        
+}
+
 void printhex(uint32 hex)
 {
         printf("0x%x\n", hex);

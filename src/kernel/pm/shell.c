@@ -53,10 +53,7 @@ char* _fgets(char *s, int n, int fd)
                 }
                 
         }
-        
-        if (ch == '\n')
-                *s++ = ch;
-        
+
         return s;
                 
 }
@@ -178,6 +175,7 @@ void shell_cmd_test(int argc, char *argv[])
 void shell_cmd_cmdlist(int argc, char *argv[])
 {
         _printf("Available commands are:\n", STDOUT);
+        
         shell_cmd_t *cmd;
         int i = 0;
         
@@ -190,7 +188,6 @@ void shell_cmd_echo(int argc, char *argv[])
 {
         for (int i = 1; i < argc; i++)
                 _printf("%s ", argv[i]);
-
         _printf("\n");
 }
 
@@ -201,7 +198,6 @@ void shell_cmd_ls(int argc, char *argv[])
         bzero(directory, sizeof(directory));
         
         int fd = -1;
-
         if (argc < 2)
                 fd = _open(cwd, 0, 0);   // current directory
         else
@@ -223,6 +219,7 @@ void shell_cmd_ls(int argc, char *argv[])
                 _printf("%s\n", directory[i].name);
                 i++;
         }
+        
         _close(fd);
 }
 
@@ -234,8 +231,8 @@ void shell_cmd_touch(int argc, char *argv[])
         }
         
         char *path = shell_makepath(argv[1]);
-        
         int fd = _open(path, O_CREAT, 0);
+        
         if (fd >= 0)
                 _printf("Created regular file %s\n", path);
         else
@@ -253,8 +250,7 @@ void shell_cmd_mkdir(int argc, char *argv[])
 
         char *path = shell_makepath(argv[1]);
         
-        // Append a trailing slash to let open() know we want to
-        // create a directory.
+        // Append a trailing slash to let open() know we want to create a directory.
         if (path[strlen(path)-1] != '/')
                 strcat(path, "/");
         
@@ -285,7 +281,6 @@ void shell_cmd_cat(int argc, char *argv[])
                 _fputch(ch, STDOUT);
         
         _fputch('\n', STDOUT);
-        
         _close(fd);
 }
 
@@ -398,11 +393,16 @@ void shell_cmd_cp(int argc, char *argv[])
         _close(target_fd);
 }
 
+extern void pm_dump();
+void shell_cmd_ps(int argc, char *argv[])
+{
+        pm_dump();
+}
+
 // TODO: nice to have:
 /*
  * tab completion
  * repeat last command
- * cp
  * rm
  * mv
  * ps
@@ -428,6 +428,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
                 {"pwd",         shell_cmd_pwd,          "Print working directory"},
                 {"cp",          shell_cmd_cp,           "Copy files"},
+                {"ps",          shell_cmd_ps,           "List processes"},
                 {"",            NULL,                   ""} // The Terminator
 };
 
@@ -435,12 +436,11 @@ struct shell_cmd_t shell_cmds[] = {
 
 void shell_handle_command(char *cmd) 
 {       
+        // Ignore returns
         if (strlen(cmd) == 1)
                 return;
         
         // Kill the trailing line feed.
-        // FIXME: Dont know why we get that twice. ???
-        cmd[strlen(cmd)-1] = '\0';
         cmd[strlen(cmd)-1] = '\0';
         
         // Parsing setup

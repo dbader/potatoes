@@ -57,12 +57,12 @@ void fs_init()
         dprint_separator();
         dprintf("%{FS:} init\n", GREEN);
         
-        if(!load_fs()){
-                printf("%{FS:} %{FS loading failed.}\n", GREEN, RED);
+//        if(!load_fs()){
+//                printf("%{FS:} %{FS loading failed.}\n", GREEN, RED);
                 if (!create_fs()){
                         panic("FS cannot be initialized!\n");
                 }
-        }
+//        }
                 
 }
 
