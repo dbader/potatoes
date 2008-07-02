@@ -537,18 +537,18 @@ void do_tests()
         //hd_stresswrite_test();
         //hd_stressread_test();
         
-        SHORTCUT_CTRL('i', isr_test);
-        SHORTCUT_CTRL('1', assert_test);
-        SHORTCUT_CTRL_SUPER('p', printf_test);
-        SHORTCUT_CTRL('m', malloc_test);
-        SHORTCUT_CTRL('h', hd_stresswrite_test);
-        SHORTCUT_CTRL_SUPER('h', hd_stressread_test);
-        SHORTCUT_CTRL('s', syscall_test);
+        //SHORTCUT_CTRL('i', isr_test);
+        //SHORTCUT_CTRL('1', assert_test);
+        //SHORTCUT_CTRL_SUPER('p', printf_test);
+        //SHORTCUT_CTRL('m', malloc_test);
+        //SHORTCUT_CTRL('h', hd_stresswrite_test);
+        //SHORTCUT_CTRL_SUPER('h', hd_stressread_test);
+        //SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
-        SHORTCUT_CTRL('f', fs_tests);
+        //SHORTCUT_CTRL('f', fs_tests);
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);
-        SHORTCUT_CTRL('n', nullptr_test);
+        //SHORTCUT_CTRL('n', nullptr_test);
         SHORTCUT_CTRL('+', switch_monitor_up);
         SHORTCUT_CTRL('-', switch_monitor_down);
         dprint_separator();

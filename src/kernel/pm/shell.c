@@ -255,7 +255,7 @@ void shell_cmd_mkdir(int argc, char *argv[])
         
         // Append a trailing slash to let open() know we want to
         // create a directory.
-        if (path[strlen(path)] != '/')
+        if (path[strlen(path)-1] != '/')
                 strcat(path, "/");
         
         int fd = _open(path, O_CREAT, 0);
@@ -340,7 +340,7 @@ void shell_cmd_cd(int argc, char *argv[])
 
 void shell_cmd_clear(int argc, char *argv[])
 {
-        for (int i = 0; i < 25 * 80; i++)
+        for (int i = 0; i < 24 * 80; i++)
                 _fputs("\b", STDOUT);
 }
 
@@ -362,11 +362,15 @@ void shell_cmd_memdump(int argc, char *argv[])
         mem_dump();
 }
 
+void shell_cmd_pwd(int argc, char *argv[])
+{
+        _printf("%s\n",cwd);
+}
+
 // TODO: nice to have:
 /*
  * tab completion
  * repeat last command
- * pwd
  * cp
  * rm
  * mv
@@ -390,7 +394,8 @@ struct shell_cmd_t shell_cmds[] = {
                 {"cd",          shell_cmd_cd,           "Change directory"},
                 {"clear",       shell_cmd_clear,        "Clear the screen"},
                 {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
-                {"memdump",     shell_cmd_memdump,     "Dump allocated blocks"},
+                {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
+                {"pwd",         shell_cmd_pwd,          "Prints working directory"},
                 {"",            NULL,                   ""} // The Terminator
 };
 
@@ -410,6 +415,7 @@ void shell_handle_command(char *cmd)
         char delim[] = " ";
         char *tok;
         char *copy = strdup(cmd); // uses kernel malloc
+        printf("malloc by strdup (copy): 0x%x\n", copy);
         char *work_copy = copy;
 
         // For the command
@@ -421,8 +427,10 @@ void shell_handle_command(char *cmd)
                         _printf("- shell: argument overflow. Last argument: %s\n", argv[argc-1]);
                         break;
                 }
-                argv[argc++] = strdup(tok);                
+                argv[argc++] = strdup(tok);
+                printf("malloc by strdup (argv[i]): 0x%x\n", argv[argc-1]);
         }
+        printf("_free(copy): 0x%x\n", copy);
         _free(copy);
         
         shell_cmd_t *command = NULL;
@@ -441,6 +449,7 @@ void shell_handle_command(char *cmd)
                 _printf("- shell: %s: command not found\n", argv[0]);
         
         for (int i = 0; i < argc; i++){
+                printf("_free(argv[i]): 0x%x\n", argv[i]);
                 _free(argv[i]);
         }
 }

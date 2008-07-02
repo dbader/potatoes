@@ -188,7 +188,9 @@ LOC:
 	@sed '/^\s*\/\//d' temp > temp2
 	@sed '/^\s*\x24/d' temp2 > temp
 	@wc -l temp > temp2
-	@echo "ETIOS now has `sed "s/\s.*//1" temp2` LOCs"
+	@echo "ETIOS now has \n\t`sed "s/\s.*//1" temp2` LOCs"
+	@echo "\t`ls $(SRCFILES) | wc -w` source files"
+	@echo "\t`ls $(HDRFILES) | wc -w` header files"
 	@rm temp2
 	@read -p "Do you want to take a look on the code? [yes/no]: " REPLY;\
 	 case $$REPLY in\

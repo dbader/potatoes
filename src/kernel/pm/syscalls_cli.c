@@ -117,6 +117,6 @@ void* _malloc(size_t size)
 extern void printf(char *fmt, ...);
 void _free(void *block)
 {
-        //printf("_free : 0x%d\n", block); //TODO: @Daniel: FIXME! see sys_free
+        //printf("_free : 0x%x\n", block);
         _syscall(SYS_FREE, block);
 }

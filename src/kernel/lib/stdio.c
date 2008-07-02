@@ -109,6 +109,7 @@ void printf(char *fmt, ...)
                                 while((ch = *fmt++) != '}' && ch != '\0'){
                                         cputchar(ch, color, BLACK);
                                 }
+                                if(ch = '\0') fmt--; //to break out from the while loop
                                 break;
                         case '%': // print '%' 
                                 putchar(ch); 
