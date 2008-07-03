@@ -399,13 +399,18 @@ void shell_cmd_ps(int argc, char *argv[])
         pm_dump();
 }
 
+void shell_cmd_exit(int argc, char *argv[])
+{
+        _printf("Bye.\n");
+        _exit(0);
+}
+
 // TODO: nice to have:
 /*
  * tab completion
  * repeat last command
  * rm
  * mv
- * ps
  * kill
  * df 
  * exit
@@ -429,6 +434,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"pwd",         shell_cmd_pwd,          "Print working directory"},
                 {"cp",          shell_cmd_cp,           "Copy files"},
                 {"ps",          shell_cmd_ps,           "List processes"},
+                {"exit",        shell_cmd_exit,         "Quit the shell"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

@@ -37,6 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/ringbuffer.h"
 #include "../fs/fs_types.h"
 #include "../fs/fs_const.h"
+#include "../fs/fs_const.h"
+#include "../io/io_virtual.h"
 
 typedef struct {
         unsigned int gs, fs, es, ds;
@@ -79,6 +81,8 @@ typedef struct process_t {
         
         /** process file table */
         proc_file pft[NUM_PROC_FILES];
+        
+        virt_monitor *vmonitor;
         
         /* xxx *stdout */
         /* llist *mem_blocks; */
