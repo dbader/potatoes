@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * 
+ * elf2flt
  *
  * @author dbader
  * @author $LastChangedBy$
@@ -57,6 +57,8 @@ uint32 next_pid = 0;
 extern device_t dev_null;
 extern device_t dev_stdout;
 extern device_t dev_stdin;
+extern device_t dev_framebuffer;
+extern device_t dev_keyboard;
 
 uint32 getpid()
 {
@@ -94,6 +96,8 @@ void pm_init()
         pm_register_device(&dev_null);
         pm_register_device(&dev_stdout);
         pm_register_device(&dev_stdin);
+        pm_register_device(&dev_framebuffer);
+        pm_register_device(&dev_keyboard);
        
         dprintf("%{pm:} scheduler initialized\n", VIOLET);
         

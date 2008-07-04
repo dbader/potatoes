@@ -63,6 +63,7 @@ virt_monitor new_virt_monitor(){
         mon_ptr->charnum = 0;
         mon_ptr->scrolldown_limit = 0;
         mon_ptr->scrollup_limit = 0;
+        mon_ptr->disable_refresh = FALSE;
         return *mon_ptr;
 }
 
@@ -215,6 +216,9 @@ void virt_cursor_move(virt_monitor *vm, uint8 dir)
  */
 void update_virt_monitor(virt_monitor *vm)
 {
+        if (vm->disable_refresh)
+                return;
+        
         set_disp(0xB8000);
         monitor_cputs(get_active_virt_monitor_name(), GREEN, BLACK);
                 

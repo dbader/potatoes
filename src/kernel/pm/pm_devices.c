@@ -26,6 +26,28 @@ device_t *devices_head = NULL;
  *      console?
  *      vmonitor?
  *      xx_status?
+ *      brainfuck interpreter /dev/brainfuck
+ *      framebuffer
+ *      /dev/bombe
+ * 
+ * 
+ * TODO: 
+stdout:
+        - support for escape characters
+                - control characters: \f clear screen \t \n \a \e
+                
+                - colors
+                - cursor (-> needs changes in IO)
+                
+stdin:
+        - support for escape characters
+                - mouse cursor
+
+/dev/mem_stats:
+        total number of blocks
+        total bytes allocated
+        bytes free
+        largest continuous free block 
  */
 
 device_t* pm_name2device(char *name)

@@ -33,6 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io_virtual.h"
 #include "../include/const.h"
 #include "../include/debug.h"
+#include "../include/string.h"
+
+extern bool keyboard_state[256];
 
 void io_init()
 {        
@@ -52,6 +55,8 @@ void io_init()
         timer_init(FREQUENCY);          dprintf("%{io:} timer initialized (%dHz)\n", YELLOW, FREQUENCY);
         set_interrupts();               dprintf("%{io:} interrupts enabled\n", YELLOW);
         hd_init();                      dprintf("%{io:} hard disk initialized\n", YELLOW);
+        
+        memset(keyboard_state, FALSE, sizeof(keyboard_state));
         
         dprintf("%{io:} initialized\n", YELLOW);
 }

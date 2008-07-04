@@ -58,6 +58,12 @@ uint8 shcut_num = 0;
 shortcut shortcuts[SHORTCUTS_ARRAY_SIZE];
 
 /**
+ * State of all keys. TRUE means the key is being held down right now.
+ * This is used by the /dev/keyboard device to provide raw keyboard access.
+ */
+bool keyboard_state[256];
+
+/**
  * Adds a shortcut to the system
  * 
  * @param control_flag          is ctrl the initiator?
@@ -83,6 +89,7 @@ void kb_handler()
         uint8 scancode = inb(0x60);
 //        if(scancode>128) return;
         if (scancode & 0x80) { //Key released
+                keyboard_state[scancode & (~0x80)] = FALSE;
                 if ((scancode & (~0x80)) == LSHIFT || (scancode & (~0x80)) == RSHIFT)
                         shift = 0;
                 else if ((scancode & (~0x80)) == ALT)
@@ -136,6 +143,7 @@ void kb_handler()
                         }
         }
         else{ //Key pressed
+                keyboard_state[scancode] = TRUE;
                 switch (scancode)
                 {
                 case CTRL:

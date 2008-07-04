@@ -43,6 +43,7 @@ typedef struct{
         uint32 charnum;
         uint32 scrolldown_limit;
         uint32 scrollup_limit;
+        bool disable_refresh; // for framebuffer access. If this is false, the vm will not be painted.
 }virt_monitor;
 
 virt_monitor* get_active_virt_monitor();

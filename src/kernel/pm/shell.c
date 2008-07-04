@@ -10,6 +10,8 @@
 int STDIN = -1;
 int STDOUT = -1;
 
+
+
 int _fputch(char ch, int fd)
 {
         return _write(fd, &ch, sizeof(ch));
@@ -336,7 +338,9 @@ void shell_cmd_cd(int argc, char *argv[])
 void shell_cmd_clear(int argc, char *argv[])
 {
         for (int i = 0; i < 24 * 80; i++)
-                _fputs("\b", STDOUT);
+                _fputch(' ', STDOUT);
+        for (int i = 0; i < 24 * 80; i++)
+                _fputch('\b', STDOUT);
 }
 
 extern void fs_shutdown();
@@ -405,10 +409,141 @@ void shell_cmd_exit(int argc, char *argv[])
         _exit(0);
 }
 
+//bool keydown(char key)
+//{
+//        char ch = 0;
+//        _read(STDIN, &ch, sizeof(ch));
+//        return ch == key;
+//}
+
+
+/*
+ * PONG code.
+ * I know this is shitty but I really had to do this quickly :)
+ * Have fun!
+ */
+bool keydown(char key, int fd)
+{
+        bool keystate[256];
+        _read(fd, keystate, sizeof(keystate));
+        return (keystate[key]);
+}
+
+#define CURSOR_UP 0x48
+#define CURSOR_DOWN 0x50
+#define ESCAPE 0x01
+
+#define SET_PIXEL(x,y,cl) pic[(y)*80+x] = cl;
+
+#define DRAW_PADDLE(x,y,cl) SET_PIXEL(x,y,cl); SET_PIXEL(x,y+1,cl); SET_PIXEL(x,y+2,cl); \
+        SET_PIXEL(x,y+3,cl); SET_PIXEL(x,y+4,cl);
+
+#define LIMIT(x, min, max) if (x<min) x = min; if (x>max) x = max;
+
+#define HIT_PADDLE(paddley, y) (paddley <= (y) && paddley + 5 >= (y))
+
+#define PADDLE_DEFLECTION(paddley, hit) (paddley - (hit)) * 10
+
+void shell_cmd_pong(int argc, char *argv[]) 
+{       
+        _printf("+++ P O N G +++\n\nControl your paddle with the cursor UP and DOWN keys\n" 
+                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                        "HAVE FUN!\n\n\n[Press any key to start playing]\n");
+        _fgetch(STDIN);
+        
+        uint8 pic[25 * 80];
+        
+        int fd = _open("/dev/framebuffer", 0, 0);
+        int keyboard = _open("/dev/keyboard", 0, 0);
+        
+        int ballx = 4000;
+        int bally = 1200;
+        
+        // ball velocity
+        int ballvelx = 50;
+        int ballvely = 0;
+        
+        // player paddle
+        int lpaddley = 10;
+        int rpaddley = 20;
+        
+        int player_score = 0;
+        int cpu_score = 0;
+        
+        while (!keydown(ESCAPE, keyboard)) {
+                // Player input
+                if (keydown(CURSOR_UP, keyboard)) lpaddley--;
+                if (keydown(CURSOR_DOWN, keyboard)) lpaddley++;
+                LIMIT(lpaddley, 0, 20);
+                
+                // CPU player update
+                if ((bally / 100) < (rpaddley+2)) 
+                        rpaddley--;
+                else if ((bally / 100) > (rpaddley+2))
+                        rpaddley++;
+                LIMIT(rpaddley, 0, 20);
+                
+                // Move ball
+                ballx += ballvelx;
+                bally += ballvely;
+                LIMIT(ballx, 0, 7900);
+                LIMIT(bally, 0, 2400);
+                
+                // Ceiling hit / Floor hit
+                if (bally == 0 || bally == 2400) {
+                        ballvely = -ballvely;
+                }
+                
+                // Paddle hit
+                if (ballx == 0) {
+                        if (HIT_PADDLE(lpaddley, bally / 100)) {
+                                ballvelx = -ballvelx;
+                                ballvely = -ballvely + PADDLE_DEFLECTION(lpaddley, bally / 100);
+                                ballx += 100;
+                        } else {
+                                cpu_score++;
+                                ballx = 4000;
+                                bally = 1200;
+                                ballvelx = 50;
+                                ballvely = 0;
+                        }
+                } else if (ballx == 7900) {
+                        if (HIT_PADDLE(rpaddley, bally / 100)) {
+                                ballvelx = -ballvelx;
+                                ballvely = -ballvely - PADDLE_DEFLECTION(rpaddley, bally / 100);
+                                ballx -= 100;
+                        } else {
+                                player_score++;
+                                ballx = 4000;
+                                bally = 1200;
+                                ballvelx = -50;
+                                ballvely = 0;
+                        }
+                }
+                
+                memset(pic, BLACK, sizeof(pic));
+        
+                for (int y = 0; y < 25; y += 2)
+                        SET_PIXEL(39, y, WHITE);
+
+                DRAW_PADDLE(0, lpaddley, BLUE);
+                DRAW_PADDLE(79, rpaddley, RED);
+                SET_PIXEL(ballx / 100, bally / 100, YELLOW);
+
+                _write(fd, pic, sizeof(pic));
+                halt();
+        }
+        
+        _close(fd);
+        _close(keyboard);
+        _printf("Player score: %d\nCPU score: %d\n\n", player_score, cpu_score);
+}
+
 // TODO: nice to have:
 /*
  * tab completion
  * repeat last command
+ * globbing
  * rm
  * mv
  * kill
@@ -435,6 +570,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"cp",          shell_cmd_cp,           "Copy files"},
                 {"ps",          shell_cmd_ps,           "List processes"},
                 {"exit",        shell_cmd_exit,         "Quit the shell"},
+                {"pong",        shell_cmd_pong,         "Nice."},
                 {"",            NULL,                   ""} // The Terminator
 };
 
