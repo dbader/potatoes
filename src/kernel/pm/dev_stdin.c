@@ -23,7 +23,7 @@ int dev_stdin_read(void *dev, int fd, void *buf, int size)
 
 int dev_stdin_write(void *dev, int fd, void *buf, int size)
 {
-        return 0;
+        return rf_write(focus_proc->stdin, buf, size);
 }
 
 int dev_stdin_seek(void *dev, int fd, int offset, int whence)

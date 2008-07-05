@@ -279,7 +279,7 @@ void shell_cmd_cat(int argc, char *argv[])
         }
         
         char ch;
-        while (_read(fd, &ch, sizeof(ch)) != 0)
+        while (_read(fd, &ch, sizeof(ch)) > 0)
                 _fputch(ch, STDOUT);
         
         _fputch('\n', STDOUT);
@@ -299,13 +299,14 @@ void shell_cmd_write(int argc, char *argv[])
                 return;
         }
                 
+        int count = 0;
         for (int i = 2; i < argc; i++) {
-                _write(fd, argv[i], strlen(argv[i]));
-                _write(fd, " ", 1);
+                count += _write(fd, argv[i], strlen(argv[i]));
+                count += _write(fd, " ", 1);
         }
         
-        _write(fd, "", 1); // append \0
-        _printf("wrote %d bytes.\n", _seek(fd, 0, SEEK_CUR));
+        count += _write(fd, "", 1); // append \0
+        _printf("wrote %d bytes.\n", count);//_seek(fd, 0, SEEK_CUR));
         _close(fd);
 }
 
@@ -432,8 +433,12 @@ bool keydown(char key, int fd)
 #define CURSOR_UP 0x48
 #define CURSOR_DOWN 0x50
 #define ESCAPE 0x01
+#define KEY_A 0x1E
+#define KEY_S 0x1F
+#define KEY_K 0x25
+#define KEY_L 0x26
 
-#define SET_PIXEL(x,y,cl) pic[(y)*80+x] = cl;
+#define SET_PIXEL(x,y,cl) bbuf[(y)*80+(x)] = cl;
 
 #define DRAW_PADDLE(x,y,cl) SET_PIXEL(x,y,cl); SET_PIXEL(x,y+1,cl); SET_PIXEL(x,y+2,cl); \
         SET_PIXEL(x,y+3,cl); SET_PIXEL(x,y+4,cl);
@@ -444,99 +449,239 @@ bool keydown(char key, int fd)
 
 #define PADDLE_DEFLECTION(paddley, hit) (paddley - (hit)) * 10
 
+// 4x5 px font
+typedef uint8 glyph_t[4*5];
+glyph_t font[] = {
+                { // 0
+                                1,1,1,1,
+                                1,0,0,1,
+                                1,0,0,1,
+                                1,0,0,1,
+                                1,1,1,1
+                },
+                { // 1
+                                0,0,1,0,
+                                0,0,1,0,
+                                0,0,1,0,
+                                0,0,1,0,
+                                0,0,1,0
+                },
+                { // 2
+                                1,1,1,1,
+                                0,0,0,1,
+                                1,1,1,1,
+                                1,0,0,0,
+                                1,1,1,1
+                },
+                { // 3
+                                1,1,1,1,
+                                0,0,0,1,
+                                1,1,1,1,
+                                0,0,0,1,
+                                1,1,1,1
+                },
+                { // 4
+                                1,0,0,1,
+                                1,0,0,1,
+                                1,1,1,1,
+                                0,0,0,1,
+                                0,0,0,1
+                },
+                { // 5
+                                1,1,1,1,
+                                1,0,0,0,
+                                1,1,1,1,
+                                0,0,0,1,
+                                1,1,1,1
+                },
+                { // 6
+                                1,1,1,1,
+                                1,0,0,0,
+                                1,1,1,1,
+                                1,0,0,1,
+                                1,1,1,1
+                },
+                { // 7
+                                1,1,1,1,
+                                0,0,0,1,
+                                0,0,0,1,
+                                0,0,0,1,
+                                0,0,0,1
+                },
+                { // 8
+                                1,1,1,1,
+                                1,0,0,1,
+                                1,1,1,1,
+                                1,0,0,1,
+                                1,1,1,1
+                },
+                { // 9
+                                1,1,1,1,
+                                1,0,0,1,
+                                1,1,1,1,
+                                0,0,0,1,
+                                1,1,1,1
+                }
+};
+
+#define DRAW_GLYPH(x, y, idx, cl) for (int px = 0; px < sizeof(glyph_t); px++) \
+        SET_PIXEL(x + px % 4, y + px / 4, (font[idx][px] ? cl : 0));
+
 void shell_cmd_pong(int argc, char *argv[]) 
 {       
-        _printf("+++ P O N G +++\n\nControl your paddle with the cursor UP and DOWN keys\n" 
-                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                        "HAVE FUN!\n\n\n[Press any key to start playing]\n");
+        bool multiplayer = (argc > 1 && !strcmp(argv[1], "-2p"));
+        
+        if (!multiplayer) {
+                _printf("+++ P O N G +++\n\nControl your paddle with the cursor UP and DOWN keys\n" 
+                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                                "To play a two player game run \"pong -2p\"\n"
+                                "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
+        } else {
+                _printf("+++ P O N G +++\n\nMULTIPLAYER MODE\n\n"
+                                "Controls for player one (blue):\n"
+                                "\tPaddle up = A\n"
+                                "\tPaddle down = S\n\n"
+                                "Controls for player two (red):\n"
+                                "\tPaddle up = K\n"
+                                "\tPaddle down = L\n\n"
+                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                                "HAVE FUN!\n\n\n[Press any key to start playing]\n");
+        }
         _fgetch(STDIN);
         
-        uint8 pic[25 * 80];
+        // the backbuffer
+        uint8 bbuf[25 * 80];
         
         int fd = _open("/dev/framebuffer", 0, 0);
         int keyboard = _open("/dev/keyboard", 0, 0);
         
-        int ballx = 4000;
-        int bally = 1200;
+        // ball position
+        int ball_x = 4000;
+        int ball_y = 1200;
         
         // ball velocity
-        int ballvelx = 50;
-        int ballvely = 0;
+        int ball_vel_x = 50;
+        int ball_vel_y = 0;
         
         // player paddle
-        int lpaddley = 10;
-        int rpaddley = 20;
+        int l_paddle_y = 10;
+        int r_paddle_y = 10;
         
+        // scores
         int player_score = 0;
         int cpu_score = 0;
         
+        int frame = 0;
+        
+        // The rendering loop
         while (!keydown(ESCAPE, keyboard)) {
+                // Game over check
+                if (player_score > 9 || cpu_score > 9) 
+                        break;
+                
                 // Player input
-                if (keydown(CURSOR_UP, keyboard)) lpaddley--;
-                if (keydown(CURSOR_DOWN, keyboard)) lpaddley++;
-                LIMIT(lpaddley, 0, 20);
+                if (!multiplayer) {
+                        if (keydown(CURSOR_UP, keyboard)) l_paddle_y--;
+                        if (keydown(CURSOR_DOWN, keyboard)) l_paddle_y++;
+                } else {
+                        if (keydown(KEY_A, keyboard)) l_paddle_y--;
+                        if (keydown(KEY_S, keyboard)) l_paddle_y++;
+                }
+                LIMIT(l_paddle_y, 0, 20);
                 
                 // CPU player update
-                if ((bally / 100) < (rpaddley+2)) 
-                        rpaddley--;
-                else if ((bally / 100) > (rpaddley+2))
-                        rpaddley++;
-                LIMIT(rpaddley, 0, 20);
+                if (!multiplayer) {
+                        // select cpu think penalty depending on the
+                        // score differences. that way the cpu will adjust
+                        // its strength to the player's skill.
+                        int fskip = cpu_score - player_score;
+                        LIMIT(fskip, 2, 9);
+                        
+                        if (ball_x > 7500) {  // cpu quick reaction distance
+                                if (ball_y / 100 < r_paddle_y + 2) 
+                                        r_paddle_y--;
+                                else if (ball_y / 100 > r_paddle_y + 2)
+                                        r_paddle_y++;
+                        } else if (frame % fskip == 0) { // only think every other frame
+                                int cpu_move = ball_vel_y;
+                                LIMIT(cpu_move, -1, 1);
+                                r_paddle_y += cpu_move;
+                        }
+                } else {
+                        if (keydown(KEY_K, keyboard)) r_paddle_y--;
+                        if (keydown(KEY_L, keyboard)) r_paddle_y++;
+                }
+                LIMIT(r_paddle_y, 0, 20);
                 
                 // Move ball
-                ballx += ballvelx;
-                bally += ballvely;
-                LIMIT(ballx, 0, 7900);
-                LIMIT(bally, 0, 2400);
+                ball_x += ball_vel_x;
+                ball_y += ball_vel_y;
+                LIMIT(ball_x, 0, 7900);
+                LIMIT(ball_y, 0, 2400);
                 
                 // Ceiling hit / Floor hit
-                if (bally == 0 || bally == 2400) {
-                        ballvely = -ballvely;
-                }
+                if (ball_y == 0 || ball_y == 2400)
+                        ball_vel_y = -ball_vel_y;
                 
                 // Paddle hit
-                if (ballx == 0) {
-                        if (HIT_PADDLE(lpaddley, bally / 100)) {
-                                ballvelx = -ballvelx;
-                                ballvely = -ballvely + PADDLE_DEFLECTION(lpaddley, bally / 100);
-                                ballx += 100;
+                if (ball_x <= 0) {
+                        if (HIT_PADDLE(l_paddle_y, ball_y / 100)) {
+                                ball_vel_x = -ball_vel_x;
+                                ball_vel_y = -ball_vel_y + PADDLE_DEFLECTION(l_paddle_y, ball_y / 100);
+                                ball_x += 100;
                         } else {
                                 cpu_score++;
-                                ballx = 4000;
-                                bally = 1200;
-                                ballvelx = 50;
-                                ballvely = 0;
+                                ball_x = 4000;
+                                ball_y = 1200;
+                                ball_vel_x = 50;
+                                ball_vel_y = 0;
                         }
-                } else if (ballx == 7900) {
-                        if (HIT_PADDLE(rpaddley, bally / 100)) {
-                                ballvelx = -ballvelx;
-                                ballvely = -ballvely - PADDLE_DEFLECTION(rpaddley, bally / 100);
-                                ballx -= 100;
+                } else if (ball_x >= 7900) {
+                        if (HIT_PADDLE(r_paddle_y, ball_y / 100)) {
+                                ball_vel_x = -ball_vel_x;
+                                ball_vel_y = -ball_vel_y - PADDLE_DEFLECTION(r_paddle_y, ball_y / 100);
+                                ball_x -= 100;
                         } else {
                                 player_score++;
-                                ballx = 4000;
-                                bally = 1200;
-                                ballvelx = -50;
-                                ballvely = 0;
+                                ball_x = 4000;
+                                ball_y = 1200;
+                                ball_vel_x = -50;
+                                ball_vel_y = 0;
                         }
                 }
                 
-                memset(pic, BLACK, sizeof(pic));
+                // Clear the backbuffer
+                memset(bbuf, BLACK, sizeof(bbuf));
         
+                // Draw score
+                DRAW_GLYPH(34,0,player_score, BLUE);
+                DRAW_GLYPH(41,0,cpu_score, RED);
+                
+                // Draw center line
                 for (int y = 0; y < 25; y += 2)
                         SET_PIXEL(39, y, WHITE);
+                
+                // Draw the ball and paddles
+                SET_PIXEL(ball_x / 100, ball_y / 100, YELLOW);
+                DRAW_PADDLE(0, l_paddle_y, BLUE);
+                DRAW_PADDLE(79, r_paddle_y, RED);
 
-                DRAW_PADDLE(0, lpaddley, BLUE);
-                DRAW_PADDLE(79, rpaddley, RED);
-                SET_PIXEL(ballx / 100, bally / 100, YELLOW);
-
-                _write(fd, pic, sizeof(pic));
+                // Display backbuffer on the screen
+                _write(fd, bbuf, sizeof(bbuf));
                 halt();
+                frame++;
         }
         
         _close(fd);
         _close(keyboard);
-        _printf("Player score: %d\nCPU score: %d\n\n", player_score, cpu_score);
+        
+        /* todo: restore cursor position */
+        
+        _printf("Game over.\nPlayer score: %d\nCPU score: %d\n", player_score, cpu_score);
+        
+        //flush stdin
+        char ch;
+        while (_read(STDIN, &ch, sizeof(ch)) != 0) ;
 }
 
 // TODO: nice to have:
@@ -570,7 +715,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"cp",          shell_cmd_cp,           "Copy files"},
                 {"ps",          shell_cmd_ps,           "List processes"},
                 {"exit",        shell_cmd_exit,         "Quit the shell"},
-                {"pong",        shell_cmd_pong,         "Nice."},
+                {"pong",        shell_cmd_pong,         "A classic video game"},
                 {"",            NULL,                   ""} // The Terminator
 };
 
