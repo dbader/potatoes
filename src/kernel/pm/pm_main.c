@@ -48,6 +48,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "syscalls_shared.h"
 #include "pm_devices.h"
 
+#include "../../apps/brainfuck_interpreter.h"
+
 process_t *procs_head = NULL;
 process_t *active_proc = NULL;
 process_t *focus_proc = NULL;
@@ -57,6 +59,7 @@ uint32 next_pid = 0;
 extern device_t dev_null;
 extern device_t dev_stdout;
 extern device_t dev_stdin;
+extern device_t dev_brainfuck;
 extern device_t dev_framebuffer;
 extern device_t dev_keyboard;
 
@@ -98,6 +101,8 @@ void pm_init()
         pm_register_device(&dev_stdin);
         pm_register_device(&dev_framebuffer);
         pm_register_device(&dev_keyboard);
+       	init_bf();
+        pm_register_device(&dev_brainfuck);
        
         dprintf("%{pm:} scheduler initialized\n", VIOLET);
         

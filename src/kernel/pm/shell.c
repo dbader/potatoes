@@ -10,8 +10,6 @@
 int STDIN = -1;
 int STDOUT = -1;
 
-
-
 int _fputch(char ch, int fd)
 {
         return _write(fd, &ch, sizeof(ch));
@@ -404,6 +402,28 @@ void shell_cmd_ps(int argc, char *argv[])
         pm_dump();
 }
 
+extern void reset_bf();
+void shell_cmd_bf(int argc, char *argv[])
+{
+        if (!strcmp(argv[1],"-i")){
+                _write(5, argv[2], strlen(argv[2]));
+        }
+        else {
+                reset_bf();
+                int fd = _open(shell_makepath(argv[1]), 0, 0);
+                if (fd < 0) {
+                        _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
+                        return;
+                }
+                char ch;
+                while (_read(fd, &ch, sizeof(ch)) != 0){
+                        _fputch(ch, 5);
+                }
+                _close(fd);
+                reset_bf();
+        }
+}
+
 void shell_cmd_exit(int argc, char *argv[])
 {
         _printf("Bye.\n");
@@ -715,6 +735,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"cp",          shell_cmd_cp,           "Copy files"},
                 {"ps",          shell_cmd_ps,           "List processes"},
                 {"exit",        shell_cmd_exit,         "Quit the shell"},
+                {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
                 {"pong",        shell_cmd_pong,         "A classic video game"},
                 {"",            NULL,                   ""} // The Terminator
 };
