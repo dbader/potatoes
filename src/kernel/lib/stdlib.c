@@ -70,10 +70,10 @@ void* mallocn(size_t size, char *name)
         mm_header *new_header;
         uint32 end_of_prev;
         for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
-                end_of_prev = ((uint32)(ptr->prev) + (uint32)sizeof(mm_header) + (ptr->prev)->size);
-                if((uint32)ptr - end_of_prev >= (size + (uint32)sizeof(mm_header))) {
+                end_of_prev = ((uint32)(ptr->prev) + sizeof(mm_header) + (ptr->prev)->size);
+                if((uint32)ptr - end_of_prev >= (size + sizeof(mm_header))) {
                         
-                        new_header = (mm_header*) (end_of_prev + 1);
+                        new_header = (mm_header*) (end_of_prev);
                         new_header->prev = ptr->prev;
                         new_header->next = ptr;
                         strncpy(new_header->name, name, sizeof(new_header->name) - 1);
@@ -82,7 +82,7 @@ void* mallocn(size_t size, char *name)
                         ptr->prev->next = new_header;
                         ptr->prev = new_header;
                         
-                        return (void*) ((uint32)new_header + (uint32)sizeof(mm_header));
+                        return (void*) ((uint32)new_header + sizeof(mm_header));
                 }
         }
         
@@ -158,7 +158,7 @@ void mem_dump()
         int total_bytes = 0;
         int total_blocks = 0;
         for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
-                dprintf("%d bytes \"%s\" at 0x%x\n", ptr->size, ptr->name, ptr + sizeof(mm_header));
+                dprintf("%d bytes \"%s\" at 0x%x\n", ptr->size, ptr->name, (uint32)ptr + sizeof(mm_header));
                 total_blocks++;
                 total_bytes += ptr->size;
         }
