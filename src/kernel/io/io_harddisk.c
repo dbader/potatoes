@@ -88,6 +88,16 @@ void dump_hd1(){
         printf("\n");
 }
 
+void select_masterdrive(uint8 head)
+{
+        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE | head);
+        inb(HDALTBASE + HDALTREG_STAT);
+        inb(HDALTBASE + HDALTREG_STAT);
+        inb(HDALTBASE + HDALTREG_STAT);
+        inb(HDALTBASE + HDALTREG_STAT);
+        inb(HDALTBASE + HDALTREG_STAT);
+}
+
 /**
  * Waits on hard disk to set the hd_interrupt flag or the drive_ready flag in the status register 
  */
@@ -139,14 +149,15 @@ void hd_init()
         uint8 stat = inb(HDBASE+HDREG_STAT);
         printf("initial status: 0x%x\n",stat);
         outb(HDBASE + HDREG_DRIVE, MASTERDRIVE); //select master drive
-        outb(HDBASE + HDREG_STAT, 0x90); //execute drive diagnostics
+        outb(HDBASE + HDREG_CMD, HDCMD_EXEC_DRIVE_DIAG); //execute drive diagnostics
         wait_on_hd_interrupt();
         uint8 stat = inb(HDBASE + HDREG_ERR);
         printf("error register: 0x%x\n",stat);
          */
-        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE); //select master drive
+        if(inb(HDALTBASE + HDALTREG_STAT) & 0x80) wait_on_hd_interrupt();
+        select_masterdrive(0);
         //sleep_ticks(1);
-        outb(HDBASE + HDREG_STAT, HDCMD_IDENTIFY_DEVICE); //identify device
+        outb(HDBASE + HDREG_CMD, HDCMD_IDENTIFY_DEVICE); //identify device
         if (inb(HDBASE + HDREG_STAT) == 0) {
                 panic("NO HARD DRIVE");
         }
@@ -167,8 +178,7 @@ void hd_write_sector(uint32 dest, void *src)
         if (dest > maxaddr) {
                 panic("hd: address too large");
         }
-        uint8 stat = inb(HDALTBASE + HDALTREG_STAT);
-        if (stat & 0x80) {
+        if (inb(HDALTBASE + HDALTREG_STAT) & 0x80) {
                 //printf("write error %x\n",stat);
                 wait_on_hd_interrupt();
         }
@@ -177,11 +187,15 @@ void hd_write_sector(uint32 dest, void *src)
         outb(HDBASE + HDREG_SEC, addr.sector);
         outb(HDBASE + HDREG_CYL_LOW, addr.cyl);
         outb(HDBASE + HDREG_CYL_HIGH, addr.cyl >> 16);
-        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE + addr.head);
+        select_masterdrive(addr.head);
+        
         //sleep_ticks(1);
-        outb(HDBASE + HDREG_STAT, HDCMD_WRITE); //write sector
+        outb(HDBASE + HDREG_CMD, HDCMD_WRITE); //write sector
         wait_on_hd_interrupt();
         repoutsw(HDBASE + HDREG_DATA, src, 256); //write buffer
+        
+        outb(HDBASE + HDREG_CMD, HDCMD_FLUSH_CACHE);
+        wait_on_hd_interrupt();
 }
 
 /**
@@ -193,8 +207,7 @@ void hd_write_sector(uint32 dest, void *src)
 void hd_read_sector(void *dest, uint32 src)
 {
         if(src > maxaddr) panic("hd: address too large");
-        uint8 stat = inb(HDALTBASE + HDALTREG_STAT);
-        if(stat & 0x80){
+        if(inb(HDALTBASE + HDALTREG_STAT) & 0x80){
                 //printf("read error %x\n",stat);
                 wait_on_hd_interrupt();
         }
@@ -205,9 +218,9 @@ void hd_read_sector(void *dest, uint32 src)
         outb(HDBASE + HDREG_SEC, addr.sector);
         outb(HDBASE + HDREG_CYL_LOW, addr.cyl);
         outb(HDBASE + HDREG_CYL_HIGH, addr.cyl >> 16);
-        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE + addr.head);
+        select_masterdrive(addr.head);
         //sleep_ticks(1);
-        outb(HDBASE + HDREG_STAT, HDCMD_READ); //read sector
+        outb(HDBASE + HDREG_CMD, HDCMD_READ); //read sector
         wait_on_hd_interrupt();
         repinsw(HDBASE + HDREG_DATA, dest, 256); //read buffer	
 }

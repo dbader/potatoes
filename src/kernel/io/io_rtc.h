@@ -1,4 +1,4 @@
-/* $Id: io_main.c 183 2008-07-04 14:31:25Z dbader $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * The real-time clock constants and the time struct
  * 
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 183 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef __IO_RTC_H

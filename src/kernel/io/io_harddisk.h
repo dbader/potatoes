@@ -13,6 +13,7 @@
 #define HDREG_CYL_HIGH 5
 #define HDREG_DRIVE 6
 #define HDREG_STAT 7
+#define HDREG_CMD 7
 #define HDALTBASE 0x3F0
 #define HDALTREG_STAT 6
 #define HDALTREG_ADDR 7
@@ -24,6 +25,7 @@
 #define HDCMD_IDENTIFY_DEVICE 0xEC
 #define HDCMD_READ 0x20
 #define HDCMD_WRITE 0x30
+#define HDCMD_FLUSH_CACHE 0xE7
 
 /**
  * This struct is filled by the IDENTIFY DRIVE command 
