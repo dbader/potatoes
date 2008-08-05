@@ -37,6 +37,7 @@ along with this program->  If not, see <http://www->gnu->org/licenses/>->
 #include "../include/const.h"
 
 #include "io.h"
+#include "io_rtc.h"
 #include "io_virtual.h"
 
 const uint8 line_width = 80;

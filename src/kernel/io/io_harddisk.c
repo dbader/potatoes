@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/const.h"
 #include "../include/init.h"
+#include "../include/util.h"
 
 #include "../io/io.h"
 #include "../io/io_harddisk.h"
@@ -43,45 +44,47 @@ volatile bool hd_interrupt = FALSE;
 
 void dump_hd1(){
         int i = 0;
-        
+
         printf("%{io:} hard disk initialization:"
                         "\n\t%u cylinders"
                         "\n\t%u heads"
                         "\n\t%u sectors per track"
                         "\n%{\t---------------}"
                         "\n\t%d\tmaximal address\n", YELLOW
-                ,hd1.apparent_cyl
-                ,hd1.apparent_head
-                ,hd1.apparent_sector_per_track
-                ,YELLOW
-                ,maxaddr);
-        
+                        ,hd1.apparent_cyl
+                        ,hd1.apparent_head
+                        ,hd1.apparent_sector_per_track
+                        ,YELLOW
+                        ,maxaddr);
+
         printf("%{\t---------------}\n", YELLOW);
 
         (hd1.buffer_type==3) ? printf("\tbuffer type:\ttwo way, cache possible\n") : 
                 ((hd1.buffer_type==1) ? printf("\tbuffer type:\tone way, single sector\n") : 
                         printf("\tbuffer type:\ttwo way, multiple sectors\n"));
-        
+
         printf("\tbuffer size:\t%d Bytes\n", hd1.buffer_size*512);      
-        
+
         printf("\tserial:\t\t");
         for(i=20; i<40; i++)
                 putchar(((uint8*)(&hd1))[i]);
         printf("\n");
-        
+
         printf("\tfirmware:\t");
         for(i=46; i<54; i++)
                 putchar(((uint8*)(&hd1))[i]);
         printf("\n");
-        
+
         printf("\tmodel:\t\t");
         for(i=54; i<94; i++)
                 putchar(((uint8*)(&hd1))[i]);
         printf("\n");
-        
-        (hd1.lba_dma_flg & 0x100) ? printf("\tdma support:\tyes\n") : printf("\tdma support:\tno\n");
-        (hd1.lba_dma_flg & 0x200) ? printf("\tlba support:\tyes\n") : printf("\tlba support:\tno\n");        
-        
+
+        (hd1.lba_dma_flg & 0x100) ? 
+                        printf("\tdma support:\tyes\n") : printf("\tdma support:\tno\n");
+        (hd1.lba_dma_flg & 0x200) ? 
+                        printf("\tlba support:\tyes\n") : printf("\tlba support:\tno\n");        
+
         printf("\n");
 }
 
@@ -90,11 +93,16 @@ void dump_hd1(){
  */
 void wait_on_hd_interrupt()
 {
+        uint8 stat=inb(HDALTBASE + HDALTREG_STAT);
+        //printf("0x%x\n", stat);
         while(!hd_interrupt){
-                uint8 stat=inb(0x3F6);
+                stat=inb(HDALTBASE + HDALTREG_STAT);
                 //printf("0x%x\n", stat);
-                if(stat & 0x40){inb(0x1F7); break;} //drdy dsc drq
-                else if (stat == 1) panic("IDE-ERROR"); //error flag
+                if ((stat & 0x80) == 0) { //busy bit isn't set
+                        inb(HDBASE + HDREG_STAT);
+                        break;
+                }
+                else if (stat & 1) panic("IDE-ERROR"); //error flag
                 halt();
         }
         hd_interrupt = FALSE;
@@ -124,19 +132,26 @@ uint32 get_hdsize()
  * Initializes the hard disk drive (IDE 0 master).
  */
 void hd_init()
-{/*
-        outb(0x1F6,0xA0);
-        outb(0x1F7,0x10); //recalibrate
+{
+        /*outb(HDBASE+HDREG_DRIVE, MASTERDRIVE);
+        outb(HDBASE+HDREG_STAT,0x10); //recalibrate
         wait_on_hd_interrupt();
-        outb(0x1F6,0xA0);
-        outb(0x1F7,0x90); //execute drive diagnostics
+        uint8 stat = inb(HDBASE+HDREG_STAT);
+        printf("initial status: 0x%x\n",stat);
+        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE); //select master drive
+        outb(HDBASE + HDREG_STAT, 0x90); //execute drive diagnostics
         wait_on_hd_interrupt();
-        uint8 stat = inb(0x1F1);
-        printf("error register: %x\n",stat);*/
-        outb(0x1F6,0xA0); //select master drive
-        outb(0x1F7,0xEC); //identify drive
+        uint8 stat = inb(HDBASE + HDREG_ERR);
+        printf("error register: 0x%x\n",stat);
+         */
+        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE); //select master drive
+        //sleep_ticks(1);
+        outb(HDBASE + HDREG_STAT, HDCMD_IDENTIFY_DEVICE); //identify device
+        if (inb(HDBASE + HDREG_STAT) == 0) {
+                panic("NO HARD DRIVE");
+        }
         wait_on_hd_interrupt();
-        repinsw(0x1F0,(uint16*)&hd1,256); //read buffer
+        repinsw(HDBASE + HDREG_DATA, (uint16*)&hd1, 256); //read buffer
         maxaddr = get_hdsize()-1;
         dump_hd1();
 }
@@ -149,18 +164,24 @@ void hd_init()
  */
 void hd_write_sector(uint32 dest, void *src)
 {
-        if(dest > maxaddr) panic("hd: address too large");
-        uint8 stat = inb(0x3F6);
-        if(stat & 0x80){printf("write error %x\n",stat); wait_on_hd_interrupt();}
+        if (dest > maxaddr) {
+                panic("hd: address too large");
+        }
+        uint8 stat = inb(HDALTBASE + HDALTREG_STAT);
+        if (stat & 0x80) {
+                //printf("write error %x\n",stat);
+                wait_on_hd_interrupt();
+        }
         struct address addr = itoaddr(dest);
-        outb(0x1F2,1);
-        outb(0x1F3,addr.sector);
-        outb(0x1F4,addr.cyl);
-        outb(0x1F5,addr.cyl >> 16);
-        outb(0x1F6,0xA0+addr.head);
-        outb(0x1F7,0x30); //write sector
+        outb(HDBASE + HDREG_COUNT, 1);
+        outb(HDBASE + HDREG_SEC, addr.sector);
+        outb(HDBASE + HDREG_CYL_LOW, addr.cyl);
+        outb(HDBASE + HDREG_CYL_HIGH, addr.cyl >> 16);
+        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE + addr.head);
+        //sleep_ticks(1);
+        outb(HDBASE + HDREG_STAT, HDCMD_WRITE); //write sector
         wait_on_hd_interrupt();
-        repoutsw(0x1F0,src,256); //write buffer
+        repoutsw(HDBASE + HDREG_DATA, src, 256); //write buffer
 }
 
 /**
@@ -172,26 +193,35 @@ void hd_write_sector(uint32 dest, void *src)
 void hd_read_sector(void *dest, uint32 src)
 {
         if(src > maxaddr) panic("hd: address too large");
-        uint8 stat = inb(0x3F6);
-        if(stat & 0x80){/*printf("read error %x\n",stat);*/ wait_on_hd_interrupt();}
+        uint8 stat = inb(HDALTBASE + HDALTREG_STAT);
+        if(stat & 0x80){
+                //printf("read error %x\n",stat);
+                wait_on_hd_interrupt();
+        }
+
         struct address addr = itoaddr(src);
-        outb(0x1F2,1);
-        outb(0x1F3,addr.sector);
-        outb(0x1F4,addr.cyl);
-        outb(0x1F5,addr.cyl >> 16);
-        outb(0x1F6,0xA0+addr.head);
-        outb(0x1F7,0x20); //read sector
+
+        outb(HDBASE + HDREG_COUNT, 1);
+        outb(HDBASE + HDREG_SEC, addr.sector);
+        outb(HDBASE + HDREG_CYL_LOW, addr.cyl);
+        outb(HDBASE + HDREG_CYL_HIGH, addr.cyl >> 16);
+        outb(HDBASE + HDREG_DRIVE, MASTERDRIVE + addr.head);
+        //sleep_ticks(1);
+        outb(HDBASE + HDREG_STAT, HDCMD_READ); //read sector
         wait_on_hd_interrupt();
-        repinsw(0x1F0,dest,256); //read buffer	
+        repinsw(HDBASE + HDREG_DATA, dest, 256); //read buffer	
 }
 
 /**
  * Handles an hard disk interrupt by setting the hd_interrupt flag.
  */
 void hd_handler(){
-        uint8 stat = inb(0x1F7);
+        uint8 stat = inb(HDBASE + HDREG_STAT);
         //printf("int 0x%x\n", stat);
-        if (stat & 0x40) hd_interrupt = TRUE;
-        else if (stat == 1) panic("IDE ERROR");
-        else panic("NO IDEA WHY");
+        if (!(stat & 0x80))
+                hd_interrupt = TRUE;
+        else if (stat & 1)
+                panic("IDE ERROR");
+        else 
+                panic("NO IDEA WHY");
 }

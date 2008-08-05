@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/util.h"
 #include "../include/assert.h"
 
+#include "io_rtc.h"
 #include "io_virtual.h"
 
 uint16 active_monitor = -1;
@@ -55,6 +56,7 @@ void switch_monitor_down()
 
 void init_vmonitors()
 {
+        rtc_init();
         vmonitor_names = 
                 (char*) callocn(num_vmonitor_limit*81, sizeof(char), "vmonitor names array");
         ASSERT(vmonitor_names != 0);
@@ -73,11 +75,12 @@ void start_vmonitor(char *name)
         maxvmonitor++;
         active_monitor=maxvmonitor;
         vmonitors[maxvmonitor] = vmonitor;
-        memset(vmonitor_names + 81 * active_monitor, '=', 74);
-        memcpy(vmonitor_names + 81 * active_monitor + 74, " ETIOS", 6);
+        memset(vmonitor_names + 81 * active_monitor, '=', 80);
         memcpy(vmonitor_names + 81 * active_monitor + 2, name, strlen(name));
         *(vmonitor_names + 81 * active_monitor + 1) = ' ';
         *(vmonitor_names + 81 * active_monitor + 1 + strlen(name) + 1) = ' ';
+        *(vmonitor_names + 81 * active_monitor + 54) = ' ';
+        *(vmonitor_names + 81 * active_monitor + 78) = ' ';
 }
 
 virt_monitor* get_active_virt_monitor(){
@@ -85,5 +88,6 @@ virt_monitor* get_active_virt_monitor(){
 }
 
 char* get_active_virt_monitor_name(){
+        memcpy(vmonitor_names + 81 * active_monitor + 55, (void*)time2str(), 23);
         return &(vmonitor_names[active_monitor*81]);
 }

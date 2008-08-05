@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"  
 
 #include "../io/io.h"
+#include "../io/io_rtc.h"
 #include "../io/io_virtual.h"
 #include "../pm/pm_main.h"  
 /**
@@ -50,7 +51,8 @@ uint32 timer_handler(uint32 context)
         ticks++;      
         if (ticks == SINT32_MAX) 
                 ticks = 0;
-        
+
+        rtc_update();
         update_virt_monitor(get_active_virt_monitor());
         
         return pm_schedule(context);

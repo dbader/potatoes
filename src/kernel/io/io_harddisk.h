@@ -3,6 +3,28 @@
 
 #include "../include/types.h"
 
+
+#define HDBASE 0x1F0
+#define HDREG_DATA 0
+#define HDREG_ERR 1
+#define HDREG_COUNT 2
+#define HDREG_SEC 3
+#define HDREG_CYL_LOW 4
+#define HDREG_CYL_HIGH 5
+#define HDREG_DRIVE 6
+#define HDREG_STAT 7
+#define HDALTBASE 0x3F0
+#define HDALTREG_STAT 6
+#define HDALTREG_ADDR 7
+
+#define MASTERDRIVE 0xA0
+#define SLAVEDRIVE 0xB0
+
+#define HDCMD_EXEC_DRIVE_DIAG 0x90
+#define HDCMD_IDENTIFY_DEVICE 0xEC
+#define HDCMD_READ 0x20
+#define HDCMD_WRITE 0x30
+
 /**
  * This struct is filled by the IDENTIFY DRIVE command 
  * 

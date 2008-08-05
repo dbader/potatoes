@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "../io/io.h"
+#include "../io/io_rtc.h"
 #include "../io/io_virtual.h"
 #include "../include/const.h"
 #include "../include/debug.h"
@@ -57,6 +58,6 @@ void io_init()
         hd_init();                      dprintf("%{io:} hard disk initialized\n", YELLOW);
         
         memset(keyboard_state, FALSE, sizeof(keyboard_state));
-        
+   
         dprintf("%{io:} initialized\n", YELLOW);
 }

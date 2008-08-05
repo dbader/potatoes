@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../io/io_virtual.h"
 #include "../io/io.h"
+#include "../io/io_rtc.h"
 #include "../mm/mm.h"
 //#include "../fs/fs_main.h"
 #include "../pm/pm_main.h"
@@ -145,7 +146,7 @@ void strsep_test()
 
         printf("\ncopy = %p\n", copy);
         printf("work_copy = %p\n", work_copy);
-     
+
         // monitor_puts("done.");
 
         free(copy);
@@ -239,7 +240,7 @@ void malloc_test()
         mm_print_memory();
         uint32 free_end = free_memory();
         printf("free memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes", 
-                free_end, free_start - free_end);
+                        free_end, free_start - free_end);
 }
 
 void sleep_test()
@@ -284,7 +285,7 @@ void hd_write_test()
                 else ch++;
         }
         hd_write_sector(500,ptr);
-                printf("written!\n");
+        printf("written!\n");
         free(ptr);
 }
 
@@ -345,17 +346,17 @@ char* fgets(char *s, int n, int fd)
                 *s++ = ch;
         }
         return s;
-                
+
 }
 
 void syscall_test_thread()
 {
         // log
         _log("log() test.\n");
-        
+
         // getpid
         printf("getpid() returns %u\n", _getpid());
-        
+
         // Test open, write, close
         int fd = _open("/test", 0, 0);
         printf("fd = %u\n", fd);
@@ -363,7 +364,7 @@ void syscall_test_thread()
         _write(fd, buf, strlen(buf) + 1);
         printf("current pos is %d\n", _seek(fd, SEEK_CUR, 0));
         _close(fd);
-        
+
         // Test open, read, close
         char rbuf[50];
         memset(rbuf, 0, sizeof(rbuf));
@@ -372,7 +373,7 @@ void syscall_test_thread()
         _read(fd, rbuf, 5);
         _close(fd);
         _log(rbuf);
-        
+
         // Test device files
         fd = _open("/dev/null", 0, 0);
         printf("devnull fd = %u\n", fd);
@@ -380,12 +381,12 @@ void syscall_test_thread()
         _read(fd, &data, sizeof(data));
         printf("data = 0x%x\n", data);
         printf("current pos is %d\n", _seek(fd, SEEK_CUR, 0));
-        
+
         // stdout
         int stdout = _open("/dev/stdout", 0, 0);
         printf("stdout = %u\n", stdout);
         _write(stdout, buf, strlen(buf) + 1);
-        
+
         //stdin
         int stdin = _open("/dev/stdin", 0, 0);
         printf("please enter something: ");
@@ -394,12 +395,12 @@ void syscall_test_thread()
         fgets(input, sizeof(input), stdin);
         printf("\nThank you. You entered: %s\n", input);
         _close(stdin);
-        
+
         // malloc and free
         void *mem = _malloc(4096);
         printf("malloc() returns 0x%x\n", mem);
         _free(mem);
-        
+
         // exit
         _exit(0);
 }
@@ -478,7 +479,7 @@ void fs_tests()
 {
         //create_fs();
         test_PM();
-        
+
 }
 
 void isr_test()
@@ -490,7 +491,7 @@ void isr_test()
 void threadA()
 {
         _log("hello from task A\n");
-                
+
         for(;;) {
                 //for (int i = 0; i < 9999; i++) ;
                 _log("A");
@@ -501,7 +502,7 @@ void threadA()
 void threadB()
 {
         _log("hello from task B\n"); // log()
-        
+
         for(;;) {
                 //for (int i = 0; i < 9999; i++) ;
                 _log("B");
@@ -525,6 +526,11 @@ void nullptr_test()
         putchar(*ptr);
 }
 
+void print_time()
+{
+        printf("%s\n",time2str());
+}
+
 void do_tests()
 {
         printf("\n%{Global keyboard shortcuts:}\n", LIGHTGREEN);
@@ -540,7 +546,7 @@ void do_tests()
         //hd_test();
         //hd_stresswrite_test();
         //hd_stressread_test();
-        
+
         //SHORTCUT_CTRL('i', isr_test);
         //SHORTCUT_CTRL('1', assert_test);
         //SHORTCUT_CTRL_SUPER('p', printf_test);
@@ -549,6 +555,7 @@ void do_tests()
         //SHORTCUT_CTRL_SUPER('h', hd_stressread_test);
         //SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
+        //SHORTCUT_CTRL('t', print_time);
         //SHORTCUT_CTRL('f', fs_tests);
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);

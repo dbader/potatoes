@@ -5,7 +5,7 @@ floppya: 1_44=floppy.img, status=inserted
 boot: a
 log: bochsout.txt
 mouse: enabled=0
-clock: sync=realtime
+clock: sync=realtime, time0=local
 cpu: ips=500000
 user_shortcut: keys=pause
 keyboard_mapping: enabled=1, map=/usr/share/bochs/keymaps/x11-pc-de.map
