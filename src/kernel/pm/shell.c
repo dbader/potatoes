@@ -704,6 +704,17 @@ void shell_cmd_pong(int argc, char *argv[])
         while (_read(STDIN, &ch, sizeof(ch)) != 0) ;
 }
 
+void shell_cmd_date(int argc, char *argv[]) 
+{
+        int fd = _open("/dev/clock", 0, 0);
+        
+        char buf[100];
+        _read(fd, buf, sizeof(buf));
+        _close(fd);
+        
+        _printf("%s\n", buf);
+}
+
 // TODO: nice to have:
 /*
  * tab completion
@@ -737,6 +748,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"exit",        shell_cmd_exit,         "Quit the shell"},
                 {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
                 {"pong",        shell_cmd_pong,         "A classic video game"},
+                {"date",        shell_cmd_date,         "Display date and time"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

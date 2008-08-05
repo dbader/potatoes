@@ -62,6 +62,7 @@ extern device_t dev_stdin;
 extern device_t dev_brainfuck;
 extern device_t dev_framebuffer;
 extern device_t dev_keyboard;
+extern device_t dev_clock;
 
 uint32 getpid()
 {
@@ -103,6 +104,7 @@ void pm_init()
         pm_register_device(&dev_keyboard);
        	init_bf();
         pm_register_device(&dev_brainfuck);
+        pm_register_device(&dev_clock);
        
         dprintf("%{pm:} scheduler initialized\n", VIOLET);
         
