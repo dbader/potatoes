@@ -49,11 +49,13 @@ void dump_hd1(){
                         "\n\t%u cylinders"
                         "\n\t%u heads"
                         "\n\t%u sectors per track"
+                        "\n\t%u bytes per sector"
                         "\n%{\t---------------}"
                         "\n\t%d\tmaximal address\n", YELLOW
                         ,hd1.apparent_cyl
                         ,hd1.apparent_head
                         ,hd1.apparent_sector_per_track
+                        ,hd1.bytes_per_sector
                         ,YELLOW
                         ,maxaddr);
 
@@ -66,31 +68,38 @@ void dump_hd1(){
         printf("\tbuffer size:\t%d Bytes\n", hd1.buffer_size*512);      
 
         printf("\tserial:\t\t");
-        for(i=20; i<40; i++)
+        for (i=20; i<40; i+=2) {
+                putchar(((uint8*)(&hd1))[i+1]);
                 putchar(((uint8*)(&hd1))[i]);
+        }
         printf("\n");
 
         printf("\tfirmware:\t");
-        for(i=46; i<54; i++)
+        for (i=46; i<54; i+=2) {
+                putchar(((uint8*)(&hd1))[i+1]);
                 putchar(((uint8*)(&hd1))[i]);
+        }
         printf("\n");
 
         printf("\tmodel:\t\t");
-        for(i=54; i<94; i++)
+        for (i=54; i<94; i+=2) {
+                putchar(((uint8*)(&hd1))[i+1]);
                 putchar(((uint8*)(&hd1))[i]);
+        }
         printf("\n");
 
         (hd1.lba_dma_flg & 0x100) ? 
                         printf("\tdma support:\tyes\n") : printf("\tdma support:\tno\n");
-        (hd1.lba_dma_flg & 0x200) ? 
-                        printf("\tlba support:\tyes\n") : printf("\tlba support:\tno\n");        
+                        (hd1.lba_dma_flg & 0x200) ? 
+                                        printf("\tlba support:\tyes\n") : printf("\tlba support:\tno\n");        
 
-        printf("\n");
+                                        printf("\n");
 }
 
 void select_masterdrive(uint8 head)
 {
         outb(HDBASE + HDREG_DRIVE, MASTERDRIVE | head);
+        //This is a bit ugly
         inb(HDALTBASE + HDALTREG_STAT);
         inb(HDALTBASE + HDALTREG_STAT);
         inb(HDALTBASE + HDALTREG_STAT);
@@ -101,18 +110,20 @@ void select_masterdrive(uint8 head)
 /**
  * Waits on hard disk to set the hd_interrupt flag or the drive_ready flag in the status register 
  */
-void wait_on_hd_interrupt()
+void wait_on_hd_interrupt(char* str)
 {
         uint8 stat=inb(HDALTBASE + HDALTREG_STAT);
-        //printf("0x%x\n", stat);
+
         while(!hd_interrupt){
                 stat=inb(HDALTBASE + HDALTREG_STAT);
                 //printf("0x%x\n", stat);
                 if ((stat & 0x80) == 0) { //busy bit isn't set
                         inb(HDBASE + HDREG_STAT);
                         break;
+                } else if (stat & 1) {
+                        printf("error code(%s): 0x%x\n", str, inb(HDBASE + HDREG_ERR));
+                        //panic("IDE-ERROR"); //error flag
                 }
-                else if (stat & 1) panic("IDE-ERROR"); //error flag
                 halt();
         }
         hd_interrupt = FALSE;
@@ -143,7 +154,8 @@ uint32 get_hdsize()
  */
 void hd_init()
 {
-        /*outb(HDBASE+HDREG_DRIVE, MASTERDRIVE);
+        /*
+        outb(HDBASE+HDREG_DRIVE, MASTERDRIVE);
         outb(HDBASE+HDREG_STAT,0x10); //recalibrate
         wait_on_hd_interrupt();
         uint8 stat = inb(HDBASE+HDREG_STAT);
@@ -151,17 +163,21 @@ void hd_init()
         outb(HDBASE + HDREG_DRIVE, MASTERDRIVE); //select master drive
         outb(HDBASE + HDREG_CMD, HDCMD_EXEC_DRIVE_DIAG); //execute drive diagnostics
         wait_on_hd_interrupt();
-        uint8 stat = inb(HDBASE + HDREG_ERR);
+        stat = inb(HDBASE + HDREG_ERR);
         printf("error register: 0x%x\n",stat);
-         */
-        if(inb(HDALTBASE + HDALTREG_STAT) & 0x80) wait_on_hd_interrupt();
+        */
+        
+        uint8 stat = inb(HDBASE + HDREG_STAT);
+        if(stat == 0xFF) panic("Floating Bus");
+        if(stat & 0x80) wait_on_hd_interrupt("init not ready");
+        
         select_masterdrive(0);
-        //sleep_ticks(1);
         outb(HDBASE + HDREG_CMD, HDCMD_IDENTIFY_DEVICE); //identify device
         if (inb(HDBASE + HDREG_STAT) == 0) {
                 panic("NO HARD DRIVE");
         }
-        wait_on_hd_interrupt();
+        wait_on_hd_interrupt("init");
+        printf("0x%x,0x%x\n", inb(HDBASE + HDREG_CYL_LOW), inb(HDBASE + HDREG_CYL_LOW));
         repinsw(HDBASE + HDREG_DATA, (uint16*)&hd1, 256); //read buffer
         maxaddr = get_hdsize()-1;
         dump_hd1();
@@ -175,12 +191,13 @@ void hd_init()
  */
 void hd_write_sector(uint32 dest, void *src)
 {
+        //printf("dest: %d\n", dest);
         if (dest > maxaddr) {
-                panic("hd: address too large");
+                panic("hd(write): address too large");
         }
         if (inb(HDALTBASE + HDALTREG_STAT) & 0x80) {
                 //printf("write error %x\n",stat);
-                wait_on_hd_interrupt();
+                wait_on_hd_interrupt("write not ready");
         }
         struct address addr = itoaddr(dest);
         outb(HDBASE + HDREG_COUNT, 1);
@@ -188,14 +205,15 @@ void hd_write_sector(uint32 dest, void *src)
         outb(HDBASE + HDREG_CYL_LOW, addr.cyl);
         outb(HDBASE + HDREG_CYL_HIGH, addr.cyl >> 16);
         select_masterdrive(addr.head);
-        
-        //sleep_ticks(1);
+
         outb(HDBASE + HDREG_CMD, HDCMD_WRITE); //write sector
-        wait_on_hd_interrupt();
+        wait_on_hd_interrupt("write");
         repoutsw(HDBASE + HDREG_DATA, src, 256); //write buffer
         
+#ifndef EEEPC
         outb(HDBASE + HDREG_CMD, HDCMD_FLUSH_CACHE);
-        wait_on_hd_interrupt();
+        wait_on_hd_interrupt("flush");
+#endif
 }
 
 /**
@@ -206,10 +224,10 @@ void hd_write_sector(uint32 dest, void *src)
  */
 void hd_read_sector(void *dest, uint32 src)
 {
-        if(src > maxaddr) panic("hd: address too large");
+        //printf("src: %d\n", src);
+        if(src > maxaddr) panic("hd(read): address too large");
         if(inb(HDALTBASE + HDALTREG_STAT) & 0x80){
-                //printf("read error %x\n",stat);
-                wait_on_hd_interrupt();
+                wait_on_hd_interrupt("read not ready");
         }
 
         struct address addr = itoaddr(src);
@@ -219,9 +237,8 @@ void hd_read_sector(void *dest, uint32 src)
         outb(HDBASE + HDREG_CYL_LOW, addr.cyl);
         outb(HDBASE + HDREG_CYL_HIGH, addr.cyl >> 16);
         select_masterdrive(addr.head);
-        //sleep_ticks(1);
         outb(HDBASE + HDREG_CMD, HDCMD_READ); //read sector
-        wait_on_hd_interrupt();
+        wait_on_hd_interrupt("read");
         repinsw(HDBASE + HDREG_DATA, dest, 256); //read buffer	
 }
 
@@ -230,11 +247,10 @@ void hd_read_sector(void *dest, uint32 src)
  */
 void hd_handler(){
         uint8 stat = inb(HDBASE + HDREG_STAT);
-        //printf("int 0x%x\n", stat);
         if (!(stat & 0x80))
                 hd_interrupt = TRUE;
         else if (stat & 1)
                 panic("IDE ERROR");
-        else 
+        else
                 panic("NO IDEA WHY");
 }

@@ -3,8 +3,14 @@
 
 #include "../include/types.h"
 
+#ifdef EEEPC
+        #define HDBASE 0x170
+        #define HDALTBASE 0x376
+#else
+        #define HDBASE 0x1F0
+        #define HDALTBASE 0x3F6
+#endif
 
-#define HDBASE 0x1F0
 #define HDREG_DATA 0
 #define HDREG_ERR 1
 #define HDREG_COUNT 2
@@ -14,9 +20,8 @@
 #define HDREG_DRIVE 6
 #define HDREG_STAT 7
 #define HDREG_CMD 7
-#define HDALTBASE 0x3F0
-#define HDALTREG_STAT 6
-#define HDALTREG_ADDR 7
+#define HDALTREG_STAT 0
+#define HDALTREG_ADDR 1
 
 #define MASTERDRIVE 0xA0
 #define SLAVEDRIVE 0xB0

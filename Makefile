@@ -144,6 +144,9 @@ bin2c: src/tools/bin2c/bin2c.c
 	
 tools: bin2c
 
+# If the USB-Stick is for the EEEPC use:
+#
+# sudo make EXTRA_CFLAGS=-DEEEPC usbstick TARGET_DEV=... PART_SIZE=...
 TARGET_DEV=undefined
 PART_SIZE=undefined
 usbstick: kernel
@@ -213,4 +216,4 @@ kernel: $(OBJFILES) Makefile
 
 %.o: %.c Makefile
 	@echo " CC	$(patsubst functions/%,%,$@)"
-	@$(CC) $(CFLAGS) -MMD -MP -MT "$*.d $*.t" -g -c $< -o $@
+	@$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -MMD -MP -MT "$*.d $*.t" -g -c $< -o $@
