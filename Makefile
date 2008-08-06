@@ -60,10 +60,13 @@ help:
 	@echo "kernel		- builds the kernel"
 	@echo "mac_runbochs	- starts bochs (mac)"
 	@echo "mac_image	- update floppy.img (mac)"
-	@echo "runbochs		- starts bochs"
+	@echo "runbochs  	- starts bochs"
+	@echo "runvirtualbox	- starts virtualbox"
+	@echo "runqemu		- starts qemu"
 	@echo "todo		- search sourcecode for TODOs"
 	@echo "tools		- all tools"
-	@echo "usbstick		- install etiOS on an usb stick"
+	@echo "usbstick   	- install etiOS on an usb stick"
+	@echo "LOC		- show lines of codes and number of files"
 	@echo "help		- displays this list"
 
 clean:
