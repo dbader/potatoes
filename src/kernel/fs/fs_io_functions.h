@@ -32,9 +32,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef FS_IO_FUNCTIONS_H_
 #define FS_IO_FUNCTIONS_H_
 
-block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling);
+#define CREATE  1
+#define DELETE  2
 
-block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling);
+
+size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling);
+
+size_t fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling);
 
 file_nr fs_open(char *abs_path);
 
@@ -43,6 +47,8 @@ bool fs_close(file_nr fd);
 bool fs_create(char *path, int data_type);
 
 bool fs_delete(char *path);
+
+bool fs_create_delete(char *abs_path, int mode, int data_type);
 
 void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 originf);
 

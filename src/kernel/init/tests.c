@@ -473,13 +473,10 @@ void ralph_wiggum()
         printf(" +        W*                  WW                       W W         \n");
 }
 
-extern void create_fs();
-extern void test_PM();
+void run_FS_tests();
 void fs_tests()
 {
-        //create_fs();
-        test_PM();
-
+        run_FS_tests();
 }
 
 void isr_test()
@@ -563,5 +560,5 @@ void do_tests()
         SHORTCUT_CTRL('+', switch_monitor_up);
         SHORTCUT_CTRL('-', switch_monitor_down);
         dprint_separator();
-        //fs_tests();
+        fs_tests();
 }

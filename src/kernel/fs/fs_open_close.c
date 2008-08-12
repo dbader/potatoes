@@ -37,11 +37,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs_const.h"
 #include "fs_types.h"
+#include "fs_io_functions.h"
 #include "fs_file_table.h"
 #include "fs_inode_table.h"
 #include "fs_buf.h"
 #include "fs_block_dev.h"
-#include "fs_io_functions.h"
 #include "fs_dir.h"
 
 
@@ -50,9 +50,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * loading the inode from HD, inserting the inode to the inode table and
  * and registering the file in the global/process file table.
  * 
- * @param path The absolute file path
- * @return The process file descriptor
- * 
+ * @param path absolute file path
+ * @return     process file descriptor
  */
 file_nr fs_open(char *abs_path)
 {
@@ -60,13 +59,12 @@ file_nr fs_open(char *abs_path)
         m_inode *inode;
         
         fs_dprintf("[fs_o_c] trying to open %s\n", abs_path);
-        dump_inode(root);
         
         if (strcmp(abs_path, "/") != 0){ //not the root directory
                 fd = name2desc(abs_path); //get the file descriptor from file table if already existent
                 if (fd != NOT_FOUND){
                         //inc_count(fd);
-                        fs_dprintf("[fs_o_c] file already exists!\n");
+                        fs_dprintf("[fs_o_c] file %s is already opened!\n", abs_path);
                         return fd; //file already exists
                 }
                 
@@ -99,7 +97,8 @@ file_nr fs_open(char *abs_path)
 /**
  * Closes a file by writing the inode to HD and freeing the file descriptor entry.
  * 
- * @param fd The process file descriptor.
+ * @param fd process file descriptor.
+ * @return   operation status
  */
 bool fs_close(file_nr fd)
 {

@@ -50,62 +50,103 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Creates a file from absolute path by inserting the name into the containing directory,
  * creating a new inode and writing it to HD.
  * 
- * @param path The file's absolute path
- * @return The result status of the create operation
+ * @param abs_path absolute file path
+ * @return         result status of the create operation
  */
 bool fs_create(char *abs_path, int data_type)
 {
-        fs_dprintf("[fs_c_d] creating dir %s...\n", abs_path);
+        fs_create_delete(abs_path, CREATE, data_type);
+}
+
+
+/**
+ * Deletes a file by removing it from the containing directory.
+ * 
+ * @param abs_path absolute file path
+ * @return         operation's result status
+ */
+bool fs_delete(char *abs_path)
+{
+        fs_create_delete(abs_path, DELETE, NULL);
+}
+
+/**
+ * Handles the creation and deletion process.
+ * 
+ * @param abs_path  absolute file path
+ * @param mode      CREATE | DELETE (@see fs_const.h)
+ * @param data_type DATA_FILE | DIRECTORY (@see fs_const.h)
+ * @return          operation's result status
+ */
+bool fs_create_delete(char *abs_path, int mode, int data_type)
+{
+        if (mode == CREATE) {
+                fs_dprintf("[fs_create_delete] CREATING file '%s'...\n", abs_path);
+        } else {
+                fs_dprintf("[fs_create_delete] DELETING file '%s'...\n", abs_path);
+        }
+        
+        if (mode == CREATE && search_file(abs_path) != NOT_FOUND) {
+                printf("%{ERROR: file '%s' already exists!}\n", RED);
+                return FALSE;
+        }
+        
+        if (mode == DELETE && search_file(abs_path) == NOT_FOUND) {
+                printf("%{ERROR: file '%s' does not exist!}\n", RED);
+                return FALSE;
+        }
         
         char *path = get_path(abs_path);
-        if (path == (char*) NULL) return FALSE;
+        if (path == NULL) {
+                return FALSE;
+        }
         
         block_nr dir_inode_block;
         
-        if (strcmp(path, "/") == 0){
+        if (strcmp(path, "/") == 0) {
                 dir_inode_block = ROOT_INODE_BLOCK;
         } else {
                 dir_inode_block = search_file(path); //find dir
         }
         
-        fs_dprintf("[fs_c_d] found dir_inode_block: %d\n", dir_inode_block);
-        
-        if (dir_inode_block == NOT_FOUND){
+        if (dir_inode_block == NOT_FOUND) {
                 return FALSE;
         }
         
         char *file_name = get_filename(abs_path);
-        if (file_name == (char*) NULL) return FALSE;
-        
-        block_nr file_block = insert_file_into_dir(dir_inode_block, file_name);
-        
-        if (file_block == NOT_POSSIBLE){
+        if (file_name == NULL) {
                 return FALSE;
         }
         
-        //create new inode and write it to HD
-        fs_dprintf("[fs_c_d] create new inode (type = %d) and write it to block %d\n", data_type, file_block);
-        m_inode *inode = new_minode(file_block, data_type, FALSE); //TODO: store in inode table?
+        block_nr file_block;
         
-        if (inode == (m_inode*) NULL) return FALSE;
+        if (mode == CREATE) {
+                file_block = insert_file_into_dir(dir_inode_block, file_name);
+        } else if (mode == DELETE) {
+                file_block = delete_file_from_dir(dir_inode_block, file_name);
+        }
         
-        write_inode(inode);
-
-        free(inode); //free memory, load from HD if needed
+        if (file_block == NOT_POSSIBLE) {
+                return FALSE;
+        }
+        
+        if (mode == CREATE) {
+                //create new inode and write it to HD
+                fs_dprintf("[fs_c_d] create new inode (type = %d) and write it to block %d\n", data_type, file_block);
+                m_inode *inode = new_minode(file_block, data_type, FALSE); //TODO: store in inode table?
+                
+                if (inode == NULL) {
+                        return FALSE;
+                }
+                
+                write_inode(inode);
+        
+                free(inode); //free memory, load from HD if needed
+        }
+        
         free(file_name);
+        free(path);
         
         return TRUE;
 }
 
-/**
- * Deletes a file by deregistering it from the containing directory.
- * 
- * @param path  The absolute file path
- * @return      The operation's result status
- */
-bool fs_delete(char *path)
-{
-        block_nr dir_blk = search_file(get_path(path));
-        //TODO implementation...
-        
-}

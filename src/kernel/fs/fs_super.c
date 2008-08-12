@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_super.h"
 #include "fs_block_dev.h"
 #include "fs_bmap.h"
+#include "../io/io_rtc.h"
 
 /**
  * Time function.
@@ -75,7 +76,7 @@ void init_super_block()
         /* pointer to root inode */
         super->s_iroot = root;
         
-        //super->s_modify_ts = get_time();
+        super->s_modify_ts = time;
         
         super->s_read_only = FALSE;
         
@@ -85,6 +86,9 @@ void init_super_block()
         
 }
 
+/**
+ * Dump the main attributes.
+ */
 void dump_super()
 {
         ASSERT(super != NIL_SUPER);

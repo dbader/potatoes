@@ -208,11 +208,14 @@ void shell_cmd_ls(int argc, char *argv[])
                 return;
         }
         
-        if (_read(fd, directory, sizeof(directory)) != sizeof(directory)) {
+        int num_bytes = _read(fd, directory, sizeof(directory));
+        //_printf("%d bytes read.\n", num_bytes);
+        
+        /*if (num_bytes != sizeof(directory)) {
                 _close(fd);
                 _printf("%s: Error reading directory\n", argv[0]);
                 return;
-        }
+        }*/
 
         int i = 0;
         while (directory[i].inode != 0) {

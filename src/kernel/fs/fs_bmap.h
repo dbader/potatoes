@@ -36,6 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Functions on the block bitmap
  */
 
+size_t malloc_bmap();
+
 void init_bmap();
 
 void load_bmap();

@@ -47,25 +47,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define NUM_FILES               10                                      /* 64; #entries in filp table */
 #define NUM_PROC_FILES          20                                      /* #concurrently opened files per process */
-#define NUM_INODES              10                                     /* 200; max. num of opened inodes(files+dir) */
+#define NUM_INODES              10                                      /* 200; max. num of opened inodes(files+dir) */
 
 #define ADDR_SIZE               4
 #define ADDRS_PER_BLOCK         BLOCK_SIZE/ADDR_SIZE
-#define NUM_DIRECT_POINTER      25                                      /* # direct pointer in inode */
+#define NUM_DIRECT_POINTER      30                                      /* # direct pointer in inode */
 #define BYTES_DIRECT            NUM_DIRECT_POINTER * BLOCK_SIZE
 #define BYTES_SINGLE_INDIRECT   ADDRS_PER_BLOCK * BLOCK_SIZE
 #define BYTES_DOUBLE_INDIRECT   ADDRS_PER_BLOCK * ADDRS_PER_BLOCK * BLOCK_SIZE
 
-
-//#define NUM_BLOCKS_ON_HD        131072                                  /* 131072 * 512 byte = 64 MB */
-//#define NUM_BMAP_BLOCKS         ((NUM_BLOCKS_ON_HD / BLOCK_SIZE) / 8)   /* #blocks for the block bitmap (rounded)*/
-
 #define BOOT_BLOCK              (block_nr) 0
 #define SUPER_BLOCK             (block_nr) 1
 #define ROOT_INODE              (inode_nr) 0
-#define ROOT_INODE_BLOCK        (block_nr) 2 //(SUPER_BLOCK + (NUM_BMAP_BLOCKS))
+#define ROOT_INODE_BLOCK        (block_nr) 2
 #define FIRST_BMAP_BLOCK        (block_nr) 3
-//#define FIRST_DATA_BLOCK        ROOT_INODE_BLOCK + 1
 
 #define DATA_FILE               1
 #define DIRECTORY               2

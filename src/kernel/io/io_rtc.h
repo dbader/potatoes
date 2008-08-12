@@ -54,7 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 char timestamp[22];
 
-struct {
+struct time{
         uint8 sec;
         uint8 min;
         uint8 hour;

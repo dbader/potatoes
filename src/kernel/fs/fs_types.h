@@ -35,10 +35,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __FS_TYPES_H_
 
 #include "fs_const.h"
+#include "../io/io_rtc.h"
 
 typedef uint32 block_nr;
 typedef sint16 inode_nr;
 typedef sint16 file_nr;
+
 
 /**
  * The directory entry.
@@ -55,9 +57,9 @@ typedef struct dir_entry{
 typedef struct d_inode{
         uint16 i_mode;                          /* file | directory */
         uint32 i_size;                          /* in byte */
-        uint32 i_create_ts;
-        uint32 i_modify_ts;
-        block_nr i_direct_pointer[NUM_DIRECT_POINTER];          /* 25*32Bit = 800Bit*/
+        time_t i_create_ts;
+        time_t i_modify_ts;
+        block_nr i_direct_pointer[NUM_DIRECT_POINTER]; 
         block_nr i_single_indirect_pointer;
         block_nr i_double_indirect_pointer;
 } d_inode;
@@ -71,9 +73,9 @@ typedef struct m_inode{
         block_nr i_adr;
         uint16 i_mode;
         uint32 i_size;
-        uint32 i_create_ts;
-        uint32 i_modify_ts;
-        block_nr i_direct_pointer[NUM_DIRECT_POINTER];          /* 25*32Bit = 800Bit */
+        time_t i_create_ts;
+        time_t i_modify_ts;
+        block_nr i_direct_pointer[NUM_DIRECT_POINTER];
         block_nr i_single_indirect_pointer;
         block_nr i_double_indirect_pointer;
 } m_inode;

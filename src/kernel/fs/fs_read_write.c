@@ -40,11 +40,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_buf.h"
 #include "fs_io_functions.h"
 
-
-block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling)
+/**
+ * Read content from HD.
+ * 
+ * @param buf           destination buffer
+ * @param inode         source inode
+ * @param num_bytes     number of bytes desired to read
+ * @param pos           start position
+ * @param allow_scaling enlarge the file if EOF is reached?
+ * @return              number of bytes read
+ */
+size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling)
 {
-        if (pos > inode->i_size) {
-                return NOT_POSSIBLE;
+        if (pos > inode->i_size || num_bytes == 0) {
+                return 0;
         }
         
         block_nr data_blk = get_data_block(inode, pos, allow_scaling); //see block_dev.c
@@ -52,46 +61,68 @@ block_nr fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool a
         fs_dprintf("[fs_r_w] found block to read content from: %d\n", data_blk);
         
         if (data_blk == NOT_FOUND){
-                return NOT_POSSIBLE;
+                return 0;
         }
         
         cache_block(data_blk, BLOCK_SIZE);
         
         uint16 offset = pos % BLOCK_SIZE; //offset within the block because of position pos
-        fs_dprintf("[fs_r_w] offset within the content block (%d) + num_bytes (%d) = %d\n", offset, num_bytes, offset + num_bytes);
+        uint16 num_readable_bytes = 0;
+        
+        fs_dprintf("[fs_r_w] offset within the content block (= %d) + num_bytes (= %d) = %d\n", offset, num_bytes, offset + num_bytes);
         
         if (offset + num_bytes <= BLOCK_SIZE){
-                memcpy(buf, read_cache.cache + offset, num_bytes); //TODO: counter-check read_cache.cache + offset
+                num_readable_bytes = num_bytes;
+                memcpy(buf, read_cache.cache + offset, num_bytes);
         } else {
-                uint16 num_readable_bytes = BLOCK_SIZE - offset;
+                num_readable_bytes = BLOCK_SIZE - offset;
                 memcpy(buf, read_cache.cache + offset, num_readable_bytes);
                 
                 fs_dprintf("[fs_r_w] reading over block edge...\n");
                 fs_dprintf("[fs_r_w] num_readable_bytes = %d, left bytes = %d, new pos = %d\n", num_readable_bytes, num_bytes - (num_readable_bytes), pos + num_readable_bytes);
                 
-                return fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes, allow_scaling);
+                return num_readable_bytes + fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes, allow_scaling);
         }
         
-        return data_blk;
+        return num_readable_bytes;
 }
 
-block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling)
+/**
+ * Write content to HD.
+ * 
+ * @param inode         destination inode
+ * @param buf           source buffer
+ * @param num_bytes     number of bytes desired to write
+ * @param pos           start position
+ * @param allow_scaling enlarge the file if EOF is reached?
+ * @return              number of bytes written
+ */
+size_t fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling)
 {
+        if (pos > inode->i_size || num_bytes == 0) {
+                return 0;
+        }
+        
         block_nr dest_blk = get_data_block(inode, pos, allow_scaling); //get_block() in block_dev.c
 
         if (dest_blk == NOT_FOUND){
-                return NOT_POSSIBLE;
+                return 0;
         }
         
         uint16 offset = pos % BLOCK_SIZE; //offset within the block because of position pos
+        uint16 num_writeable_bytes = 0;
+        
+        
         if (offset + num_bytes <= BLOCK_SIZE){
-                cache_block(dest_blk, BLOCK_SIZE); //dest: read_cache
+                num_writeable_bytes = num_bytes;
                 
-                //overwrite modified bytes
-                memcpy(read_cache.cache + offset, buf, num_bytes); //TODO: counter-check write_cache.cache + offset
+                cache_block(dest_blk, BLOCK_SIZE); //load dest_blk to read_cache
+                
+                memcpy(read_cache.cache + offset, buf, num_bytes); //overwrite modified bytes
+                
                 wrt_cache(&read_cache, BLOCK_SIZE);
         } else {
-                uint16 num_writeable_bytes = BLOCK_SIZE - offset;
+                num_writeable_bytes = BLOCK_SIZE - offset;
                 cache_block(dest_blk, BLOCK_SIZE);
                 
                 memcpy(read_cache.cache + offset, buf, num_writeable_bytes);
@@ -100,14 +131,18 @@ block_nr fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool 
                 fs_dprintf("[fs_r_w] writing over block edge...\n");
                 fs_dprintf("[fs_r_w] num_writeable_bytes = %d, left bytes = %d, new pos = %d\n", num_writeable_bytes, num_bytes - (num_writeable_bytes), pos + num_writeable_bytes);
                            
-                return fs_write(inode, buf + num_writeable_bytes, num_bytes - (num_writeable_bytes), pos + num_writeable_bytes, allow_scaling);
+                return num_writeable_bytes + fs_write(inode, buf + num_writeable_bytes, num_bytes - (num_writeable_bytes), pos + num_writeable_bytes, allow_scaling);
         }
         
         if (inode->i_size < pos + num_bytes){
                 fs_dprintf("[fs_r_w] new file's size: %d\n", pos + num_bytes);
                 inode->i_size = pos + num_bytes;
-                write_inode(inode);
         }
         
-        return dest_blk;
+        inode->i_modify_ts = time;
+        fs_dprintf("[fs_r_w] new file's i_modify_ts: %s\n", time2str());
+        
+        write_inode(inode);
+        
+        return num_writeable_bytes;
 }

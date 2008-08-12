@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/types.h"
 #include "../include/debug.h"
+#include "../include/assert.h"
 #include "../include/string.h"
 #include "../include/stdlib.h"
 
@@ -43,23 +44,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_block_dev.h"
 
 extern uint32 get_hdsize();
+
 /**
- * Resets the block bitmap.
- * Set boot block, super block, ... (until first "real" data block) as used.
+ * Allocate the block bitmap in memory.
+ * 
+ * @return size of the block bitmap
  */
-void init_bmap()
+size_t malloc_bmap()
 {
-        uint32 size =  get_hdsize() / 8;
+        size_t size =  get_hdsize() / 8;
         num_bmap_blocks = size / BLOCK_SIZE + 1;
         first_data_block = ROOT_INODE_BLOCK + num_bmap_blocks + 1;
         
         bmap = mallocn(size, "block bitmap");
         
-        bzero(bmap, size);
+        if (bmap == (void *) NULL){
+                return 0;
+        } else {
+                fs_dprintf("[fs_bmap] malloced bmap.\n");
+                bzero(bmap, size);
+                
+                return size;
+        }
+}
+
+/**
+ * Resets the block bitmap.
+ */
+void init_bmap()
+{
+        size_t size = malloc_bmap();
+        ASSERT(size != 0);
         
         fs_dprintf("[fs_bmap] initializing bmap (size = %d)\n", size);
         
-        for (block_nr i = 0; i < first_data_block; i++){
+        //Set boot block, super block, ... (until first "real" data block) as used.
+        for (block_nr i = 0; i < first_data_block; i++){ 
                 mark_block(i, TRUE);
         }
 }
@@ -69,7 +89,10 @@ void init_bmap()
  */
 void load_bmap()
 {
-        fs_dprintf("[fs_bmap] loading bmap from HD\n");
+        size_t size = malloc_bmap();
+        ASSERT(size != 0);
+        
+        fs_dprintf("[fs_bmap] loading bmap (size = %d) from HD\n", size);
         int j = 0;
         for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + num_bmap_blocks; i++){
                 rd_block(&bmap[j*BLOCK_SIZE], i, BLOCK_SIZE);
@@ -179,6 +202,11 @@ void dump_bmap()
 {
         uint8 byte = 0; 
         uint8 bit  = 0;
+        
+        if (bmap == (void *) NULL){
+                fs_dprintf("[fs_bmap] BMAP is NULL\n");
+                return;
+        }
         
         fs_dprintf("[fs_bmap] BMAP (used blocks): \n");
         

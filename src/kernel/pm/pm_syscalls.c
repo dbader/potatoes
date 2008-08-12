@@ -173,7 +173,7 @@ void sys_close(void* data)
                 else
                         args->success = dev->close(dev, args->fd);
         } else {
-                if (do_close_pf(active_proc->pft, args->fd - MAX_DEVICES) == FALSE)
+                if (do_close_pf(active_proc->pft, args->fd - MAX_DEVICES) == EOF)
                         args->success = -1;
                 else
                         args->success = 0;
@@ -203,9 +203,9 @@ void sys_read(void* data)
 
                 // Right now do_read() does not support partially successful reads.
                 // So we have to patch that up: 
-                if (args->rw_count != FALSE)
-                        args->rw_count = args->size;
-
+                //if (args->rw_count != FALSE)
+                  //      args->rw_count = args->size;
+                
                 pft_entry->pf_pos += args->rw_count;
         }
 }
@@ -232,8 +232,8 @@ void sys_write(void* data)
 
                 // Right now do_write() does not support partially successful writes.
                 // So we have to patch that up: 
-                if (args->rw_count != FALSE)
-                        args->rw_count = args->size;
+                //if (args->rw_count != FALSE)
+                  //      args->rw_count = args->size;
 
                 pft_entry->pf_pos += args->rw_count;
         }

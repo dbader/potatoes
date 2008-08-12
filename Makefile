@@ -81,7 +81,7 @@ runvirtualbox: fdimage
 	@VBoxManage startvm $(OSNAME)
 	
 runqemu: fdimage hdimage
-	@qemu -localtime -fda floppy.img -hda hda.img --full-screen
+	@qemu -localtime -fda floppy.img -hda hda.img #--full-screen
 	
 mac_runbochs: mac_image
 	@/Applications/bochs.app/Contents/MacOS/bochs -q -f src/tools/bochsrc

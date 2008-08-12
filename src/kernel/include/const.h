@@ -38,4 +38,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FALSE           0
 #define FREQUENCY       100 //inits timer with frequency 100Hz (shoots every 10 ms)
 
+#define EOF             -1
+
 #endif /* const.h */

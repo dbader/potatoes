@@ -33,13 +33,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name);
 bool contains_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name);
+
 block_nr search_file(char *path);
 block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[]);
 
 block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name);
-uint32 insert_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr, char *name);
+uint32 create_entry(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], block_nr blk_nr, char *name);
 
-void delete_file_in_dir(char *name);
+block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name);
+uint32 delete_entry(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name);
 
 char* get_filename(char *abs_path);
 char* get_path(char *abs_path);

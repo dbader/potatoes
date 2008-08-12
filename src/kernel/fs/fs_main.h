@@ -47,20 +47,20 @@ bool do_mkdir(char *abs_path);
 bool do_mkfile(char *abs_path);
 
 /* DELETE */
-//
+int do_remove(char *abs_path);
 
 /* OPEN */
 file_nr do_open(char *abs_path);
 
 /* CLOSE */
-bool do_close(file_nr fd);
-bool do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd);
+int do_close(file_nr fd);
+int do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd);
 
 /* READ */
-bool do_read(file_nr fd, void *buf, size_t num_bytes, uint32 pos);
+size_t do_read(file_nr fd, void *buf, size_t count, uint32 pos);
 
 /* WRITE */
-bool do_write(file_nr fd, void *buf, size_t num_bytes, uint32 pos);
+size_t do_write(file_nr fd, void *buf, size_t count, uint32 pos);
 
 
 

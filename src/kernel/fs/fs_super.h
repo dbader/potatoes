@@ -46,7 +46,7 @@ struct super_block {
         /* in mem */
         uint8 *s_bmap;                                  /* pointer to block bitmap */
         m_inode *s_iroot;                               /* pointer to root inode */
-        uint32 s_modify_ts;
+        time_t s_modify_ts;
         uint16 s_read_only;                             /* TRUE or FALSE */
         uint16 s_dirt;                                  /* CLEAN or DIRTY */
         uint32 s_magic_number;          

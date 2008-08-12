@@ -58,37 +58,19 @@ void init_inode_table()
         }
 }
 
-
-void dump_inode(m_inode *mi)
+/**
+ * Create a new root inode.
+ */
+void create_root()
 {
-        fs_dprintf("[fs_inode_table] INODE: num = %d; adr = %d; sip = %d; dip = %d; mode = %d\n", 
-                 mi->i_num, mi->i_adr,
-                 mi->i_single_indirect_pointer,
-                 mi->i_double_indirect_pointer,
-                 mi->i_mode);
-        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
-                fs_dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
-        }
-        fs_dprintf("\n");
-}
-
-void dump_dinode(d_inode *mi)
-{
-        fs_dprintf("[fs_inode_table] INODE: sip = %d; dip = %d; mode = %d\n", 
-                 mi->i_single_indirect_pointer,
-                 mi->i_double_indirect_pointer,
-                 mi->i_mode);
-        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
-                fs_dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
-        }
-        fs_dprintf("\n");
-}
-
-void dump_inodes()
-{
-        for (int i = 0; i < NUM_INODES; i++){
-                dump_inode(&inode_table[i]);
-        }
+        m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
+        if (new_root == (m_inode*) NULL) return;
+        memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
+        
+        root = &inode_table[ROOT_INODE];
+        root->i_num = ROOT_INODE;
+        
+        ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
 }
 
 /**
@@ -96,9 +78,7 @@ void dump_inodes()
  */
 void load_root()
 {
-        fs_dprintf("[fs_inode_table] load root inode from block %d to inode table\n", ROOT_INODE_BLOCK);
-
-        rd_block(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK, BLOCK_SIZE);
+        read_minode(&inode_table[ROOT_INODE], ROOT_INODE_BLOCK);
         root = &inode_table[ROOT_INODE];
         root->i_adr = ROOT_INODE_BLOCK;
         root->i_num = ROOT_INODE;
@@ -109,25 +89,15 @@ void load_root()
         
 }
 
+/**
+ * Write root to HD.
+ */
 void write_root()
 {
-        fs_dprintf("[fs_inode_table] write root inode to block %d\n", ROOT_INODE_BLOCK);
+        d_inode *d_root = mallocn(sizeof(d_inode), "tmp d_inode");
+        ASSERT(d_root != (void *) NULL);
         
-        wrt_block(ROOT_INODE_BLOCK, root, sizeof(root));
-}
-
-void create_root()
-{
-        fs_dprintf("[fs_inode_table] create new root inode");
-        
-        m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
-        if (new_root == (m_inode*) NULL) return;
-        memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
-        
-        root = &inode_table[ROOT_INODE];
-        root->i_num = ROOT_INODE;
-        
-        ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
+        write_inode(root);
 }
 
 /**
@@ -143,22 +113,26 @@ m_inode* get_inode(inode_nr i_num)
                         return &inode_table[i];
                 }
         }
-        return (m_inode *) NULL;
+        return NULL;
 }
 
 /**
- * Write a memory inode to disk.
- * First transform memory inode to a disk inode. Then copy this disk inode to the write_cache.
- * Finally write the write_cache to disk.
+ * Read a inode from HD into a disk inode.
  * 
- * @param inode Pointer to the memory inode which should be written
- * @return boolean status of operation
+ * @param inode         destination
+ * @param inode_blk     source block on HD
  */
 void read_dinode(d_inode *inode, block_nr inode_blk)
 {
         rd_block(inode, inode_blk, sizeof(d_inode));
 }
 
+/**
+ * Read a inode from HD into a memory inode.
+ * 
+ * @param inode         destination
+ * @param inode_blk     source block on HD
+ */
 void read_minode(m_inode *inode, block_nr inode_blk)
 {
         bzero(&d_inode_cache, sizeof(d_inode_cache));
@@ -170,22 +144,22 @@ void read_minode(m_inode *inode, block_nr inode_blk)
 
 /**
  * Write a memory inode to disk.
- * First transform memory inode to a disk inode. Then copy this disk inode to the write_cache.
- * Finally write the write_cache to disk.
  * 
- * @param inode Pointer to the memory inode which should be written
- * @return boolean status of operation
+ * @param inode         pointer to the memory inode which should be written
+ * @return boolean      status of operation
  */
 void write_inode(m_inode *inode)
 {
-        cpy_minode_to_dinode(&d_inode_cache, inode);
+        cpy_minode_to_dinode(&d_inode_cache, inode); //transform memory inode to a disk inode.
         
         wrt_block(inode->i_adr, &d_inode_cache, sizeof(d_inode));
 }
 
+/**
+ * Write all inodes from inode table to HD.
+ */ 
 void write_inodes()
 {
-        //close all left inodes
         for (int i = 0; i < NUM_INODES; i++){
                 write_inode(&inode_table[i]);
         }
@@ -194,8 +168,8 @@ void write_inodes()
 /**
  * Copy common content of a memory inode to a disk inode.
  * 
- * @param mi The memory inode
- * @param di The disk inode
+ * @param di    disk inode
+ * @param mi    memory inode
  */
 void cpy_minode_to_dinode(d_inode *di, m_inode *mi)
 {
@@ -212,6 +186,12 @@ void cpy_minode_to_dinode(d_inode *di, m_inode *mi)
         di->i_double_indirect_pointer = mi->i_double_indirect_pointer;
 }
 
+/**
+ * Copy common content of a disk inode to a memory inode.
+ * 
+ * @param mi    memory inode
+ * @param di    disk inode
+ */
 void cpy_dinode_to_minode(m_inode *mi, d_inode *di)
 {
         mi->i_mode                      = di->i_mode;
@@ -227,14 +207,24 @@ void cpy_dinode_to_minode(m_inode *mi, d_inode *di)
         mi->i_double_indirect_pointer   = di->i_double_indirect_pointer;
 }
 
+/**
+ * Create a new memory inode.
+ * 
+ * @param adr            block address
+ * @param mode           DATA_FILE | DIRECTORY (@see fs_const.h)
+ * @param to_inode_table should the new inode be inserted into the inode table?
+ * @return               pointer to new inode
+ */
 m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
 {
         m_inode *mi;
         
-        if (!to_inode_table){
-                mi = malloc(sizeof(m_inode));
-                if (mi == (void*) NULL) return (m_inode *) NULL;
-                mi->i_num = NIL_INODE; //TODO: changed...
+        if (!to_inode_table) {
+                mi = mallocn(sizeof(m_inode), "new m_inode");
+                if (mi == NULL) {
+                        return (m_inode *) NULL;
+                }
+                mi->i_num = NIL_INODE;
         } else {
                 mi = alloc_inode();
         }
@@ -242,7 +232,9 @@ m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
         mi->i_adr  = adr;
         mi->i_mode = mode;
         mi->i_size = 0;
-        mi->i_create_ts = NULL; //TODO: get create_ts from Dmitriy
+        
+        mi->i_create_ts = time;
+        mi->i_modify_ts = time;
         
         for (int i = 0; i < NUM_DIRECT_POINTER; i++){
                 mi->i_direct_pointer[i] = NULL;
@@ -278,5 +270,52 @@ m_inode* alloc_inode(void)
                         return &inode_table[i];
                 }
         }
-        return (m_inode*) NULL;
+        return NULL;
+}
+
+/********* DEBUG *********/
+
+/**
+ * Print out a inode's attributes for debug purposes.
+ * 
+ * @param mi    inode to be printed
+ */
+void dump_inode(m_inode *mi)
+{
+        fs_dprintf("[fs_inode_table] INODE: num = %d; adr = %d; sip = %d; dip = %d; mode = %d\n", 
+                 mi->i_num, mi->i_adr,
+                 mi->i_single_indirect_pointer,
+                 mi->i_double_indirect_pointer,
+                 mi->i_mode);
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+                fs_dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
+        }
+        fs_dprintf("\n");
+}
+
+/**
+ * Print out a disk inode's attributes for debug purposes.
+ * 
+ * @param di    inode to be printed
+ */
+void dump_dinode(d_inode *di)
+{
+        fs_dprintf("[fs_inode_table] INODE: sip = %d; dip = %d; mode = %d\n", 
+                 di->i_single_indirect_pointer,
+                 di->i_double_indirect_pointer,
+                 di->i_mode);
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+                fs_dprintf("dp[%d] = %d; ", i, di->i_direct_pointer[i]);
+        }
+        fs_dprintf("\n");
+}
+
+/**
+ * Print out inode table for debug purposes.
+ */
+void dump_inodes()
+{
+        for (int i = 0; i < NUM_INODES; i++){
+                dump_inode(&inode_table[i]);
+        }
 }

@@ -52,5 +52,6 @@ typedef double  float64;
 typedef uint8   bool;
 
 typedef uint32  size_t;
+typedef struct time time_t;
 
 #endif /* types.h */

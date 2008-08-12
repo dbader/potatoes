@@ -110,12 +110,28 @@ void test_reload()
         */
 }
 
+void __ls(char* path){
+        dir_entry directory [DIR_ENTRIES_PER_BLOCK];
+        bzero(directory, sizeof(directory));
+        
+        file_nr fd = do_open(path);
+        dprintf("%d bytes read. \n", do_read(fd, directory, sizeof(directory), 0));
+               
+        dprintf("inode\tname\n-------------------------------------\n");
+        int i = 0;
+        while (directory[i].inode != 0) {
+                dprintf("%d\t%s\n", directory[i].inode, directory[i].name);
+                i++;
+        }
+        do_close(fd);
+}
+
 void test_create()
 {
         
         char number[4];
         char buf[5];
-        for (int i = 1; i < 1000; i++){
+        for (int i = 1; i < 10; i++){
                 bzero(number, 4);
                 itoa(i, number, 10);
                 bzero(buf, 5);
@@ -126,48 +142,26 @@ void test_create()
         }
         
         
-        if (!fs_create("/dir1", DIRECTORY)) dprintf("creation unsuccessful!\n");
-        if (!fs_create("/dir1/dir2/dir3", DIRECTORY)) dprintf("creation unsuccessful!\n");
-        if (!fs_create("/dir1/dir4", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        //if (!fs_create("/dir1", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        //if (!fs_create("/dir1/dir2/dir3", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        //if (!fs_create("/dir1/dir4", DIRECTORY)) dprintf("creation unsuccessful!\n");
                 
         dprintf("\n");
         
-        dump_inode(&inode_table[ROOT_INODE]);
-        dprintf("\n");
-        //if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
-
-        dprintf("\ncontent of dir_entry_block 34:\n");
-        char *p1 = malloc(BLOCK_SIZE);
-        bzero(p1, BLOCK_SIZE);
-        rd_block(p1, 34, BLOCK_SIZE);
-        for (int i = 0; i < BLOCK_SIZE; i++){
-                dprintf("%c", *p1++);
-                
-                if (i% sizeof(dir_entry) == 0)
-                        dprintf("\n");
-        }
-        
-        /*dump_inode(root);
-        write_inode(root);
-        
-        read_minode(root, 33);
-        dump_inode(root);
-        */
-        
-        //if (fs_open("/dir1") == -1) dprintf("opening unsuccessful!\n");
-        //dump_inodes();
-        //dump_files();
+        __ls("/dir1");
 }
 
-void test_rw_1() //quantitative
+extern void mem_dump();
+
+void test_rw_quantitative() //TODO!
 {
         char to_write[30] = "Hallo, ich war auf der HDD!";
-        if (!fs_create("/file1", DATA_FILE)){
+        if (!fs_create("/file1", DATA_FILE)) {
                 dprintf("creation unsuccessful!\n");
                 return;
         }
         
-        char to_read[1000];
+        char to_read[100];
         bzero(to_read, sizeof(to_read));
         
         if (fs_open("/file1") == NOT_POSSIBLE){
@@ -175,42 +169,40 @@ void test_rw_1() //quantitative
                 return;
         }
         
-        //dump_inodes();
-        //dump_files();
+        int num_bytes = 0;
         
         file *f = get_file(name2desc("/file1"));
         m_inode *mi = f->f_inode;
-        for (int pos = 0; pos < 20000; pos += 20){
-                if (fs_write(mi, to_write, sizeof(to_write), pos, TRUE) == NOT_POSSIBLE){
+        for (int pos = 0; pos < 1000 * sizeof(to_write); pos += sizeof(to_write)){
+                num_bytes = fs_write(mi, to_write, sizeof(to_write), pos, TRUE);
+                dprintf("wrote %d bytes\n", num_bytes);
+                if (num_bytes == 0){
                         dprintf("writing unsuccessful!\n");
                         return;
                 }
+                dprintf("\n");
         }
-
+        
+        mem_dump();
+        
         dprintf("written: %s\n\n", to_write);
         
-        if (fs_read(to_read, mi, sizeof(to_read), 0, FALSE) == NOT_POSSIBLE){
+        num_bytes = fs_read(to_read, mi, sizeof(to_read), 0, FALSE);
+        dprintf("read %d bytes\n", num_bytes);
+        if (num_bytes == 0){
                 dprintf("reading unsuccessful!\n");
                 return;   
         }
         
         dprintf("read: %s\n", to_read);
-        
-        dump_inodes();
-        
-        rd_block(addr_cache, 61, BLOCK_SIZE);
-        dprintf("block 61: \n");
-        for (int i = 0; i< ADDRS_PER_BLOCK; i++){
-                dprintf("%d\n", addr_cache[i]);
-        }
 }
 
-void test_rw_2() //qualitativ
+void test_rw_qualitative()
 {
         char string[30] = "Hallo, ich war auf der HDD!!!!"; 
-        char to_write[2000];
+        char to_write[60];
         
-        for (int i = 0; i < 30; i++){
+        for (int i = 0; i < 2; i++){
                 strcat(to_write, string);
         }
 
@@ -226,19 +218,38 @@ void test_rw_2() //qualitativ
         }
 
         m_inode *mi = get_file(name2desc("/file1"))->f_inode;
-        if (fs_write(mi, to_write, sizeof(to_write), 0, TRUE) == NOT_POSSIBLE) {
+        int num_bytes = fs_write(mi, to_write, sizeof(to_write), 0, TRUE);
+        dprintf("wrote %d bytes.\n", num_bytes);
+        if (num_bytes == 0) {
                 dprintf("writing unsuccessful!\n");
                 return;
         }
 
-        char to_read[20];
-        bzero(to_read, 2000);
+        char to_read[1000];
+        bzero(to_read, sizeof(to_read));
 
-        if (fs_read(to_read, mi, sizeof(to_read), 0, FALSE) == NOT_POSSIBLE){
+        num_bytes = fs_read(to_read, mi, sizeof(to_read), 0, FALSE);
+        if (num_bytes == 0){
                 dprintf("reading unsuccessful!\n");
                 return;   
         } else {
-                dprintf("read: %s\n", to_read);
+                dprintf("read %d bytes: %s[END]\n", num_bytes, to_read);
+        }
+        
+        //write again with offset 7
+        if (fs_write(mi, to_write, sizeof(to_write), 7, TRUE) == 0) {
+                dprintf("writing unsuccessful!\n");
+                return;
+        }
+        
+        bzero(to_read, sizeof(to_read));
+
+        num_bytes = fs_read(to_read, mi, sizeof(to_read), 0, FALSE);
+        if (num_bytes == 0){
+                dprintf("reading unsuccessful!\n");
+                return;   
+        } else {
+                dprintf("read %d bytes: %s[END]\n", num_bytes, to_read);
         }
 }
 
@@ -349,27 +360,33 @@ void test_ls()
         
         file_nr fd = do_open("/usr");
         
-        do_read(fd, directory, sizeof(directory), 0);
+        __ls("/usr");
+}
+
+void test_sync()
+{
+        fs_shutdown();
+        dump_bmap();
+        dump_inode(root);
+        load_fs();
+        dump_bmap();
+        dump_inode(root);
+}
+
+void test_delete()
+{
+        if (!fs_create("/dir1", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
         
-        /*
-         * TODO: replace '5' with (get_file(fd)->f_inode)->i_size
-         * when size is properly supported by CREATE
-         * 
-         * FIXME: How do I find out whether sth is a file or a directory?
-         */
-        dprintf("inode\tname\n-------------------------------------\n");
-        int i = 0;
-        while (directory[i].inode != 0) {
-                dprintf("%d\t%s", directory[i].inode, directory[i].name);
-//                if (get_file(inode2desc(&directory[i].inode))->f_inode->i_mode == DIRECTORY)
-//                        dprintf("/ [DIR]\n");
-//                else
-//                        dprintf(" [FILE]\n");
-                i++;
-        }
+        __ls("/dir1");
+        fs_delete("/dir1/dir2");
+        __ls("/dir1");
+        fs_delete("/dir1");
+        __ls("/");
+        
 }
 
 void run_FS_tests()
 {
-        test_bmap();
+        //test_rw_quantitative();
 }

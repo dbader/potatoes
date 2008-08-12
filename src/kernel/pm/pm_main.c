@@ -100,12 +100,12 @@ void pm_init()
         pm_register_device(&dev_null);
         pm_register_device(&dev_stdout);
         pm_register_device(&dev_stdin);
-        pm_register_device(&dev_framebuffer);
+        /* pm_register_device(&dev_framebuffer);
         pm_register_device(&dev_keyboard);
        	init_bf();
         pm_register_device(&dev_brainfuck);
         pm_register_device(&dev_clock);
-       
+       */
         dprintf("%{pm:} scheduler initialized\n", VIOLET);
         
         //test_ls();

@@ -100,7 +100,6 @@ int main(struct multiboot *mboot_ptr)
         printf("%{main:} init complete at %d ticks.\n", RED, get_ticks());
         
         do_tests();
-        //fs_shutdown();
         
         printf("%{main:} entering idle loop\n", RED);
         

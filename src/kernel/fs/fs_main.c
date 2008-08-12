@@ -46,9 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 extern void panic(char *msg);
 
-//tests
-extern void run_FS_tests();
-
 /**
  * Initializes the file system.
  */
@@ -57,12 +54,12 @@ void fs_init()
         dprint_separator();
         dprintf("%{FS:} init\n", GREEN);
         
-//        if(!load_fs()){
-//                printf("%{FS:} %{FS loading failed.}\n", GREEN, RED);
+        if(!load_fs()){
+                printf("%{FS:} %{FS loading failed.}\n", GREEN, RED);
                 if (!create_fs()){
                         panic("FS cannot be initialized!\n");
                 }
-//        }
+        }
                 
 }
 
@@ -114,35 +111,26 @@ bool create_fs()
         init_super_block();
         dump_super();
         
-        //run tests
-        //run_FS_tests();
-        
         return TRUE; 
 }
 
 /**
- * do_X functions for handling the system calls.
- * 
- * TODO: adapt to C-lib standard!
+ * interface functions to handle the system calls.
  */
-bool do_read(file_nr fd, void *buf, size_t num_bytes, uint32 pos)
+
+size_t do_read(file_nr fd, void *buf, size_t count, uint32 pos)
 {
-        return (fs_read(buf, get_file(fd)->f_inode, num_bytes, pos, FALSE) != NOT_POSSIBLE);
+        return fs_read(buf, get_file(fd)->f_inode, count, pos, FALSE);
 }
 
-bool do_write(file_nr fd, void *buf, size_t num_bytes, uint32 pos)
+size_t do_write(file_nr fd, void *buf, size_t count, uint32 pos)
 {
-        return (fs_write(get_file(fd)->f_inode, buf, num_bytes, pos, TRUE) != NOT_POSSIBLE);
+        return fs_write(get_file(fd)->f_inode, buf, count, pos, TRUE);
 }
 
 bool do_create(char *abs_path, uint8 mode)
 {
-        return (fs_create(abs_path, DATA_FILE));
-}
-
-file_nr do_open(char *abs_path)
-{
-        return (fs_open(abs_path));
+        return (fs_create(abs_path, mode));
 }
 
 bool do_mkdir(char *abs_path)
@@ -152,23 +140,33 @@ bool do_mkdir(char *abs_path)
 
 bool do_mkfile(char *abs_path)
 {
-        return (do_create(abs_path, DIRECTORY));
+        return (do_create(abs_path, DATA_FILE));
 }
 
-bool do_close(file_nr fd)
+int do_remove(char *abs_path)
 {
-        return (fs_close(fd));
+        return (fs_delete(abs_path)) ? 0 : -1;
 }
 
-bool do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
+file_nr do_open(char *abs_path)
+{
+        return (fs_open(abs_path));
+}
+
+int do_close(file_nr fd)
+{
+        return (fs_close(fd)) ? 0 : EOF;
+}
+
+int do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
 {
         proc_file *pf = get_proc_file(pft, pfd);
-        if (do_close(pf->pf_f_desc)){
+        if (do_close(pf->pf_f_desc) == 0){
                 free_proc_file(pft, pfd);
-                return TRUE;
+                return 0;
         }
         
-        return FALSE;
+        return EOF;
 }
 
 
