@@ -52,7 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling)
 {
-        if (pos > inode->i_size || num_bytes == 0) {
+        if ((pos > inode->i_size && !allow_scaling) || num_bytes == 0) {
                 return 0;
         }
         
@@ -99,7 +99,7 @@ size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool all
  */
 size_t fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool allow_scaling)
 {
-        if (pos > inode->i_size || num_bytes == 0) {
+        if ((pos > inode->i_size && !allow_scaling) || num_bytes == 0) {
                 return 0;
         }
         
