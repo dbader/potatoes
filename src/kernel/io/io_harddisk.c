@@ -177,7 +177,7 @@ void hd_init()
                 panic("NO HARD DRIVE");
         }
         wait_on_hd_interrupt("init");
-        printf("0x%x,0x%x\n", inb(HDBASE + HDREG_CYL_LOW), inb(HDBASE + HDREG_CYL_LOW));
+        //printf("0x%x,0x%x\n", inb(HDBASE + HDREG_CYL_LOW), inb(HDBASE + HDREG_CYL_LOW));
         repinsw(HDBASE + HDREG_DATA, (uint16*)&hd1, 256); //read buffer
         maxaddr = get_hdsize()-1;
         dump_hd1();
