@@ -1,4 +1,4 @@
-/* $Id: int_handler.h 137 2008-06-15 22:04:35Z dbader $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Interprets brainfuck source code.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dbader $
- * @version $Rev: 137 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../kernel/include/types.h"
@@ -40,21 +40,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/pm/syscalls_shared.h"
 #include "brainfuck_interpreter.h"
 
+int STDERR = 1;
+
 int maxlength = 10000;
-int recursion_depth = 50;
+const int maxloopdepth = 50;
 char *bf_start;
 char *bf_ptr;
+char *bf_buffer = NULL;
+int bf_buf_offset = 0;
+int bf_buf_position = -1;
+int loop_marks[50][2];
 bool jumpover = FALSE;
-char **loopbody;
-int *loopptr;
-sint8 loopdepth = -1;
-int STDERR = 1;
-bool *do_loop;
-int bf_count_inner_loop = 0;
-int bf_offset = 0;
-int *bf_offsets;
-int temp;
-char* bf_str = 0;
+bool store_lock = FALSE;
+int loopdepth=0;
+int temploopdepth=0;
+int store_lock_level=0;
 
 void init_bf()
 {
@@ -142,81 +142,176 @@ void init_bf()
                 >[<++>-]\n\
                 <[>++<-]\n\
                 >[<++>-]\n\
-                <[->+.<]\n";
+                <[->+.<]\n\
+                [-]++++++++++.";
         fd = _open("/bf_files/ascii.b", O_CREAT, 0);
         _write(fd, str, strlen(str));
         _close(fd);
 
+        str="                   >\
+                               + +\
+                              +   +\
+                             [ < + +\
+                            +       +\
+                           + +     + +\
+                          >   -   ]   >\
+                         + + + + + + + +\
+                        [               >\
+                       + +             + +\
+                      <   -           ]   >\
+                     > + + >         > > + >\
+                    >       >       +       <\
+                   < <     < <     < <     < <\
+                  <   [   -   [   -   >   +   <\
+                 ] > [ - < + > > > . < < ] > > >\
+                [                               [\
+               - >                             + +\
+              +   +                           +   +\
+             + + [ >                         + + + +\
+            <       -                       ]       >\
+           . <     < [                     - >     + <\
+          ]   +   >   [                   -   >   +   +\
+         + + + + + + + +                 < < + > ] > . [\
+        -               ]               >               ]\
+       ] +             < <             < [             - [\
+      -   >           +   <           ]   +           >   [\
+     - < + >         > > - [         - > + <         ] + + >\
+    [       -       <       -       >       ]       <       <\
+   < ]     < <     < <     ] +     + +     + +     + +     + +\
+  +   .   +   +   +   +   [   -   ]   <   ]   +   +   +   +   +\
+ * * * * * M a d e * B y : * N Y Y R I K K I * 2 0 0 2 * * * * *";
+        fd = _open("/bf_files/sierpinski.b", O_CREAT, 0);
+        _write(fd, str, strlen(str));
+        _close(fd);
+
+        str="+++++++++++ //number of fibbonacci numbers\
+                >+>>>>++++++++++++++++++++++++++++++++++++++++++++\
+                >++++++++++++++++++++++++++++++++<<<<<<[>[>>>>>>+>\
+                +<<<<<<<-]>>>>>>>[<<<<<<<+>>>>>>>-]<[>++++++++++[-\
+                <-[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<[>>>+<<<\
+                -]>>[-]]<<]>>>[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]\
+                >[<<+>>[-]]<<<<<<<]>>>>>[+++++++++++++++++++++++++\
+                +++++++++++++++++++++++.[-]]++++++++++<[->-<]>++++\
+                ++++++++++++++++++++++++++++++++++++++++++++.[-]<<\
+                <<<<<<<<<<[>>>+>+<<<<-]>>>>[<<<<+>>>>-]<-[>>.>.<<<\
+                [-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]\
+                [-]++++++++++.";
+        fd = _open("/bf_files/finitefib.b", O_CREAT, 0);
+        _write(fd, str, strlen(str));
+        _close(fd);
+        
+        str="++++[>+++++<-]>[<+++++>-]+<+[\
+                >[>+>+<<-]++>>[<<+>>-]>>>[-]++>[-]+\
+                >>>+[[-]++++++>>>]<<<[[<++++++++<++>>-]+<.<[>----<-]<]\
+                <<[>>>>>[>>>[-]+++++++++<[>-<-]+++++++++>[-[<->-]+[<<<]]<[>+<-]>]<<-]<<-\
+                ]";
+        fd = _open("/bf_files/squares.b", O_CREAT, 0);
+        _write(fd, str, strlen(str));
+        _close(fd);
+        
+        str=" >>>>+>+++>+++>>>>>+++[\
+        >,+>++++[>++++<-]>[<<[-[->]]>[<]>-]<<[\
+        >+>+>>+>+[<<<<]<+>>[+<]<[>]>+[[>>>]>>+[<<<<]>-]+<+>>>-[\
+        <<+[>]>>+<<<+<+<--------[\
+        <<-<<+[>]>+<<-<<-[\
+        <<<+<-[>>]<-<-<<<-<----[\
+        <<<->>>>+<-[\
+        <<<+[>]>+<<+<-<-[\
+        <<+<-<+[>>]<+<<<<+<-[\
+        <<-[>]>>-<<<-<-<-[\
+        <<<+<-[>>]<+<<<+<+<-[\
+        <<<<+[>]<-<<-[\
+        <<+[>]>>-<<<<-<-[\
+        >>>>>+<-<<<+<-[\
+        >>+<<-[\
+        <<-<-[>]>+<<-<-<-[\
+        <<+<+[>]<+<+<-[\
+        >>-<-<-[\
+        <<-[>]<+<++++[<-------->-]++<[\
+        <<+[>]>>-<-<<<<-[\
+        <<-<<->>>>-[\
+        <<<<+[>]>+<<<<-[\
+        <<+<<-[>>]<+<<<<<-[\
+        >>>>-<<<-<-\
+        ]]]]]]]]]]]]]]]]]]]]]]>[>[[[<<<<]>+>>[>>>>>]<-]<]>>>+>>>>>>>+>]<\
+        ]<[-]<<<<<<<++<+++<+++[\
+        [>]>>>>>>++++++++[<<++++>++++++>-]<-<<[-[<+>>.<-]]<<<<[\
+        -[-[>+<-]>]>>>>>[.[>]]<<[<+>-]>>>[<<++[<+>--]>>-]\
+        <<[->+<[<++>-]]<<<[<+>-]<<<<\
+        ]>>+>>>--[<+>---]<.>>[[-]<<]<\
+        ]\
+        [Enter a number using ()-./0123456789abcdef and space, and hit return.\
+        DanielBCristofani(cristofd at hevanet dot com)\
+        http://www.hevanet.com/cristofd/brainfuck/]";
+        fd = _open("/bf_files/num2asciiart.b", O_CREAT, 0);
+        _write(fd, str, strlen(str));
+        _close(fd);
+
         bf_start = (char*)_malloc(maxlength);
-        loopbody = (char**)_malloc(recursion_depth*sizeof(char*));
-        loopptr = (int*)_malloc(recursion_depth*sizeof(int));
-        bf_offsets = (int*)_malloc(recursion_depth*sizeof(int));
-        do_loop = (bool*)_malloc(recursion_depth*sizeof(bool));
         int i;
         for(i=0; i<maxlength; i++)
                 *(bf_start + i) = 0;
-        bf_ptr = bf_start + (maxlength / 2);
+        bf_ptr = bf_start;
 }
 
 void reset_bf()
 {       
         maxlength = 10000;
         _free(bf_start);
-        _free(loopbody);
-        _free(loopptr);
+        if(bf_buffer != NULL) {
+                _free(bf_buffer);
+        }
+        bf_buffer = NULL;
+        bf_buf_offset = 0;
+        bf_buf_position = -1;
+        loopdepth = 0;
+        int temploopdepth=0;
+        int temploopdepth2=0;
         bf_start = (char*)_malloc(maxlength);
-        loopbody = (char**)_malloc(recursion_depth*sizeof(char*));
-        loopptr = (int*)_malloc(recursion_depth*sizeof(int));
         int i;
         for(i=0; i<maxlength; i++)
                 *(bf_start + i) = 0;
         bf_ptr = bf_start;
-        do_loop = FALSE;
         jumpover = FALSE;
-        loopdepth = -1;
 }
 
 void interpret_bf(char ch)
 {
-        int i;
-        //cputchar(ch,BLUE,YELLOW);
-
-        for(i=0; i<=loopdepth; i++)
-                if(     !do_loop[loopdepth] &&
-                                !do_loop[i] &&
-                                !(!jumpover && i==loopdepth && ch==']')
-                )
-                        *(loopbody[i] + loopptr[i]++) = ch;
-
-        if(jumpover && ch == '['){
-                bf_count_inner_loop++;
-                return;
-        }
-        else if(jumpover && ch == ']' && bf_count_inner_loop != 0){
-                bf_count_inner_loop--;
-                return;
-        }
-        else if(jumpover && ch != ']'){
-                return;
-        }
-        else if(jumpover){
-                jumpover = FALSE; 
-                return;
+        int start, end;
+        
+        //doing loop mode
+        if (!store_lock && bf_buffer != NULL) {
+                *(bf_buffer + bf_buf_offset) = ch;
+                bf_buf_offset++;
+                bf_buf_position++;
         }
 
-        //if(!do_loop[loopdepth] && ch!=']')
-        //        *(loopbody[loopdepth] + loopptr[loopdepth]++) = ch;
-        //        if(loopdepth>=0 && !do_loop[loopdepth]){
-        //                *(loopbody[loopdepth] + loopptr[loopdepth]++) = ch;
-        //        }
+        //jump over loop mode
+        //matching closing bracket
+        if (jumpover == TRUE && ch == ']' && loopdepth == temploopdepth) {
+                jumpover = FALSE;
+                loopdepth--;
+                temploopdepth = 0;
+                return;
+        }
+        //other symbol
+        else if (jumpover == TRUE) {
+                if (ch == '[') {
+                        loopdepth++;
+                }
+                if (ch == ']') {
+                        loopdepth--;
+                }
+                return;
+        }
 
+        //handle symbol mode        
         switch(ch){
         case '+':
                 ++*bf_ptr;
                 break;
         case '-':
                 --*bf_ptr;
-                //printf("%{-----}%d%{-----}\n",RED,*bf_ptr,RED);
                 break;
         case '<':
                 --bf_ptr;
@@ -232,46 +327,51 @@ void interpret_bf(char ch)
                         halt();
                 break;
         case '[':
-                if(*bf_ptr == 0) jumpover = TRUE;
-                else{
-                        if(loopdepth >= 0 && do_loop[loopdepth-bf_offset]){
-                                bf_offset++;
-                        }
-                        loopdepth++;
-                        loopptr[loopdepth]=0;
-                        do_loop[loopdepth]=FALSE;
-                        loopbody[loopdepth] = (char*)_malloc(maxlength);
-                        for(i=0; i<maxlength; i++)
-                                *(loopbody[loopdepth] + i) = 0;
+                loopdepth++;
+                if (*bf_ptr == 0) {
+                        jumpover = TRUE;
+                        temploopdepth = loopdepth;
+                }
+                else if (bf_buffer == NULL) {
+                        bf_buffer = (char*)_malloc(maxlength);
+                }
+                else {
+                        loop_marks[loopdepth][0] = bf_buf_position + 1;
                 }
                 break;
         case ']':
-                bf_offsets[loopdepth] = bf_offset;
-                bf_offset = 0;
-                while(*bf_ptr != 0){
-                        do_loop[loopdepth] = TRUE;
-                        //printf("loopdepth: %d\n",loopdepth);
-                        for(i=0; i<loopptr[loopdepth-bf_offset]; i++){
-                                interpret_bf(*(loopbody[loopdepth-bf_offset]+i));
+                loop_marks[loopdepth][1] = bf_buf_position;
+                while (*bf_ptr != 0) {
+                        store_lock = TRUE;
+                        if(store_lock_level == 0) {
+                                store_lock_level = loopdepth;
                         }
-                        //_write(BRAINFUCK,loopbody[tbemploopdepth],strlen(loopbody[temploopdepth]));
+                        start = loop_marks[loopdepth][0];
+                        bf_buf_position = start;
+                        end = loop_marks[loopdepth][1];
+                        while (start < end) {
+                                interpret_bf(*(bf_buffer + start));
+                                start++;
+                                bf_buf_position = start;
+                        }
+
                 }
-
-                bf_offset = bf_offsets[loopdepth];
-
-                //                dprintf("loopdepth = %d\tbf_offset = %d\npos = %d\tvalue = %d:\n",loopdepth, bf_offset, bf_ptr-bf_start, *bf_ptr);
-                //                for(i=0; i<=loopdepth; i++)
-                //                        printf("%s\n\n",loopbody[i]);
-                //                dprint_separator();
-
-                _free(loopbody[loopdepth]);
-                do_loop[loopdepth] = FALSE;
-                loopdepth--;
-                if(bf_offset>0) bf_offset--;
+                if (loopdepth == store_lock_level) {
+                        store_lock = FALSE;
+                        store_lock_level = 0;
+                }
+                if (--loopdepth == 0) {
+                        _free(bf_buffer);
+                        bf_buffer = NULL;
+                        bf_buf_offset = 0;
+                        bf_buf_position = -1;
+                }
+                break;
         }
 
         if(bf_ptr < bf_start){
-                _write(STDERR, "LOWER BOUND ERROR\n", sizeof("LOWER BOUND ERROR\n"));
+                _write(STDERR, "LOWER BOUND ERROR\tREPAIRING\n", 
+                                sizeof("LOWER BOUND ERROR\tREPAIRING\n"));
                 maxlength *= 2;
                 char* temp = _malloc(maxlength);
                 memcpy(temp + (maxlength / 2), bf_start, maxlength / 2);
@@ -281,7 +381,8 @@ void interpret_bf(char ch)
                 //reset_bf();
         }
         else if (bf_ptr > bf_start + maxlength - 1){
-                _write(STDERR, "UPPER BOUND ERROR\n", sizeof("UPPER BOUND ERROR\n"));
+                _write(STDERR, "UPPER BOUND ERROR\tREPAIRING\n", 
+                                sizeof("UPPER BOUND ERROR\tREPAIRING\n"));
                 maxlength *= 2;
                 char* temp = _malloc(maxlength);
                 memcpy(temp, bf_start, maxlength / 2);

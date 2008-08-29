@@ -3,6 +3,7 @@
 #include "../io/io.h"
 #include "../include/string.h"
 #include "../include/const.h"
+#include "../include/limits.h"
 #include "../include/stdlib.h"
 #include "../include/stdio.h"
 #include "../fs/fs_types.h"
@@ -414,6 +415,7 @@ void shell_cmd_bf(int argc, char *argv[])
         else {
                 reset_bf();
                 int fd = _open(shell_makepath(argv[1]), 0, 0);
+                int temp = get_ticks();
                 if (fd < 0) {
                         _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                         return;
@@ -422,6 +424,9 @@ void shell_cmd_bf(int argc, char *argv[])
                 while (_read(fd, &ch, sizeof(ch)) != 0){
                         _fputch(ch, 5);
                 }
+                temp = get_ticks()-temp;
+                (temp < 0) ? temp += UINT32_MAX : temp;
+                _printf("time elapsed: %d ticks\n", temp);
                 _close(fd);
                 reset_bf();
         }
