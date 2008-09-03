@@ -91,13 +91,14 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
         uint32 temp;
         
         if(vm->charnum >= (vmonitor_height / 2 - 1)){
-                if(vm->scrollup_limit < (vm->size / 0xA0) - 25) vm->scrollup_limit++;
+                if(vm->scrollup_limit < ((vm->size - vmonitor_height) / 0xA0)) vm->scrollup_limit++;
                 vm->vis_begin += line_width; 
                 if (vm->vis_begin >= vm->begin + vm->size / 2){
                         vm->vis_begin = vm->begin;                        
                 }
                 //scroll, if outside of display-memory
-                uint16 *ptr = vm->begin + (vm->vis_begin + ((vmonitor_height - 1) / 2) - vm->begin)
+                uint16 *ptr = vm->begin + 
+                                (vm->vis_begin + (vmonitor_height / 2) - line_width - vm->begin)
                                 % (vm->size / 2),
                        *tmpptr;
                 for (tmpptr = ptr; tmpptr < ptr + line_width; tmpptr++)
@@ -186,6 +187,9 @@ int virt_monitor_puts(virt_monitor *vm, char *str)
  */
 void virt_cursor_move(virt_monitor *vm, uint8 dir)
 {
+        if (vm->disable_refresh)
+                        return;
+        
         switch (dir){
         case 0: 
                 vm->charnum = 
@@ -217,8 +221,12 @@ void virt_cursor_move(virt_monitor *vm, uint8 dir)
  */
 void update_virt_monitor(virt_monitor *vm)
 {
-        if (vm->disable_refresh)
+        if (vm->disable_refresh) {
+                //disable cursor
+                outb(0x3D4, 0x0E);
+                outb(0x3D5, 0x20);
                 return;
+        }
         
         set_disp(0xB8000);
         monitor_cputs(get_active_virt_monitor_name(), GREEN, BLACK);
@@ -273,6 +281,6 @@ void virt_monitor_scrolldown(virt_monitor *vm)
 void virt_monitor_invert(virt_monitor *vm)
 {
         for(uint8 *temp = (uint8*)vm->vis_begin + 1;
-                        temp <= (uint8*)(vm->vis_begin + line_width * 25); temp+=2)
+                        temp <= (uint8*)(vm->vis_begin + vmonitor_height); temp+=2)
                 *temp = 0xFF - *temp;
 }

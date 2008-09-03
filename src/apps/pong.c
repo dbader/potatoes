@@ -192,8 +192,6 @@ void shell_cmd_pong(int argc, char *argv[])
         _close(fd);
         _close(keyboard);
         
-        /* todo: restore cursor position */
-        
         _printf("Game over.\nPlayer score: %d\nCPU score: %d\n", player_score, cpu_score);
         
         //flush stdin

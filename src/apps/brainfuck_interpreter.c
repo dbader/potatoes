@@ -259,10 +259,8 @@ void init_bf()
 void reset_bf()
 {       
         maxlength = 10000;
-//        printf("_free(bf_start): 0x%x\n", bf_start);
-//        _free(bf_start);
+        _free(bf_start);
         if(bf_buffer != NULL) {
-                printf("_free(bf_buffer): 0x%x\n", bf_buffer);
                 _free(bf_buffer);
         }
         bf_buffer = NULL;
@@ -272,8 +270,8 @@ void reset_bf()
         temploopdepth=0;
         store_lock_level=0;
         store_lock = FALSE;
-//        bf_start = (char*)_malloc(maxlength);
-//        ASSERT(bf_start != NULL);
+        bf_start = (char*)_malloc(maxlength);
+        ASSERT(bf_start != NULL);
         int i;
         for(i=0; i<maxlength; i++)
                 *(bf_start + i) = 0;
@@ -368,7 +366,6 @@ void interpret_bf(char ch)
                         store_lock_level = 0;
                 }
                 if (--loopdepth == 0 && bf_buffer != NULL) {
-//                        printf("_free(bf_buffer): 0x%x", bf_buffer);
                         _free(bf_buffer);
                         bf_buffer = NULL;
                         bf_buf_offset = 0;
@@ -384,11 +381,9 @@ void interpret_bf(char ch)
                 maxlength *= 2;
                 char* temp = _malloc(maxlength);
                 memcpy(temp + (maxlength / 2), bf_start, maxlength / 2);
-                //printf("_free(bf_start): 0x%x\n", bf_start);
                 _free(bf_start);
                 bf_start = temp;
                 bf_ptr = bf_start + (maxlength / 2) - 1;
-                //reset_bf();
         }
         else if (bf_ptr > bf_start + maxlength - 1){
                 _write(STDERR, "UPPER BOUND ERROR\tREPAIRING\n", 
@@ -396,10 +391,8 @@ void interpret_bf(char ch)
                 maxlength *= 2;
                 char* temp = _malloc(maxlength);
                 memcpy(temp, bf_start, maxlength / 2);
-                //printf("_free(bf_start): 0x%x\n", bf_start);
                 _free(bf_start);
                 bf_start = temp;
                 bf_ptr = bf_start + (maxlength / 2);
-                //reset_bf();
         }
 }

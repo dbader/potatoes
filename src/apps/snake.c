@@ -304,7 +304,6 @@ void shell_cmd_snake(int argc, char *argv[])
         _close(fd);
         _close(keyboard);
 
-        /* todo: restore cursor position */
         if (multiplayer) {
                 if (loser == 3)
                 {
