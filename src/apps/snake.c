@@ -46,7 +46,7 @@ uint8 direction2 = 0;
 // the backbuffer
 uint8 bbuf[25 * 80];
 
-uint16 draw_snake(ring_fifo *snake, uint8 color)
+uint16 draw_snake(ring_fifo *snake, uint8 color, uint8 headcolor)
 {
         uint16 ch;
         ring_fifo *temp = rf_copy(snake);
@@ -55,7 +55,7 @@ uint16 draw_snake(ring_fifo *snake, uint8 color)
                 SET_PIXEL(ch >> 8, ch & 0xFF, color);
         }
         rf_read(temp, (uint8*)&ch, 2);
-        SET_PIXEL(ch >> 8, ch & 0xFF, color + 1);
+        SET_PIXEL(ch >> 8, ch & 0xFF, headcolor);
         rf_free(temp);
         return ch;
 }
@@ -92,11 +92,11 @@ void shell_cmd_snake(int argc, char *argv[])
                                 "\tDown = S\n"
                                 "\tLeft = A\n"
                                 "\tRight = D\n"
-                                "Controls for player two (yellow):\n"
-                                "\tUp = W\n"
-                                "\tDown = S\n"
-                                "\tLeft = A\n"
-                                "\tRight = D\n"
+                                "Controls for player two (blue):\n"
+                                "\tUp = I\n"
+                                "\tDown = J\n"
+                                "\tLeft = K\n"
+                                "\tRight = L\n"
                                 "You can leave the game at any time by pressing the ESCAPE key.\n\n"
                                 "HAVE FUN!\n\n\n[Press any key to start playing]\n");
         }
@@ -136,6 +136,32 @@ void shell_cmd_snake(int argc, char *argv[])
 
         // The rendering loop
         while (!keydown(ESCAPE, keyboard)) {
+
+                // Test collision
+                if (body_collision(snake1, head1)) {
+                        SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
+                        loser = 1;
+                        break;
+                }
+                if (multiplayer) {
+                        if (body_collision(snake2, head1)) {
+                                SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
+                                loser = 1; 
+                        }
+                        if (body_collision(snake1, head2)) {
+                                SET_PIXEL(head2 >> 8, head2 & 0xFF, RED);
+                                loser = (loser == 0) ? 2 : 3;
+                        }
+                        if (body_collision(snake2, head2)) {
+                                SET_PIXEL(head2 >> 8, head2 & 0xFF, RED);
+                                loser = (loser == 0) ? 2 : 3;
+                        }
+                        if (head1 == head2) {
+                                loser = 3;
+                                SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
+                        }
+                }
+                if (loser != 0) break;
 
                 // Player input
                 if (!multiplayer) {
@@ -249,42 +275,13 @@ void shell_cmd_snake(int argc, char *argv[])
                 memset(bbuf, BLACK, sizeof(bbuf));
 
                 // Draw snake
-                head1 = draw_snake(snake1, GREEN);
+                head1 = draw_snake(snake1, LIGHTGREEN, GREEN);
                 if (multiplayer) {
-                        head2 = draw_snake(snake2, YELLOW);
+                        head2 = draw_snake(snake2, LIGHTBLUE, BLUE);
                 }
 
                 // Draw apple
                 SET_PIXEL(apple >> 8, apple & 0xFF, ORANGE);
-
-                // Test collision
-                if (body_collision(snake1, head1)) {
-                        SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
-                        loser = 1;
-                        break;
-                }
-                if (multiplayer) {
-                        if (body_collision(snake2, head1)) {
-                                SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
-                                loser = 1;
-                                break;   
-                        }
-                        if (body_collision(snake1, head2)) {
-                                SET_PIXEL(head2 >> 8, head2 & 0xFF, RED);
-                                loser = 2;
-                                break;
-                        }
-                        if (body_collision(snake2, head2)) {
-                                SET_PIXEL(head2 >> 8, head2 & 0xFF, RED);
-                                loser = 2;
-                                break;
-                        }
-                        if (head1 == head2) {
-                                loser = 3;
-                                SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
-                                break;
-                        }
-                }
 
                 // Display backbuffer on the screen
                 _write(fd, bbuf, sizeof(bbuf));
