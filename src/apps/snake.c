@@ -71,6 +71,7 @@ bool body_collision(ring_fifo *snake, uint16 pos)
                         return TRUE;
                 }
         }
+        rf_free(temp);
         return FALSE;
 }
 
