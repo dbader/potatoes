@@ -55,6 +55,7 @@ typedef struct {
 } ring_fifo;
 
 ring_fifo* rf_alloc(uint32 size);
+ring_fifo* rf_copy(ring_fifo *fifo);
 void rf_free(ring_fifo *fifo);
 void rf_clear(ring_fifo *fifo);
 uint32 rf_getlength(ring_fifo *fifo);

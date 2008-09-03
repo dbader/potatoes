@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/include/string.h"
 
 #include "../kernel/include/debug.h"
+#include "../kernel/include/assert.h"
 
 #include "../kernel/io/io.h"
 #include "../kernel/pm/syscalls_cli.h"
@@ -248,6 +249,7 @@ void init_bf()
         _close(fd);
 
         bf_start = (char*)_malloc(maxlength);
+        ASSERT(bf_start != NULL);
         int i;
         for(i=0; i<maxlength; i++)
                 *(bf_start + i) = 0;
@@ -257,17 +259,21 @@ void init_bf()
 void reset_bf()
 {       
         maxlength = 10000;
-        _free(bf_start);
+//        printf("_free(bf_start): 0x%x\n", bf_start);
+//        _free(bf_start);
         if(bf_buffer != NULL) {
+                printf("_free(bf_buffer): 0x%x\n", bf_buffer);
                 _free(bf_buffer);
         }
         bf_buffer = NULL;
         bf_buf_offset = 0;
         bf_buf_position = -1;
         loopdepth = 0;
-        int temploopdepth=0;
-        int temploopdepth2=0;
-        bf_start = (char*)_malloc(maxlength);
+        temploopdepth=0;
+        store_lock_level=0;
+        store_lock = FALSE;
+//        bf_start = (char*)_malloc(maxlength);
+//        ASSERT(bf_start != NULL);
         int i;
         for(i=0; i<maxlength; i++)
                 *(bf_start + i) = 0;
@@ -306,7 +312,7 @@ void interpret_bf(char ch)
         }
 
         //handle symbol mode        
-        switch(ch){
+        switch (ch) {
         case '+':
                 ++*bf_ptr;
                 break;
@@ -334,6 +340,7 @@ void interpret_bf(char ch)
                 }
                 else if (bf_buffer == NULL) {
                         bf_buffer = (char*)_malloc(maxlength);
+                        ASSERT(bf_buffer != NULL);
                 }
                 else {
                         loop_marks[loopdepth][0] = bf_buf_position + 1;
@@ -360,11 +367,13 @@ void interpret_bf(char ch)
                         store_lock = FALSE;
                         store_lock_level = 0;
                 }
-                if (--loopdepth == 0) {
+                if (--loopdepth == 0 && bf_buffer != NULL) {
+//                        printf("_free(bf_buffer): 0x%x", bf_buffer);
                         _free(bf_buffer);
                         bf_buffer = NULL;
                         bf_buf_offset = 0;
                         bf_buf_position = -1;
+                        
                 }
                 break;
         }
@@ -375,6 +384,7 @@ void interpret_bf(char ch)
                 maxlength *= 2;
                 char* temp = _malloc(maxlength);
                 memcpy(temp + (maxlength / 2), bf_start, maxlength / 2);
+                //printf("_free(bf_start): 0x%x\n", bf_start);
                 _free(bf_start);
                 bf_start = temp;
                 bf_ptr = bf_start + (maxlength / 2) - 1;
@@ -386,6 +396,7 @@ void interpret_bf(char ch)
                 maxlength *= 2;
                 char* temp = _malloc(maxlength);
                 memcpy(temp, bf_start, maxlength / 2);
+                //printf("_free(bf_start): 0x%x\n", bf_start);
                 _free(bf_start);
                 bf_start = temp;
                 bf_ptr = bf_start + (maxlength / 2);

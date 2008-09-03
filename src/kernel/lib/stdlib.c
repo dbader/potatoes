@@ -1,4 +1,4 @@
-/* $Id: malloc_free.c 64 2008-05-16 18:17:51Z jschamburger $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Functions to allocate and free memory
  *
  * @author Johannes Schamburger
- * @author $LastChangedBy: jschamburger $
- * @version $Rev: 64 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../include/types.h"
@@ -35,6 +35,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/debug.h"
 #include "../mm/mm.h"
+
+static long _seed = 1L;
+
+void srand(unsigned int seed)
+{
+  _seed = (long) seed;
+}
+
+int rand()
+{
+  return (((_seed = _seed * 214013L + 2531011L) >> 16) & 0x7fff);
+}
 
 /**
  * allocates size bytes and additionally saves a name in the header of the block.

@@ -1,4 +1,4 @@
-/* $Id: pm_ringbuffer.c 87 2008-05-19 22:43:25Z dbader $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Ring buffer implementation. Mainly used by the process management stdin queue.
  *
  * @author dbader
- * @author $LastChangedBy: dbader $
- * @version $Rev: 87 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../include/ringbuffer.h"
@@ -58,6 +58,21 @@ ring_fifo* rf_alloc(uint32 size)
         rf_clear(fifo);
         
         return fifo;
+}
+
+/**
+ * Copies the given ring_buffer into a new allocated copy.
+ * @param the ring_buffer to copy from
+ * @return pointer to the new copy of the given ring_buffer
+ */
+ring_fifo* rf_copy(ring_fifo *fifo)
+{
+        ring_fifo *ret = rf_alloc(fifo->size);
+        memcpy(ret->data, fifo->data, fifo->size);
+        ret->start = fifo->start;
+        ret->end = fifo->end;
+        ret->len = fifo->len;
+        return ret;
 }
 
 /**

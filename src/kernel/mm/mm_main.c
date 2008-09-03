@@ -68,7 +68,7 @@ void mm_init(uint32 start, uint32 end)
 
         // This would like to live in main()...
         init_vmonitors();
-        printf("%{etiOS - $Rev: 119 $ - "__DATE__" "__TIME__"\n", LIGHTGREEN);
+        printf("%{etiOS - $Rev$ - "__DATE__" "__TIME__"\n", LIGHTGREEN);
         dprint_separator();
 
         dprintf("%{mm:} init\n", LIGHTBLUE);

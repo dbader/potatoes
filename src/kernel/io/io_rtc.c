@@ -53,6 +53,9 @@ void rtc_init()
         time.day = inb(RTC_DATA);
         outb(RTC_ADDR, RTC_WEEKDAY);
         time.weekday = inb(RTC_DATA);
+#ifdef QEMU
+        time.weekday++;
+#endif
         outb(RTC_ADDR, RTC_MONTH);
         time.month = inb(RTC_DATA);
         outb(RTC_ADDR, RTC_YEAR);
@@ -74,6 +77,9 @@ void rtc_update()
                                 time.day = inb(RTC_DATA);
                                 outb(RTC_ADDR, RTC_WEEKDAY);
                                 time.weekday = inb(RTC_DATA);
+#ifdef QEMU
+                                time.weekday++;
+#endif
                                 if (time.day == 1) {
                                         outb(RTC_ADDR, RTC_MONTH);
                                         time.month = inb(RTC_DATA);

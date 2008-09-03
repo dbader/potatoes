@@ -49,4 +49,10 @@ int _seek(int fd, int offset, int whence);
 void* _malloc(size_t size);
 void _free(void *block);
 
+void _printf(char *fmt, ...);
+char* _fgets(char *s, int n, int fd);
+int _fputs(char *s, int fd);
+int _fgetch(int fd);
+int _fputch(char ch, int fd);
+
 #endif /* syscalls_cli.h */

@@ -1,4 +1,4 @@
-/* $Id: int_handler.h 137 2008-06-15 22:04:35Z dbader $
+/* $Id$
       _   _  ____   _____ 
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___  
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * The brainfuck device.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dbader $
- * @version $Rev: 137 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "../include/types.h"

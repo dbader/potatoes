@@ -36,6 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "types.h"
 
+void srand(int seed);
+int rand();
 void* malloc(uint32 size);
 void* mallocn(uint32 size, char *name);
 void* calloc(size_t elements, size_t size);

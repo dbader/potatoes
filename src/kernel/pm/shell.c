@@ -1,3 +1,34 @@
+/* $Id$
+      _   _  ____   _____ 
+     | | (_)/ __ \ / ____|
+  ___| |_ _| |  | | (___  
+ / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
+|  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
+ \___|\__|_|\____/|_____/ 
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/**
+ * @file
+ * etiOS shell
+ *
+ * @author dbader
+ * @author $LastChangedBy$
+ * @version $Rev$
+ */
+
 #include "syscalls_shared.h"
 #include "syscalls_cli.h"
 #include "../io/io.h"
@@ -7,6 +38,8 @@
 #include "../include/stdlib.h"
 #include "../include/stdio.h"
 #include "../fs/fs_types.h"
+
+#include "../../apps/games.h"
 
 int STDIN = -1;
 int STDOUT = -1;
@@ -406,7 +439,7 @@ void shell_cmd_ps(int argc, char *argv[])
         pm_dump();
 }
 
-extern void reset_bf();
+void reset_bf();
 void shell_cmd_bf(int argc, char *argv[])
 {
         if (!strcmp(argv[1],"-i")){
@@ -436,280 +469,6 @@ void shell_cmd_exit(int argc, char *argv[])
 {
         _printf("Bye.\n");
         _exit(0);
-}
-
-//bool keydown(char key)
-//{
-//        char ch = 0;
-//        _read(STDIN, &ch, sizeof(ch));
-//        return ch == key;
-//}
-
-
-/*
- * PONG code.
- * I know this is shitty but I really had to do this quickly :)
- * Have fun!
- */
-bool keydown(char key, int fd)
-{
-        bool keystate[256];
-        _read(fd, keystate, sizeof(keystate));
-        return (keystate[key]);
-}
-
-#define CURSOR_UP 0x48
-#define CURSOR_DOWN 0x50
-#define ESCAPE 0x01
-#define KEY_A 0x1E
-#define KEY_S 0x1F
-#define KEY_K 0x25
-#define KEY_L 0x26
-
-#define SET_PIXEL(x,y,cl) bbuf[(y)*80+(x)] = cl;
-
-#define DRAW_PADDLE(x,y,cl) SET_PIXEL(x,y,cl); SET_PIXEL(x,y+1,cl); SET_PIXEL(x,y+2,cl); \
-        SET_PIXEL(x,y+3,cl); SET_PIXEL(x,y+4,cl);
-
-#define LIMIT(x, min, max) if (x<min) x = min; if (x>max) x = max;
-
-#define HIT_PADDLE(paddley, y) (paddley <= (y) && paddley + 5 >= (y))
-
-#define PADDLE_DEFLECTION(paddley, hit) (paddley - (hit)) * 10
-
-// 4x5 px font
-typedef uint8 glyph_t[4*5];
-glyph_t font[] = {
-                { // 0
-                                1,1,1,1,
-                                1,0,0,1,
-                                1,0,0,1,
-                                1,0,0,1,
-                                1,1,1,1
-                },
-                { // 1
-                                0,0,1,0,
-                                0,0,1,0,
-                                0,0,1,0,
-                                0,0,1,0,
-                                0,0,1,0
-                },
-                { // 2
-                                1,1,1,1,
-                                0,0,0,1,
-                                1,1,1,1,
-                                1,0,0,0,
-                                1,1,1,1
-                },
-                { // 3
-                                1,1,1,1,
-                                0,0,0,1,
-                                1,1,1,1,
-                                0,0,0,1,
-                                1,1,1,1
-                },
-                { // 4
-                                1,0,0,1,
-                                1,0,0,1,
-                                1,1,1,1,
-                                0,0,0,1,
-                                0,0,0,1
-                },
-                { // 5
-                                1,1,1,1,
-                                1,0,0,0,
-                                1,1,1,1,
-                                0,0,0,1,
-                                1,1,1,1
-                },
-                { // 6
-                                1,1,1,1,
-                                1,0,0,0,
-                                1,1,1,1,
-                                1,0,0,1,
-                                1,1,1,1
-                },
-                { // 7
-                                1,1,1,1,
-                                0,0,0,1,
-                                0,0,0,1,
-                                0,0,0,1,
-                                0,0,0,1
-                },
-                { // 8
-                                1,1,1,1,
-                                1,0,0,1,
-                                1,1,1,1,
-                                1,0,0,1,
-                                1,1,1,1
-                },
-                { // 9
-                                1,1,1,1,
-                                1,0,0,1,
-                                1,1,1,1,
-                                0,0,0,1,
-                                1,1,1,1
-                }
-};
-
-#define DRAW_GLYPH(x, y, idx, cl) for (int px = 0; px < sizeof(glyph_t); px++) \
-        SET_PIXEL(x + px % 4, y + px / 4, (font[idx][px] ? cl : 0));
-
-void shell_cmd_pong(int argc, char *argv[]) 
-{       
-        bool multiplayer = (argc > 1 && !strcmp(argv[1], "-2p"));
-        
-        if (!multiplayer) {
-                _printf("+++ P O N G +++\n\nControl your paddle with the cursor UP and DOWN keys\n" 
-                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                                "To play a two player game run \"pong -2p\"\n"
-                                "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
-        } else {
-                _printf("+++ P O N G +++\n\nMULTIPLAYER MODE\n\n"
-                                "Controls for player one (blue):\n"
-                                "\tPaddle up = A\n"
-                                "\tPaddle down = S\n\n"
-                                "Controls for player two (red):\n"
-                                "\tPaddle up = K\n"
-                                "\tPaddle down = L\n\n"
-                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                                "HAVE FUN!\n\n\n[Press any key to start playing]\n");
-        }
-        _fgetch(STDIN);
-        
-        // the backbuffer
-        uint8 bbuf[25 * 80];
-        
-        int fd = _open("/dev/framebuffer", 0, 0);
-        int keyboard = _open("/dev/keyboard", 0, 0);
-        
-        // ball position
-        int ball_x = 4000;
-        int ball_y = 1200;
-        
-        // ball velocity
-        int ball_vel_x = 50;
-        int ball_vel_y = 0;
-        
-        // player paddle
-        int l_paddle_y = 10;
-        int r_paddle_y = 10;
-        
-        // scores
-        int player_score = 0;
-        int cpu_score = 0;
-        
-        int frame = 0;
-        
-        // The rendering loop
-        while (!keydown(ESCAPE, keyboard)) {
-                // Game over check
-                if (player_score > 9 || cpu_score > 9) 
-                        break;
-                
-                // Player input
-                if (!multiplayer) {
-                        if (keydown(CURSOR_UP, keyboard)) l_paddle_y--;
-                        if (keydown(CURSOR_DOWN, keyboard)) l_paddle_y++;
-                } else {
-                        if (keydown(KEY_A, keyboard)) l_paddle_y--;
-                        if (keydown(KEY_S, keyboard)) l_paddle_y++;
-                }
-                LIMIT(l_paddle_y, 0, 20);
-                
-                // CPU player update
-                if (!multiplayer) {
-                        // select cpu think penalty depending on the
-                        // score differences. that way the cpu will adjust
-                        // its strength to the player's skill.
-                        int fskip = cpu_score - player_score;
-                        LIMIT(fskip, 2, 9);
-                        
-                        if (ball_x > 7500) {  // cpu quick reaction distance
-                                if (ball_y / 100 < r_paddle_y + 2) 
-                                        r_paddle_y--;
-                                else if (ball_y / 100 > r_paddle_y + 2)
-                                        r_paddle_y++;
-                        } else if (frame % fskip == 0) { // only think every other frame
-                                int cpu_move = ball_vel_y;
-                                LIMIT(cpu_move, -1, 1);
-                                r_paddle_y += cpu_move;
-                        }
-                } else {
-                        if (keydown(KEY_K, keyboard)) r_paddle_y--;
-                        if (keydown(KEY_L, keyboard)) r_paddle_y++;
-                }
-                LIMIT(r_paddle_y, 0, 20);
-                
-                // Move ball
-                ball_x += ball_vel_x;
-                ball_y += ball_vel_y;
-                LIMIT(ball_x, 0, 7900);
-                LIMIT(ball_y, 0, 2400);
-                
-                // Ceiling hit / Floor hit
-                if (ball_y == 0 || ball_y == 2400)
-                        ball_vel_y = -ball_vel_y;
-                
-                // Paddle hit
-                if (ball_x <= 0) {
-                        if (HIT_PADDLE(l_paddle_y, ball_y / 100)) {
-                                ball_vel_x = -ball_vel_x;
-                                ball_vel_y = -ball_vel_y + PADDLE_DEFLECTION(l_paddle_y, ball_y / 100);
-                                ball_x += 100;
-                        } else {
-                                cpu_score++;
-                                ball_x = 4000;
-                                ball_y = 1200;
-                                ball_vel_x = 50;
-                                ball_vel_y = 0;
-                        }
-                } else if (ball_x >= 7900) {
-                        if (HIT_PADDLE(r_paddle_y, ball_y / 100)) {
-                                ball_vel_x = -ball_vel_x;
-                                ball_vel_y = -ball_vel_y - PADDLE_DEFLECTION(r_paddle_y, ball_y / 100);
-                                ball_x -= 100;
-                        } else {
-                                player_score++;
-                                ball_x = 4000;
-                                ball_y = 1200;
-                                ball_vel_x = -50;
-                                ball_vel_y = 0;
-                        }
-                }
-                
-                // Clear the backbuffer
-                memset(bbuf, BLACK, sizeof(bbuf));
-        
-                // Draw score
-                DRAW_GLYPH(34,0,player_score, BLUE);
-                DRAW_GLYPH(41,0,cpu_score, RED);
-                
-                // Draw center line
-                for (int y = 0; y < 25; y += 2)
-                        SET_PIXEL(39, y, WHITE);
-                
-                // Draw the ball and paddles
-                SET_PIXEL(ball_x / 100, ball_y / 100, YELLOW);
-                DRAW_PADDLE(0, l_paddle_y, BLUE);
-                DRAW_PADDLE(79, r_paddle_y, RED);
-
-                // Display backbuffer on the screen
-                _write(fd, bbuf, sizeof(bbuf));
-                halt();
-                frame++;
-        }
-        
-        _close(fd);
-        _close(keyboard);
-        
-        /* todo: restore cursor position */
-        
-        _printf("Game over.\nPlayer score: %d\nCPU score: %d\n", player_score, cpu_score);
-        
-        //flush stdin
-        char ch;
-        while (_read(STDIN, &ch, sizeof(ch)) != 0) ;
 }
 
 void shell_cmd_date(int argc, char *argv[]) 
@@ -756,6 +515,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"exit",        shell_cmd_exit,         "Quit the shell"},
                 {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
                 {"pong",        shell_cmd_pong,         "A classic video game"},
+                {"snake",       shell_cmd_snake,        "Another classic video game"},
                 {"date",        shell_cmd_date,         "Display date and time"},
                 {"",            NULL,                   ""} // The Terminator
 };
@@ -790,7 +550,7 @@ void shell_handle_command(char *cmd)
                 argv[argc++] = strdup(tok);
                 //printf("malloc by strdup (argv[i]): 0x%x\n", argv[argc-1]);
         }
-        //printf("_free(copy): 0x%x\n", copy);
+        //printf("_free(copy=%s): 0x%x\n", copy, copy);
         _free(copy);
         
         shell_cmd_t *command = NULL;
@@ -809,7 +569,7 @@ void shell_handle_command(char *cmd)
                 _printf("- shell: %s: command not found\n", argv[0]);
         
         for (int i = 0; i < argc; i++){
-                //printf("_free(argv[i]): 0x%x\n", argv[i]);
+                //printf("_free(argv[%d]=%s): 0x%x\n", i, argv[i], argv[i]);
                 _free(argv[i]);
         }
 }
