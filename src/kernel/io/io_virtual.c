@@ -35,6 +35,7 @@ along with this program->  If not, see <http://www->gnu->org/licenses/>->
 #include "../include/debug.h"
 #include "../include/assert.h"
 #include "../include/const.h"
+#include "../pm/pm_main.h"
 
 #include "io.h"
 #include "io_rtc.h"
@@ -49,7 +50,7 @@ const uint8 cursor_offset = 80;
 /**
  * Creates a new virtual output.
  */
-virt_monitor new_virt_monitor()
+virt_monitor new_virt_monitor(uint32 pid)
 {
         virt_monitor *mon_ptr;
         ASSERT(mon_ptr != 0);
@@ -65,6 +66,7 @@ virt_monitor new_virt_monitor()
         mon_ptr->scrolldown_limit = 0;
         mon_ptr->scrollup_limit = 0;
         mon_ptr->disable_refresh = FALSE;
+        mon_ptr->pid = pid;
         return *mon_ptr;
 }
 
@@ -80,6 +82,8 @@ void free_virt_monitor(virt_monitor *vm)
                 vmonitors[active_monitor] = vmonitors[maxvmonitor];
         }
         memset(&(vmonitors[maxvmonitor--]), 0, sizeof(virt_monitor));
+        
+       // pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
 /**

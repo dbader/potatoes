@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/util.h"
 #include "../include/assert.h"
+#include "../pm/pm_main.h"
 
 #include "io_rtc.h"
 #include "io_virtual.h"
@@ -48,12 +49,16 @@ void switch_monitor_up()
 {
         if (active_monitor < maxvmonitor) active_monitor++;
         else if (active_monitor == maxvmonitor) active_monitor = 0;
+        
+//        pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
 void switch_monitor_down()
 {
         if (active_monitor > 0) active_monitor--;
         else if (active_monitor == 0) active_monitor = maxvmonitor;
+        
+//        pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
 void init_vmonitors()
@@ -65,17 +70,17 @@ void init_vmonitors()
         vmonitors =
                 (virt_monitor*)callocn(num_vmonitor_limit, sizeof(virt_monitor*), "vmonitors array");
         ASSERT(vmonitors != 0);
-        start_vmonitor("DEBUG MONITOR");
+        start_vmonitor("DEBUG MONITOR", 0);
 }
 
 /**
  * Initializes the virtual monitor.
  */
-virt_monitor* start_vmonitor(char *name)
+virt_monitor* start_vmonitor(char *name, uint32 pid)
 {
         maxvmonitor++;
         active_monitor = maxvmonitor;
-        vmonitors[maxvmonitor] = new_virt_monitor();
+        vmonitors[maxvmonitor] = new_virt_monitor(pid);
         memset(vmonitor_names + 81 * active_monitor, '=', 80);
         memcpy(vmonitor_names + 81 * active_monitor + 2, name, strlen(name));
         *(vmonitor_names + 81 * active_monitor + 1) = ' ';

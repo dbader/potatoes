@@ -47,6 +47,7 @@ typedef struct {
         uint32 scrolldown_limit;
         uint32 scrollup_limit;
         bool disable_refresh; // for framebuffer access. If this is false, the vm will not be painted.
+        uint32 pid;
 }virt_monitor;
 
 extern virt_monitor *vmonitors;
@@ -54,7 +55,7 @@ extern virt_monitor *vmonitors;
 virt_monitor* get_active_virt_monitor();
 char* get_active_virt_monitor_name();
 
-virt_monitor new_virt_monitor();
+virt_monitor new_virt_monitor(uint32 pid);
 void free_virt_monitor(virt_monitor *vm);
 
 void update_virt_monitor();
@@ -76,7 +77,7 @@ void virt_monitor_putc(virt_monitor *vm, char ch);
 int virt_monitor_puts(virt_monitor *vm, char *str);
 
 void init_vmonitors();
-virt_monitor* start_vmonitor();
+virt_monitor* start_vmonitor(char *name, uint32 pid);
 
 void switch_monitor_down();
 void switch_monitor_up();

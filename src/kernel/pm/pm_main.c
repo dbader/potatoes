@@ -203,7 +203,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 
         focus_proc = proc; //FIXME: hackhackhack
 
-        proc->vmonitor = start_vmonitor(name);
+        proc->vmonitor = start_vmonitor(name, proc->pid);
 
         set_interrupts();
 
@@ -218,6 +218,18 @@ void pm_destroy_thread(process_t *proc)
         free(proc->name);
         free(proc->stack_start);
         free(proc);
+}
+
+void pm_set_focus_proc(uint32 pid)
+{
+//        process_t *p = procs_head;
+//        do {
+//                if (p->pid == pid)
+//                        break;
+//                p = p->next;
+//        } while (p != procs_head);
+//        
+//        focus_proc = p;
 }
 
 void pm_dump()
