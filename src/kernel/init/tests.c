@@ -538,6 +538,7 @@ void print_time()
         printf("%s\n", time2str());
 }
 
+void make_snapshot();
 void do_tests()
 {
         printf("\n%{Global keyboard shortcuts:}\n", LIGHTGREEN);
@@ -569,6 +570,7 @@ void do_tests()
         //SHORTCUT_CTRL('n', nullptr_test);
         SHORTCUT_CTRL('+', switch_monitor_up);
         SHORTCUT_CTRL('-', switch_monitor_down);
+        SHORTCUT_CTRL('s', make_snapshot);
         dprint_separator();
         fs_tests();
 }

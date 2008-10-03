@@ -80,7 +80,7 @@ runbochs: fdimage hdimage
 runvirtualbox: fdimage	
 	@VBoxManage startvm $(OSNAME)
 	
-runqemu: fdimage hdimage
+runqemu: fdimage
 	@qemu -localtime -fda floppy.img -hda hda.img #--full-screen
 	
 mac_runbochs: mac_image

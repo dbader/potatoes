@@ -57,6 +57,7 @@ bool keydown(char key, int fd);
 #define CURSOR_LEFT 0x4B
 #define CURSOR_RIGHT 0x4D
 #define ESCAPE 0x01
+#define ENTER 0x1C
 #define KEY_W 0x11
 #define KEY_A 0x1E
 #define KEY_S 0x1F

@@ -102,6 +102,7 @@ void sys_exit(void *data)
         dprintf("exit %u: %d\n", getpid(), (sint32)data);
         active_proc->state = PSTATE_DEAD; // pm_schedule will then unlink and destroy it.
 
+        free_virt_monitor(active_proc->vmonitor);
         //TODO: return status to waiting parents
 }
 

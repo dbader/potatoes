@@ -62,7 +62,7 @@ ring_fifo* rf_alloc(uint32 size)
 
 /**
  * Copies the given ring_buffer into a new allocated copy.
- * @param the ring_buffer to copy from
+ * @param fifo the ring_buffer to copy from
  * @return pointer to the new copy of the given ring_buffer
  */
 ring_fifo* rf_copy(ring_fifo *fifo)

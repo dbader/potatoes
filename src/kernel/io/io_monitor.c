@@ -58,7 +58,7 @@ void set_disp(uint32 addr)
 ////160KB = 1000 * 160B = 1000 lines
 //const uint32 io_bufsize = 160000;
 
-///**
+///*
 // * Moves the cursor in the given direction
 // *
 // * @param dir 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT
