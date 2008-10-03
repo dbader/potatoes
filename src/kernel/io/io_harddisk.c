@@ -1,6 +1,6 @@
 /* $Id$
       _   _  ____   _____
-     | | (_)/ __ \ / ____|uint16
+     | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
@@ -38,12 +38,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io.h"
 #include "../io/io_harddisk.h"
 
+/**
+ *  Our single hard disk struct. etiOS is handling only one hard disk device.
+ */
 struct hd_info hd1;
-uint32 maxaddr;
+
+/**
+ *  Signals a pending hard disk interrupt.
+ */
 volatile bool hd_interrupt = FALSE;
 
 /**
- * Printing some hard disk informations, taken from the hd1 struct
+ * Printing some hard disk informations, taken from the hd1 struct.
  */
 void dump_hd1()
 {
@@ -61,7 +67,7 @@ void dump_hd1()
                , hd1.apparent_sector_per_track
                , hd1.bytes_per_sector
                , YELLOW
-               , maxaddr);
+               , get_hdsize());
 
         printf("%{\t---------------}\n", YELLOW);
 
@@ -108,12 +114,13 @@ void dump_hd1()
 void select_masterdrive(uint8 head)
 {
         outb(HDBASE + HDREG_DRIVE, MASTERDRIVE | head);
-        //This is a bit ugly. It is used as an short delay (idea taken from an osdev-tutorial)
-        inb(HDALTBASE + HDALTREG_STAT);
-        inb(HDALTBASE + HDALTREG_STAT);
-        inb(HDALTBASE + HDALTREG_STAT);
-        inb(HDALTBASE + HDALTREG_STAT);
-        inb(HDALTBASE + HDALTREG_STAT);
+//TODO: see if this is necessary
+//        This is a bit ugly. It is used as an short delay (idea taken from an osdev-tutorial)
+//        inb(HDALTBASE + HDALTREG_STAT);
+//        inb(HDALTBASE + HDALTREG_STAT);
+//        inb(HDALTBASE + HDALTREG_STAT);
+//        inb(HDALTBASE + HDALTREG_STAT);
+//        inb(HDALTBASE + HDALTREG_STAT);
 }
 
 /**
@@ -127,13 +134,11 @@ void wait_on_hd_interrupt(char* str)
 
         while (!hd_interrupt) {
                 stat = inb(HDALTBASE + HDALTREG_STAT);
-                //printf("0x%x\n", stat);
                 if ((stat & 0x80) == 0) { //busy bit isn't set
                         inb(HDBASE + HDREG_STAT);
                         break;
                 } else if (stat & 1) {
                         printf("error code(%s): 0x%x\n", str, inb(HDBASE + HDREG_ERR));
-                        //panic("IDE-ERROR"); //error flag
                 }
                 halt();
         }
@@ -141,12 +146,13 @@ void wait_on_hd_interrupt(char* str)
 }
 
 /**
- * Converts an linear block number into a valid CHS-address
+ * Converts a linear block number into a valid CHS-address
  *
  * @param iaddr the logical block number
  * @return the CHS-address struct
  */
-struct address itoaddr(uint32 iaddr) {
+struct address itoaddr(uint32 iaddr) 
+{
         struct address addr;
         addr.sector = iaddr % hd1.apparent_sector_per_track + 1;
         iaddr = (iaddr - addr.sector + 1) / hd1.apparent_sector_per_track;
@@ -170,7 +176,7 @@ uint32 get_hdsize()
  */
 void hd_init()
 {
-        /*
+/*TODO: see if this is necessary
         outb(HDBASE+HDREG_DRIVE, MASTERDRIVE);
         outb(HDBASE+HDREG_STAT,0x10); //recalibrate
         wait_on_hd_interrupt();
@@ -181,21 +187,22 @@ void hd_init()
         wait_on_hd_interrupt();
         stat = inb(HDBASE + HDREG_ERR);
         printf("error register: 0x%x\n",stat);
-        */
+*/
 
         uint8 stat = inb(HDBASE + HDREG_STAT);
-        if (stat == 0xFF) panic("Floating Bus");
-        if (stat & 0x80) wait_on_hd_interrupt("init not ready");
-
-        select_masterdrive(0);
-        outb(HDBASE + HDREG_CMD, HDCMD_IDENTIFY_DEVICE); //identify device
-        if (inb(HDBASE + HDREG_STAT) == 0) {
-                panic("NO HARD DRIVE");
+        if (stat == HDSTATE_FLOATINGBUS) { 
+                panic("hd_init: Floating Bus");
         }
-        wait_on_hd_interrupt("init");
-        //printf("0x%x,0x%x\n", inb(HDBASE + HDREG_CYL_LOW), inb(HDBASE + HDREG_CYL_LOW));
-        repinsw(HDBASE + HDREG_DATA, (uint16*)&hd1, 256); //read buffer
-        maxaddr = get_hdsize() - 1;
+        if (stat & HDSTATE_NOTREADY) { 
+                wait_on_hd_interrupt("hd_init: not ready");
+        }
+        select_masterdrive(0);
+        outb(HDBASE + HDREG_CMD, HDCMD_IDENTIFY_DEVICE); // identify device
+        if (inb(HDBASE + HDREG_STAT) == 0) {
+                panic("hd_init: NO HARD DRIVE");
+        }
+        wait_on_hd_interrupt("hd_init");
+        repinsw(HDBASE + HDREG_DATA, (uint16*)&hd1, 256); // read buffer
         dump_hd1();
 }
 
@@ -207,12 +214,10 @@ void hd_init()
  */
 void hd_write_sector(uint32 dest, void *src)
 {
-        //printf("dest: %d\n", dest);
-        if (dest > maxaddr) {
+        if (dest > get_hdsize()) {
                 panic("hd(write): address too large");
         }
-        if (inb(HDALTBASE + HDALTREG_STAT) & 0x80) {
-                //printf("write error %x\n",stat);
+        if (inb(HDALTBASE + HDALTREG_STAT) & HDSTATE_NOTREADY) {
                 wait_on_hd_interrupt("write not ready");
         }
         struct address addr = itoaddr(dest);
@@ -222,10 +227,13 @@ void hd_write_sector(uint32 dest, void *src)
         outb(HDBASE + HDREG_CYL_HIGH, addr.cyl >> 16);
         select_masterdrive(addr.head);
 
-        outb(HDBASE + HDREG_CMD, HDCMD_WRITE); //write sector
+        outb(HDBASE + HDREG_CMD, HDCMD_WRITE); // write sector
         wait_on_hd_interrupt("write");
-        repoutsw(HDBASE + HDREG_DATA, src, 256); //write buffer
+        repoutsw(HDBASE + HDREG_DATA, src, 256); // write buffer
 
+/**
+ * The EEEPC needs a cache flush after a write operation.
+ */
 #ifndef EEEPC
         outb(HDBASE + HDREG_CMD, HDCMD_FLUSH_CACHE);
         wait_on_hd_interrupt("flush");
@@ -240,9 +248,10 @@ void hd_write_sector(uint32 dest, void *src)
  */
 void hd_read_sector(void *dest, uint32 src)
 {
-        //printf("src: %d\n", src);
-        if (src > maxaddr) panic("hd(read): address too large");
-        if (inb(HDALTBASE + HDALTREG_STAT) & 0x80) {
+        if (src > get_hdsize()) {
+                panic("hd(read): address too large");
+        }
+        if (inb(HDALTBASE + HDALTREG_STAT) & HDSTATE_NOTREADY) {
                 wait_on_hd_interrupt("read not ready");
         }
 
@@ -264,10 +273,11 @@ void hd_read_sector(void *dest, uint32 src)
 void hd_handler()
 {
         uint8 stat = inb(HDBASE + HDREG_STAT);
-        if (!(stat & 0x80))
+        if (!(stat & 0x80)) {
                 hd_interrupt = TRUE;
-        else if (stat & 1)
-                panic("IDE ERROR");
-        else
-                panic("NO IDEA WHY");
+        } else if (stat & 1) {
+                panic("hd_handler: IDE ERROR");
+        } else {
+                panic("hd_handler: UNKNOWN ERROR");
+        }
 }

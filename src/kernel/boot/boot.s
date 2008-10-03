@@ -69,7 +69,6 @@ start:
         cli 
         ; Load multiboot information:
         push ebx
-        
         cli                     ;Disable interrupts
         call main               ; call our main() function.
         jmp $                   ; Enter an infinite loop, to stop the processor

@@ -40,8 +40,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void rtc_init()
 {
-        //        outb(RTC_ADDR, RTC_STATB);
-        //        outb(RTC_DATA, 0x7E);
+        // TODO: is this necessary? 
+        // sets rtc parameters
+        // outb(RTC_ADDR, RTC_STATB);
+        // outb(RTC_DATA, 0x7E);
 
         outb(RTC_ADDR, RTC_SEC);
         time.sec = inb(RTC_DATA);
@@ -53,6 +55,8 @@ void rtc_init()
         time.day = inb(RTC_DATA);
         outb(RTC_ADDR, RTC_WEEKDAY);
         time.weekday = inb(RTC_DATA);
+        
+// FIXME: this is dirty: QEMU's rtc encodes the weekday differently from other rtcs
 #ifdef QEMU
         time.weekday++;
 #endif
@@ -93,8 +97,10 @@ void rtc_update()
         }
 }
 
+// FIXME: RACE CONDITION ALERT: should be given a buffer as parameter!!!
 char* time2str()
 {
+        static char timestamp[23];
         switch (time.weekday) {
         case 1:
                 strcpy(timestamp, "SUN");

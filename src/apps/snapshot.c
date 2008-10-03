@@ -46,7 +46,7 @@ void snapshot()
 
         char* str = _malloc(50);
         memset(str, 0, 50);
-        strcpy(str, "/snapshots/\0");
+        strcpy(str, "/snapshots/");
 
         int stdin = _open("/dev/stdin", 0, 0);
 

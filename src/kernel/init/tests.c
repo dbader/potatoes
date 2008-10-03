@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../io/io_virtual.h"
 #include "../io/io.h"
+#include "../io/io_harddisk.h"
 #include "../io/io_rtc.h"
 #include "../mm/mm.h"
 //#include "../fs/fs_main.h"
@@ -314,7 +315,7 @@ void hd_stresswrite_test()
                 hd_write_sector(i + 500, ptr);
                 printf("written!\t%s\n\n", (char*)ptr);
         }
-        hd_write_sector(maxaddr, ptr);
+        hd_write_sector(get_hdsize(), ptr);
         printf("written max\t%s\n\n", (char*)ptr);
         free(ptr);
 }
@@ -334,7 +335,7 @@ void hd_stressread_test()
                 ((uint8*)ptr)[i+11] = 0;
                 printf("%s\n\n", (char*)ptr);
         }
-        hd_read_sector(ptr, maxaddr);
+        hd_read_sector(ptr, get_hdsize());
         ((uint8*)ptr)[10] = 0;
         printf("read max\t%s\n\n", (char*)ptr);
         free(ptr);

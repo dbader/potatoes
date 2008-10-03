@@ -77,65 +77,75 @@ void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*fu
         shortcuts[shcut_num].control = control_flag;
         shortcuts[shcut_num].super = super_flag;
         shortcuts[shcut_num].func = function;
-        if (shcut_num + 1 < SHORTCUTS_ARRAY_SIZE) shcut_num++;
+        if (shcut_num + 1 < SHORTCUTS_ARRAY_SIZE) {
+                shcut_num++;
+        }
 }
 
 /**
- * Handles an keyboard interrupt, by calling the PM (providing already the right character).
+ * Handles a keyboard interrupt by calling the PM (providing already the right character).
  * In echo-mode prints the typed character directly to the screen.
  */
 void kb_handler()
 {
-        uint8 scancode = inb(0x60);
-//        if(scancode>128) return;
-        if (scancode & 0x80) { //Key released
-                keyboard_state[scancode & (~0x80)] = FALSE;
-                if ((scancode & (~0x80)) == LSHIFT || (scancode & (~0x80)) == RSHIFT)
+        uint8 scancode = inb(KB_PORT);
+        if (scancode & KEY_RELEASED) { //Key released
+                keyboard_state[scancode & KEY_PRESSED] = FALSE;
+                if ((scancode & KEY_PRESSED) == LSHIFT || (scancode & KEY_PRESSED) == RSHIFT) {
                         shift = 0;
-                else if ((scancode & (~0x80)) == ALT)
+                } else if ((scancode & KEY_PRESSED) == ALT) {
                         alt = 0;
-                else if ((scancode & (~0x80)) == CTRL)
+                } else if ((scancode & KEY_PRESSED) == CTRL) {
                         ctrl = 0;
-                else if ((scancode & (~0x80)) == SUPER)
-                        super_button = 0;
+                } else if ((scancode & KEY_PRESSED) == SUPER) {
+                        super_button = 0;       
+                }
         } else if (shift) { //Key pressed while shift is pressed
                 if (kb_shift_map[scancode] != 0) {
-                        if (echo) virt_monitor_putc(get_active_virt_monitor(), kb_shift_map[scancode]);
-                        else pm_handle_input(kb_shift_map[scancode]);
+                        if (echo) {
+                                virt_monitor_putc(get_active_virt_monitor(), kb_shift_map[scancode]);
+                        } else {
+                                pm_handle_input(kb_shift_map[scancode]);
+                        }
                 }
         } else if (alt) { //Key pressed while alt is pressed
-                if (scancode == 0x12) virt_monitor_invert(get_active_virt_monitor());
+                if (scancode == ESCAPE) {
+                        virt_monitor_invert(get_active_virt_monitor());
+                }
                 if (kb_alt_map[scancode] != 0) {
-                        if (echo) virt_monitor_putc(get_active_virt_monitor(), kb_alt_map[scancode]);
-                        else pm_handle_input(kb_alt_map[scancode]);
+                        if (echo) {
+                                virt_monitor_putc(get_active_virt_monitor(), kb_alt_map[scancode]);
+                        } else {
+                                pm_handle_input(kb_alt_map[scancode]);
+                        }
                 }
         } else if (ctrl && super_button) { //Key pressed while ctrl & super are pressed
-                int i = 0;
-                for (i; i <= shcut_num; i++)
+                for (int i = 0; i <= shcut_num; i++) {
                         if ( shortcuts[i].control && shortcuts[i].super
                                         && shortcuts[i].ch == kb_map[scancode] ) {
                                 set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }
+                }
         } else if (ctrl && scancode != SUPER) { //Key pressed while ctrl is pressed
-                int i = 0;
-                for (i; i <= shcut_num; i++)
+                for (int i = 0; i <= shcut_num; i++) {
                         if ( shortcuts[i].control && !shortcuts[i].super
                                         && shortcuts[i].ch == kb_map[scancode] ) {
                                 set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }
+                }
         } else if (super_button && scancode != CTRL) { //Key pressed while super is pressed
-                int i = 0;
-                for (i; i <= shcut_num; i++)
+                for (int i = 0; i <= shcut_num; i++) {
                         if ( shortcuts[i].super && !shortcuts[i].control
                                         && shortcuts[i].ch == kb_map[scancode] ) {
                                 set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }
+                }
         } else { //Key pressed
                 keyboard_state[scancode] = TRUE;
                 switch (scancode) {
@@ -177,10 +187,13 @@ void kb_handler()
                         virt_monitor_scrolldown(get_active_virt_monitor());
                         break;
                 default:
-                        if (kb_map[scancode] != 0)
-                                if (echo) virt_monitor_putc(get_active_virt_monitor(),
-                                                                    kb_map[scancode]);
-                                else pm_handle_input(kb_map[scancode]);
+                        if (kb_map[scancode] != 0) {
+                                if (echo) {
+                                        virt_monitor_putc(get_active_virt_monitor(), kb_map[scancode]);
+                                } else {
+                                        pm_handle_input(kb_map[scancode]);
+                                }
+                        }
                 }
         }
 }

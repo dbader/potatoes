@@ -126,26 +126,29 @@ void sys_open(void *data)
         sc_open_args_t *args = (sc_open_args_t*) data;
         SYSCALL_TRACE("SYS_OPEN(\"%s\", 0x%x, 0x%x)\n", args->path, args->oflag, args->mode);
 
-        device_t *dev = pm_name2device(args->path);
+        char* path = strdup(args->path);
+        
+        device_t *dev = pm_name2device(path);
         if (dev != NULL) {
                 // It's a device file
                 //dprintf("opening device %s\n", dev->name);
-                args->fd = dev->open(dev, args->path, args->oflag, args->mode);
+                args->fd = dev->open(dev, path, args->oflag, args->mode);
         } else {
                 // It's a real file.
-                int fd = do_open(args->path);
+                int fd = do_open(path);
 
                 // Does not exist yet and the create flag ist set
                 if (fd == NOT_POSSIBLE && args->oflag == O_CREAT) {
                         // See if it's a directory
-                        if (args->path[strlen(args->path)-1] == '/') {
+                        if (path[strlen(path)-1] == '/') {
                                 // Kill trailing slash.
-                                args->path[strlen(args->path)-1] = '\0';
-                                do_mkdir(args->path);
+                                path[strlen(path)-1] = '\0';
+                                do_mkdir(path);
+                                
                         } else
-                                do_mkfile(args->path);
+                                do_mkfile(path);
 
-                        fd = do_open(args->path);
+                        fd = do_open(path);
                 }
 
                 if (fd == NOT_POSSIBLE)
@@ -154,6 +157,8 @@ void sys_open(void *data)
                         args->fd = insert_proc_file(active_proc->pft, fd) + MAX_DEVICES;
                 }
         }
+        
+        free(path);
 }
 
 void sys_close(void* data)

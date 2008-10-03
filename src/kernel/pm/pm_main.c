@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * elf2flt
+ * Process management main source file.
  *
  * @author dbader
  * @author $LastChangedBy$
@@ -47,12 +47,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "pm_syscalls.h"
 #include "syscalls_shared.h"
 #include "pm_devices.h"
-
 #include "../../apps/brainfuck_interpreter.h"
 
+/** Process list. */
 process_t *procs_head = NULL;
+
+/** Pointer to the active process, ie the process which is executing. */
 process_t *active_proc = NULL;
+
+/** Pointer to the process which has the input focus. */
 process_t *focus_proc = NULL;
+
+/** Process ID of the next process that gets created. */
 uint32 next_pid = 0;
 
 // Devices
@@ -64,6 +70,11 @@ extern device_t dev_framebuffer;
 extern device_t dev_keyboard;
 extern device_t dev_clock;
 
+/**
+ * Returns the PID of the active process.
+ * 
+ * @return the PID
+ */
 uint32 getpid()
 {
         ASSERT(active_proc != NULL);
@@ -83,6 +94,7 @@ void pm_init()
 
         memset(procs_head, 0, sizeof(process_t));
 
+        // Initialize the kernel thread
         procs_head->name = "kernel";
         procs_head->state = PSTATE_ALIVE;
         procs_head->pid = next_pid++;
@@ -107,22 +119,24 @@ void pm_init()
         pm_register_device(&dev_clock);
 
         dprintf("%{pm:} scheduler initialized\n", VIOLET);
-
-        //test_ls();
 }
+
 /**
- * Reschedule if needed.
+ * Switch to the next process in a round robin fashion.
+ * 
+ * @param context the tasks context on the stack
+ * @return the context of the process which becomes active
  */
 uint32 pm_schedule(uint32 context)
 {
-        // Bail out if the kernel task was not yet created by pm_init()
+        // Bail out if the kernel task was not yet created by pm_init().
         if (active_proc == NULL) {
                 return context;
         }
 
         active_proc->context = context;
 
-        // Destroy all zombie processes
+        // Destroy all zombie processes up to the first alive process.
         while (active_proc->next->state == PSTATE_DEAD) {
                 pm_destroy_thread(active_proc->next);
                 active_proc->next = active_proc->next->next;
@@ -132,6 +146,14 @@ uint32 pm_schedule(uint32 context)
         return active_proc->context;
 }
 
+/** 
+ * Creates a new thread.
+ * 
+ * @param name the process's name
+ * @param entry the entry point
+ * @param stacksize the stack size
+ * @return the PID of the new thread
+ */
 uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 {
         clear_interrupts();
@@ -142,9 +164,10 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 
         process_t *proc = malloc(sizeof(process_t));
 
-        if (proc == NULL)
+        if (proc == NULL) {
                 panic("pm_create_thread: out of memory");
-
+        }
+                
         proc->name = strdup(name);
         proc->pid = next_pid++;
         proc->state = PSTATE_ALIVE;
@@ -154,13 +177,15 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 
         proc->stack_start = malloc(stacksize);
 
-        if (proc->stack_start == NULL)
+        if (proc->stack_start == NULL) {
                 panic("pm_create_thread: could not allocate stack");
-
+        }
+                
         proc->stdin = rf_alloc(STDIN_QUEUE_SIZE);
 
-        if (proc->stdin == NULL)
+        if (proc->stdin == NULL) {
                 panic("pm_create_thread: could not allocate stdin");
+        }
 
         proc->context = (uint32) proc->stack_start + stacksize; // Stack grows downwards
 
@@ -210,16 +235,31 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         return proc->pid;
 }
 
+/**
+ * Releases a thread's resources. The only place this should be called from
+ * is pm_schedule() - to mark a process for destruction, set its "dead" flag.
+ * 
+ * @see pm_schedule
+ * @param proc the process to destroy
+ */
 void pm_destroy_thread(process_t *proc)
 {
         dprintf("%{pm:} destroy thread \"%s\" pid = %u\n\n", VIOLET, proc->name, proc->pid);
-        if (proc->stdin != NULL)
+        
+        if (proc->stdin != NULL) {
                 rf_free(proc->stdin);
+        }
+        
         free(proc->name);
         free(proc->stack_start);
         free(proc);
 }
 
+/**
+ * Gives a process the input focus.
+ * 
+ * @param pid the process id
+ */
 void pm_set_focus_proc(uint32 pid)
 {
         process_t *p = procs_head;
@@ -232,6 +272,10 @@ void pm_set_focus_proc(uint32 pid)
         focus_proc = p;
 }
 
+/**
+ * Prints some status information about all processes. Can be used as a crude form 
+ * of unix's "ps" command.
+ */
 void pm_dump()
 {
         dprintf("PID\tNAME\t\tCONTEXT\n");
@@ -242,9 +286,4 @@ void pm_dump()
                 p = p->next;
         } while (p != procs_head);
 
-}
-
-void printhex(uint32 hex)
-{
-        printf("0x%x\n", hex);
 }

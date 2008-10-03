@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ENTRY(start)
 SECTIONS
 {
-    start = 0x100000; _start = 0x100000; __start = 0x100000;
     .text 0x100000 :
     {
         code = .; _code = .; __code = .;

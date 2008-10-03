@@ -3,14 +3,21 @@
 
 #include "../include/types.h"
 
+/**
+ * The io ports of the EEEPC are mapped at different addresses compared to other architectures
+ * 
+ * If you're running etiOS on the EEEPC, you need to compile the kernel with
+ * make EXTRA_CFLAGS=-DEEEPC [target]
+ */
 #ifdef EEEPC
-#define HDBASE 0x170
-#define HDALTBASE 0x376
+        #define HDBASE 0x170
+        #define HDALTBASE 0x376
 #else
-#define HDBASE 0x1F0
-#define HDALTBASE 0x3F6
+        #define HDBASE 0x1F0
+        #define HDALTBASE 0x3F6
 #endif
 
+// Hard disk register offsets
 #define HDREG_DATA 0
 #define HDREG_ERR 1
 #define HDREG_COUNT 2
@@ -20,22 +27,30 @@
 #define HDREG_DRIVE 6
 #define HDREG_STAT 7
 #define HDREG_CMD 7
+
+// Hard disk alternative register offsets
 #define HDALTREG_STAT 0
 #define HDALTREG_ADDR 1
 
+// Hard disk drive selectors
 #define MASTERDRIVE 0xA0
 #define SLAVEDRIVE 0xB0
 
+// Hard disk ata commands
 #define HDCMD_EXEC_DRIVE_DIAG 0x90
 #define HDCMD_IDENTIFY_DEVICE 0xEC
 #define HDCMD_READ 0x20
 #define HDCMD_WRITE 0x30
 #define HDCMD_FLUSH_CACHE 0xE7
 
+// Hard disk state flags
+#define HDSTATE_FLOATINGBUS 0xFF
+#define HDSTATE_NOTREADY 0x80
+
 /**
- * This struct is filled by the IDENTIFY DRIVE command
+ * This struct is filled by the IDENTIFY DRIVE command.
  *
- * contains hard disk geometry data and more
+ * It contains hard disk geometry data and more.
  */
 struct hd_info {
         uint16 config_word;
@@ -73,11 +88,13 @@ struct hd_info {
 }__attribute__((__packed__));
 
 /**
- * address data for the hard disk packed in a struct
+ * Address data for the hard disk packed in a struct.
  */
 struct address {
         uint32 cyl;
         uint16 head;
         uint16 sector;
 };
+
+uint32 get_hdsize();
 #endif /*__IO_HARDDISK_H_*/

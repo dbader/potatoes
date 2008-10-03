@@ -196,44 +196,6 @@ incoming_syscall:
         
         popad
         iret
-        
-[EXTERN printhex]
-[EXTERN monitor_puti]
-[GLOBAL print_stack]
-printstack:
-        push edx
-        push dword [esp+4]
-        call printhex
-        pop edx
-        push dword [esp+8]
-        call printhex
-        pop edx
-        push dword [esp+12]
-        call printhex
-        pop edx
-        push dword [esp+16]
-        call printhex
-        pop edx
-        push dword [esp+20]
-        call printhex
-        pop edx
-        push dword [esp+24]
-        call printhex
-        pop edx
-        push dword [esp+28]
-        call printhex
-        pop edx
-        push dword [esp+32]
-        call printhex
-        pop edx
-        push dword [esp+36]
-        call printhex
-        pop edx
-        push dword [esp+40]
-        call printhex
-        pop edx
-        pop edx
-        ret
                
 [GLOBAL halt]
 halt:

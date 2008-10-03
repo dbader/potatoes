@@ -18,7 +18,7 @@ int dev_stdin_close(void *dev, int fd)
 
 int dev_stdin_read(void *dev, int fd, void *buf, int size)
 {
-        return rf_read(active_proc->stdin, buf, size); //TODO:fixed: focus_proc instead of active_proc!?
+        return rf_read(active_proc->stdin, buf, size);
 }
 
 int dev_stdin_write(void *dev, int fd, void *buf, int size)

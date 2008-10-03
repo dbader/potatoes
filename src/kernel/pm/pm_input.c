@@ -45,14 +45,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Handles keyboard input. This gets called from the I/O code after a keypress was received
  * and translated. pm_handle_input() then distributes incoming character to the focussed
  * process' input queue.
+ * 
  * @param c input character
  */
 void pm_handle_input(char c)
 {
-        if (focus_proc == NULL)
+        if (focus_proc == NULL) {
                 return;
-
-        if (rf_write(focus_proc->stdin, &c, sizeof(c)) != sizeof(c))
-                dprintf("error writing to stdin\n");
+        }
+        
+        if (rf_write(focus_proc->stdin, &c, sizeof(c)) != sizeof(c)) {
+                dprintf("pm_handle_input: error writing to stdin\n");
+        }
 }
 

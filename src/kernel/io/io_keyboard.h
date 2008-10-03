@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/types.h"
 
+// Some often needed keycodes.
 #define LSHIFT 0x2A
 #define RSHIFT 0x36
 #define ALT 0x38
@@ -45,6 +46,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CURSOR_RIGHT 0x4D
 #define CTRL 0x1D
 #define SUPER 0x5B
+#define ESCAPE 0x01
+#define ENTER 0x1C
 
 void cursor_move(uint8 dir);
 
@@ -444,22 +447,22 @@ char kb_alt_map[] = {
 /**
  * Shift-pressed flag
  */
-static bool shift = 0;
+bool shift = 0;
 
 /**
  * Alt-pressed flag
  */
-static bool alt = 0;
+bool alt = 0;
 
 /**
  * Super-pressed flag
  */
-static bool super_button = 0;
+bool super_button = 0;
 
 /**
  * Ctrl-pressed flag
  */
-static bool ctrl = 0;
+bool ctrl = 0;
 
 /**
  * Structure of a shortcut
@@ -468,7 +471,14 @@ typedef struct {
         void (*func)();
         bool control;
         bool super;
-        uint8 ch;
+        char ch;
 } shortcut;
+
+//Keyboard io port
+#define KB_PORT 0x60
+
+//Key state
+#define KEY_PRESSED (~0x80)
+#define KEY_RELEASED 0x80
 
 #endif /*__IO_KEYBOARD_H*/

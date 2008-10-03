@@ -52,8 +52,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_STATC 12
 #define RTC_STATD 13
 
-char timestamp[22];
-
+/**
+ * Global time struct.
+ */
 struct time {
         uint8 sec;
         uint8 min;
