@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution pos
                 return;
 
         char **arg = &fmt + 1;
-        char ch; 
+        char ch;
         int character;
         char buf[40];
 
@@ -113,8 +113,8 @@ void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution pos
                 if (ch == '%') {
                         ch = *fmt++;
                         switch (ch) {
-                        case '%': // print '%' 
-                                _fputch(ch, STDOUT); 
+                        case '%': // print '%'
+                                _fputch(ch, STDOUT);
                                 break;
                         case 'i': // signed integer
                         case 'd':
@@ -135,7 +135,7 @@ void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution pos
                                  * compiler warning.
                                  * Code was: putchar((char)*arg++);
                                  */
-                                character = (int) *arg++;
+                                character = (int) * arg++;
                                 _fputch((char)character, STDOUT);
                                 break;
                         case 's': // string
@@ -401,7 +401,7 @@ void shell_cmd_memdump(int argc, char *argv[])
 
 void shell_cmd_pwd(int argc, char *argv[])
 {
-        _printf("%s\n",cwd);
+        _printf("%s\n", cwd);
 }
 
 void shell_cmd_cp(int argc, char *argv[])
@@ -411,17 +411,17 @@ void shell_cmd_cp(int argc, char *argv[])
                 return;
         }
 
-        int src_fd = _open(shell_makepath(argv[1]), 0, 0);       
+        int src_fd = _open(shell_makepath(argv[1]), 0, 0);
         if (src_fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
-                return;   
+                return;
         }
 
         int target_fd = _open(shell_makepath(argv[2]), O_CREAT, 0);
         if (src_fd < 0) {
                 _printf("%s: %s: Could not create target file\n", argv[0], argv[2]);
                 _close(src_fd);
-                return;   
+                return;
         }
 
         char ch;
@@ -441,10 +441,9 @@ void shell_cmd_ps(int argc, char *argv[])
 void reset_bf();
 void shell_cmd_bf(int argc, char *argv[])
 {
-        if (!strcmp(argv[1],"-i")){
+        if (!strcmp(argv[1], "-i")) {
                 _write(5, argv[2], strlen(argv[2]));
-        }
-        else {
+        } else {
                 reset_bf();
                 int fd = _open(shell_makepath(argv[1]), 0, 0);
                 int temp = get_ticks();
@@ -453,10 +452,10 @@ void shell_cmd_bf(int argc, char *argv[])
                         return;
                 }
                 char ch;
-                while (_read(fd, &ch, sizeof(ch)) != 0){
+                while (_read(fd, &ch, sizeof(ch)) != 0) {
                         _fputch(ch, 5);
                 }
-                temp = get_ticks()-temp;
+                temp = get_ticks() - temp;
                 (temp < 0) ? temp += UINT32_MAX : temp;
                 _printf("time elapsed: %d ticks\n", temp);
                 _close(fd);
@@ -470,7 +469,7 @@ void shell_cmd_exit(int argc, char *argv[])
         _exit(0);
 }
 
-void shell_cmd_date(int argc, char *argv[]) 
+void shell_cmd_date(int argc, char *argv[])
 {
         int fd = _open("/dev/clock", 0, 0);
 
@@ -489,41 +488,41 @@ void shell_cmd_date(int argc, char *argv[])
  * rm
  * mv
  * kill
- * df 
+ * df
  * exit
  * exec
  */
 
 void make_snapshot();
 struct shell_cmd_t shell_cmds[] = {
-                {"test",        shell_cmd_test,         "Test argument parsing"},
-                {"cmdlist",     shell_cmd_cmdlist,      "List available commands"},
-                {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
-                {"ls",          shell_cmd_ls,           "List directory"},
-                {"touch",       shell_cmd_touch,        "Create regular file"},
-                {"mkdir",       shell_cmd_mkdir,        "Create directory"},
-                {"cat",         shell_cmd_cat,          "Print file contents"},
-                {"write",       shell_cmd_write,        "Write text to file"},
-                {"cd",          shell_cmd_cd,           "Change directory"},
-                {"clear",       shell_cmd_clear,        "Clear the screen"},
-                {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
-                {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
-                {"pwd",         shell_cmd_pwd,          "Print working directory"},
-                {"cp",          shell_cmd_cp,           "Copy files"},
-                {"ps",          shell_cmd_ps,           "List processes"},
-                {"exit",        shell_cmd_exit,         "Quit the shell"},
-                {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
-                {"pong",        shell_cmd_pong,         "A classic video game"},
-                {"snake",       shell_cmd_snake,        "Another classic video game"},
-                {"date",        shell_cmd_date,         "Display date and time"},
-                {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
-                {"",            NULL,                   ""} // The Terminator
+        {"test",        shell_cmd_test,         "Test argument parsing"},
+        {"cmdlist",     shell_cmd_cmdlist,      "List available commands"},
+        {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
+        {"ls",          shell_cmd_ls,           "List directory"},
+        {"touch",       shell_cmd_touch,        "Create regular file"},
+        {"mkdir",       shell_cmd_mkdir,        "Create directory"},
+        {"cat",         shell_cmd_cat,          "Print file contents"},
+        {"write",       shell_cmd_write,        "Write text to file"},
+        {"cd",          shell_cmd_cd,           "Change directory"},
+        {"clear",       shell_cmd_clear,        "Clear the screen"},
+        {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
+        {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
+        {"pwd",         shell_cmd_pwd,          "Print working directory"},
+        {"cp",          shell_cmd_cp,           "Copy files"},
+        {"ps",          shell_cmd_ps,           "List processes"},
+        {"exit",        shell_cmd_exit,         "Quit the shell"},
+        {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
+        {"pong",        shell_cmd_pong,         "A classic video game"},
+        {"snake",       shell_cmd_snake,        "Another classic video game"},
+        {"date",        shell_cmd_date,         "Display date and time"},
+        {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
+        {"",            NULL,                   ""} // The Terminator
 };
 
-#define NUM_SHELL_COMMANDS (sizeof(shell_cmds) / sizeof(shell_cmd_t)) - 1 
+#define NUM_SHELL_COMMANDS (sizeof(shell_cmds) / sizeof(shell_cmd_t)) - 1
 
-void shell_handle_command(char *cmd) 
-{       
+void shell_handle_command(char *cmd)
+{
         // Ignore returns
         if (strlen(cmd) == 1)
                 return;
@@ -542,7 +541,7 @@ void shell_handle_command(char *cmd)
         int argc = 0;
         char *argv[16];
 
-        while((tok = strsep(&work_copy, delim)) != NULL) {
+        while ((tok = strsep(&work_copy, delim)) != NULL) {
                 if (argc >= (sizeof(argv) / sizeof(char*))) {
                         _printf("- shell: argument overflow. Last argument: %s\n", argv[argc-1]);
                         break;
@@ -568,7 +567,7 @@ void shell_handle_command(char *cmd)
         else
                 _printf("- shell: %s: command not found\n", argv[0]);
 
-        for (int i = 0; i < argc; i++){
+        for (int i = 0; i < argc; i++) {
                 //printf("_free(argv[%d]=%s): 0x%x\n", i, argv[i], argv[i]);
                 _free(argv[i]);
         }
@@ -604,7 +603,7 @@ void shell_main()
 {
         STDIN = _open("/dev/stdin", 0, 0);
         STDOUT = _open("/dev/stdout", 0, 0);
-        
+
         _printf("Welcome to etiOS!\n");
         _printf("Try \"cmdlist\" for a list of commands.\n\n");
 

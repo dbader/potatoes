@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,15 +21,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Keyboard-handler
- * 
+ *
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
  * @version $Rev$
  */
 
-#include "../include/const.h" 
+#include "../include/const.h"
 #include "../include/types.h"
 #include "../include/stdio.h"
 #include "../include/stdlib.h"
@@ -65,11 +65,11 @@ bool keyboard_state[256];
 
 /**
  * Adds a shortcut to the system
- * 
+ *
  * @param control_flag          is ctrl the initiator?
  * @param super_flag            is super the initiator?
  * @param character             shortcut character
- * @param (*function)()         function to be called 
+ * @param (*function)()         function to be called
  */
 void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*function)())
 {
@@ -81,7 +81,7 @@ void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*fu
 }
 
 /**
- * Handles an keyboard interrupt, by calling the PM (providing already the right character). 
+ * Handles an keyboard interrupt, by calling the PM (providing already the right character).
  * In echo-mode prints the typed character directly to the screen.
  */
 void kb_handler()
@@ -98,54 +98,47 @@ void kb_handler()
                         ctrl = 0;
                 else if ((scancode & (~0x80)) == SUPER)
                         super_button = 0;
-        }   
-        else if (shift) { //Key pressed while shift is pressed
+        } else if (shift) { //Key pressed while shift is pressed
                 if (kb_shift_map[scancode] != 0) {
-                        if(echo) virt_monitor_putc(get_active_virt_monitor(), kb_shift_map[scancode]);
+                        if (echo) virt_monitor_putc(get_active_virt_monitor(), kb_shift_map[scancode]);
                         else pm_handle_input(kb_shift_map[scancode]);
                 }
-        }
-        else if (alt) { //Key pressed while alt is pressed
+        } else if (alt) { //Key pressed while alt is pressed
                 if (scancode == 0x12) virt_monitor_invert(get_active_virt_monitor());
                 if (kb_alt_map[scancode] != 0) {
-                        if(echo) virt_monitor_putc(get_active_virt_monitor(), kb_alt_map[scancode]);
+                        if (echo) virt_monitor_putc(get_active_virt_monitor(), kb_alt_map[scancode]);
                         else pm_handle_input(kb_alt_map[scancode]);
                 }
-        }
-        else if (ctrl && super_button) { //Key pressed while ctrl & super are pressed
+        } else if (ctrl && super_button) { //Key pressed while ctrl & super are pressed
                 int i = 0;
-                for(i; i<=shcut_num; i++)
-                        if ( shortcuts[i].control && shortcuts[i].super  
-                                        && shortcuts[i].ch == kb_map[scancode] ){
+                for (i; i <= shcut_num; i++)
+                        if ( shortcuts[i].control && shortcuts[i].super
+                                        && shortcuts[i].ch == kb_map[scancode] ) {
                                 set_interrupts();
                                 shortcuts[i].func();
                                 break;
-                        }               
-        }
-        else if (ctrl && scancode != SUPER) { //Key pressed while ctrl is pressed
+                        }
+        } else if (ctrl && scancode != SUPER) { //Key pressed while ctrl is pressed
                 int i = 0;
-                for(i; i<=shcut_num; i++)
+                for (i; i <= shcut_num; i++)
                         if ( shortcuts[i].control && !shortcuts[i].super
-                                        && shortcuts[i].ch == kb_map[scancode] ){
+                                        && shortcuts[i].ch == kb_map[scancode] ) {
                                 set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }
-        }
-        else if (super_button && scancode != CTRL) { //Key pressed while super is pressed
+        } else if (super_button && scancode != CTRL) { //Key pressed while super is pressed
                 int i = 0;
-                for(i; i<=shcut_num; i++)
+                for (i; i <= shcut_num; i++)
                         if ( shortcuts[i].super && !shortcuts[i].control
-                                        && shortcuts[i].ch == kb_map[scancode] ){
+                                        && shortcuts[i].ch == kb_map[scancode] ) {
                                 set_interrupts();
                                 shortcuts[i].func();
                                 break;
                         }
-        }
-        else{ //Key pressed
+        } else { //Key pressed
                 keyboard_state[scancode] = TRUE;
-                switch (scancode)
-                {
+                switch (scancode) {
                 case CTRL:
                         ctrl = 1;
                         break;
@@ -185,8 +178,8 @@ void kb_handler()
                         break;
                 default:
                         if (kb_map[scancode] != 0)
-                                if(echo) virt_monitor_putc(get_active_virt_monitor(), 
-                                                kb_map[scancode]);
+                                if (echo) virt_monitor_putc(get_active_virt_monitor(),
+                                                                    kb_map[scancode]);
                                 else pm_handle_input(kb_map[scancode]);
                 }
         }

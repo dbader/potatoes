@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Shell & monitor interface
- * 
+ *
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
  * @version $Rev$
@@ -46,23 +46,23 @@ char *vmonitor_names;
 
 void switch_monitor_up()
 {
-        if(active_monitor < maxvmonitor) active_monitor++;
-        else if(active_monitor == maxvmonitor) active_monitor = 0;
+        if (active_monitor < maxvmonitor) active_monitor++;
+        else if (active_monitor == maxvmonitor) active_monitor = 0;
 }
 
 void switch_monitor_down()
 {
-        if(active_monitor>0) active_monitor--;
-        else if(active_monitor == 0) active_monitor = maxvmonitor;
+        if (active_monitor > 0) active_monitor--;
+        else if (active_monitor == 0) active_monitor = maxvmonitor;
 }
 
 void init_vmonitors()
 {
         rtc_init();
-        vmonitor_names = 
-                (char*) callocn(num_vmonitor_limit*81, sizeof(char), "vmonitor names array");
+        vmonitor_names =
+                (char*) callocn(num_vmonitor_limit * 81, sizeof(char), "vmonitor names array");
         ASSERT(vmonitor_names != 0);
-        vmonitors = 
+        vmonitors =
                 (virt_monitor*)callocn(num_vmonitor_limit, sizeof(virt_monitor*), "vmonitors array");
         ASSERT(vmonitors != 0);
         start_vmonitor("DEBUG MONITOR");
@@ -74,7 +74,7 @@ void init_vmonitors()
 virt_monitor* start_vmonitor(char *name)
 {
         maxvmonitor++;
-        active_monitor=maxvmonitor;
+        active_monitor = maxvmonitor;
         vmonitors[maxvmonitor] = new_virt_monitor();
         memset(vmonitor_names + 81 * active_monitor, '=', 80);
         memcpy(vmonitor_names + 81 * active_monitor + 2, name, strlen(name));
@@ -85,11 +85,13 @@ virt_monitor* start_vmonitor(char *name)
         return &(vmonitors[maxvmonitor]);
 }
 
-virt_monitor* get_active_virt_monitor(){
+virt_monitor* get_active_virt_monitor()
+{
         return &(vmonitors[active_monitor]);
 }
 
-char* get_active_virt_monitor_name(){
+char* get_active_virt_monitor_name()
+{
         memcpy(vmonitor_names + 81 * active_monitor + 55, (void*)time2str(), 23);
         return &(vmonitor_names[active_monitor*81]);
 }

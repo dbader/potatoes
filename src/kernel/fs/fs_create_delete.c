@@ -87,12 +87,12 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
         }
 
         if (mode == CREATE && search_file(abs_path) != NOT_FOUND) {
-                printf("%{ERROR: file '%s' already exists!}\n", RED);
+                printf("%{ERROR}: file '%s' already exists!\n", RED, abs_path);
                 return FALSE;
         }
 
         if (mode == DELETE && search_file(abs_path) == NOT_FOUND) {
-                printf("%{ERROR: file '%s' does not exist!}\n", RED);
+                printf("%{ERROR}: file '%s' does not exist!\n", RED, abs_path);
                 return FALSE;
         }
 
