@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Basic definitions concerning syscalls "open" and "close"
- * 
+ *
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
@@ -46,10 +46,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /**
- * Opens a file by searching the inode's block number, 
+ * Opens a file by searching the inode's block number,
  * loading the inode from HD, inserting the inode to the inode table and
  * and registering the file in the global/process file table.
- * 
+ *
  * @param path absolute file path
  * @return     process file descriptor
  */
@@ -57,37 +57,36 @@ file_nr fs_open(char *abs_path)
 {
         file_nr fd;
         m_inode *inode;
-        
+
         fs_dprintf("[fs_o_c] trying to open %s\n", abs_path);
-        
-        if (strcmp(abs_path, "/") != 0){ //not the root directory
+
+        if (strcmp(abs_path, "/") != 0) { //not the root directory
                 fd = name2desc(abs_path); //get the file descriptor from file table if already existent
-                if (fd != NOT_FOUND){
+                if (fd != NOT_FOUND) {
                         //inc_count(fd);
                         fs_dprintf("[fs_o_c] file %s is already opened!\n", abs_path);
                         return fd; //file already exists
                 }
-                
+
                 block_nr block = search_file(abs_path);
-                if (block == NOT_FOUND){
+                if (block == NOT_FOUND) {
                         fs_dprintf("[fs_o_c] block not found!\n");
                         return NOT_EXISTENT;
                 }
-                
+
                 inode = alloc_inode();
-                if (inode == (m_inode*) NULL){
+                if (inode == (m_inode*) NULL) {
                         fs_dprintf("[fs_o_c] inode not allocateable!\n");
                         return NOT_POSSIBLE;
                 }
-                
+
                 read_minode(inode, block); //read content from HD
+        } else {
+                inode = root;
         }
-        else {
-              inode = root;  
-        }
-        
+
         fd = insert_file(inode, abs_path, inode->i_mode);
-        if (fd == NOT_FOUND){
+        if (fd == NOT_FOUND) {
                 fs_dprintf("[fs_o_c] new file could not be inserted!\n");
                 return NOT_POSSIBLE;
         }
@@ -96,7 +95,7 @@ file_nr fs_open(char *abs_path)
 
 /**
  * Closes a file by writing the inode to HD and freeing the file descriptor entry.
- * 
+ *
  * @param fd process file descriptor.
  * @return   operation status
  */
@@ -104,12 +103,12 @@ bool fs_close(file_nr fd)
 {
         file *f = get_file(fd);
 
-        if (f == (file*) NULL || f->f_desc == NIL_FILE){
+        if (f == (file*) NULL || f->f_desc == NIL_FILE) {
                 return FALSE; //file does not exist
         }
-        
+
         write_inode(f->f_inode);
         free_file(fd);
-        
+
         return TRUE;
 }

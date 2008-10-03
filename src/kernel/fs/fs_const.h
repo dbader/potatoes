@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Basic constant definitions. This file defines constants used
  * throughout the file system.
  *
@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #define BLOCK_SIZE              512
-#define NAME_SIZE               28  
+#define NAME_SIZE               28
 #define DIR_ENTRY_SIZE          sizeof (struct dir_entry)               //4 + NAME_SIZE
 #define DISK_INODE_SIZE         sizeof (struct d_inode)                 //2 + 5*4 + NUM_DIRECT_POINTER*4 
 #define MEM_INODE_SIZE          sizeof (struct m_inode)                 //2*2 + 6*4 + NUM_DIRECT_POINTER*4 

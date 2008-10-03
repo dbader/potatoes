@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Headers for string.c
  *
  * @author Dmitriy Traytel
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef __STRING_H
 #define __STRING_H
- 
+
 uint32 strlen(char* str);
 char* strcpy(char *dest, char *src);
 char* strncpy(char *dest, char *src, size_t n);

@@ -25,14 +25,14 @@ int dev_framebuffer_read(void *dev, int fd, void *buf, int size)
 
 //* Draws ASCII "pixels" directly to the video memory without using the vmonitors.
 int dev_framebuffer_write(void *dev, int fd, void *buf, int size)
-{       
+{
         if (size > 25 * 80)
                 size = 25 * 80;
- 
+
         uint16 *vid = (uint16*) 0xB8000;
         for (int i = 0; i < size; i++)
                 *vid++ = *((uint8*)buf++) * 0x1000 + ' ';
-        
+
         return size;
 }
 
@@ -42,12 +42,12 @@ int dev_framebuffer_seek(void *dev, int fd, int offset, int whence)
 }
 
 device_t dev_framebuffer = {
-                "/dev/framebuffer",    // name
-                3,              // fd
-                NULL,           // data
-                dev_framebuffer_open,
-                dev_framebuffer_close,
-                dev_framebuffer_read,
-                dev_framebuffer_write,
-                dev_framebuffer_seek
+        "/dev/framebuffer",    // name
+        3,              // fd
+        NULL,           // data
+        dev_framebuffer_open,
+        dev_framebuffer_close,
+        dev_framebuffer_read,
+        dev_framebuffer_write,
+        dev_framebuffer_seek
 };

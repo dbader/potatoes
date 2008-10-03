@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * The inode table.
  * This table contains the currently opened inodes.
  * This table is only existent in memory.
@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void init_inode_table()
 {
         fs_dprintf("[fs_inode_table] resetting inode_table\n");
-        for (int i = 0; i < NUM_INODES; i++){
+        for (int i = 0; i < NUM_INODES; i++) {
                 inode_table[i].i_num = NIL_INODE;
         }
 }
@@ -66,10 +66,10 @@ void create_root()
         m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
         if (new_root == (m_inode*) NULL) return;
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
-        
+
         root = &inode_table[ROOT_INODE];
         root->i_num = ROOT_INODE;
-        
+
         ASSERT(inode_table[ROOT_INODE].i_num != NIL_INODE);
 }
 
@@ -84,9 +84,9 @@ void load_root()
         root->i_num = ROOT_INODE;
 
         fs_dprintf("[fs_inode_table] root block: %d\n", root->i_adr);
-        
+
         ASSERT(root != (m_inode *) NULL);
-        
+
 }
 
 /**
@@ -96,20 +96,20 @@ void write_root()
 {
         d_inode *d_root = mallocn(sizeof(d_inode), "tmp d_inode");
         ASSERT(d_root != (void *) NULL);
-        
+
         write_inode(root);
 }
 
 /**
  * Returns a pointer to an inode with inode_nr = i_num.
- * 
+ *
  * @param i_num The inode number of the inode
  * @return Pointer to the inode.
  */
 m_inode* get_inode(inode_nr i_num)
 {
-        for (int i = 0; i < NUM_INODES; i++){
-                if (inode_table[i].i_num == i_num){
+        for (int i = 0; i < NUM_INODES; i++) {
+                if (inode_table[i].i_num == i_num) {
                         return &inode_table[i];
                 }
         }
@@ -118,7 +118,7 @@ m_inode* get_inode(inode_nr i_num)
 
 /**
  * Read a inode from HD into a disk inode.
- * 
+ *
  * @param inode         destination
  * @param inode_blk     source block on HD
  */
@@ -129,14 +129,14 @@ void read_dinode(d_inode *inode, block_nr inode_blk)
 
 /**
  * Read a inode from HD into a memory inode.
- * 
+ *
  * @param inode         destination
  * @param inode_blk     source block on HD
  */
 void read_minode(m_inode *inode, block_nr inode_blk)
 {
         bzero(&d_inode_cache, sizeof(d_inode_cache));
-        
+
         read_dinode(&d_inode_cache, inode_blk);
         cpy_dinode_to_minode(inode, &d_inode_cache);
         inode->i_adr = inode_blk;
@@ -144,30 +144,30 @@ void read_minode(m_inode *inode, block_nr inode_blk)
 
 /**
  * Write a memory inode to disk.
- * 
+ *
  * @param inode         pointer to the memory inode which should be written
  * @return boolean      status of operation
  */
 void write_inode(m_inode *inode)
 {
         cpy_minode_to_dinode(&d_inode_cache, inode); //transform memory inode to a disk inode.
-        
+
         wrt_block(inode->i_adr, &d_inode_cache, sizeof(d_inode));
 }
 
 /**
  * Write all inodes from inode table to HD.
- */ 
+ */
 void write_inodes()
 {
-        for (int i = 0; i < NUM_INODES; i++){
+        for (int i = 0; i < NUM_INODES; i++) {
                 write_inode(&inode_table[i]);
         }
 }
 
 /**
  * Copy common content of a memory inode to a disk inode.
- * 
+ *
  * @param di    disk inode
  * @param mi    memory inode
  */
@@ -177,18 +177,18 @@ void cpy_minode_to_dinode(d_inode *di, m_inode *mi)
         di->i_size      = mi->i_size;
         di->i_create_ts = mi->i_create_ts;
         di->i_modify_ts = mi->i_modify_ts;
-        
-        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++) {
                 di->i_direct_pointer[i] = mi->i_direct_pointer[i];
         }
-        
+
         di->i_single_indirect_pointer = mi->i_single_indirect_pointer;
         di->i_double_indirect_pointer = mi->i_double_indirect_pointer;
 }
 
 /**
  * Copy common content of a disk inode to a memory inode.
- * 
+ *
  * @param mi    memory inode
  * @param di    disk inode
  */
@@ -198,8 +198,8 @@ void cpy_dinode_to_minode(m_inode *mi, d_inode *di)
         mi->i_size                      = di->i_size;
         mi->i_create_ts                 = di->i_create_ts;
         mi->i_modify_ts                 = di->i_modify_ts;
-        
-        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++) {
                 mi->i_direct_pointer[i] = di->i_direct_pointer[i];
         }
 
@@ -209,7 +209,7 @@ void cpy_dinode_to_minode(m_inode *mi, d_inode *di)
 
 /**
  * Create a new memory inode.
- * 
+ *
  * @param adr            block address
  * @param mode           DATA_FILE | DIRECTORY (@see fs_const.h)
  * @param to_inode_table should the new inode be inserted into the inode table?
@@ -218,7 +218,7 @@ void cpy_dinode_to_minode(m_inode *mi, d_inode *di)
 m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
 {
         m_inode *mi;
-        
+
         if (!to_inode_table) {
                 mi = mallocn(sizeof(m_inode), "new m_inode");
                 if (mi == NULL) {
@@ -228,44 +228,44 @@ m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
         } else {
                 mi = alloc_inode();
         }
-        
+
         mi->i_adr  = adr;
         mi->i_mode = mode;
         mi->i_size = 0;
-        
+
         mi->i_create_ts = time;
         mi->i_modify_ts = time;
-        
-        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++) {
                 mi->i_direct_pointer[i] = NULL;
         }
-        
+
         mi->i_single_indirect_pointer = NULL;
         mi->i_double_indirect_pointer = NULL;
-        
+
         return mi;
 }
 
 /**
  * Sets an inode as unused.
- * 
+ *
  * @param i_num The inode number
  */
 void free_inode(inode_nr i_num)
 {
-      m_inode *i = get_inode(i_num);
-      i->i_num = NIL_INODE;             //overwrite inode number with -1 -> "unused"
+        m_inode *i = get_inode(i_num);
+        i->i_num = NIL_INODE;             //overwrite inode number with -1 -> "unused"
 }
 
 /**
  * Returns an unused inode.
- * 
+ *
  * @return Pointer to the inode
  */
 m_inode* alloc_inode(void)
 {
-        for (int i = 0; i < NUM_INODES; i++){
-                if (inode_table[i].i_num == NIL_INODE){
+        for (int i = 0; i < NUM_INODES; i++) {
+                if (inode_table[i].i_num == NIL_INODE) {
                         inode_table[i].i_num = i;
                         return &inode_table[i];
                 }
@@ -277,17 +277,17 @@ m_inode* alloc_inode(void)
 
 /**
  * Print out a inode's attributes for debug purposes.
- * 
+ *
  * @param mi    inode to be printed
  */
 void dump_inode(m_inode *mi)
 {
-        fs_dprintf("[fs_inode_table] INODE: num = %d; adr = %d; sip = %d; dip = %d; mode = %d\n", 
-                 mi->i_num, mi->i_adr,
-                 mi->i_single_indirect_pointer,
-                 mi->i_double_indirect_pointer,
-                 mi->i_mode);
-        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+        fs_dprintf("[fs_inode_table] INODE: num = %d; adr = %d; sip = %d; dip = %d; mode = %d\n",
+                   mi->i_num, mi->i_adr,
+                   mi->i_single_indirect_pointer,
+                   mi->i_double_indirect_pointer,
+                   mi->i_mode);
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++) {
                 fs_dprintf("dp[%d] = %d; ", i, mi->i_direct_pointer[i]);
         }
         fs_dprintf("\n");
@@ -295,16 +295,16 @@ void dump_inode(m_inode *mi)
 
 /**
  * Print out a disk inode's attributes for debug purposes.
- * 
+ *
  * @param di    inode to be printed
  */
 void dump_dinode(d_inode *di)
 {
-        fs_dprintf("[fs_inode_table] INODE: sip = %d; dip = %d; mode = %d\n", 
-                 di->i_single_indirect_pointer,
-                 di->i_double_indirect_pointer,
-                 di->i_mode);
-        for (int i = 0; i < NUM_DIRECT_POINTER; i++){
+        fs_dprintf("[fs_inode_table] INODE: sip = %d; dip = %d; mode = %d\n",
+                   di->i_single_indirect_pointer,
+                   di->i_double_indirect_pointer,
+                   di->i_mode);
+        for (int i = 0; i < NUM_DIRECT_POINTER; i++) {
                 fs_dprintf("dp[%d] = %d; ", i, di->i_direct_pointer[i]);
         }
         fs_dprintf("\n");
@@ -315,7 +315,7 @@ void dump_dinode(d_inode *di)
  */
 void dump_inodes()
 {
-        for (int i = 0; i < NUM_INODES; i++){
+        for (int i = 0; i < NUM_INODES; i++) {
                 dump_inode(&inode_table[i]);
         }
 }

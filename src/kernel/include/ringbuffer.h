@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * 
+ *
  *
  * @author dbader
  * @author $LastChangedBy$
@@ -40,16 +40,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef struct {
         /** the data pointer */
         uint8  *data;
-        
+
         /** size of data (max value of len) */
         uint32  size;
-        
+
         /** read position */
         uint32  start;
-        
+
         /** write position */
         uint32  end;
-        
+
         /** number of used bytes */
         uint32  len;
 } ring_fifo;

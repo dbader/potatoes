@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Process management code that handles keyboard input. After a keypress an interrupt
  * is generated which gets handled by the I/O code. In io_keyboard.c the keyboard scancode
  * gets converted into an ascii character which is then given to pm_handle_input().
- * 
+ *
  * pm_handle_input() then writes the new character to the focussed process' stdin queue.
  * The respective process can then choose to read its stdin queue at any time via a call
- * to read(STDIN, &buf, len). 
+ * to read(STDIN, &buf, len).
  *
  * @author dbader
  * @author $LastChangedBy$
@@ -48,10 +48,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @param c input character
  */
 void pm_handle_input(char c)
-{       
+{
         if (focus_proc == NULL)
                 return;
-        
+
         if (rf_write(focus_proc->stdin, &c, sizeof(c)) != sizeof(c))
                 dprintf("error writing to stdin\n");
 }

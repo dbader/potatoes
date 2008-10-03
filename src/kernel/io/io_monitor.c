@@ -1,10 +1,10 @@
 /*
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Functions to print things on the monitor
- * 
+ *
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
  * @version $Rev$
@@ -60,26 +60,26 @@ void set_disp(uint32 addr)
 
 ///**
 // * Moves the cursor in the given direction
-// * 
+// *
 // * @param dir 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT
 // */
 //void cursor_move(uint8 dir)
 //{
 //        switch (dir){
-//        case 0: 
-//                charnum = (charnum + 2000 - 80) % 2000; 
+//        case 0:
+//                charnum = (charnum + 2000 - 80) % 2000;
 //                break;
-//        case 1: 
-//                charnum = (charnum + 80) % 2000; 
+//        case 1:
+//                charnum = (charnum + 80) % 2000;
 //                break;
-//        case 2: 
+//        case 2:
 //                charnum = (charnum - charnum % 80) + (charnum % 80 +80 - 1) % 80;
 //                break;
-//        case 3: 
+//        case 3:
 //                charnum = (charnum - charnum % 80) + (charnum +1) % 80;
 //                break;
 //        }
-//        disp = (uint16*)0xB8000 + charnum; 
+//        disp = (uint16*)0xB8000 + charnum;
 //        //Cursor update
 //        outb(0x3D4, 0x0E);
 //        outb(0x3D5, charnum >> 8);
@@ -88,7 +88,7 @@ void set_disp(uint32 addr)
 //}
 //
 ///**
-// * Initializes the monitor buffers. 
+// * Initializes the monitor buffers.
 // */
 //void monitor_init()
 //{
@@ -98,7 +98,7 @@ void set_disp(uint32 addr)
 ////        down_buffer_start = mallocn(io_bufsize, "scrolling buffer(down)");
 ////        ASSERT(down_buffer_start != NULL);
 ////        bzero(down_buffer_start, io_bufsize);
-//        
+//
 //        //disables the blinking mode
 //        inb(0x3DA);
 //        outb(0x3C0,0x10);
@@ -167,32 +167,32 @@ void set_disp(uint32 addr)
 
 /**
  *  Writes a colored character to the display.
- *  
+ *
  * @param ch character to be written
  * @param fg foreground-color
  * @param bg background color
- */	
+ */
 void monitor_cputc(char ch, uint8 fg, uint8 bg)
 {
-        uint32 i=0;
+        uint32 i = 0;
         uint32 temp;
         //if(charnum >= 1999)monitor_scroll(); //scroll, if outside of display-memory
-        switch(ch){
+        switch (ch) {
         case '\a':
                 monitor_invert();
                 sleep_ticks(15);
                 monitor_invert();
                 break;
         case '\n':
-                temp= 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
-                while(i++ < temp){ //calculating the "new line" starting position
-                        monitor_cputc(' ',fg,bg);
+                temp = 0x50 - (((uint32)disp - 0xB8000) % 0xA0) / 2;
+                while (i++ < temp) { //calculating the "new line" starting position
+                        monitor_cputc(' ', fg, bg);
                 }
                 break;
         case '\t':
                 temp = 0x8 - (((uint32)disp - 0xB8000) % 0x10) / 2;
-                while(i++ < temp){ //calculating the "next tab" starting position
-                        monitor_cputc(' ',fg,bg);
+                while (i++ < temp) { //calculating the "next tab" starting position
+                        monitor_cputc(' ', fg, bg);
                 }
                 break;
         case '\b':
@@ -213,14 +213,14 @@ void monitor_cputc(char ch, uint8 fg, uint8 bg)
 
 /**
  *  Writes a colored null-terminated string to the display.
- * 
+ *
  * @param *str pointer to the string
  * @param fg foreground-color
  * @param bg background color
  */
 void monitor_cputs(char *str, uint8 fg, uint8 bg)
 {
-        while(*str!=0){
+        while (*str != 0) {
                 monitor_cputc(*str, fg, bg);
                 str += 1;
         }
@@ -228,7 +228,7 @@ void monitor_cputs(char *str, uint8 fg, uint8 bg)
 
 /**
  * Writes a character to the display.
- * 
+ *
  * @param ch character to be written
  */
 void monitor_putc(char ch)
@@ -238,7 +238,7 @@ void monitor_putc(char ch)
 
 /**
  * Writes a null-terminated string to the display.
- * 
+ *
  * @param *str pointer to the string
  */
 void monitor_puts(char *str)
@@ -248,22 +248,24 @@ void monitor_puts(char *str)
 
 /**
  * Writes an integer to the display.
- * 
+ *
  * @param x integer to be written
  */
 void monitor_puti(sint32 x)
 {
-        int div=1000000000;
-        if(x < 0){
-                monitor_cputc('-',RED,BLACK);
+        int div = 1000000000;
+        if (x < 0) {
+                monitor_cputc('-', RED, BLACK);
                 x = -x;
+        } else if (x == 0) {
+                monitor_cputc('0', RED, BLACK);
+                return;
         }
-        else if (x == 0) {monitor_cputc('0',RED,BLACK); return;}
-        while(div > x)
+        while (div > x)
                 div /= 10;
-        while(div > 0){
-                monitor_cputc((uint8)(x / div + 48),RED,BLACK);
-                x%=div;
+        while (div > 0) {
+                monitor_cputc((uint8)(x / div + 48), RED, BLACK);
+                x %= div;
                 div /= 10;
         }
         monitor_putc('\n');
@@ -271,21 +273,21 @@ void monitor_puti(sint32 x)
 
 /**
  * Writes a hex-byte to the display.
- * 
+ *
  * @param ch character to be written
  */
 void monitor_puthex(uint8 ch)
 {
         uint8 low = ch % 16;
-        uint8 high = ch / 16;  
-        if(high>9)
-                monitor_cputc((high + 55),GREEN,BLACK);
+        uint8 high = ch / 16;
+        if (high > 9)
+                monitor_cputc((high + 55), GREEN, BLACK);
         else
-                monitor_cputc((high + 48),GREEN,BLACK);
-        if(low>9)
-                monitor_cputc((low + 55),GREEN,BLACK);
+                monitor_cputc((high + 48), GREEN, BLACK);
+        if (low > 9)
+                monitor_cputc((low + 55), GREEN, BLACK);
         else
-                monitor_cputc((low + 48),GREEN,BLACK);
+                monitor_cputc((low + 48), GREEN, BLACK);
 }
 
 /**
@@ -293,6 +295,6 @@ void monitor_puthex(uint8 ch)
  */
 void monitor_invert()
 {
-        for(uint8 *temp = (uint8*)0xB8001; (uint32)temp < 0xB8FA0; temp+=2)
-                *temp = 0xFF - *temp;
+        for (uint8 *temp = (uint8*)0xB8001; (uint32)temp < 0xB8FA0; temp += 2)
+                * temp = 0xFF - *temp;
 }

@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  * This contains all the syscall definitions for the "client" side. Every etiOS userspace
  * program needs this file to make system calls.
- * 
+ *
  * Most of the code here consists of simple stubs which convert between the function's
  * arguments and the argument format expected by the kernel.
- * 
- * See syscalls_shared.h for the definitions of the argument data structures (sc_XXX_args_t). 
+ *
+ * See syscalls_shared.h for the definitions of the argument data structures (sc_XXX_args_t).
  *
  * @author dbader
  * @author $LastChangedBy$
@@ -46,8 +46,8 @@ void _log(char* msg)
 void _exit(int status)
 {
         _syscall(SYS_EXIT, (void*)status);
-        
-        // Never return. 
+
+        // Never return.
         WAIT_FOR_INTERRUPT();
 }
 

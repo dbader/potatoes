@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,14 +21,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Basic buffer functions.
  * Types of temporary buffers used:
- * 
+ *
  * 1) current_block_buffer
  * 2) write_pre_cache_buffer
  * 3) current_indirect_adr_buffer
- * 
+ *
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Clears a struct of type 'block_cache'.
- * 
+ *
  * @param cache Pointer to a cache
  */
 void clear_cache(block_cache *cache)
@@ -56,7 +56,7 @@ void clear_cache(block_cache *cache)
 
 /**
  * Clears a array of bytes = a buffer.
- * 
+ *
  * @param Pointer to the array/buffer
  */
 void clear_buffer(uint8 buffer[BLOCK_SIZE])

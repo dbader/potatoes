@@ -1,10 +1,10 @@
 /* $Id: pong.c 195 2008-08-29 22:54:26Z dtraytel $
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Pong game.
  *
  * @author Daniel Bader
@@ -44,58 +44,58 @@ bool keydown(char key, int fd)
         return (keystate[key]);
 }
 
-void shell_cmd_pong(int argc, char *argv[]) 
-{       
+void shell_cmd_pong(int argc, char *argv[])
+{
         bool multiplayer = (argc > 1 && !strcmp(argv[1], "-2p"));
-        
+
         if (!multiplayer) {
-                _printf("+++ P O N G +++\n\nControl your paddle with the cursor UP and DOWN keys\n" 
-                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                                "To play a two player game run \"pong -2p\"\n"
-                                "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
+                _printf("+++ P O N G +++\n\nControl your paddle with the cursor UP and DOWN keys\n"
+                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                        "To play a two player game run \"pong -2p\"\n"
+                        "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
         } else {
                 _printf("+++ P O N G +++\n\nMULTIPLAYER MODE\n\n"
-                                "Controls for player one (blue):\n"
-                                "\tPaddle up = A\n"
-                                "\tPaddle down = S\n\n"
-                                "Controls for player two (red):\n"
-                                "\tPaddle up = K\n"
-                                "\tPaddle down = L\n\n"
-                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                                "HAVE FUN!\n\n\n[Press any key to start playing]\n");
+                        "Controls for player one (blue):\n"
+                        "\tPaddle up = A\n"
+                        "\tPaddle down = S\n\n"
+                        "Controls for player two (red):\n"
+                        "\tPaddle up = K\n"
+                        "\tPaddle down = L\n\n"
+                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                        "HAVE FUN!\n\n\n[Press any key to start playing]\n");
         }
         _fgetch(STDIN);
-        
+
         // the backbuffer
         uint8 bbuf[25 * 80];
-        
+
         int fd = _open("/dev/framebuffer", 0, 0);
         int keyboard = _open("/dev/keyboard", 0, 0);
-        
+
         // ball position
         int ball_x = 4000;
         int ball_y = 1200;
-        
+
         // ball velocity
         int ball_vel_x = 50;
         int ball_vel_y = 0;
-        
+
         // player paddle
         int l_paddle_y = 10;
         int r_paddle_y = 10;
-        
+
         // scores
         int player_score = 0;
         int cpu_score = 0;
-        
+
         int frame = 0;
-        
+
         // The rendering loop
         while (!keydown(ESCAPE, keyboard)) {
                 // Game over check
-                if (player_score > 9 || cpu_score > 9) 
+                if (player_score > 9 || cpu_score > 9)
                         break;
-                
+
                 // Player input
                 if (!multiplayer) {
                         if (keydown(CURSOR_UP, keyboard)) l_paddle_y--;
@@ -105,7 +105,7 @@ void shell_cmd_pong(int argc, char *argv[])
                         if (keydown(KEY_S, keyboard)) l_paddle_y++;
                 }
                 LIMIT(l_paddle_y, 0, 20);
-                
+
                 // CPU player update
                 if (!multiplayer) {
                         // select cpu think penalty depending on the
@@ -113,9 +113,9 @@ void shell_cmd_pong(int argc, char *argv[])
                         // its strength to the player's skill.
                         int fskip = cpu_score - player_score;
                         LIMIT(fskip, 2, 9);
-                        
+
                         if (ball_x > 7500) {  // cpu quick reaction distance
-                                if (ball_y / 100 < r_paddle_y + 2) 
+                                if (ball_y / 100 < r_paddle_y + 2)
                                         r_paddle_y--;
                                 else if (ball_y / 100 > r_paddle_y + 2)
                                         r_paddle_y++;
@@ -129,17 +129,17 @@ void shell_cmd_pong(int argc, char *argv[])
                         if (keydown(KEY_L, keyboard)) r_paddle_y++;
                 }
                 LIMIT(r_paddle_y, 0, 20);
-                
+
                 // Move ball
                 ball_x += ball_vel_x;
                 ball_y += ball_vel_y;
                 LIMIT(ball_x, 0, 7900);
                 LIMIT(ball_y, 0, 2400);
-                
+
                 // Ceiling hit / Floor hit
                 if (ball_y == 0 || ball_y == 2400)
                         ball_vel_y = -ball_vel_y;
-                
+
                 // Paddle hit
                 if (ball_x <= 0) {
                         if (HIT_PADDLE(l_paddle_y, ball_y / 100)) {
@@ -166,18 +166,18 @@ void shell_cmd_pong(int argc, char *argv[])
                                 ball_vel_y = 0;
                         }
                 }
-                
+
                 // Clear the backbuffer
                 memset(bbuf, BLACK, sizeof(bbuf));
-        
+
                 // Draw score
-                DRAW_GLYPH(34,0,player_score, BLUE);
-                DRAW_GLYPH(41,0,cpu_score, RED);
-                
+                DRAW_GLYPH(34, 0, player_score, BLUE);
+                DRAW_GLYPH(41, 0, cpu_score, RED);
+
                 // Draw center line
                 for (int y = 0; y < 25; y += 2)
                         SET_PIXEL(39, y, WHITE);
-                
+
                 // Draw the ball and paddles
                 SET_PIXEL(ball_x / 100, ball_y / 100, YELLOW);
                 DRAW_PADDLE(0, l_paddle_y, BLUE);
@@ -188,12 +188,12 @@ void shell_cmd_pong(int argc, char *argv[])
                 halt();
                 frame++;
         }
-        
+
         _close(fd);
         _close(keyboard);
-        
+
         _printf("Game over.\nPlayer score: %d\nCPU score: %d\n", player_score, cpu_score);
-        
+
         //flush stdin
         char ch;
         while (_read(STDIN, &ch, sizeof(ch)) != 0) ;

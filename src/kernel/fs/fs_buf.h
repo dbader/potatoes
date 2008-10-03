@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Basic buffer/cache definitions.
- * 
+ *
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
@@ -65,7 +65,7 @@ m_inode m_inode_cache;
 
 /**
  * A directory cache.
- * 
+ *
  * (4 bytes for block_nr, NAME_SIZE bytes for the name)
  */
 dir_entry dir_cache[DIR_ENTRIES_PER_BLOCK];

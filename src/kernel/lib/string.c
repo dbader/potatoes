@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Basic functions for string manipulation.
  *
  * @author Dmitriy Traytel
@@ -52,9 +52,9 @@ uint32 strlen(char* str)
  * @see strncpy
  * @param dest Destination string
  * @param src Source string
- * @return dest, the destination string 
+ * @return dest, the destination string
  */
-char* strcpy(char *dest, char *src) 
+char* strcpy(char *dest, char *src)
 {
         char *ret = dest;
         while (*src != '\0')
@@ -72,7 +72,7 @@ char* strcpy(char *dest, char *src)
  * @param n Number of bytes to copy at most
  * @return dest, the destination string
  */
-char* strncpy(char *dest, char *src, size_t n) 
+char* strncpy(char *dest, char *src, size_t n)
 {
         char *ret = dest;
         while (n-- > 0) {
@@ -89,7 +89,7 @@ char* strncpy(char *dest, char *src, size_t n)
  * The terminating \\0 character is considered to be part of the string.
  * @param str the string to search
  * @param ch the character to look for
- * @return the first occurence of ch in str or NULL if not found 
+ * @return the first occurence of ch in str or NULL if not found
  */
 char* strchr(char *str, char ch)
 {
@@ -111,7 +111,7 @@ char* strchr(char *str, char ch)
 char* strdup(char* str)
 {
         char *ret = (char*)mallocn(strlen(str) + 1, "strdup()");
-               
+
         if (ret == NULL)
                 return NULL;
         else
@@ -119,7 +119,7 @@ char* strdup(char* str)
 }
 
 /**
- * Concatenates two strings by appending a copy of s2 to the end of s1. 
+ * Concatenates two strings by appending a copy of s2 to the end of s1.
  * @param s1 the "head"
  * @param s2 the "tail"
  * @return the concatenated string
@@ -130,7 +130,7 @@ char* strcat(char *s1, char *s2)
 }
 
 /**
- * Concatenates two strings by appending a copy of s2 to the end of s1. 
+ * Concatenates two strings by appending a copy of s2 to the end of s1.
  * Not more than n characters are copied from s2.
  * @param s1 the "head"
  * @param s2 the "tail"
@@ -139,15 +139,15 @@ char* strcat(char *s1, char *s2)
  */
 char* strncat(char *s1, char *s2, size_t n)
 {
-        return strncpy(strchr(s1, '\0'), s2, n);        
+        return strncpy(strchr(s1, '\0'), s2, n);
 }
 
 /**
  * Tokenizes a string. Take note that strsep() will manipulate both the string pointer
  * **str_ptr points at as well as the contents of the respective string.
- *  
+ *
  * Example:
- * 
+ *
  *      char path[] = "/usr/share/bin/editor";<p>
  *      char delim[] = "/";<p>
  *      char *tok;<p>
@@ -165,10 +165,10 @@ char* strncat(char *s1, char *s2, size_t n)
  *      puts("done.");<p>
  *
  *      free(copy);<p>
- * 
+ *
  * @bug The current implementation does not handle multiple delimiters (as specified in the
  *      libc manual). Only the first character in *delims is used for tokenizing the input string.
- * 
+ *
  * @param str_ptr Pointer to string to tokenize
  * @param delims String containing all delimiter characters
  * @return The next token or NULL if the end of the input string was reached
@@ -176,30 +176,30 @@ char* strncat(char *s1, char *s2, size_t n)
 char* strsep(char **str_ptr, char *delims)
 {
         //printf("strsep(\"%s\") ", *str_ptr);
-        
+
         if (*str_ptr == NULL)
                 return NULL;
-        
-        char *ret = *str_ptr;      
+
+        char *ret = *str_ptr;
         char *offs = strchr(*str_ptr, *delims);
-        
+
         if (offs == NULL) {
                 *str_ptr = NULL;
                 return ret;
         }
-        
+
         //printf("offs = '%s'\n", offs);
-        
+
         *offs = '\0';
         *str_ptr = offs + 1;
-        
+
         return ret;
 }
 
 /**
  * Compares two strings.
  * @param s1 String
- * @param s2 String 
+ * @param s2 String
  * @return 0 if both strings are equal, >0 if s1 greater than s2, <0 if s1 is less than s2
  */
 sint32 strcmp(char *s1, char *s2)
@@ -220,7 +220,7 @@ sint32 strcmp(char *s1, char *s2)
  * @param count Number of bytes to write
  * @return dest, the destination memory
  */
-void* memset(void *dest, uint8 value, size_t count) 
+void* memset(void *dest, uint8 value, size_t count)
 {
         void *ret = dest;
         for (int i = 0; i < count; i++)
@@ -251,7 +251,7 @@ void* memcpy(void *dest, void *src, size_t count)
 {
         void *ret = dest;
         for (int i = 0; i < count; i++)
-        *((uint8*)dest++) = *((uint8*)src++);
+                *((uint8*)dest++) = *((uint8*)src++);
 
         return ret;
 }
@@ -273,9 +273,9 @@ void* memmove(void *dest, void *src, size_t count)
 
         memcpy(temp, src, count);
         memcpy(dest, temp, count);
-        
+
         free(temp);
-        
+
         return dest;
 }
 
@@ -306,36 +306,36 @@ char* strreverse(char *str)
  * and take into account future format changes).
  * In other, GAD inspired words:
  * bufsize >= ceil(log2(MAX_INT)) which is equal to: bufsize >= sizeof(int) * 8
- * 
+ *
  * This is not a part of the C standard library.
- * 
+ *
  * @param n the number to convert
  * @param str the target string buffer
  * @param base the base to use for the conversion
  * @return The original value of str
  */
 char* itoa(int n, char *str, unsigned int base)
-{      
+{
         char *ret = str;
         bool neg = FALSE;
-        
+
         /* Treat negative base 10 integers specially. */
         if (base == 10 && n < 0) {
                 *str++ = '-';
                 n = -n;
                 neg = TRUE;
         }
-        
+
         /* Convert to unsigned to get proper two's complement hex strings. */
         unsigned int num = n;
-        
+
         do {
                 int rem = num % base;
                 *str++ = rem < 10 ? '0' + rem : 55 + rem;
         } while (num /= base);
-        
+
         *str = '\0';
-        
+
         /* Do not change the position of the minus sign. */
         if (neg) {
                 strreverse(++ret);

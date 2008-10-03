@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WAIT_FOR_INTERRUPT() __asm__("hlt");
 
 /* These are readable definitions of the syscall ids. */
-#define SYS_LOG         0 
+#define SYS_LOG         0
 #define SYS_EXIT        1
 #define SYS_GETPID      2
 #define SYS_OPEN        3
@@ -83,7 +83,7 @@ typedef struct sc_read_write_args_t {
 
 /** Arguments for the SEEK syscall. */
 typedef struct sc_seek_args_t {
-        int pos; // return value  
+        int pos; // return value
         int fd;
         int offset;
         int whence;

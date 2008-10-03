@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * 
+ *
  *
  * @author dbader
  * @author $LastChangedBy$
@@ -44,7 +44,7 @@ typedef struct {
         unsigned int gs, fs, es, ds;
         unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
         unsigned int int_no, err_code;
-        unsigned int eip, cs, eflags, useresp, ss;    
+        unsigned int eip, cs, eflags, useresp, ss;
 } /*__attribute__((__packed__))*/ cpu_state_t;
 
 #define PSTATE_ALIVE 0
@@ -57,38 +57,38 @@ typedef struct {
 typedef struct process_t {
         /** process name */
         char *name;
-        
+
         /** process id */
         uint32 pid;
-        
-        /** process state: running, dead, ... */ 
+
+        /** process state: running, dead, ... */
         uint8 state;
-        
+
         /** the memory area which constitutes the stack */
         uint32 context;
-        
+
         /** pointer to the beginning of the memory that holds the stack */
         void *stack_start;
-        
+
         /** memory address */
         void *addr;
-        
+
         /** process timeslice */
         uint32 timeslice;
-        
+
         /** STDIN queue */
         ring_fifo *stdin;
-        
+
         /** process file table */
         proc_file pft[NUM_PROC_FILES];
-        
+
         virt_monitor *vmonitor;
-        
+
         /* xxx *stdout */
         /* llist *mem_blocks; */
-     
+
         /** linked list next ptr */
-        struct process_t *next; 
+        struct process_t *next;
 } process_t;
 
 #define STDIN_QUEUE_SIZE 512

@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -45,18 +45,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ring_fifo* rf_alloc(uint32 size)
 {
         ring_fifo *fifo = (ring_fifo*) malloc(sizeof(ring_fifo));
-        
+
         if (fifo == NULL)
                 return NULL;
-        
+
         fifo->size = size;
         fifo->data = (uint8*) malloc(size);
-        
+
         if (fifo->data == NULL)
                 return NULL;
-        
+
         rf_clear(fifo);
-        
+
         return fifo;
 }
 
@@ -139,7 +139,7 @@ void rf_dump(ring_fifo *fifo)
 {
         ASSERT(fifo != NULL)
         printf("ring_fifo @ %p:\n\tdata = %p\n\tsize = %d\n\tstart = %d\n\tend = %d\n\tlen = %d\n",
-                        fifo, fifo->data, fifo->size, fifo->start, fifo->end, fifo->len);
+               fifo, fifo->data, fifo->size, fifo->start, fifo->end, fifo->len);
 }
 
 /**
@@ -151,25 +151,25 @@ void rf_dump(ring_fifo *fifo)
  * @return Number of bytes written, -1 on error.
  */
 sint32 rf_write(ring_fifo *fifo, uint8 *buf, uint32 count)
-{       
+{
         if (fifo == NULL || buf == NULL)
-                        return -1;
-        
+                return -1;
+
         sint32 written = 0;
-        
+
         while (count-- > 0) {
                 if (fifo->len == fifo->size) {
                         printf("rf_write: buffer is full.");
                         return written;
-                } 
-                
+                }
+
                 fifo->data[fifo->end] = *buf++;
                 fifo->end = (fifo->end + 1) % fifo->size;
                 fifo->len++;
                 written++;
         }
-        
-        return written;        
+
+        return written;
 }
 
 /**
@@ -184,9 +184,9 @@ sint32 rf_read(ring_fifo *fifo, uint8 *buf, uint32 count)
 {
         if (fifo == NULL || buf == NULL)
                 return -1;
-        
+
         sint32 read = 0;
-        
+
         while (count-- > 0) {
                 if (fifo->len == 0) {
                         return read;
@@ -197,6 +197,6 @@ sint32 rf_read(ring_fifo *fifo, uint8 *buf, uint32 count)
                 fifo->len--;
                 read++;
         }
-        
+
         return read;
 }

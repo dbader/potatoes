@@ -32,12 +32,12 @@ int dev_clock_seek(void *dev, int fd, int offset, int whence)
 }
 
 device_t dev_clock = {
-                "/dev/clock",    // name
-                6,              // fd
-                NULL,           // data
-                dev_clock_open,
-                dev_clock_close,
-                dev_clock_read,
-                dev_clock_write,
-                dev_clock_seek
+        "/dev/clock",    // name
+        6,              // fd
+        NULL,           // data
+        dev_clock_open,
+        dev_clock_close,
+        dev_clock_read,
+        dev_clock_write,
+        dev_clock_seek
 };

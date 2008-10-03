@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ extern void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg);
  * P=segment present? DPL=descriptor priveledge level      *
  ***********************************************************/
 
-void isr_init() 
+void isr_init()
 {
         idt_fill_entry(0, (uint32)isr0, 0x8, 0x8E);
         idt_fill_entry(1, (uint32)isr1, 0x8, 0x8E);
@@ -113,39 +113,39 @@ void isr_init()
 }
 
 char *ex_messages[] = {
-                "division by zero",
-                "debug",
-                "not maskable interrupt",
-                "breakpoint",
-                "overflow",
-                "out of bounds",
-                "invalid opcode",
-                "no coprocessor",
-                "double fault",
-                "coprocessor segment overrun",
-                "bad tss",
-                "segment not present",
-                "stack fault",
-                "general protection",
-                "page fault",
-                "unknown interrupt",
-                "coprocessor fault",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",       
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved",
-                "reserved"       
+        "division by zero",
+        "debug",
+        "not maskable interrupt",
+        "breakpoint",
+        "overflow",
+        "out of bounds",
+        "invalid opcode",
+        "no coprocessor",
+        "double fault",
+        "coprocessor segment overrun",
+        "bad tss",
+        "segment not present",
+        "stack fault",
+        "general protection",
+        "page fault",
+        "unknown interrupt",
+        "coprocessor fault",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved"
 };
 
 void isr_handler(cpu_state_t *cpu_state)

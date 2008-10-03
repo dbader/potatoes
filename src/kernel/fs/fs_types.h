@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Basic type definitions. This file defines basic data types used
  * throughout the file system. You should use these types whenever possible
  * in order to avoid the possible ambiguity of the builtin types.
@@ -45,7 +45,7 @@ typedef sint16 file_nr;
 /**
  * The directory entry.
  */
-typedef struct dir_entry{
+typedef struct dir_entry {
         block_nr inode;
         char name[NAME_SIZE];
 } dir_entry;
@@ -54,12 +54,12 @@ typedef struct dir_entry{
 /**
  * The inode on disk.
  */
-typedef struct d_inode{
+typedef struct d_inode {
         uint16 i_mode;                          /* file | directory */
         uint32 i_size;                          /* in byte */
         time_t i_create_ts;
         time_t i_modify_ts;
-        block_nr i_direct_pointer[NUM_DIRECT_POINTER]; 
+        block_nr i_direct_pointer[NUM_DIRECT_POINTER];
         block_nr i_single_indirect_pointer;
         block_nr i_double_indirect_pointer;
 } d_inode;
@@ -68,7 +68,7 @@ typedef struct d_inode{
 /**
  * The inode in memory.
  */
-typedef struct m_inode{
+typedef struct m_inode {
         inode_nr i_num;
         block_nr i_adr;
         uint16 i_mode;
@@ -84,7 +84,7 @@ typedef struct m_inode{
 /**
  * The global file descriptor.
  */
-typedef struct file{
+typedef struct file {
         file_nr f_desc;                         /* file (f) descriptor */
         m_inode *f_inode;
         char *f_name;                           /* pointer to absolute file path */
@@ -95,7 +95,7 @@ typedef struct file{
 /**
  * The process file descriptor.
  */
-typedef struct proc_file{
+typedef struct proc_file {
         file_nr pf_desc;                        /* process file (pf) descriptor */
         file_nr pf_f_desc;                      /* pointer to global file descriptor */
         uint32 pf_pos;                          /* position in file */
@@ -105,7 +105,7 @@ typedef struct proc_file{
 /**
  * A buffer for one block.
  */
-typedef struct block_buffer{
+typedef struct block_buffer {
         block_nr block_nr;
         uint8 cache[BLOCK_SIZE];                /* BLOCK_SIZE * 1 byte = BLOCK_SIZE byte space for block content */
 } block_buffer;
@@ -113,7 +113,7 @@ typedef struct block_buffer{
 
 /**
  * The cache for one generic block.
- */  
+ */
 typedef block_buffer block_cache;
 
 

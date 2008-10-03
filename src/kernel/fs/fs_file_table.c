@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * The file descriptor table functions.
  *
  * @author Vincenz Doelle
@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void init_file_table()
 {
-        for(int i = 0; i < NUM_FILES; i++){
+        for (int i = 0; i < NUM_FILES; i++) {
                 gft[i].f_desc = NIL_FILE;               //desc = NIL_FILE = -1 => desc not assigned => file not used
         }
 }
@@ -57,79 +57,79 @@ void init_file_table()
 void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 {
         fs_dprintf("[fs_file_table] initialize proc_file_table at 0x%d\n", pft);
-        for(int i = 0; i < NUM_PROC_FILES; i++){
+        for (int i = 0; i < NUM_PROC_FILES; i++) {
                 pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
         }
 }
 
 /**
  * Insert a new file to the global filp table.
- * 
+ *
  * @return the assigned file descriptor
  */
 file_nr insert_file(m_inode *inode, char *name, uint8 mode)
 {
         name = strdup(name);
-        
+
         file_nr old = name2desc(name);          //exists a file with the same path already?
-        if (old != NOT_FOUND){
+        if (old != NOT_FOUND) {
                 //inc_count(old);                 //increment reference counter
                 fs_dprintf("[fs_file_table] file already exists. returned old FD.\n");
                 free(name);
                 return old;
         }
-                
+
         file *fd = alloc_file();
-        
-        if (fd == (file*) NULL){
+
+        if (fd == (file*) NULL) {
                 fs_dprintf("[fs_file_table] new file could not be allocated!\n");
                 free(name);
                 return NOT_POSSIBLE;
         }
 
         fd->f_inode = inode;
-        fd->f_name  = name; 
+        fd->f_name  = name;
         fd->f_mode  = mode;
-        
+
         return fd->f_desc;
 }
 
 
 /**
  * Insert a new file to a given process filp table.
- * 
+ *
  * @return fd   assigned file descriptor
  */
 file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length: NUM_PROC_FILES
 {
         proc_file *fd = alloc_proc_file(pft);
-        
-        if (fd == (proc_file *) NULL){
+
+        if (fd == (proc_file *) NULL) {
                 fs_dprintf("allocation of new proc_file not possible!\n");
                 return NOT_POSSIBLE;
         }
-        
+
         fd->pf_f_desc = glo_fd;
         fd->pf_pos    = 0;
-        
+
         file *f = get_file(glo_fd);
-        
-        if (f != (file *) NULL){
+
+        if (f != (file *) NULL) {
                 inc_count(glo_fd);
         }
-        
+
         return fd->pf_desc;
 }
 
 /**
  * Allocate an unused file in the global file table.
- * 
+ *
  * @return pointer to the allocated file
  */
 file* alloc_file()
 {
-        for(int i = 0; i < NUM_FILES; i++){
-                if (gft[i].f_desc == NIL_FILE){
+        for (int i = 0; i < NUM_FILES; i++) {
+                if (gft[i].f_desc == NIL_FILE) {
                         gft[i].f_desc = i;
                         gft[i].f_count = 0;
                         return &gft[i];
@@ -140,13 +140,13 @@ file* alloc_file()
 
 /**
  * Allocate an unused file in the process file table.
- * 
+ *
  * @return Pointer to the allocated file
  */
 proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES])
 {
-        for(int i = 0; i < NUM_PROC_FILES; i++){
-                if (pft[i].pf_desc == NIL_PROC_FILE){
+        for (int i = 0; i < NUM_PROC_FILES; i++) {
+                if (pft[i].pf_desc == NIL_PROC_FILE) {
                         pft[i].pf_desc = i;
                         return &pft[i];
                 }
@@ -156,49 +156,49 @@ proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES])
 
 /**
  * Find a file in the global file table
- * 
+ *
  * @return Pointer to the found file
  */
 
 file* get_file(file_nr fd)
 {
-        for (int i = 0; i < NUM_FILES; i++){
+        for (int i = 0; i < NUM_FILES; i++) {
                 if ( gft[i].f_desc == fd )
                         return &gft[i];
-        } 
-               
-        return (file *) NULL;  
+        }
+
+        return (file *) NULL;
 }
 
 /**
  * Find a file in the process file table.
- * 
+ *
  * @return pointer to the file found
  */
 proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
 {
-        for (int i = 0; i < NUM_PROC_FILES; i++){
+        for (int i = 0; i < NUM_PROC_FILES; i++) {
                 if ( pft[i].pf_desc == fd )
                         return &pft[i];
-        } 
-               
-        return (proc_file *) NULL;  
+        }
+
+        return (proc_file *) NULL;
 }
 
 /**
  * Reset a file. Free memory if possible.
- * 
+ *
  * @param fd    file descriptor
  */
 void free_file(file_nr fd)
 {
         file *f = get_file(fd);
         f->f_count--;
-        if (f->f_count == 0){
+        if (f->f_count == 0) {
                 f->f_desc = NIL_FILE;
                 free(f->f_name);
                 f->f_name = (char *) NULL;
-                
+
                 if (f->f_inode->i_adr != ROOT_INODE_BLOCK)
                         free_inode(f->f_inode->i_num);
         }
@@ -206,14 +206,14 @@ void free_file(file_nr fd)
 
 /**
  * Reset a process file.
- * 
+ *
  * @param pft   process file table
  * @param fd    the file
  */
 void free_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
 {
         proc_file *pf = get_proc_file(pft, fd);
-        
+
         pf->pf_desc = NIL_PROC_FILE;
         pf->pf_pos = 0;
         pf->pf_f_desc = NIL_FILE;
@@ -221,7 +221,7 @@ void free_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
 
 /**
  * Increment the reference counter of a file.
- * 
+ *
  * @param fd    file descriptor
  */
 void inc_count(file_nr fd)
@@ -231,7 +231,7 @@ void inc_count(file_nr fd)
 }
 
 /**
- * Move file position to current file position + offset. 
+ * Move file position to current file position + offset.
  *
  * @param pft    process file table
  * @param fd     file descriptor
@@ -246,43 +246,43 @@ void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 orig
 
 /**
  * Find the descriptor of a file with the file name.
- * 
+ *
  * @param name  file name
  * @return fd   found file descriptor
  */
 file_nr name2desc(char *name) //in global filp table
-{ 
-        for (int i = 0; i < NUM_FILES; i++){
+{
+        for (int i = 0; i < NUM_FILES; i++) {
                 //fs_dprintf("%s on 0x%d\n\n", gft[i].f_name, &gft[i].f_name);
-                if (gft[i].f_name != (char *) NULL && strcmp(name, gft[i].f_name) == 0) { 
+                if (gft[i].f_name != (char *) NULL && strcmp(name, gft[i].f_name) == 0) {
                         fs_dprintf("[fs_file_table] %s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
                         return gft[i].f_desc;
                 }
-        } 
-        
-        return NOT_FOUND; 
+        }
+
+        return NOT_FOUND;
 }
 
 /**
  * Find the descriptor of a file via its inode (number).
- * 
+ *
  * @param  inode  the file's inode
  * @return fd     found file descriptor
  */
 file_nr inode2desc(m_inode *inode)
 {
-        for (int i = 0; i < NUM_FILES; i++){
-                if ( inode->i_num == ((m_inode *)(gft[i].f_inode))->i_num ){
+        for (int i = 0; i < NUM_FILES; i++) {
+                if ( inode->i_num == ((m_inode *)(gft[i].f_inode))->i_num ) {
                         return gft[i].f_desc;
                 }
-        } 
-               
-        return NOT_FOUND; 
+        }
+
+        return NOT_FOUND;
 }
 
 /**
  * Look whether the global file table contains a special file descriptor.
- * 
+ *
  * @return operation status
  */
 bool contains_file(file_nr fd)
@@ -292,7 +292,7 @@ bool contains_file(file_nr fd)
 
 /**
  * Check whether a file descriptors belong to a directory.
- * 
+ *
  * @param fd    file descriptor
  * @return      belongs to a directory?
  */
@@ -305,40 +305,42 @@ bool is_directory(file_nr fd)
 
 /**
  * Print out a file for debug purposes.
- * 
+ *
  * @param f     file to be printed
  */
 void dump_file(file *f)
 {
         fs_dprintf("[fs_file_table] FILE: '%s': f_desc = %d; f_inode (nr)= %d; f_count = %d; f_mode = %d\n",
-                 f->f_name, f->f_desc, (f->f_inode)->i_num, f->f_count, f->f_mode);
+                   f->f_name, f->f_desc, (f->f_inode)->i_num, f->f_count, f->f_mode);
 }
 
 /**
  * Print out file table for debug purposes.
  */
-void dump_files(){
-        for (int i = 0; i < NUM_FILES; i++){
+void dump_files()
+{
+        for (int i = 0; i < NUM_FILES; i++) {
                 dump_file(&gft[i]);
         }
 }
 
 /**
  * Print out a process file for debug purposes.
- * 
+ *
  * @param pf     file to be printed
  */
 void dump_proc_file(proc_file *pf)
 {
         fs_dprintf("[fs_file_table] PROC_FILE: pf_desc = %d; pf_f_desc %d; pf_pos = %d\n",
-                 pf->pf_desc, pf->pf_f_desc, pf->pf_pos);
+                   pf->pf_desc, pf->pf_f_desc, pf->pf_pos);
 }
 
 /**
  * Print out process file table for debug purposes.
  */
-void dump_proc_files(proc_file pft[NUM_PROC_FILES]){
-        for (int i = 0; i < NUM_PROC_FILES; i++){
+void dump_proc_files(proc_file pft[NUM_PROC_FILES])
+{
+        for (int i = 0; i < NUM_PROC_FILES; i++) {
                 dump_proc_file(&pft[i]);
         }
 }

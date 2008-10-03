@@ -1,10 +1,10 @@
 /* $Id: snake.c 195 2008-08-29 22:54:26Z dtraytel $
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Snake game.
  *
  * @author Dmitriy Traytel
@@ -75,30 +75,30 @@ bool body_collision(ring_fifo *snake, uint16 pos)
         return FALSE;
 }
 
-void shell_cmd_snake(int argc, char *argv[]) 
-{       
+void shell_cmd_snake(int argc, char *argv[])
+{
         bool multiplayer = (argc > 1 && !strcmp(argv[1], "-2p"));
 
         if (!multiplayer) {
                 _printf("+++ S N A K E +++\n\n"
-                                "Control your snake with the cursor UP, DOWN, LEFT & RIGHT keys\n" 
-                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                                "To play a two player game run \"snake -2p\"\n"
-                                "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
+                        "Control your snake with the cursor UP, DOWN, LEFT & RIGHT keys\n"
+                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                        "To play a two player game run \"snake -2p\"\n"
+                        "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
         } else {
                 _printf("+++ S N A K E +++\n\nMULTIPLAYER MODE\n\n"
-                                "Controls for player one (green):\n"
-                                "\tUp = W\n"
-                                "\tDown = S\n"
-                                "\tLeft = A\n"
-                                "\tRight = D\n"
-                                "Controls for player two (blue):\n"
-                                "\tUp = I\n"
-                                "\tDown = J\n"
-                                "\tLeft = K\n"
-                                "\tRight = L\n"
-                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                                "HAVE FUN!\n\n\n[Press any key to start playing]\n");
+                        "Controls for player one (green):\n"
+                        "\tUp = W\n"
+                        "\tDown = S\n"
+                        "\tLeft = A\n"
+                        "\tRight = D\n"
+                        "Controls for player two (blue):\n"
+                        "\tUp = I\n"
+                        "\tDown = J\n"
+                        "\tLeft = K\n"
+                        "\tRight = L\n"
+                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                        "HAVE FUN!\n\n\n[Press any key to start playing]\n");
         }
         _fgetch(STDIN);
 
@@ -113,7 +113,7 @@ void shell_cmd_snake(int argc, char *argv[])
         srand(rand());
         uint16 apple = ((rand() % 80) << 8) + (rand() % 25);
 
-        snake1 = rf_alloc(2*80*25);
+        snake1 = rf_alloc(2 * 80 * 25);
         head1 = (0 << 8) + 12;
         rf_write(snake1, (uint8*)&head1, 2);
         head1 = (1 << 8) + 12;
@@ -121,9 +121,9 @@ void shell_cmd_snake(int argc, char *argv[])
         head1 = (2 << 8) + 12;
         rf_write(snake1, (uint8*)&head1, 2);
         direction1 = 0;
-        if(multiplayer) {
+        if (multiplayer) {
                 direction2 = 0;
-                snake2=rf_alloc(2*80*25);
+                snake2 = rf_alloc(2 * 80 * 25);
                 head2 = (79 << 8) + 12;
                 rf_write(snake2, (uint8*)&head2, 2);
                 head2 = (78 << 8) + 12;
@@ -146,7 +146,7 @@ void shell_cmd_snake(int argc, char *argv[])
                 if (multiplayer) {
                         if (body_collision(snake2, head1)) {
                                 SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
-                                loser = 1; 
+                                loser = 1;
                         }
                         if (body_collision(snake1, head2)) {
                                 SET_PIXEL(head2 >> 8, head2 & 0xFF, RED);
@@ -184,7 +184,7 @@ void shell_cmd_snake(int argc, char *argv[])
                 if (frame % 5 == 0) {
                         switch (direction1) {
                         case SNAKE_UP:
-                                if(head1 != apple) {
+                                if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
                                         while (head1 == apple || body_collision(snake1, apple)) {
@@ -195,7 +195,7 @@ void shell_cmd_snake(int argc, char *argv[])
                                 rf_write(snake1, (uint8*)&head1, 2);
                                 break;
                         case SNAKE_RIGHT:
-                                if(head1 != apple) {
+                                if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
                                         while (head1 == apple || body_collision(snake1, apple)) {
@@ -206,7 +206,7 @@ void shell_cmd_snake(int argc, char *argv[])
                                 rf_write(snake1, (uint8*)&head1, 2);
                                 break;
                         case SNAKE_DOWN:
-                                if(head1 != apple) {
+                                if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
                                         while (head1 == apple || body_collision(snake1, apple)) {
@@ -217,7 +217,7 @@ void shell_cmd_snake(int argc, char *argv[])
                                 rf_write(snake1, (uint8*)&head1, 2);
                                 break;
                         case SNAKE_LEFT:
-                                if(head1 != apple) {
+                                if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
                                         while (head1 == apple || body_collision(snake1, apple)) {
@@ -227,11 +227,11 @@ void shell_cmd_snake(int argc, char *argv[])
                                 head1 = ((((head1 >> 8) - 1 + 80) % 80) << 8) + (head1 & 0xFF);
                                 rf_write(snake1, (uint8*)&head1, 2);
                                 break;
-                        } 
-                        if(multiplayer) {
+                        }
+                        if (multiplayer) {
                                 switch (direction2) {
                                 case SNAKE_UP:
-                                        if(head2 != apple) {
+                                        if (head2 != apple) {
                                                 rf_read(snake2, (uint8*)&trash, 2);
                                         } else {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
@@ -240,7 +240,7 @@ void shell_cmd_snake(int argc, char *argv[])
                                         rf_write(snake2, (uint8*)&head2, 2);
                                         break;
                                 case SNAKE_RIGHT:
-                                        if(head2 != apple) {
+                                        if (head2 != apple) {
                                                 rf_read(snake2, (uint8*)&trash, 2);
                                         } else {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
@@ -249,7 +249,7 @@ void shell_cmd_snake(int argc, char *argv[])
                                         rf_write(snake2, (uint8*)&head2, 2);
                                         break;
                                 case SNAKE_DOWN:
-                                        if(head2 != apple) {
+                                        if (head2 != apple) {
                                                 rf_read(snake2, (uint8*)&trash, 2);
                                         } else {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
@@ -258,16 +258,16 @@ void shell_cmd_snake(int argc, char *argv[])
                                         rf_write(snake2, (uint8*)&head2, 2);
                                         break;
                                 case SNAKE_LEFT:
-                                        if(head2 != apple) {
+                                        if (head2 != apple) {
                                                 rf_read(snake2, (uint8*)&trash, 2);
                                         } else {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
                                         }
-                                        head2 = ((((head2 >> 8) - 1 + 80) % 80) << 8) 
-                                        + (head2 & 0xFF);
+                                        head2 = ((((head2 >> 8) - 1 + 80) % 80) << 8)
+                                                + (head2 & 0xFF);
                                         rf_write(snake2, (uint8*)&head2, 2);
                                         break;
-                                } 
+                                }
                         }
                 }
 
@@ -302,20 +302,17 @@ void shell_cmd_snake(int argc, char *argv[])
         _close(keyboard);
 
         if (multiplayer) {
-                if (loser == 3)
-                {
+                if (loser == 3) {
                         printf("\nBoth players lost!\n");
                 }
-                if (loser == 2)
-                {
+                if (loser == 2) {
                         printf("\nPlayer 2 lost!\n");
                 }
-                if (loser == 1)
-                {
+                if (loser == 1) {
                         printf("\nPlayer 1 lost!\n");
                 }
                 printf("Player 1:\t%d pts\nPlayer 2:\t%d pts\n",
-                                (rf_getlength(snake1) / 2) - 3, (rf_getlength(snake2) / 2) - 3);
+                       (rf_getlength(snake1) / 2) - 3, (rf_getlength(snake2) / 2) - 3);
         } else {
                 printf("\nGame over!\nYour points:\t%d\n", (rf_getlength(snake1) / 2) - 3);
         }

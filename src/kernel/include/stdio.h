@@ -1,10 +1,10 @@
 /*
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Standard I/O functions
  *
  * @author Dmitriy Traytel
@@ -35,23 +35,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "types.h"
 
-enum colors{
-        BLACK=0x0,
-        BLUE=0x1,
-        GREEN=0x2,
-        CYAN=0x3,
-        RED=0x4,
-        VIOLET=0x5,
-        ORANGE=0x6,
-        LIGHTGREY=0x7,
-        DARKGREY=0x8,
-        LIGHTBLUE=0x9,
-        LIGHTGREEN=0xA,
-        TURQUOISE=0xB,
-        PINK=0xC,
-        MAGENTA=0xD,
-        YELLOW=0xE,
-        WHITE=0xF,
+enum colors {
+        BLACK = 0x0,
+        BLUE = 0x1,
+        GREEN = 0x2,
+        CYAN = 0x3,
+        RED = 0x4,
+        VIOLET = 0x5,
+        ORANGE = 0x6,
+        LIGHTGREY = 0x7,
+        DARKGREY = 0x8,
+        LIGHTBLUE = 0x9,
+        LIGHTGREEN = 0xA,
+        TURQUOISE = 0xB,
+        PINK = 0xC,
+        MAGENTA = 0xD,
+        YELLOW = 0xE,
+        WHITE = 0xF,
 };
 
 //prints colored character

@@ -29,16 +29,16 @@ device_t *devices_head = NULL;
  *      brainfuck interpreter /dev/brainfuck
  *      framebuffer
  *      /dev/bombe
- * 
- * 
- * TODO: 
+ *
+ *
+ * TODO:
 stdout:
         - support for escape characters
                 - control characters: \f clear screen \t \n \a \e
-                
+
                 - colors
                 - cursor (-> needs changes in IO)
-                
+
 stdin:
         - support for escape characters
                 - mouse cursor
@@ -47,40 +47,40 @@ stdin:
         total number of blocks
         total bytes allocated
         bytes free
-        largest continuous free block 
+        largest continuous free block
  */
 
 device_t* pm_name2device(char *name)
 {
         device_t *dev = devices_head;
-        
+
         if (dev == NULL)
                 return NULL;
-        
+
         do {
                 if (strcmp(dev->name, name) == 0)
                         return dev;
-                
+
                 dev = dev->next;
         } while (dev != NULL);
-        
+
         return NULL;
 }
 
 device_t* pm_fd2device(int fd)
 {
         device_t *dev = devices_head;
-        
+
         if (dev == NULL)
                 return NULL;
-        
+
         do {
                 if (dev->fd == fd)
                         return dev;
-                
+
                 dev = dev->next;
         } while (dev != NULL);
-        
+
         return NULL;
 }
 
@@ -90,16 +90,16 @@ void pm_register_device(device_t *dev)
                 printf("pm_register_device: %s already registered\n", dev->name);
                 return;
         }
-        
+
         if (pm_fd2device(dev->fd) != NULL) {
                 printf("pm_register_device: fd %d already registered\n", dev->fd);
                 return;
         }
-                
+
         dev->next = devices_head;
         devices_head = dev;
-        
-        do_create(dev->name, 0); 
-        
+
+        do_create(dev->name, 0);
+
         dprintf("%{pm:} registered device %s\n", VIOLET, dev->name);
 }

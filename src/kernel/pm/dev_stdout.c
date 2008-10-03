@@ -32,12 +32,12 @@ int dev_stdout_seek(void *dev, int fd, int offset, int whence)
 }
 
 device_t dev_stdout = {
-                "/dev/stdout",  // name
-                1,              // fd
-                NULL,           // data
-                dev_stdout_open,
-                dev_stdout_close,
-                dev_stdout_read,
-                dev_stdout_write,
-                dev_stdout_seek
+        "/dev/stdout",  // name
+        1,              // fd
+        NULL,           // data
+        dev_stdout_open,
+        dev_stdout_close,
+        dev_stdout_read,
+        dev_stdout_write,
+        dev_stdout_seek
 };

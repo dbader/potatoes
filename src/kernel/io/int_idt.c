@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Builds and initializes the interrupt descriptor table.
  *
  * @author Dmitriy Traytel
@@ -31,23 +31,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../include/types.h"
 
-/** 
+/**
  * The structure of one IDT entry.
  */
-struct idt_entry //16+16+8+8+16=64 bit
-{
+struct idt_entry { //16+16+8+8+16=64 bit
         uint16 low_offset;
         uint16 selector;
         uint8 separator; //always 0
         uint8 flags;
         uint16 high_offset;
-}__attribute__((packed)); //gcc-flag to use 64 connected bits of memory for the struct 
+}__attribute__((packed)); //gcc-flag to use 64 connected bits of memory for the struct
 
-/** 
+/**
  * The structure of the IDT pointer which tells the processor where to find our IDT
  */
-struct idt_pointer //16+32=48 bit
-{
+struct idt_pointer { //16+32=48 bit
         uint16 maxsize;
         uint32 start;
 }__attribute__((packed)); //gcc-flag to use 64 connected bits of memory for the struct
@@ -64,7 +62,7 @@ struct idt_pointer idtp;
 
 /**
  * Makes a new idt-entry
- * 
+ *
  * @param pos Number of the new idt-entry
  * @param offset Offset to be added to the base address
  * @param sel Selector for the segment's base address
@@ -91,10 +89,10 @@ extern void idt_flush(uint32);
 void idt_init()
 {
         idtp.maxsize = (64 * 256) - 1;
-        idtp.start = (uint32) &idt;
+        idtp.start = (uint32) & idt;
         int i;
-        for (i=0; i<256; i++){                  //fill with empty descriptors
-                idt_fill_entry(i,0,0,0);
+        for (i = 0; i < 256; i++) {             //fill with empty descriptors
+                idt_fill_entry(i, 0, 0, 0);
         }
         //idt_load();
         idt_flush((uint32)&idtp);

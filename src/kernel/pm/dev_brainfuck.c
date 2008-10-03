@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * The brainfuck device.
  *
  * @author Dmitriy Traytel
@@ -56,16 +56,16 @@ int dev_brainfuck_read(void *dev, int fd, void *buf, int size)
 
 int dev_brainfuck_write(void *dev, int fd, void *buf, int size)
 {
-        for (int i = 0; i < size; i++){
-                char ch=*((char*)buf++);
-                if(     ch!='.' &&
-                        ch!=',' &&
-                        ch!='+' &&
-                        ch!='-' &&
-                        ch!='<' &&
-                        ch!='>' &&
-                        ch!='[' &&
-                        ch!=']')
+        for (int i = 0; i < size; i++) {
+                char ch = *((char*)buf++);
+                if (     ch != '.' &&
+                                ch != ',' &&
+                                ch != '+' &&
+                                ch != '-' &&
+                                ch != '<' &&
+                                ch != '>' &&
+                                ch != '[' &&
+                                ch != ']')
                         return 0;
                 interpret_bf(ch);
         }
@@ -78,12 +78,12 @@ int dev_brainfuck_seek(void *dev, int fd, int offset, int whence)
 }
 
 device_t dev_brainfuck = {
-                "/dev/brainfuck",    // name
-                BRAINFUCK,           // fd
-                NULL,           // data
-                dev_brainfuck_open,
-                dev_brainfuck_close,
-                dev_brainfuck_read,
-                dev_brainfuck_write,
-                dev_brainfuck_seek
+        "/dev/brainfuck",    // name
+        BRAINFUCK,           // fd
+        NULL,           // data
+        dev_brainfuck_open,
+        dev_brainfuck_close,
+        dev_brainfuck_read,
+        dev_brainfuck_write,
+        dev_brainfuck_seek
 };

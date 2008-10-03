@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Timer-handler
- * 
+ *
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
  * @version $Rev$
@@ -32,14 +32,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/limits.h"
 #include "../include/types.h"
-#include "../include/stdio.h"  
+#include "../include/stdio.h"
 
 #include "../io/io.h"
 #include "../io/io_rtc.h"
 #include "../io/io_virtual.h"
-#include "../pm/pm_main.h"  
+#include "../pm/pm_main.h"
 /**
- * This variable is incremented after every IRQ0 (or reseted to 0) 
+ * This variable is incremented after every IRQ0 (or reseted to 0)
  */
 static sint32 ticks = 0;
 
@@ -48,13 +48,13 @@ static sint32 ticks = 0;
  */
 uint32 timer_handler(uint32 context)
 {
-        ticks++;      
-        if (ticks == SINT32_MAX) 
+        ticks++;
+        if (ticks == SINT32_MAX)
                 ticks = 0;
 
         rtc_update();
         update_virt_monitor(get_active_virt_monitor());
-        
+
         return pm_schedule(context);
 }
 
@@ -72,13 +72,11 @@ sint32 get_ticks()
  */
 void sleep(sint32 num)
 {
-        sint32 i = ticks + FREQUENCY*num;
-        if(SINT32_MAX - ticks < FREQUENCY*num){
-                sleep((SINT32_MAX-ticks)/FREQUENCY);
-                sleep(num-(SINT32_MAX-ticks)/FREQUENCY); 
-        }
-        else
-        {
+        sint32 i = ticks + FREQUENCY * num;
+        if (SINT32_MAX - ticks < FREQUENCY*num) {
+                sleep((SINT32_MAX - ticks) / FREQUENCY);
+                sleep(num - (SINT32_MAX - ticks) / FREQUENCY);
+        } else {
                 reactivate_pic();
                 set_interrupts();
                 while (ticks < i) {
@@ -93,12 +91,10 @@ void sleep(sint32 num)
 void sleep_ticks(sint32 num)
 {
         sint32 i = ticks + num;
-        if(SINT32_MAX - ticks < num){
-                sleep(SINT32_MAX-ticks);
-                sleep(num-(SINT32_MAX-ticks)); 
-        }
-        else
-        {
+        if (SINT32_MAX - ticks < num) {
+                sleep(SINT32_MAX - ticks);
+                sleep(num - (SINT32_MAX - ticks));
+        } else {
                 reactivate_pic();
                 set_interrupts();
                 while (ticks < i) {

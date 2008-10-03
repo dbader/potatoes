@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -93,26 +93,26 @@ void printf(char *fmt, ...)
 {
         if (fmt == NULL)
                 return;
-        
+
         char **arg = &fmt + 1;
-        char ch; 
+        char ch;
         int character;
         int color;
         char buf[40];
-        
+
         while ((ch = *fmt++) != '\0')
                 if (ch == '%') {
                         ch = *fmt++;
                         switch (ch) {
                         case '{': //print colored until }
-                                color = (int)*arg++;
-                                while((ch = *fmt++) != '}' && ch != '\0'){
+                                color = (int) * arg++;
+                                while ((ch = *fmt++) != '}' && ch != '\0') {
                                         cputchar(ch, color, BLACK);
                                 }
-                                if(ch = '\0') fmt--; //to break out from the while loop
+                                if (ch = '\0') fmt--; //to break out from the while loop
                                 break;
-                        case '%': // print '%' 
-                                putchar(ch); 
+                        case '%': // print '%'
+                                putchar(ch);
                                 break;
                         case 'i': // signed integer
                         case 'd':
@@ -133,7 +133,7 @@ void printf(char *fmt, ...)
                                  * compiler warning.
                                  * Code was: putchar((char)*arg++);
                                  */
-                                character = (int) *arg++;
+                                character = (int) * arg++;
                                 putchar((char)character);
                                 break;
                         case 's': // string

@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * The superblock table.
  *
  * @author Vincenz Doelle
@@ -42,15 +42,15 @@ struct super_block {
         uint16  s_bmap_blocks;                          /* # blocks used by block bitmap */
         block_nr s_first_data_block;
         uint32 s_max_file_size;
-        
+
         /* in mem */
         uint8 *s_bmap;                                  /* pointer to block bitmap */
         m_inode *s_iroot;                               /* pointer to root inode */
         time_t s_modify_ts;
         uint16 s_read_only;                             /* TRUE or FALSE */
         uint16 s_dirt;                                  /* CLEAN or DIRTY */
-        uint32 s_magic_number;          
-        
+        uint32 s_magic_number;
+
 } super_block;
 
 void init_super_block();

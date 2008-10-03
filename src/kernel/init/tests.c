@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * @file 
+ * @file
  * Basic difinitions for functions used in the main()-function of the kernel
  *
  * @author Dmitriy Traytel
@@ -51,15 +51,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * output-testing
  */
 void draw_test()
-{ 
-        monitor_cputs("Test by Dmitriy Traytel (the i/o-master of etiOS)\n",WHITE,BLACK); 
-        monitor_puts("      _   _  ____   _____\n"); 
+{
+        monitor_cputs("Test by Dmitriy Traytel (the i/o-master of etiOS)\n", WHITE, BLACK);
+        monitor_puts("      _   _  ____   _____\n");
         monitor_puts("     | | (_)/ __ \\ / ____|\n");
         monitor_puts("  ___| |_ _| |  | | (___\n");
-        monitor_puts(" / _ \\ __| | |  | |\\___ \\\n"); 
+        monitor_puts(" / _ \\ __| | |  | |\\___ \\\n");
         monitor_puts("|  __/ |_| | |__| |____) |\n");
         monitor_puts(" \\___|\\__|_|\\____/|_____/\n\n");
-        monitor_cputs("Copyright 2008 Daniel Bader,Vincenz Doelle,Johannes Schamburger,Dmitriy Traytel\n",0xA,BLACK);
+        monitor_cputs("Copyright 2008 Daniel Bader,Vincenz Doelle,Johannes Schamburger,Dmitriy Traytel\n", 0xA, BLACK);
 
         monitor_puts("\ttab-test\tok\n");
         monitor_puti(strlen("hallo welt")); //strlen-test
@@ -87,22 +87,22 @@ void draw_test()
 
         monitor_puts("\tbegin color test:\n");
         monitor_cputs("                                        ", BLACK, WHITE);
-        monitor_cputs("                                        ", BLACK, BLUE); 
-        monitor_cputs("                                        ", BLACK, GREEN); 
-        monitor_cputs("                                        ", BLACK, CYAN); 
-        monitor_cputs("                                        ", BLACK, RED); 
+        monitor_cputs("                                        ", BLACK, BLUE);
+        monitor_cputs("                                        ", BLACK, GREEN);
+        monitor_cputs("                                        ", BLACK, CYAN);
+        monitor_cputs("                                        ", BLACK, RED);
         monitor_cputs("                                        ", BLACK, VIOLET);
-        monitor_cputs("                                        ", BLACK, ORANGE); 
-        monitor_cputs("                                        ", BLACK, LIGHTGREY); 
-        monitor_cputs("                                        ", BLACK, DARKGREY); 
-        monitor_cputs("                                        ", BLACK, LIGHTBLUE); 
+        monitor_cputs("                                        ", BLACK, ORANGE);
+        monitor_cputs("                                        ", BLACK, LIGHTGREY);
+        monitor_cputs("                                        ", BLACK, DARKGREY);
+        monitor_cputs("                                        ", BLACK, LIGHTBLUE);
         monitor_cputs("                                        ", BLACK, LIGHTGREEN);
-        monitor_cputs("                                        ", BLACK, TURQUOISE); 
-        monitor_cputs("                                        ", BLACK, PINK); 
-        monitor_cputs("                                        ", BLACK, MAGENTA); 
-        monitor_cputs("                                        ", BLACK, YELLOW); 
+        monitor_cputs("                                        ", BLACK, TURQUOISE);
+        monitor_cputs("                                        ", BLACK, PINK);
+        monitor_cputs("                                        ", BLACK, MAGENTA);
+        monitor_cputs("                                        ", BLACK, YELLOW);
         monitor_cputs("                                        ", BLACK, BLACK);
-        monitor_puts("\tcolor-test\tok\n");             
+        monitor_puts("\tcolor-test\tok\n");
 }
 
 void printf_test()
@@ -110,7 +110,7 @@ void printf_test()
         int x = 42;
         printf("this is a printf() test:\n");
         printf("hello %d and %d - 15%% done. - %s world!\n - %u - %c - %p\n\n",
-                        23, x, "hello,", -17, '@', &x);
+               23, x, "hello,", -17, '@', &x);
 }
 
 void strings_test()
@@ -155,14 +155,14 @@ void strsep_test()
 // test ASSERT() macro
 void assert_test()
 {
-        int i=0;
+        int i = 0;
         ASSERT(TRUE)
         ASSERT(FALSE)
         ASSERT(i != 0)
 }
 
 /* just a hack to easily dump mboot fields */
-#define MBOOT_INFO(x) printf("\t%s = %u\n", #x, mboot_ptr->x); 
+#define MBOOT_INFO(x) printf("\t%s = %u\n", #x, mboot_ptr->x);
 
 void grubstruct_test(struct multiboot *mboot_ptr)
 {
@@ -179,7 +179,7 @@ void grubstruct_test(struct multiboot *mboot_ptr)
 void mm_print_memory()
 {
         mm_header *ptr;
-        for(ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
+        for (ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
                 printf("%s (0x%x)", ptr->name, (uint32)ptr);
                 printf("\tnext: 0x%x", ptr->next);
                 printf("\tprev: 0x%x", ptr->prev);
@@ -193,11 +193,11 @@ void malloc_test()
         void *mm_test[15];
         uint32 free_start = free_memory();
         // total allocation amount: 2535 bytes + 6 * 16 bytes
-        mm_test[1] = mallocn(100,"1");
+        mm_test[1] = mallocn(100, "1");
         printf("1: allocating 100 bytes...\n");
-        mm_test[2] = mallocn(100,"2");
-        printf("2: allocating 100 bytes...\n");  
-        mm_test[3] = mallocn(300,"3");
+        mm_test[2] = mallocn(100, "2");
+        printf("2: allocating 100 bytes...\n");
+        mm_test[3] = mallocn(300, "3");
         printf("3: allocating 300 bytes...\n\n");
         mm_print_memory();
         free(mm_test[2]);
@@ -209,13 +209,13 @@ void malloc_test()
         printf("\ntrying to free the block at 3 + 10 bytes...\n\n");
         free((void*)(mm_test[3] + 10));
         mm_print_memory();
-        mm_test[4] = mallocn(50,"4");
-        printf("\n4: allocating 50 bytes...\n\n"); 
+        mm_test[4] = mallocn(50, "4");
+        printf("\n4: allocating 50 bytes...\n\n");
         mm_print_memory();
-        mm_test[5] = mallocn(50,"5");
+        mm_test[5] = mallocn(50, "5");
         printf("\n5: allocating 50 bytes...\n\n");
         mm_print_memory();
-        mm_test[6] = mallocn(34,"6");
+        mm_test[6] = mallocn(34, "6");
         printf("\n6: allocating 34 bytes...\n\n");
         mm_print_memory();
         printf("\n7: reallocating 3 to 300 bytes...\n\n");
@@ -233,29 +233,39 @@ void malloc_test()
         mm_test[10] = callocn(5, sizeof(134), "calloc");
         uint8* tmp;
         printf("content of 10: ");
-        for(tmp = (uint8*)mm_test[10]; (uint32)tmp < (uint32)mm_test[10] + (5 * sizeof(134)); tmp++) {
+        for (tmp = (uint8*)mm_test[10]; (uint32)tmp < (uint32)mm_test[10] + (5 * sizeof(134)); tmp++) {
                 printf("%d", *tmp);
         }
         printf("\n\n");
         mm_print_memory();
         uint32 free_end = free_memory();
-        printf("free memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes", 
-                        free_end, free_start - free_end);
+        printf("free memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes",
+               free_end, free_start - free_end);
 }
 
 void sleep_test()
 {
         printf("Sleep test...\n");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
-        sleep(1); printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
+        sleep(1);
+        printf(".");
         printf("\n10 seconds later\n");
 }
 
@@ -276,57 +286,57 @@ void hd_test()
 
 void hd_write_test()
 {
-        void *ptr = mallocn(512,"HD-Test"), *temp;
-        ASSERT(ptr!=0);
-        char ch=1;
-        for(temp = ptr; temp < ptr+512; temp++){
+        void *ptr = mallocn(512, "HD-Test"), *temp;
+        ASSERT(ptr != 0);
+        char ch = 1;
+        for (temp = ptr; temp < ptr + 512; temp++) {
                 *(uint8*)temp = ch;
-                if(ch==127) ch=1;
+                if (ch == 127) ch = 1;
                 else ch++;
         }
-        hd_write_sector(500,ptr);
+        hd_write_sector(500, ptr);
         printf("written!\n");
         free(ptr);
 }
 
 void hd_stresswrite_test()
 {
-        void *ptr = mallocn(512,"HD-Test"), *temp;
-        char ch=15;
-        for(temp = ptr; temp < ptr+512; temp++){
+        void *ptr = mallocn(512, "HD-Test"), *temp;
+        char ch = 15;
+        for (temp = ptr; temp < ptr + 512; temp++) {
                 *(uint8*)temp = ch;
-                if(ch==127) ch=15;
+                if (ch == 127) ch = 15;
                 else ch++;
         }
-        ASSERT(ptr!=0);
+        ASSERT(ptr != 0);
         int i;
-        for(i = 0; i < 100; i++){
-                hd_write_sector(i+500,ptr);
-                printf("written!\t%s\n\n",(char*)ptr);
+        for (i = 0; i < 100; i++) {
+                hd_write_sector(i + 500, ptr);
+                printf("written!\t%s\n\n", (char*)ptr);
         }
         hd_write_sector(maxaddr, ptr);
-        printf("written max\t%s\n\n",(char*)ptr);
+        printf("written max\t%s\n\n", (char*)ptr);
         free(ptr);
 }
 
 void hd_stressread_test()
 {
-        void *ptr = mallocn(512,"HD-Test"), *temp;
-        char ch=0;
-        for(temp = ptr; temp < ptr+512; temp++){
+        void *ptr = mallocn(512, "HD-Test"), *temp;
+        char ch = 0;
+        for (temp = ptr; temp < ptr + 512; temp++) {
                 *(uint8*)temp = ch;
                 ch = (ch + 1) % 128;
         }
-        ASSERT(ptr!=0);
+        ASSERT(ptr != 0);
         int i;
-        for(i = 0; i < 100; i++){
-                hd_read_sector(ptr,i+500);
-                ((uint8*)ptr)[i+11]=0;
-                printf("%s\n\n",(char*)ptr);
+        for (i = 0; i < 100; i++) {
+                hd_read_sector(ptr, i + 500);
+                ((uint8*)ptr)[i+11] = 0;
+                printf("%s\n\n", (char*)ptr);
         }
         hd_read_sector(ptr, maxaddr);
-        ((uint8*)ptr)[10]=0;
-        printf("read max\t%s\n\n",(char*)ptr);
+        ((uint8*)ptr)[10] = 0;
+        printf("read max\t%s\n\n", (char*)ptr);
         free(ptr);
 }
 
@@ -489,7 +499,7 @@ void threadA()
 {
         _log("hello from task A\n");
 
-        for(;;) {
+        for (;;) {
                 //for (int i = 0; i < 9999; i++) ;
                 _log("A");
                 halt();
@@ -500,7 +510,7 @@ void threadB()
 {
         _log("hello from task B\n"); // log()
 
-        for(;;) {
+        for (;;) {
                 //for (int i = 0; i < 9999; i++) ;
                 _log("B");
                 halt();
@@ -509,12 +519,12 @@ void threadB()
 
 void threadA_test()
 {
-        pm_create_thread("test-A", threadA, 4096);        
+        pm_create_thread("test-A", threadA, 4096);
 }
 
 void threadB_test()
 {
-        pm_create_thread("test-B", threadB, 4096);        
+        pm_create_thread("test-B", threadB, 4096);
 }
 
 void nullptr_test()
@@ -525,7 +535,7 @@ void nullptr_test()
 
 void print_time()
 {
-        printf("%s\n",time2str());
+        printf("%s\n", time2str());
 }
 
 void do_tests()
@@ -533,7 +543,7 @@ void do_tests()
         printf("\n%{Global keyboard shortcuts:}\n", LIGHTGREEN);
         //fs_tests();
         //grubstruct_test(g_mboot_ptr);
-        //strings_test();       
+        //strings_test();
         //draw_test();
         //printf_test();
         //assert_test();

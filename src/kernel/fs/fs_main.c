@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * This is the central program dealing as an interface between FS and PM.
- * 
- * 
+ *
+ *
  * @author Vincenz Doelle
  * @author $LastChangedBy$
  * @version $Rev$
@@ -53,14 +53,14 @@ void fs_init()
 {
         dprint_separator();
         dprintf("%{FS:} init\n", GREEN);
-        
-        if(!load_fs()){
+
+        if (!load_fs()) {
                 printf("%{FS:} %{FS loading failed.}\n", GREEN, RED);
-                if (!create_fs()){
+                if (!create_fs()) {
                         panic("FS cannot be initialized!\n");
                 }
         }
-                
+
 }
 
 /**
@@ -70,12 +70,12 @@ void fs_shutdown()
 {
         printf("%{FS:} shutting down FS..\n", GREEN);
         write_root(); //TODO: intersection with "close all left inodes?"
-        
+
         //close all open files
-        for(int i = 0; i < NUM_FILES; i++){
+        for (int i = 0; i < NUM_FILES; i++) {
                 fs_close(gft[i].f_desc); //TODO: problem when count > 1 (e.g. not properly closed by PM)
         }
-        
+
         write_bmap();
         write_super_block();
         free(bmap);
@@ -110,8 +110,8 @@ bool create_fs()
         create_root();
         init_super_block();
         dump_super();
-        
-        return TRUE; 
+
+        return TRUE;
 }
 
 /**
@@ -161,11 +161,11 @@ int do_close(file_nr fd)
 int do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
 {
         proc_file *pf = get_proc_file(pft, pfd);
-        if (do_close(pf->pf_f_desc) == 0){
+        if (do_close(pf->pf_f_desc) == 0) {
                 free_proc_file(pft, pfd);
                 return 0;
         }
-        
+
         return EOF;
 }
 
@@ -173,18 +173,18 @@ int do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
 /**
  * Prints out all important constants concerning the file system.
  * For debug purposes only.
- */ 
+ */
 void dump_consts()
 {
         printf("NUM_FILES = %d\nNUM_PROC_FILES = %d\nNUM_INODES = %d\n\n"
-                "SUPER_SIZE = %d\nDISK_INODE_SIZE = %d\nMEM_INODE_SIZE = %d\n\n"
-                "INODES_PER_BLOCK = %d\nDIR_ENTRIES_PER_BLOCK = %d\nADDRS_PER_BLOCK = %d\n"
-                "BYTES_DIRECT = %d\nBYTES_SINGLE_INDIRECT = %d\nBYTES_DOUBLE_INDIRECT = %d\n\n"
-                "ROOT_INODE_BLOCK = %d\n\n\n",
-                NUM_FILES, NUM_PROC_FILES, NUM_INODES,
-                SUPER_SIZE, DISK_INODE_SIZE, MEM_INODE_SIZE,
-                INODES_PER_BLOCK, DIR_ENTRIES_PER_BLOCK, ADDRS_PER_BLOCK,
-                BYTES_DIRECT, BYTES_SINGLE_INDIRECT, BYTES_DOUBLE_INDIRECT,
-                ROOT_INODE_BLOCK);
+               "SUPER_SIZE = %d\nDISK_INODE_SIZE = %d\nMEM_INODE_SIZE = %d\n\n"
+               "INODES_PER_BLOCK = %d\nDIR_ENTRIES_PER_BLOCK = %d\nADDRS_PER_BLOCK = %d\n"
+               "BYTES_DIRECT = %d\nBYTES_SINGLE_INDIRECT = %d\nBYTES_DOUBLE_INDIRECT = %d\n\n"
+               "ROOT_INODE_BLOCK = %d\n\n\n",
+               NUM_FILES, NUM_PROC_FILES, NUM_INODES,
+               SUPER_SIZE, DISK_INODE_SIZE, MEM_INODE_SIZE,
+               INODES_PER_BLOCK, DIR_ENTRIES_PER_BLOCK, ADDRS_PER_BLOCK,
+               BYTES_DIRECT, BYTES_SINGLE_INDIRECT, BYTES_DOUBLE_INDIRECT,
+               ROOT_INODE_BLOCK);
 }
 

@@ -32,12 +32,12 @@ int dev_stdin_seek(void *dev, int fd, int offset, int whence)
 }
 
 device_t dev_stdin = {
-                "/dev/stdin",   // name
-                2,              // fd
-                NULL,           // data
-                dev_stdin_open,
-                dev_stdin_close,
-                dev_stdin_read,
-                dev_stdin_write,
-                dev_stdin_seek
+        "/dev/stdin",   // name
+        2,              // fd
+        NULL,           // data
+        dev_stdin_open,
+        dev_stdin_close,
+        dev_stdin_read,
+        dev_stdin_write,
+        dev_stdin_seek
 };

@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Reads a file and dumps its contents into a C byte array. 
+ * Reads a file and dumps its contents into a C byte array.
  * Example:
  *      - contents of input.bin: "Hello, World. This is a test."
  *      - then run "bin2c input.bin > test.c"
@@ -33,9 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *                               0x20, 0x69, 0x73, 0x20, 0x61, 0x20, 0x74, 0x65, 0x73,
  *                               0x74, 0x2e, 0x0a
  *               }
- * 
+ *
  * Build via "gcc bin2c.c -o bin2c" (the makefile also has a target called bin2c)
- * 
+ *
  * @author dbader
  * @author $LastChangedBy$
  * @version $Rev$
@@ -50,30 +50,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define VARTAB "        "
 #define ITEMSPERLINE 15
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
         if (argc < 2) {
                 printf("bin2c (c) Daniel Bader 2008\nUsage: bin2c [input_file]\n");
                 exit(1);
         }
-        
+
         FILE *in = fopen(argv[1], "rb");
-        
+
         if (!in) {
                 printf("error opening input file %s\n", argv[1]);
                 exit(1);
         }
-        
+
         fseek(in, 0, SEEK_END);
         int size = ftell(in);
         fseek(in, 0, SEEK_SET);
-        
+
         unsigned char *buf = (unsigned char*) malloc(size);
         fread(buf, 1, size, in);
-        
+
         printf(VARHDR, argv[1], size);
         printf(VARTAB);
-        
+
         int i;
         for (i = 0; i < size; i++) {
                 if (i > 0 && i % ITEMSPERLINE == 0)
@@ -82,11 +82,11 @@ int main(int argc, char **argv)
                 if (i != size - 1)
                         printf(", ");
         }
-        
+
         printf(VAREND);
 
         free(buf);
         fclose(in);
 
-	return EXIT_SUCCESS;
+        return EXIT_SUCCESS;
 }

@@ -4,11 +4,11 @@
 #include "../include/types.h"
 
 #ifdef EEEPC
-        #define HDBASE 0x170
-        #define HDALTBASE 0x376
+#define HDBASE 0x170
+#define HDALTBASE 0x376
 #else
-        #define HDBASE 0x1F0
-        #define HDALTBASE 0x3F6
+#define HDBASE 0x1F0
+#define HDALTBASE 0x3F6
 #endif
 
 #define HDREG_DATA 0
@@ -33,11 +33,11 @@
 #define HDCMD_FLUSH_CACHE 0xE7
 
 /**
- * This struct is filled by the IDENTIFY DRIVE command 
- * 
+ * This struct is filled by the IDENTIFY DRIVE command
+ *
  * contains hard disk geometry data and more
  */
-struct hd_info{
+struct hd_info {
         uint16 config_word;
         uint16 num_cyl;
         uint16 reserved1;
@@ -60,12 +60,12 @@ struct hd_info{
         uint16 timingmode_dma; //Bits 15-8
         uint16 reserved3;
         uint16 apparent_cyl;
-        uint16 apparent_head;	
+        uint16 apparent_head;
         uint16 apparent_sector_per_track;
         uint16 apparent_capacity[2];
         uint16 sectors_per_int; //Bits 7-0
         uint16 num_lba_sectors[2];
-        uint16 mode_single_dma; //Bits 15-8 active mode, Bits 7-0 supported modes 
+        uint16 mode_single_dma; //Bits 15-8 active mode, Bits 7-0 supported modes
         uint16 mode_multi_dma; //Bits 15-8 active mode, Bits 7-0 supported modes
         uint16 reserved4[64];
         uint16 manufacturer2[32];
@@ -73,9 +73,9 @@ struct hd_info{
 }__attribute__((__packed__));
 
 /**
- * address data for the hard disk packed in a struct 
+ * address data for the hard disk packed in a struct
  */
-struct address{
+struct address {
         uint32 cyl;
         uint16 head;
         uint16 sector;

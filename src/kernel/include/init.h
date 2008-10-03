@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * @file 
+ * @file
  * Basic difinitions for functions used in the main()-function of the kernel
  *
  * @author Dmitriy Traytel
@@ -35,34 +35,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "types.h"
 
 /**
- * Multiboot structure. 
+ * Multiboot structure.
  * @see http://www.gnu.org/software/grub/manual/multiboot/multiboot.html
  */
 struct multiboot {
-   uint32 flags;
-   uint32 mem_lower;
-   uint32 mem_upper;
-   uint32 boot_device;
-   uint32 cmdline;
-   uint32 mods_count;
-   uint32 mods_addr;
-   uint32 num;
-   uint32 size;
-   uint32 addr;
-   uint32 shndx;
-   uint32 mmap_length;
-   uint32 mmap_addr;
-   uint32 drives_length;
-   uint32 drives_addr;
-   uint32 config_table;
-   uint32 boot_loader_name;
-   uint32 apm_table;
-   uint32 vbe_control_info;
-   uint32 vbe_mode_info;
-   uint32 vbe_mode;
-   uint32 vbe_interface_seg;
-   uint32 vbe_interface_off;
-   uint32 vbe_interface_len;
+        uint32 flags;
+        uint32 mem_lower;
+        uint32 mem_upper;
+        uint32 boot_device;
+        uint32 cmdline;
+        uint32 mods_count;
+        uint32 mods_addr;
+        uint32 num;
+        uint32 size;
+        uint32 addr;
+        uint32 shndx;
+        uint32 mmap_length;
+        uint32 mmap_addr;
+        uint32 drives_length;
+        uint32 drives_addr;
+        uint32 config_table;
+        uint32 boot_loader_name;
+        uint32 apm_table;
+        uint32 vbe_control_info;
+        uint32 vbe_mode_info;
+        uint32 vbe_mode;
+        uint32 vbe_interface_seg;
+        uint32 vbe_interface_off;
+        uint32 vbe_interface_len;
 }  __attribute__((packed));
 
 /** Global pointer to multiboot structure */
@@ -77,8 +77,8 @@ void fs_shutdown();
 
 void panic(char *msg);
 
- 
+
 //test-functions
 void do_tests();
- 
+
 #endif /* init.h */

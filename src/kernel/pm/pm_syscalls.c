@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * This is the kernel side implementation of the syscalls.  
+ * This is the kernel side implementation of the syscalls.
  *
  * @author dbader
  * @author $LastChangedBy$
@@ -44,20 +44,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "pm_syscalls.h"
 #include "pm_devices.h"
 
-/** 
+/**
  * The system call table. Make sure this corresponds to the constants
  * defined in syscall_shared.h (otherwise mayhem ensues). */
 syscall_handler syscall_table[] = {
-                sys_log,        // 0
-                sys_exit,       // 1
-                sys_getpid,     // 2
-                sys_open,       // 3
-                sys_close,      // 4
-                sys_read,       // 5
-                sys_write,      // 6
-                sys_seek,       // 7
-                sys_malloc,     // 8
-                sys_free        // 9
+        sys_log,        // 0
+        sys_exit,       // 1
+        sys_getpid,     // 2
+        sys_open,       // 3
+        sys_close,      // 4
+        sys_read,       // 5
+        sys_write,      // 6
+        sys_seek,       // 7
+        sys_malloc,     // 8
+        sys_free        // 9
 };
 
 //#define MAX_SYSCALL (sizeof(syscall_table) / sizeof(syscall_handler)) - 1
@@ -95,36 +95,36 @@ void sys_exit(void *data)
 {
         SYSCALL_TRACE("SYS_EXIT(%d)\n", (sint32)data);
         ASSERT(active_proc != NULL);
-        
+
         if (getpid() == 0)
                 panic("cannot exit() the kernel thread");
-        
+
         dprintf("exit %u: %d\n", getpid(), (sint32)data);
         active_proc->state = PSTATE_DEAD; // pm_schedule will then unlink and destroy it.
-        
+
         //TODO: return status to waiting parents
 }
 
 /**
- * int _getpid(); 
+ * int _getpid();
  */
 void sys_getpid(void *data)
 {
         SYSCALL_TRACE("SYS_GETPID(0x%x)\n", data);
         if (data == NULL)
                 return;
-        
+
         *((uint32*) data) = getpid();
 }
 
 /**
- * int _open(char *path, int oflag, ...); 
+ * int _open(char *path, int oflag, ...);
  */
 void sys_open(void *data)
 {
         sc_open_args_t *args = (sc_open_args_t*) data;
         SYSCALL_TRACE("SYS_OPEN(\"%s\", 0x%x, 0x%x)\n", args->path, args->oflag, args->mode);
-        
+
         device_t *dev = pm_name2device(args->path);
         if (dev != NULL) {
                 // It's a device file
@@ -142,14 +142,14 @@ void sys_open(void *data)
                                 args->path[strlen(args->path)-1] = '\0';
                                 do_mkdir(args->path);
                         } else
-                                do_create(args->path, 0);
+                                do_mkfile(args->path);
 
                         fd = do_open(args->path);
                 }
-                
-                if (fd == NOT_POSSIBLE) 
+
+                if (fd == NOT_POSSIBLE)
                         args->fd = -1;
-                else{
+                else {
                         args->fd = insert_proc_file(active_proc->pft, fd) + MAX_DEVICES;
                 }
         }
@@ -159,12 +159,12 @@ void sys_close(void* data)
 {
         sc_close_args_t *args = (sc_close_args_t*) data;
         SYSCALL_TRACE("SYS_CLOSE(%d)\n", args->fd);
-        
+
         if (args->fd < 0) {
                 args->success = -1;
                 return;
         }
-        
+
         if (args->fd < MAX_DEVICES) {
                 // It's a device file
                 device_t *dev = pm_fd2device(args->fd);
@@ -181,13 +181,13 @@ void sys_close(void* data)
 }
 
 /**
- * int _read(int fd, void *buf, int size); 
+ * int _read(int fd, void *buf, int size);
  */
 void sys_read(void* data)
 {
         sc_read_write_args_t *args = (sc_read_write_args_t*) data;
         //SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
-        
+
         if (args->fd < MAX_DEVICES) {
                 // It's a device file
                 device_t *dev = pm_fd2device(args->fd);
@@ -198,14 +198,14 @@ void sys_read(void* data)
         } else {
                 // It's a regular file
                 SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
-                proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);                
+                proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
                 args->rw_count = do_read(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
 
                 // Right now do_read() does not support partially successful reads.
-                // So we have to patch that up: 
+                // So we have to patch that up:
                 //if (args->rw_count != FALSE)
-                  //      args->rw_count = args->size;
-                
+                //      args->rw_count = args->size;
+
                 pft_entry->pf_pos += args->rw_count;
         }
 }
@@ -222,18 +222,18 @@ void sys_write(void* data)
                 if (!dev)
                         args->rw_count = -1;
                 else {
-                      //  dprintf("write func of %s is at 0x%x\n", dev->name, dev->write);
+                        //  dprintf("write func of %s is at 0x%x\n", dev->name, dev->write);
                         args->rw_count = dev->write(dev, args->fd, args->buf, args->size);
                 }
         } else {
                 // It's a regular file
-                proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);  
+                proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
                 args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
 
                 // Right now do_write() does not support partially successful writes.
-                // So we have to patch that up: 
+                // So we have to patch that up:
                 //if (args->rw_count != FALSE)
-                  //      args->rw_count = args->size;
+                //      args->rw_count = args->size;
 
                 pft_entry->pf_pos += args->rw_count;
         }
@@ -243,7 +243,7 @@ void sys_seek(void* data)
 {
         sc_seek_args_t *args = (sc_seek_args_t*) data;
         SYSCALL_TRACE("SYS_SEEK(%d, %d, %d)\n", args->fd, args->offset, args->whence);
-        
+
         if (args->fd < MAX_DEVICES) {
                 // It's a device file
                 device_t *dev = pm_fd2device(args->fd);
@@ -254,16 +254,19 @@ void sys_seek(void* data)
         } else {
                 // It's a regular file
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
-                
+
                 switch (args->whence) {
-                case SEEK_SET:  pft_entry->pf_pos = args->offset;
-                                break;
-                case SEEK_CUR:  pft_entry->pf_pos += args->offset;
-                                break;
-                case SEEK_END:  pft_entry->pf_pos = get_file(pft_entry->pf_f_desc)->f_inode->i_size + args->offset;
-                                break;
+                case SEEK_SET:
+                        pft_entry->pf_pos = args->offset;
+                        break;
+                case SEEK_CUR:
+                        pft_entry->pf_pos += args->offset;
+                        break;
+                case SEEK_END:
+                        pft_entry->pf_pos = get_file(pft_entry->pf_f_desc)->f_inode->i_size + args->offset;
+                        break;
                 }
-                
+
                 args->pos = pft_entry->pf_pos;
         }
 }

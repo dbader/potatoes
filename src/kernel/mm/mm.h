@@ -1,10 +1,10 @@
 /* $Id$
-      _   _  ____   _____ 
+      _   _  ____   _____
      | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
+  ___| |_ _| |  | | (___
  / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
 |  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
+ \___|\__|_|\____/|_____/
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * Definitions for the functions and variables used in the memory manager.
- * 
+ *
  * @author Johannes Schamburger
  * @author $LastChangedBy$
  * @version $Rev$
@@ -42,7 +42,7 @@ typedef struct mm_header {
         struct mm_header *next;         // pointer to the header of the next occupied block
         char name[32];                     // name of the block
         uint32 size;                    // size of the current block
-       // uint8 pad[100];
+        // uint8 pad[100];
 } mm_header;
 
 /**
