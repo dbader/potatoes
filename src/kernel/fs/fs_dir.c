@@ -228,8 +228,9 @@ uint32 delete_entry(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
                 if (strcmp(file_list[i].name, name) == 0) {
                         bzero(file_list[i].name, NAME_SIZE);
-                        file_list[i].inode = NULL;
                         mark_block(file_list[i].inode, FALSE);
+                        fs_dprintf("--> marked block %d as FALSE\n", file_list[i].inode);
+                        file_list[i].inode = NULL;
                         return i*sizeof(dir_entry); //delete position
                 }
         }

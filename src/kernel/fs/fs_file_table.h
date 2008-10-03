@@ -60,6 +60,7 @@ void free_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd);
 
 bool contains_file(file_nr fd);
 bool is_directory(file_nr fd);
+size_t get_size(file_nr fd);
 
 file_nr name2desc(char *name);
 file_nr inode2desc(m_inode *inode);

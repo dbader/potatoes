@@ -301,6 +301,17 @@ bool is_directory(file_nr fd)
         return (get_file(fd)->f_inode)->i_mode == DIRECTORY;
 }
 
+/**
+ * Get size of file/directory.
+ * 
+ * @param fd    file descriptor
+ * @return      size
+ */
+size_t get_size(file_nr fd)
+{
+        return (get_file(fd)->f_inode)->i_size;
+}
+
 /********* DEBUG *********/
 
 /**
