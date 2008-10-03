@@ -83,7 +83,7 @@ void free_virt_monitor(virt_monitor *vm)
         }
         memset(&(vmonitors[maxvmonitor--]), 0, sizeof(virt_monitor));
         
-       // pm_set_focus_proc(vmonitors[active_monitor].pid);
+        pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
 /**

@@ -222,14 +222,14 @@ void pm_destroy_thread(process_t *proc)
 
 void pm_set_focus_proc(uint32 pid)
 {
-//        process_t *p = procs_head;
-//        do {
-//                if (p->pid == pid)
-//                        break;
-//                p = p->next;
-//        } while (p != procs_head);
-//        
-//        focus_proc = p;
+        process_t *p = procs_head;
+        do {
+                if (p->pid == pid)
+                        break;
+                p = p->next;
+        } while (p != procs_head);
+        
+        focus_proc = p;
 }
 
 void pm_dump()

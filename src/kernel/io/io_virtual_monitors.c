@@ -50,7 +50,7 @@ void switch_monitor_up()
         if (active_monitor < maxvmonitor) active_monitor++;
         else if (active_monitor == maxvmonitor) active_monitor = 0;
         
-//        pm_set_focus_proc(vmonitors[active_monitor].pid);
+        pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
 void switch_monitor_down()
@@ -58,7 +58,7 @@ void switch_monitor_down()
         if (active_monitor > 0) active_monitor--;
         else if (active_monitor == 0) active_monitor = maxvmonitor;
         
-//        pm_set_focus_proc(vmonitors[active_monitor].pid);
+        pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
 void init_vmonitors()
