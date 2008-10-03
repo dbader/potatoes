@@ -46,12 +46,13 @@ mboot:
                                 ; 4-byte boundary in your kernel file
     dd  MBOOT_HEADER_FLAGS      ; How GRUB should load your file / settings
     dd  MBOOT_CHECKSUM          ; To ensure that the above values are correct
-    
-    dd  mboot                   ; Location of this descriptor
-    dd  code                    ; Start of kernel '.text' (code) section.
-    dd  bss                     ; End of kernel '.data' section.
-    dd  end                     ; End of kernel.
-    dd  start                   ; Kernel entry point (initial EIP).
+
+; fields used if MULTIBOOT_AOUT_KLUDGE is set in MULTIBOOT_HEADER_FLAGS
+;    dd  mboot                   ; Location of this descriptor
+;    dd  code                    ; Start of kernel '.text' (code) section.
+;    dd  bss                     ; End of kernel '.data' section.
+;    dd  end                     ; End of kernel.
+;    dd  start                   ; Kernel entry point (initial EIP).
 
 
 [GLOBAL start]                  ; Kernel entry point.
