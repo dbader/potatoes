@@ -52,13 +52,13 @@ extern uint32 get_hdsize();
  */
 size_t malloc_bmap()
 {
-        size_t size =  get_hdsize() / 8;
-        num_bmap_blocks = size / BLOCK_SIZE + 1;
+        size_t size =  get_hdsize() / 8; //manage 8 blocks with one byte (see 'bitmap')
+        num_bmap_blocks = size / BLOCK_SIZE + 1; // '+ 1' to round up
         first_data_block = ROOT_INODE_BLOCK + num_bmap_blocks + 1;
 
         bmap = mallocn(size, "block bitmap");
 
-        if (bmap == (void *) NULL) {
+        if (bmap == NULL) {
                 return 0;
         } else {
                 fs_dprintf("[fs_bmap] malloced bmap.\n");
@@ -94,9 +94,8 @@ void load_bmap()
 
         fs_dprintf("[fs_bmap] loading bmap (size = %d) from HD\n", size);
         int j = 0;
-        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + num_bmap_blocks; i++) {
+        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + num_bmap_blocks; i++, j++) {
                 rd_block(&bmap[j*BLOCK_SIZE], i, BLOCK_SIZE);
-                j++;
         }
 }
 
@@ -107,9 +106,8 @@ void write_bmap()
 {
         fs_dprintf("[fs_bmap] writing bmap to HD\n");
         int j = 0;
-        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + num_bmap_blocks; i++) {
-                wrt_block(i, &bmap[j*BLOCK_SIZE], BLOCK_SIZE); //TODO: test this!
-                j++;
+        for (int i = FIRST_BMAP_BLOCK; i < FIRST_BMAP_BLOCK + num_bmap_blocks; i++, j++) {
+                wrt_block(i, &bmap[j*BLOCK_SIZE], BLOCK_SIZE);
         }
 }
 
@@ -117,8 +115,9 @@ void write_bmap()
  * Find a new unused block.
  * Search linear from the "start" block number.
  *
- * @param start Search offset (start to search linear from block number "start")
- * @return The block number of the unused block.
+ * @param start  search offset (start to search linear from block number "start")
+ * 
+ * @return block number of the unused block
  */
 block_nr get_free_block(block_nr start)
 {
@@ -135,21 +134,17 @@ block_nr get_free_block(block_nr start)
 }
 
 /**
- * Function to mark a block number as free (flag = 0) or used (flag = 1)
+ * Function to mark a block number as free (flag = 0) or used (flag = 1).
  *
- * @param blk_nr The block number which should be marked
- * @param flag   The value with whom the block should be marked (1 | 0)
+ * @param blk_nr block number which should be marked
+ * @param flag   value with whom the block should be marked (1 | 0)
  */
 void mark_block(block_nr blk_nr, bool flag)
 {
         uint8 byte = bmap[blk_nr / 8];
         uint8 bit  = blk_nr % 8;
 
-        //fs_dprintf("byte: %b\n", byte);
-
         byte = (byte >> (8 - bit)) | (byte << bit); //rotate left
-
-        //fs_dprintf("byte: %b\n", byte);
 
         if (flag == TRUE) {
                 byte = byte | 0x80;  //set first bit to 1 with (byte OR 10000000)
@@ -157,11 +152,7 @@ void mark_block(block_nr blk_nr, bool flag)
                 byte = byte & 0x7F;  //set first bit to 0 with (byte AND 01111111)
         }
 
-        //fs_dprintf("byte: %b\n", byte);
-
         byte = (byte >> bit) | (byte << (8 - bit)); //rotate right (back)
-
-        //fs_dprintf("byte: %b\n\n", byte);
 
         bmap[blk_nr / 8] = byte;
 }
@@ -169,8 +160,8 @@ void mark_block(block_nr blk_nr, bool flag)
 /**
  * Checks whether a block was already allocated before.
  *
- * @param block number to check
- * @return allocation status
+ * @param blk_nr block number to check
+ * @return       allocation status
  */
 bool is_allocated_block(block_nr blk_nr)
 {
@@ -186,7 +177,7 @@ bool is_allocated_block(block_nr blk_nr)
 /**
  * Allocates a new block.
  *
- * @param start Search offset (start to search linear from block number "start")
+ * @param start  search offset (start to search linear from block number "start")
  */
 block_nr alloc_block(block_nr start)
 {
@@ -204,7 +195,7 @@ void dump_bmap()
         uint8 byte = 0;
         uint8 bit  = 0;
 
-        if (bmap == (void *) NULL) {
+        if (bmap == NULL) {
                 fs_dprintf("[fs_bmap] BMAP is NULL\n");
                 return;
         }

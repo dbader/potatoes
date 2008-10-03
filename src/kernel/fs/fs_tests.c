@@ -378,16 +378,18 @@ void test_delete()
 {
         if (!fs_create("/dir1", DIRECTORY)) dprintf("creation unsuccessful!\n");
         if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
-
+        
+        dump_bmap();
         __ls("/dir1");
-        fs_delete("/dir1/dir2");
-        __ls("/dir1");
+        //fs_delete("/dir1/dir2");
+        //__ls("/dir1");
         fs_delete("/dir1");
         __ls("/");
+        dump_bmap();
 
 }
 
 void run_FS_tests()
 {
-        //test_rw_quantitative();
+        test_delete();
 }

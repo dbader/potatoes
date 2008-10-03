@@ -50,8 +50,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * loading the inode from HD, inserting the inode to the inode table and
  * and registering the file in the global/process file table.
  *
- * @param path absolute file path
- * @return     process file descriptor
+ * @param abs_path      absolute file path
+ * @return              process file descriptor
  */
 file_nr fs_open(char *abs_path)
 {
@@ -62,10 +62,9 @@ file_nr fs_open(char *abs_path)
 
         if (strcmp(abs_path, "/") != 0) { //not the root directory
                 fd = name2desc(abs_path); //get the file descriptor from file table if already existent
-                if (fd != NOT_FOUND) {
-                        //inc_count(fd);
+                if (fd != NOT_FOUND) { //file already exists
                         fs_dprintf("[fs_o_c] file %s is already opened!\n", abs_path);
-                        return fd; //file already exists
+                        return fd;
                 }
 
                 block_nr block = search_file(abs_path);
@@ -96,8 +95,8 @@ file_nr fs_open(char *abs_path)
 /**
  * Closes a file by writing the inode to HD and freeing the file descriptor entry.
  *
- * @param fd process file descriptor.
- * @return   operation status
+ * @param fd    process file descriptor.
+ * @return      operation status
  */
 bool fs_close(file_nr fd)
 {

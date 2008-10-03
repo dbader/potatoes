@@ -36,6 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/debug.h"
 #include "../mm/mm.h"
 
+
+//TODO: comment!
 static long _seed = 1L;
 
 void srand(unsigned int seed)
@@ -49,23 +51,23 @@ int rand()
 }
 
 /**
- * allocates size bytes and additionally saves a name in the header of the block.
+ * Allocates 'size' bytes and additionally saves a name in the header of the block.
  * ATTENTION: if malloc fails (i.e. there is not enough free space), the return value is
- * (void*) NULL. So this should always be tested!
+ * (void*) NULL. So, this should always be tested!
  *
  * @param size  how much space shall be allocated
- * @param name  the name of the memory block (mainly for debugging purposes)
+ * @param name  name of the memory block (mainly for debugging purposes)
  * @return      pointer to the allocated space
  */
 
-//
-// Enables a braindead memory "manager" for debugging purposes. (daniel)
-// Use this to make sure a bug is not related to MM.
-//
+/*
+ * Enables a braindead memory "manager" for debugging purposes. (daniel)
+ * Use this to make sure a bug is not related to MM.
+ */
 //#define MEM_FAILSAFE
 
 #ifdef MEM_FAILSAFE
-void* mem = (void*) 0x200000; // assume this is past the kernel code...
+void* mem = (void*) 0x300000; // assume this is past the kernel code...
 #endif
 
 void* mallocn(size_t size, char *name)
@@ -76,11 +78,10 @@ void* mallocn(size_t size, char *name)
         return ret;
 #endif
 
-        //size += 100;
-
         mm_header *ptr;
         mm_header *new_header;
         uint32 end_of_prev;
+        
         for (ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
                 end_of_prev = ((uint32)(ptr->prev) + sizeof(mm_header) + (ptr->prev)->size);
                 if ((uint32)ptr - end_of_prev >= (size + sizeof(mm_header))) {
@@ -98,34 +99,13 @@ void* mallocn(size_t size, char *name)
                 }
         }
 
-        return (void*) NULL;
+        return NULL;
 }
 
 /**
- * allocates size bytes cleaned and additionally saves a name in the header of the block
- *
- * @param size  how much space shall be allocated
- * @param name  the name of the memory block (mainly for debugging purposes)
- * @return      pointer to the allocated space
- */
-
-/*void* malloc_name(uint32 size, char* name)
-{
-//        printf("allocation of %d bytes.0x%x\n", size, mm_occupied_top);
-        mm_occupied_top += size;
-//        printf("mm_occupied_top neu: 0x%x\n",mm_occupied_top);
-        if ((uint32)mm_occupied_top < (uint32)mm_end) {
-                return (void*) (mm_occupied_top - size);
-        } else {
-                mm_occupied_top -= size;
-                return (void*) NULL;
-        }
-}*/
-
-/**
- * allocates size bytes
+ * Allocates 'size' bytes.
  * ATTENTION: if malloc fails (i.e. there is not enough free space), the return value is
- * (void*) NULL. So this should always be tested!
+ * (void*) NULL. So, this should always be tested!
  *
  * @param size  how much space shall be allocated
  * @return      pointer to the allocated space
@@ -136,17 +116,18 @@ void* malloc(size_t size)
 }
 
 /**
- * allocates space for n elements of the same size and additionally saves a name in
- * the header of the block
+ * Allocates space for n elements of the same size and additionally saves a name in
+ * the header of the block.
  *
  * @param n     number of elements
  * @param size  size of each element
+ * @param name  name of the memory block (mainly for debugging purposes)
  */
 void* callocn(size_t n, size_t size, char *name)
 {
         void* ret = mallocn(n * size, name);
-        if (ret == (void*) NULL) {
-                return (void*) NULL;
+        if (ret == NULL) {
+                return NULL;
         }
         mm_header* header = (mm_header*) ((uint32)ret - sizeof(mm_header));
         bzero(ret, n * size);
@@ -154,7 +135,7 @@ void* callocn(size_t n, size_t size, char *name)
 }
 
 /**
- * allocates space for n elements of the same size
+ * Allocates space for n elements of the same size.
  *
  * @param n     number of elements
  * @param size  size of each element
@@ -179,7 +160,7 @@ void mem_dump()
 }
 
 /**
- * frees a memory block
+ * Frees a memory block.
  *
  * @param start pointer to the start of the block that shall be freed
  */
@@ -200,7 +181,7 @@ void free(void *start)
 }
 
 /**
- * reallocates a memory block to size bytes
+ * Reallocates a memory block to 'size' bytes.
  * ATTENTION: if realloc fails (i.e. there is not enough free space), the return value is
  * (void*) NULL. So this should always be tested!
  * Especially realloc() shouldn't be used like this:
@@ -219,22 +200,27 @@ void free(void *start)
 void* realloc(void *pointer, size_t size)
 {
         mm_header* hdr = (mm_header*)(pointer - sizeof(mm_header));
+        
         // the free space after pointer is big enough for the new size
-        if ((uint32)hdr->next >= (uint32)((uint32) pointer + size)) {
+        if ((uint32)hdr->next >= ((uint32) pointer + size)) {
                 hdr->size = size;
                 return pointer;
         }
+        
         void* new = mallocn(size, hdr->name);
-        if (new == (void*) NULL) {
-                return (void*) NULL;
+        
+        if (new == NULL) {
+                return NULL;
         }
+        
         memmove(new, pointer, hdr->size);
         free(pointer);
+        
         return new;
 }
 
 /**
- * function to return the free memory space
+ * Function to return the free memory space.
  *
  * @return      free memory space in bytes
  */
@@ -242,7 +228,8 @@ uint32 free_memory()
 {
         mm_header *ptr;
         uint32 free = 0;
-        for (ptr = mm_start->next; ptr != mm_end->next; ptr = (*ptr).next) {
+        
+        for (ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
                 free += (uint32)ptr - ((uint32)ptr->prev + sizeof(mm_header) + (ptr->prev)->size);
         }
 

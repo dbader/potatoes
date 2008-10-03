@@ -67,6 +67,8 @@ void gdt_add_entry(sint32 num, uint32 base, uint32 limit, uint8 access, uint8 gr
 {
         dprintf("%{mm:} GDT[%d] 0x%x - 0x%x access: 0x%x gran: 0x%x\n",
                 LIGHTBLUE, num, base, limit, access, gran);
+        
+        //TODO: add comments to understand shifts and &s
         gdt[num].base_low = (base & 0xFFFF);
         gdt[num].base_middle = (base >> 16) & 0xFF;
         gdt[num].base_high = (base >> 24) & 0xFF;

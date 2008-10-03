@@ -36,6 +36,6 @@ gdt_flush:
         mov fs, ax
         mov gs, ax
         mov ss, ax
-        jmp 0x08:.flush ; 0x08 is the offset to our code segment
+        jmp 0x08:.flush ; 0x08 is the offset to our code segment ; TODO: why to flush()?
 .flush:
            ret

@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * Basic buffer/cache definitions.
+ * (cache = [addr][buffer])
  *
  * @author Vincenz Doelle
  * @author $LastChangedBy$

@@ -23,11 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * Basic buffer functions.
- * Types of temporary buffers used:
- *
- * 1) current_block_buffer
- * 2) write_pre_cache_buffer
- * 3) current_indirect_adr_buffer
+ * 
+ * Types of temporary caches (= [addr][buffer]) used:
+ * 1) read_cache
+ * 2) write_cache
+ * 3) addr_cache
+ * 4) d_inode_cache
+ * 5) m_inode_cache
  *
  * @author Vincenz Doelle
  * @author $LastChangedBy$
@@ -46,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Clears a struct of type 'block_cache'.
  *
- * @param cache Pointer to a cache
+ * @param cache pointer to a cache
  */
 void clear_cache(block_cache *cache)
 {
@@ -57,7 +59,7 @@ void clear_cache(block_cache *cache)
 /**
  * Clears a array of bytes = a buffer.
  *
- * @param Pointer to the array/buffer
+ * @param buffer  pointer to the array/buffer
  */
 void clear_buffer(uint8 buffer[BLOCK_SIZE])
 {

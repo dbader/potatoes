@@ -69,7 +69,7 @@ void fs_init()
 void fs_shutdown()
 {
         printf("%{FS:} shutting down FS..\n", GREEN);
-        write_root(); //TODO: intersection with "close all left inodes?"
+        write_root();
 
         //close all open files
         for (int i = 0; i < NUM_FILES; i++) {
@@ -102,8 +102,6 @@ bool load_fs()
 bool create_fs()
 {
         printf("%{FS:} creating new FS...\n", GREEN);
-        //dump_consts();
-
         init_bmap();
         init_inode_table();
         init_file_table();
@@ -115,7 +113,7 @@ bool create_fs()
 }
 
 /**
- * interface functions to handle the system calls.
+ * Interface functions to handle the system calls.
  */
 
 size_t do_read(file_nr fd, void *buf, size_t count, uint32 pos)

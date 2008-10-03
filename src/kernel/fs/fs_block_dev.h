@@ -42,8 +42,8 @@ void wrt_cache(block_cache *cache, size_t num_bytes);
 
 void clear_block(block_nr blk_nr);
 
-block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_scaling);
+block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_enlargement);
 
-block_nr scale(block_nr *blk_ptr, block_nr alloc_start);
+block_nr enlarge_file(block_nr *blk_ptr, block_nr alloc_start);
 
 #endif /*__FS_BLOCK_DEV_H_*/

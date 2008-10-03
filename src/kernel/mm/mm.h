@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Definitions for the functions and variables used in the memory manager.
+ * Definitions for the functions and variables used in the memory management.
  *
  * @author Johannes Schamburger
  * @author $LastChangedBy$
@@ -35,18 +35,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __MM_H_
 
 /**
- * the structure of a header of an occupied memory block (size: 4 * 32bit = 128bit
+ * the structure of a header of an occupied memory block (size: 4 * 32bit = 128bit)
  */
 typedef struct mm_header {
         struct mm_header *prev;         // pointer to the header of the previous occupied block
         struct mm_header *next;         // pointer to the header of the next occupied block
-        char name[32];                     // name of the block
+        char name[32];                  // name of the block
         uint32 size;                    // size of the current block
         // uint8 pad[100];
 } mm_header;
 
 /**
- * the start adress of the part of the memory that shall be managed
+ * the start address of the part of the memory that shall be managed
  */
 mm_header *mm_start;
 // [temporary] start of the part of the memory used for testing

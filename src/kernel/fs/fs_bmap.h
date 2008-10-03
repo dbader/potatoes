@@ -60,7 +60,7 @@ void dump_bmap();
  * a bit larger than NUM_BLOCKS_ON_HD / 8
  */
 /****************************************************/
-uint8 *bmap; //uint8 bmap[NUM_BMAP_BLOCKS * BLOCK_SIZE];
+uint8 *bmap;
 uint32 num_bmap_blocks;
 uint32 first_data_block;
 /****************************************************/

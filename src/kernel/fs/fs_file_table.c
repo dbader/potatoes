@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /**
- * Initialize the global filp table with NULL elements.
+ * Initialize the global file table with NULL elements.
  */
 void init_file_table()
 {
@@ -52,7 +52,9 @@ void init_file_table()
 }
 
 /**
- * Initialize the process filp table with NULL elements.
+ * Initialize the process file table with NULL elements.
+ * 
+ * @param pft   process file table
  */
 void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 {
@@ -63,9 +65,12 @@ void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 }
 
 /**
- * Insert a new file to the global filp table.
+ * Insert a new file to the global file table.
  *
- * @return the assigned file descriptor
+ * @param inode corresponding inode
+ * @param name  filename
+ * @param mode  DATA_FILE | DIRECTORY
+ * @return      assigned file descriptor
  */
 file_nr insert_file(m_inode *inode, char *name, uint8 mode)
 {
@@ -96,9 +101,11 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode)
 
 
 /**
- * Insert a new file to a given process filp table.
+ * Insert a new file to a given process file table.
  *
- * @return fd   assigned file descriptor
+ * @param pft      process file table
+ * @param glo_fd   global (for all processes) file descriptor
+ * @return         assigned file descriptor
  */
 file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length: NUM_PROC_FILES
 {
@@ -141,7 +148,8 @@ file* alloc_file()
 /**
  * Allocate an unused file in the process file table.
  *
- * @return Pointer to the allocated file
+ * @param pft   process file table
+ * @return      pointer to the allocated file
  */
 proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES])
 {
@@ -155,9 +163,10 @@ proc_file* alloc_proc_file(proc_file pft[NUM_PROC_FILES])
 }
 
 /**
- * Find a file in the global file table
+ * Find a file in the global file table.
  *
- * @return Pointer to the found file
+ * @param fd    file descriptor
+ * @return      pointer to the found file
  */
 
 file* get_file(file_nr fd)
@@ -173,7 +182,9 @@ file* get_file(file_nr fd)
 /**
  * Find a file in the process file table.
  *
- * @return pointer to the file found
+ * @param pft   process file table
+ * @param fd    file descriptor
+ * @return      pointer to the file found
  */
 proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
 {
@@ -248,9 +259,9 @@ void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 orig
  * Find the descriptor of a file with the file name.
  *
  * @param name  file name
- * @return fd   found file descriptor
+ * @return      found file descriptor
  */
-file_nr name2desc(char *name) //in global filp table
+file_nr name2desc(char *name) //in global file table
 {
         for (int i = 0; i < NUM_FILES; i++) {
                 //fs_dprintf("%s on 0x%d\n\n", gft[i].f_name, &gft[i].f_name);
@@ -267,7 +278,7 @@ file_nr name2desc(char *name) //in global filp table
  * Find the descriptor of a file via its inode (number).
  *
  * @param  inode  the file's inode
- * @return fd     found file descriptor
+ * @return        found file descriptor
  */
 file_nr inode2desc(m_inode *inode)
 {
@@ -283,7 +294,8 @@ file_nr inode2desc(m_inode *inode)
 /**
  * Look whether the global file table contains a special file descriptor.
  *
- * @return operation status
+ * @param fd    file descriptor
+ * @return      operation status
  */
 bool contains_file(file_nr fd)
 {

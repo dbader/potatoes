@@ -43,20 +43,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Read content from HD.
  *
- * @param buf           destination buffer
- * @param inode         source inode
- * @param num_bytes     number of bytes desired to read
- * @param pos           start position
- * @param allow_scaling enlarge the file if EOF is reached?
- * @return              number of bytes read
+ * @param buf                   destination buffer
+ * @param inode                 source inode
+ * @param num_bytes             number of bytes desired to read
+ * @param pos                   start position
+ * @param allow_enlargement     enlarge the file if EOF is reached?
+ * @return                      number of bytes read
  */
-size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_scaling)
+size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool allow_enlargement)
 {
-        if ((pos > inode->i_size && !allow_scaling) || num_bytes == 0) {
+        if ((pos > inode->i_size && !allow_enlargement) || num_bytes == 0) {
                 return 0;
         }
 
-        block_nr data_blk = get_data_block(inode, pos, allow_scaling); //see block_dev.c
+        block_nr data_blk = get_data_block(inode, pos, allow_enlargement); //see block_dev.c
 
         fs_dprintf("[fs_r_w] found block to read content from: %d\n", data_blk);
 
@@ -81,7 +81,7 @@ size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool all
                 fs_dprintf("[fs_r_w] reading over block edge...\n");
                 fs_dprintf("[fs_r_w] num_readable_bytes = %d, left bytes = %d, new pos = %d\n", num_readable_bytes, num_bytes - (num_readable_bytes), pos + num_readable_bytes);
 
-                return num_readable_bytes + fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes, allow_scaling);
+                return num_readable_bytes + fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes, allow_enlargement);
         }
 
         return num_readable_bytes;

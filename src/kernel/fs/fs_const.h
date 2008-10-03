@@ -52,9 +52,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ADDR_SIZE               4
 #define ADDRS_PER_BLOCK         BLOCK_SIZE/ADDR_SIZE
 #define NUM_DIRECT_POINTER      30                                      /* # direct pointer in inode */
-#define BYTES_DIRECT            NUM_DIRECT_POINTER * BLOCK_SIZE
-#define BYTES_SINGLE_INDIRECT   ADDRS_PER_BLOCK * BLOCK_SIZE
-#define BYTES_DOUBLE_INDIRECT   ADDRS_PER_BLOCK * ADDRS_PER_BLOCK * BLOCK_SIZE
+#define BYTES_DIRECT            NUM_DIRECT_POINTER * BLOCK_SIZE         /* # bytes accessable by direct pointer in inode */
+#define BYTES_SINGLE_INDIRECT   ADDRS_PER_BLOCK * BLOCK_SIZE            /* # bytes accessable by single indirect pointer in inode */
+#define BYTES_DOUBLE_INDIRECT   ADDRS_PER_BLOCK * ADDRS_PER_BLOCK * BLOCK_SIZE /* # bytes accessable by double indirect pointer in inode */
 
 #define BOOT_BLOCK              (block_nr) 0
 #define SUPER_BLOCK             (block_nr) 1

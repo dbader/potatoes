@@ -48,9 +48,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Find a filename within a block of directory entries.
  * Format of an entry: (struct dir_entry): [block_nr, name].
  *
- * @param file_list directory's file list of type dir_entry
- * @param name      file name which should be found
- * @return          block_nr of the file if found
+ * @param file_list  directory's file list of type dir_entry
+ * @param name       file name which should be found
+ * @return           block_nr of the file if found
  */
 block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
@@ -98,11 +98,11 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
                 dir_entry_blk = get_data_block(dir_inode, pos, TRUE);
 
                 if (dir_entry_blk == NOT_POSSIBLE) {
-                        return NOT_POSSIBLE; //problems during reading
+                        return NOT_POSSIBLE; 
                 }
 
                 if (fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, TRUE) == 0) {
-                        return NOT_POSSIBLE;
+                        return NOT_POSSIBLE; //problems during reading
                 }
 
                 if (contains_filename(dir_cache, name) == TRUE) { //file is already existent
@@ -170,11 +170,11 @@ block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name)
                 dir_entry_blk = get_data_block(dir_inode, pos, FALSE);
 
                 if (dir_entry_blk == NOT_POSSIBLE) {
-                        return NOT_POSSIBLE; //problems during reading
+                        return NOT_POSSIBLE; 
                 }
 
                 if (fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE) == 0) {
-                        return NOT_POSSIBLE;
+                        return NOT_POSSIBLE; //problems during reading
                 }
 
                 if (contains_filename(dir_cache, name)) {
@@ -240,8 +240,9 @@ uint32 delete_entry(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 /**
  * Checks whether a directory contains a special filename
  *
- * @param see find_file()
- * @return TRUE | FALSE
+ * @param file_list  directory's file list of type dir_entry
+ * @param name       file name which should be found
+ * @return           filename found?
  */
 bool contains_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
@@ -277,17 +278,16 @@ block_nr search_file(char *path)
 /**
  * Recursive search for files
  *
- * @param path  absolute path to file
- * @return      block number of the file's inode (if found)
+ * @param crt_dir       current directory to search in
+ * @param path          absolute path to file
+ * @param tok           a token of the path
+ * @param delim         mostly '/'
+ * @return              block number of the file's inode (if found)
  */
 block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
 {
         fs_dprintf("[fs_dir] searching for filename '%s' in block %d...\n", tok, crt_dir);
 
-        uint32 pos = 0;
-        uint32 bytes_read = 0;
-
-        block_nr file_blk;
         m_inode *dir_inode;
 
         if (crt_dir == root->i_adr) {
@@ -297,6 +297,10 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
                 dir_inode = &m_inode_cache;
         }
 
+        uint32 pos = 0;
+        uint32 bytes_read = 0;
+        block_nr file_blk; //corresponding block number to filename
+        
         do {
                 bytes_read = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE); //read content = file list
                 file_blk = find_filename(dir_cache, tok);  //find current file in the directory cache

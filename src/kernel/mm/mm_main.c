@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * initializes memory management
+ * Initializes memory management.
  *
  * @author Johannes Schamburger
  * @author $LastChangedBy$
@@ -37,14 +37,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io_virtual.h"
 
 /**
- * Initializes memory management (including the GDT)
+ * Initializes memory management (including the GDT).
  *
- * @param start the start of the part of the memory to be managed
- * @param end   the end of the part of the memory to be managed
+ * @param start start of the part of the memory to be managed
+ * @param end   end of the part of the memory to be managed
  */
 void mm_init(uint32 start, uint32 end)
 {
-
+        //TODO: delete disabled code
+        
         // set the start and the end of the memory
         mm_start = (mm_header*) start;
         mm_end = (mm_header*) (end - sizeof(mm_header));
@@ -66,7 +67,7 @@ void mm_init(uint32 start, uint32 end)
 //        dprintf("mm_start.name: %s\n", mm_start->name);
 //        dprintf("mm_start.size: %d\n", mm_start->size);
 
-        // This would like to live in main()...
+        // This would like to live in main()... //TODO: clear up... (e.g. split init functions)
         init_vmonitors();
         printf("%{etiOS - $Rev$ - "__DATE__" "__TIME__"\n", LIGHTGREEN);
         dprint_separator();

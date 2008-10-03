@@ -47,11 +47,11 @@ struct super_block {
         uint8 *s_bmap;                                  /* pointer to block bitmap */
         m_inode *s_iroot;                               /* pointer to root inode */
         time_t s_modify_ts;
-        uint16 s_read_only;                             /* TRUE or FALSE */
+        bool s_read_only;                               /* TRUE or FALSE */
         uint16 s_dirt;                                  /* CLEAN or DIRTY */
         uint32 s_magic_number;
 
-} super_block;
+}__attribute__((packed)) super_block;
 
 void init_super_block();
 

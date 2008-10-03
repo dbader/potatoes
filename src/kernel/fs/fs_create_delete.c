@@ -50,12 +50,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Creates a file from absolute path by inserting the name into the containing directory,
  * creating a new inode and writing it to HD.
  *
- * @param abs_path absolute file path
- * @return         result status of the create operation
+ * @param abs_path   absolute file path
+ * @param data_type  DATA_FILE | DIRECTORY (@see fs_const.h)
+ * @return           result status of the create operation
  */
 bool fs_create(char *abs_path, int data_type)
 {
-        fs_create_delete(abs_path, CREATE, data_type);
+        return fs_create_delete(abs_path, CREATE, data_type);
 }
 
 
@@ -63,11 +64,11 @@ bool fs_create(char *abs_path, int data_type)
  * Deletes a file by removing it from the containing directory.
  *
  * @param abs_path absolute file path
- * @return         operation's result status
+ * @return         result status of the delete operation
  */
 bool fs_delete(char *abs_path)
 {
-        fs_create_delete(abs_path, DELETE, NULL);
+        return fs_create_delete(abs_path, DELETE, NULL);
 }
 
 /**
@@ -76,7 +77,7 @@ bool fs_delete(char *abs_path)
  * @param abs_path  absolute file path
  * @param mode      CREATE | DELETE (@see fs_const.h)
  * @param data_type DATA_FILE | DIRECTORY (@see fs_const.h)
- * @return          operation's result status
+ * @return          result status of the create/delete operation
  */
 bool fs_create_delete(char *abs_path, int mode, int data_type)
 {
@@ -133,7 +134,7 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
         if (mode == CREATE) {
                 //create new inode and write it to HD
                 fs_dprintf("[fs_c_d] create new inode (type = %d) and write it to block %d\n", data_type, file_block);
-                m_inode *inode = new_minode(file_block, data_type, FALSE); //TODO: store in inode table?
+                m_inode *inode = new_minode(file_block, data_type, FALSE);
 
                 if (inode == NULL) {
                         return FALSE;

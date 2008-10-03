@@ -48,7 +48,7 @@ typedef sint16 file_nr;
 typedef struct dir_entry {
         block_nr inode;
         char name[NAME_SIZE];
-} dir_entry;
+} __attribute__((packed)) dir_entry;
 
 
 /**
@@ -62,7 +62,7 @@ typedef struct d_inode {
         block_nr i_direct_pointer[NUM_DIRECT_POINTER];
         block_nr i_single_indirect_pointer;
         block_nr i_double_indirect_pointer;
-} d_inode;
+} __attribute__((packed)) d_inode;
 
 
 /**
