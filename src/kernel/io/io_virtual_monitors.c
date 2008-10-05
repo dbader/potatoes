@@ -65,7 +65,7 @@ void init_vmonitors()
 {
         rtc_init();
         vmonitor_names =
-                (char*) callocn(num_vmonitor_limit * 81, sizeof(char), "vmonitor names array");
+                (char*)callocn(num_vmonitor_limit * 81, sizeof(char), "vmonitor names array");
         ASSERT(vmonitor_names != 0);
         vmonitors =
                 (virt_monitor*)callocn(num_vmonitor_limit, sizeof(virt_monitor*), "vmonitors array");
@@ -79,8 +79,8 @@ void init_vmonitors()
 virt_monitor* start_vmonitor(char *name, uint32 pid)
 {
         maxvmonitor++;
-        active_monitor = maxvmonitor;
         vmonitors[maxvmonitor] = new_virt_monitor(pid);
+        active_monitor = maxvmonitor;
         memset(vmonitor_names + 81 * active_monitor, '=', 80);
         memcpy(vmonitor_names + 81 * active_monitor + 2, name, strlen(name));
         *(vmonitor_names + 81 * active_monitor + 1) = ' ';

@@ -139,6 +139,7 @@ uint32 pm_schedule(uint32 context)
         // Destroy all zombie processes up to the first alive process.
         while (active_proc->next->state == PSTATE_DEAD) {
                 pm_destroy_thread(active_proc->next);
+                // FIXME: active_proc->next is non existent here 
                 active_proc->next = active_proc->next->next;
         }
 

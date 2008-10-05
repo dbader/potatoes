@@ -45,6 +45,7 @@ const uint8 line_width = 80;
 const uint16 vmonitor_height = 0xF00;
 const uint32 monitor_start = 0xB80A0;
 const uint8 cursor_offset = 80;
+virt_monitor *mon_ptr;
 
 
 /**
@@ -52,8 +53,6 @@ const uint8 cursor_offset = 80;
  */
 virt_monitor new_virt_monitor(uint32 pid)
 {
-        virt_monitor *mon_ptr;
-        ASSERT(mon_ptr != 0);
         void *mon = mallocn(VIRTUAL_MONITOR_SIZE, "virtual monitor");
         ASSERT(mon != 0);
         for (uint16 *temp = mon; temp < (uint16*)mon + vmonitor_height; temp++) {

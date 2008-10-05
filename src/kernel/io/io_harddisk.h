@@ -91,9 +91,9 @@ struct hd_info {
  * Address data for the hard disk packed in a struct.
  */
 struct address {
-        uint32 cyl;
-        uint16 head;
-        uint16 sector;
+        uint16 cyl;
+        uint8 head;
+        uint8 sector;
 };
 
 uint32 get_hdsize();

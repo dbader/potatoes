@@ -58,7 +58,7 @@ void init_file_table()
  */
 void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 {
-        fs_dprintf("[fs_file_table] initialize proc_file_table at 0x%d\n", pft);
+        fs_dprintf("[fs_file_table] initialize proc_file_table at 0x%p\n", pft);
         for (int i = 0; i < NUM_PROC_FILES; i++) {
                 pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
         }

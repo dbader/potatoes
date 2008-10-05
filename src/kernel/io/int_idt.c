@@ -78,11 +78,6 @@ void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg)
 }
 
 /**
- * Tells the CPU where to find our IDT
- */
-extern void idt_load();
-
-/**
  * Initializes a new idt with blank entries
  */
 extern void idt_flush(uint32);
@@ -94,6 +89,5 @@ void idt_init()
         for (i = 0; i < 256; i++) {             //fill with empty descriptors
                 idt_fill_entry(i, 0, 0, 0);
         }
-        //idt_load();
         idt_flush((uint32)&idtp);
 }

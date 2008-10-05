@@ -70,7 +70,7 @@ char* shell_makepath(char *path);
 void shell_cmd_snapshot(int argc, char *argv[])
 {
         if (argc < 2) {
-                _printf("Usage: snap [path]\n", STDOUT);
+                _printf("Usage: view [path]\n", STDOUT);
                 return;
         }
         int fd = _open(shell_makepath(argv[1]), 0, 0);

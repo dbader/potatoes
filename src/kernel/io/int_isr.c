@@ -150,6 +150,6 @@ char *ex_messages[] = {
 
 void isr_handler(cpu_state_t *cpu_state)
 {
-        //printf("got isr %u\n", cpu_state.int_no);
+        //printf("got isr %u\n", cpu_state->int_no);
         panic(ex_messages[cpu_state->int_no]);
 }
