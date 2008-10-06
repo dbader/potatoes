@@ -31,7 +31,7 @@ int dev_framebuffer_write(void *dev, int fd, void *buf, int size)
                 size = 25 * 80;
         }
         
-        uint16 *vid = (uint16*) 0xB8000;
+        uint16 *vid = (uint16*) VGA_DISPLAY;
         for (int i = 0; i < size; i++) {
                 *vid++ = *((uint8*)buf++) * 0x1000 + ' ';
         }

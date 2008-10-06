@@ -281,7 +281,7 @@ void hd_test()
         char *res_string = malloc(50);
         hd_read_sector((void*) res_string, 42);
         puts(res_string);
-        //hd_write_sector(42,(uint16*)0xB8000);
+        //hd_write_sector(42,(uint16*)VGA_DISPLAY);
         //hd_read_sector((uint16*)0xB85A0,42);
 }
 
@@ -536,7 +536,9 @@ void nullptr_test()
 
 void print_time()
 {
-        printf("%s\n", time2str());
+        char* ts = mallocn(23, "print_time test");
+        printf("%s\n", time2str(ts));
+        free(ts);
 }
 
 void make_snapshot();
@@ -573,5 +575,5 @@ void do_tests()
         SHORTCUT_CTRL('-', switch_monitor_down);
         SHORTCUT_CTRL('s', make_snapshot);
         dprint_separator();
-        fs_tests();
+        //fs_tests();
 }

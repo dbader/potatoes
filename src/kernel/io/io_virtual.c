@@ -41,36 +41,33 @@ along with this program->  If not, see <http://www->gnu->org/licenses/>->
 #include "io_rtc.h"
 #include "io_virtual.h"
 
-const uint8 line_width = 80;
-const uint16 vmonitor_height = 0xF00;
-const uint32 monitor_start = 0xB80A0;
-const uint8 cursor_offset = 80;
-virt_monitor *mon_ptr;
-
-
 /**
  * Creates a new virtual output.
+ * 
+ * @param *vm pointer to the virtual monitor struct, where the data should be written to
+ * @param pid PID of the appropriate process
  */
-virt_monitor new_virt_monitor(uint32 pid)
+void new_virt_monitor(virt_monitor *vm, uint32 pid)
 {
         void *mon = mallocn(VIRTUAL_MONITOR_SIZE, "virtual monitor");
         ASSERT(mon != 0);
-        for (uint16 *temp = mon; temp < (uint16*)mon + vmonitor_height; temp++) {
+        for (uint16 *temp = mon; temp < (uint16*)mon + VMONITOR_HEIGHT; temp++) {
                 *temp = 0xF00;
         }
-        mon_ptr->begin = (uint16*)mon;
-        mon_ptr->size = VIRTUAL_MONITOR_SIZE;
-        mon_ptr->vis_begin = (uint16*)mon;
-        mon_ptr->charnum = 0;
-        mon_ptr->scrolldown_limit = 0;
-        mon_ptr->scrollup_limit = 0;
-        mon_ptr->disable_refresh = FALSE;
-        mon_ptr->pid = pid;
-        return *mon_ptr;
+        vm->begin = (uint16*)mon;
+        vm->size = VIRTUAL_MONITOR_SIZE;
+        vm->vis_begin = (uint16*)mon;
+        vm->charnum = 0;
+        vm->scrolldown_limit = 0;
+        vm->scrollup_limit = 0;
+        vm->disable_refresh = FALSE;
+        vm->pid = pid;
 }
 
 /**
  * Deletes a virtual output.
+ * 
+ * @param *vm virtual monitor to be deleted
  */
 void free_virt_monitor(virt_monitor *vm)
 {
@@ -88,7 +85,7 @@ void free_virt_monitor(virt_monitor *vm)
 /**
  *  Writes a colored character to the virtual monitor.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor, on which the character shall be written
  * @param ch character to be written
  * @param fg foreground-color
  * @param bg background color
@@ -98,20 +95,20 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
         uint32 i = 0;
         uint32 temp;
 
-        if (vm->charnum >= (vmonitor_height / 2 - 1)) {
-                if (vm->scrollup_limit < ((vm->size - vmonitor_height) / 0xA0)) vm->scrollup_limit++;
-                vm->vis_begin += line_width;
+        if (vm->charnum >= (VMONITOR_HEIGHT / 2 - 1)) {
+                if (vm->scrollup_limit < ((vm->size - VMONITOR_HEIGHT) / 0xA0)) vm->scrollup_limit++;
+                vm->vis_begin += LINE_WIDTH;
                 if (vm->vis_begin >= vm->begin + vm->size / 2) {
                         vm->vis_begin = vm->begin;
                 }
                 //scroll, if outside of display-memory
                 uint16 *ptr = vm->begin +
-                              (vm->vis_begin + (vmonitor_height / 2) - line_width - vm->begin)
+                              (vm->vis_begin + (VMONITOR_HEIGHT / 2) - LINE_WIDTH - vm->begin)
                               % (vm->size / 2),
                               *tmpptr;
-                for (tmpptr = ptr; tmpptr < ptr + line_width; tmpptr++)
+                for (tmpptr = ptr; tmpptr < ptr + LINE_WIDTH; tmpptr++)
                         *tmpptr = 0xF00;
-                vm->charnum -= line_width;
+                vm->charnum -= LINE_WIDTH;
         }
         switch (ch) {
 //        case '\a':
@@ -121,7 +118,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
 //                virt_monitor_invert(get_active_virt_monitor());
 //                break;
         case '\n':
-                temp = line_width - (vm->charnum % line_width);
+                temp = LINE_WIDTH - (vm->charnum % LINE_WIDTH);
                 while (i++ < temp) { //calculating the "new line" starting position
                         virt_monitor_cputc(vm, ' ', fg, bg);
                 }
@@ -149,7 +146,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
 /**
  *  Writes a colored null-terminated string to the virtual monitor.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor, on which the string shall be written
  * @param *str pointer to the string
  * @param fg foreground-color
  * @param bg background color
@@ -168,7 +165,7 @@ int virt_monitor_cputs(virt_monitor *vm, char *str, uint8 fg, uint8 bg)
 /**
  * Writes a character to the virtual monitor.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor, on which the character shall be written
  * @param ch character to be written
  */
 void virt_monitor_putc(virt_monitor *vm, char ch)
@@ -179,7 +176,7 @@ void virt_monitor_putc(virt_monitor *vm, char ch)
 /**
  * Writes a null-terminated string to the virtual monitor.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor, on which the string shall be written
  * @param *str pointer to the string
  */
 int virt_monitor_puts(virt_monitor *vm, char *str)
@@ -190,7 +187,7 @@ int virt_monitor_puts(virt_monitor *vm, char *str)
 /**
  * Moves the cursor in the given direction.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor, on which the cursur shall be moved
  * @param dir 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT
  */
 void virt_cursor_move(virt_monitor *vm, uint8 dir)
@@ -201,31 +198,31 @@ void virt_cursor_move(virt_monitor *vm, uint8 dir)
         switch (dir) {
         case 0:
                 vm->charnum =
-                        (vm->charnum + (vmonitor_height / 2) - line_width) % (vmonitor_height / 2);
+                        (vm->charnum + (VMONITOR_HEIGHT / 2) - LINE_WIDTH) % (VMONITOR_HEIGHT / 2);
                 break;
         case 1:
-                vm->charnum = (vm->charnum + line_width) % (vmonitor_height / 2);
+                vm->charnum = (vm->charnum + LINE_WIDTH) % (VMONITOR_HEIGHT / 2);
                 break;
         case 2:
-                vm->charnum = (vm->charnum - vm->charnum % line_width) +
-                              (vm->charnum % line_width + 80 - 1) % line_width;
+                vm->charnum = (vm->charnum - vm->charnum % LINE_WIDTH) +
+                              (vm->charnum % LINE_WIDTH + 80 - 1) % LINE_WIDTH;
                 break;
         case 3:
                 vm->charnum =
-                        (vm->charnum - vm->charnum % line_width) + (vm->charnum + 1) % line_width;
+                        (vm->charnum - vm->charnum % LINE_WIDTH) + (vm->charnum + 1) % LINE_WIDTH;
                 break;
         }
         //Cursor update
         outb(0x3D4, 0x0E);
-        outb(0x3D5, (vm->charnum + cursor_offset) >> 8);
+        outb(0x3D5, (vm->charnum + CURSOR_OFFSET) >> 8);
         outb(0x3D4, 0x0F);
-        outb(0x3D5, (vm->charnum + cursor_offset));
+        outb(0x3D5, (vm->charnum + CURSOR_OFFSET));
 }
 
 /**
  * Updates the virtual monitor.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor to be updated
  */
 void update_virt_monitor(virt_monitor *vm)
 {
@@ -236,58 +233,63 @@ void update_virt_monitor(virt_monitor *vm)
                 return;
         }
 
-        set_disp(0xB8000);
+        set_disp(VGA_DISPLAY);
         monitor_cputs(get_active_virt_monitor_name(), GREEN, BLACK);
 
-        if ((vm->begin + vm->size / 2) - vm->vis_begin >= vmonitor_height) {
-                memcpy((void*)monitor_start, (void*)(vm->vis_begin), vmonitor_height);
+        if ((vm->begin + vm->size / 2) - vm->vis_begin >= VMONITOR_HEIGHT) {
+                memcpy((void*)MONITOR_START, (void*)(vm->vis_begin), VMONITOR_HEIGHT);
         } else {
-                memcpy((void*)monitor_start, (void*)(vm->vis_begin),
+                memcpy((void*)MONITOR_START, (void*)(vm->vis_begin),
                        2*(vm->begin + vm->size / 2 - vm->vis_begin));
-                memcpy((void*)monitor_start + 2*(vm->begin + vm->size / 2 - vm->vis_begin),
+                memcpy((void*)MONITOR_START + 2*(vm->begin + vm->size / 2 - vm->vis_begin),
                        (void*)(vm->begin),
-                       2*(vmonitor_height - (vm->begin + vm->size / 2 - vm->vis_begin)));
+                       2*(VMONITOR_HEIGHT - (vm->begin + vm->size / 2 - vm->vis_begin)));
         }
         //Cursor update
         outb(0x3D4, 0x0E);
-        outb(0x3D5, (vm->charnum + cursor_offset) >> 8);
+        outb(0x3D5, (vm->charnum + CURSOR_OFFSET) >> 8);
         outb(0x3D4, 0x0F);
-        outb(0x3D5, (vm->charnum + cursor_offset));
+        outb(0x3D5, (vm->charnum + CURSOR_OFFSET));
 }
 
 /**
- * Scrolls the virtual monitor up on request.
+ * Scrolls a virtual monitor up on request.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor to scroll
  */
 void virt_monitor_scrollup(virt_monitor *vm)
 {
         if (vm->scrollup_limit) {
                 vm->scrollup_limit--;
-                if (vm->vis_begin > vm->begin) vm->vis_begin -= line_width;
-                else vm->vis_begin = vm->begin + (vm->size / 2) - line_width;
+                if (vm->vis_begin > vm->begin) vm->vis_begin -= LINE_WIDTH;
+                else vm->vis_begin = vm->begin + (vm->size / 2) - LINE_WIDTH;
                 vm->scrolldown_limit++;
         }
 }
 
 /**
- * Scrolls the virtual monitor down on request.
+ * Scrolls a virtual monitor down on request.
  *
- * @param *vm active virtual monitor
+ * @param *vm virtual monitor to scroll
  */
 void virt_monitor_scrolldown(virt_monitor *vm)
 {
         if (vm->scrolldown_limit) {
                 vm->scrolldown_limit--;
-                if (vm->vis_begin < vm->begin + (vm->size / 2)) vm->vis_begin += line_width;
+                if (vm->vis_begin < vm->begin + (vm->size / 2)) vm->vis_begin += LINE_WIDTH;
                 else vm->vis_begin = vm->begin;
                 vm->scrollup_limit++;
         }
 }
 
+/**
+ * Inverts a virtual monitor.
+ * 
+ * @param *vm virtual monitor to invert
+ */
 void virt_monitor_invert(virt_monitor *vm)
 {
         for (uint8 *temp = (uint8*)vm->vis_begin + 1;
-                        temp <= (uint8*)(vm->vis_begin + vmonitor_height); temp += 2)
+                        temp <= (uint8*)(vm->vis_begin + VMONITOR_HEIGHT); temp += 2)
                 * temp = 0xFF - *temp;
 }

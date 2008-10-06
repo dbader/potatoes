@@ -1,6 +1,7 @@
 #include "../include/types.h"
 #include "../include/const.h"
 #include "../include/string.h"
+#include "../include/stdlib.h"
 #include "../include/debug.h"
 #include "pm_devices.h"
 #include "../io/io_rtc.h"
@@ -17,7 +18,9 @@ int dev_clock_close(void *dev, int fd)
 
 int dev_clock_read(void *dev, int fd, void *buf, int size)
 {
-        strncpy(buf, time2str(), size);
+        char* timestamp = mallocn(23, "dev_clock");
+        strncpy(buf, time2str(timestamp), size);
+        free(timestamp);
         return strlen(buf);
 }
 

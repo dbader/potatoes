@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TRUE            1
 #define FALSE           0
 #define FREQUENCY       100 //inits timer with frequency 100Hz (shoots every 10 ms)
+#define VGA_DISPLAY     0xB8000
 
 #define EOF             -1
 

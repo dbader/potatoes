@@ -196,7 +196,7 @@ incoming_syscall:
         
         popad
         iret
-               
+
 [GLOBAL halt]
 halt:
         hlt

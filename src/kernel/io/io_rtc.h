@@ -67,6 +67,6 @@ struct time {
 
 void rtc_init();
 void rtc_update();
-char* time2str();
+char* time2str(char* timestamp);
 
 #endif /*__IO_RTC_H*/

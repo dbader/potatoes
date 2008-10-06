@@ -81,7 +81,7 @@ void shell_cmd_snapshot(int argc, char *argv[])
 
         int keyboard = _open("/dev/keyboard", 0, 0);
         get_active_virt_monitor()->disable_refresh = TRUE;
-        _read(fd, (void*)0xB8000, 2*25*80);
+        _read(fd, (void*)VGA_DISPLAY, 2*25*80);
 
         while (!keydown(ESCAPE, keyboard)) ;
 
@@ -96,6 +96,6 @@ void shell_cmd_snapshot(int argc, char *argv[])
 
 void make_snapshot()
 {
-        memcpy(snap_buffer, (void*)0xB8000, 2*25*80);
+        memcpy(snap_buffer, (void*)VGA_DISPLAY, 2*25*80);
         pm_create_thread("SNAPSHOT", snapshot, 4096);
 }

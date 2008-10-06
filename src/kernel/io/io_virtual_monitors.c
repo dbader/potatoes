@@ -45,6 +45,9 @@ virt_monitor *vmonitors;
 uint16 num_vmonitor_limit = 1000;
 char *vmonitor_names;
 
+/**
+ * Switches to the next virtual monitor.
+ */
 void switch_monitor_up()
 {
         if (active_monitor < maxvmonitor) active_monitor++;
@@ -53,6 +56,9 @@ void switch_monitor_up()
         pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
+/**
+ * Switches to the previous virtual monitor.
+ */
 void switch_monitor_down()
 {
         if (active_monitor > 0) active_monitor--;
@@ -61,6 +67,9 @@ void switch_monitor_down()
         pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
+/**
+ * Initializes the virtual monitors.
+ */
 void init_vmonitors()
 {
         rtc_init();
@@ -74,12 +83,16 @@ void init_vmonitors()
 }
 
 /**
- * Initializes the virtual monitor.
+ * Initializes and registers a virtual monitor.
+ * 
+ * @param *name name of the new virtual monitor
+ * @param pid PID of the appropriate process
+ * @return pointer to the new virtual monitor
  */
 virt_monitor* start_vmonitor(char *name, uint32 pid)
 {
         maxvmonitor++;
-        vmonitors[maxvmonitor] = new_virt_monitor(pid);
+        new_virt_monitor(&vmonitors[maxvmonitor], pid);
         active_monitor = maxvmonitor;
         memset(vmonitor_names + 81 * active_monitor, '=', 80);
         memcpy(vmonitor_names + 81 * active_monitor + 2, name, strlen(name));
@@ -90,13 +103,25 @@ virt_monitor* start_vmonitor(char *name, uint32 pid)
         return &(vmonitors[maxvmonitor]);
 }
 
+/**
+ * Returns the pointer to the active virtual monitor
+ * 
+ * @return pointer to the active virtual monitor
+ */
 virt_monitor* get_active_virt_monitor()
 {
         return &(vmonitors[active_monitor]);
 }
 
+/**
+ * Returns the name of the active virtual monitor
+ * 
+ * @return pointer to the name string
+ */
 char* get_active_virt_monitor_name()
 {
-        memcpy(vmonitor_names + 81 * active_monitor + 55, (void*)time2str(), 23);
+        char* timestamp = mallocn(23, "timestamp");
+        memcpy(vmonitor_names + 81 * active_monitor + 55, time2str(timestamp), 23);
+        free(timestamp);
         return &(vmonitor_names[active_monitor*81]);
 }

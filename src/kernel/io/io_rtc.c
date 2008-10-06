@@ -38,6 +38,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/types.h"
 
+/**
+ * Initializes the global data struct
+ */
 void rtc_init()
 {
         // TODO: is this necessary? 
@@ -66,6 +69,9 @@ void rtc_init()
         time.year = inb(RTC_DATA);
 }
 
+/**
+ * Updates the date-data in the global time struct
+ */
 void rtc_update()
 {
         outb(RTC_ADDR, RTC_SEC);
@@ -97,10 +103,14 @@ void rtc_update()
         }
 }
 
-// FIXME: RACE CONDITION ALERT: should be given a buffer as parameter!!!
-char* time2str()
+/**
+ * Converts the data in the global time struct into a readable string
+ * 
+ * @param timestamp the buffer for the date-string
+ * @return the pointer to the same buffer now filled with the date string
+ */
+char* time2str(char timestamp[23])
 {
-        static char timestamp[23];
         switch (time.weekday) {
         case 1:
                 strcpy(timestamp, "SUN");

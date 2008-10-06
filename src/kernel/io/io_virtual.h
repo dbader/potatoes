@@ -35,6 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 
 #define VIRTUAL_MONITOR_SIZE 160000
+#define LINE_WIDTH 80
+#define VMONITOR_HEIGHT 0xF00
+#define MONITOR_START 0xB80A0
+#define CURSOR_OFFSET 80
 
 extern uint16 maxvmonitor;
 extern uint16 active_monitor;
@@ -55,7 +59,7 @@ extern virt_monitor *vmonitors;
 virt_monitor* get_active_virt_monitor();
 char* get_active_virt_monitor_name();
 
-virt_monitor new_virt_monitor(uint32 pid);
+void new_virt_monitor(virt_monitor *vm, uint32 pid);
 void free_virt_monitor(virt_monitor *vm);
 
 void update_virt_monitor();
