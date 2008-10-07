@@ -50,16 +50,6 @@ int rand()
         return (((_seed = _seed * 214013L + 2531011L) >> 16) & 0x7fff);
 }
 
-/**
- * Allocates 'size' bytes and additionally saves a name in the header of the block.
- * ATTENTION: if malloc fails (i.e. there is not enough free space), the return value is
- * (void*) NULL. So, this should always be tested!
- *
- * @param size  how much space shall be allocated
- * @param name  name of the memory block (mainly for debugging purposes)
- * @return      pointer to the allocated space
- */
-
 /*
  * Enables a braindead memory "manager" for debugging purposes. (daniel)
  * Use this to make sure a bug is not related to MM.
@@ -70,6 +60,15 @@ int rand()
 void* mem = (void*) 0x300000; // assume this is past the kernel code...
 #endif
 
+/**
+ * Allocates 'size' bytes and additionally saves a name in the header of the block.
+ * ATTENTION: if malloc fails (i.e. there is not enough free space), the return value is
+ * (void*) NULL. So, this should always be tested!
+ *
+ * @param size  how much space shall be allocated
+ * @param name  name of the memory block (mainly for debugging purposes)
+ * @return      pointer to the allocated space
+ */
 void* mallocn(size_t size, char *name)
 {
 #ifdef MEM_FAILSAFE
@@ -185,10 +184,10 @@ void free(void *start)
  * ATTENTION: if realloc fails (i.e. there is not enough free space), the return value is
  * (void*) NULL. So this should always be tested!
  * Especially realloc() shouldn't be used like this:
- *
+ * @code
  * int* p = malloc(50);
  * p = realloc(100);
- *
+ * @endcode
  * In this case, if realloc fails, p is overwritten by (void*) NULL. So, the memory allocated
  * for p is no longer accessible, which means that the data stored in p is lost and the memory
  * allocated for p can't be used any more.

@@ -147,7 +147,7 @@ char* strncat(char *s1, char *s2, size_t n)
  * **str_ptr points at as well as the contents of the respective string.
  *
  * Example:
- *
+ * @code
  *      char path[] = "/usr/share/bin/editor";<p>
  *      char delim[] = "/";<p>
  *      char *tok;<p>
@@ -165,6 +165,7 @@ char* strncat(char *s1, char *s2, size_t n)
  *      puts("done.");<p>
  *
  *      free(copy);<p>
+ * @endcode
  *
  * @bug The current implementation does not handle multiple delimiters (as specified in the
  *      libc manual). Only the first character in *delims is used for tokenizing the input string.

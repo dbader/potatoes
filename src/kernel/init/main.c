@@ -47,7 +47,8 @@ struct multiboot *g_mboot_ptr;
 /**
  * The address of end is equal to the end of kernel code in memory + 1.
  * This constant gets defined in the linker script link.ld.
- * Example: mem_start = (uint32) &end;
+ * 
+ * Usage example: @code mem_start = (uint32) &end; @endcode
  */
 extern int end;
 
@@ -79,12 +80,13 @@ void panic(char *msg)
                 halt();
 }
 
+extern void shell_main();
+
 /**
  * C kernel entry point.
  *
  * @param mboot_ptr The multiboot struct passed by the bootloader (grub).
  */
-extern void shell_main();
 int main(struct multiboot *mboot_ptr)
 {
         g_mboot_ptr = mboot_ptr;
@@ -96,7 +98,7 @@ int main(struct multiboot *mboot_ptr)
         pm_init();
 
         dprint_separator();
-        printf("%{main:} %d bytes kernel stack\n", RED, 0x300000 - (uint32)&end);
+        printf("%{main:} %d bytes kernel stack\n", RED, 0x300000 - (uint32)end);
         printf("%{main:} init complete at %d ticks.\n", RED, get_ticks());
 
         do_tests();
