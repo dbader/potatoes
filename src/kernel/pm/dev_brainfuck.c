@@ -46,7 +46,6 @@ int dev_brainfuck_close(void *dev, int fd)
         return 0;
 }
 
-
 int dev_brainfuck_read(void *dev, int fd, void *buf, int size)
 {
         for (int i = 0; i < size; i++)

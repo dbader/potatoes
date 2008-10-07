@@ -38,11 +38,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "pm_main.h"
 #include "syscalls_shared.h"
 
+/**
+ * Writes a string to the kernel debug monitor. Useful to dump
+ * strings that should not be displayed in the process's own
+ * vmonitor.
+ * 
+ * @param msg the text to print
+ */
 void _log(char* msg)
 {
         _syscall(SYS_LOG, msg);
 }
 
+/**
+ * Exits the calling process and releases its resources.
+ * 
+ * @param status the return status
+ */
 void _exit(int status)
 {
         _syscall(SYS_EXIT, (void*)status);
@@ -51,6 +63,11 @@ void _exit(int status)
         WAIT_FOR_INTERRUPT();
 }
 
+/**
+ * Returns the PID (process id) of the calling process.
+ * 
+ * @return the process id
+ */
 int _getpid()
 {
         uint32 pid;
@@ -58,6 +75,14 @@ int _getpid()
         return pid;
 }
 
+/**
+ * Opens a file or a device.
+ * 
+ * @param path the path of the file to open
+ * @param oflag the open flag. @see O_OPEN @see O_CREAT 
+ * @param mode not used as of now. Set to 0.
+ * @return a valid handle on success or -1 if failed
+ */
 int _open(char *path, int oflag, int mode)
 {
         sc_open_args_t args;
@@ -68,6 +93,12 @@ int _open(char *path, int oflag, int mode)
         return args.fd;
 }
 
+/**
+ * Closes a open file handle.
+ * 
+ * @param fd the file descriptor of the file to close
+ * @return 0 on success, -1 on error
+ */
 int _close(int fd)
 {
         sc_close_args_t args;
@@ -76,6 +107,14 @@ int _close(int fd)
         return args.success;
 }
 
+/**
+ * Reads data from a file or device.
+ * 
+ * @param fd the file descriptor
+ * @param buf the buffer to receive the data read
+ * @param size the number of bytes to read
+ * @return the number of bytes read or -1 on error
+ */
 int _read(int fd, void *buf, int size)
 {
         sc_read_write_args_t args;
@@ -86,6 +125,14 @@ int _read(int fd, void *buf, int size)
         return args.rw_count;
 }
 
+/**
+ * Writes data into a file or device.
+ * 
+ * @param fd the file descriptor
+ * @param buf the buffer containing the data to write
+ * @param size the number of bytes to write
+ * @return the number of bytes written or -1 on error
+ */
 int _write(int fd, void *buf, int size)
 {
         sc_read_write_args_t args;
@@ -96,6 +143,18 @@ int _write(int fd, void *buf, int size)
         return args.rw_count;
 }
 
+/**
+ * Moves the file pointer in a file or device. The file pointer
+ * determines the current read and write position inside a file.
+ * 
+ * @param fd the file descriptor
+ * @param offset the offset from the position specified by the "whence" argument
+ * @param whence the starting position of the seek operation. 
+ * 			@see SEEK_SET 
+ * 			@see SEEK_CUR
+ * 			@see SEEK_END
+ * @return the new position of the file pointer
+ */
 int _seek(int fd, int offset, int whence)
 {
         sc_seek_args_t args;
@@ -106,6 +165,12 @@ int _seek(int fd, int offset, int whence)
         return args.pos;
 }
 
+/**
+ * Allocates new memory. @see _free
+ * 
+ * @param size the number of bytes to allocate
+ * @return a pointer to the new memory area or NULL if allocation failed
+ */
 void* _malloc(size_t size)
 {
         sc_malloc_args_t args;
@@ -114,9 +179,12 @@ void* _malloc(size_t size)
         return args.mem;
 }
 
-extern void printf(char *fmt, ...);
+/**
+ * Frees memory previously allocated through malloc(). @see _malloc
+ * 
+ * @param block pointer to a memory block allocated through malloc
+ */
 void _free(void *block)
 {
-        //printf("_free : 0x%x\n", block);
         _syscall(SYS_FREE, block);
 }

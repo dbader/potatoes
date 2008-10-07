@@ -52,6 +52,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_SYSCALL     9
 
 // Definitions for open()'s oflag argument
+/** 
+ * Attempts to open a file. If the file does not exists open() aborts
+ * and returns -1. 
+ */
+#define O_OPEN  0
+
+/** 
+ * Attempts to open a file. If the file does not exist yet open()
+ * creates the file and opens it. 
+ */
 #define O_CREAT 1
 
 /** Arguments for the OPEN syscall. */
@@ -77,8 +87,13 @@ typedef struct sc_read_write_args_t {
 } sc_read_write_args_t;
 
 // Definitions for seek()'s whence argument
+/** Seek to an absolute position. */
 #define SEEK_SET 0
+
+/** Seek relative from the current position of the file pointer. */ 
 #define SEEK_CUR 1
+
+/** Seek relative to the end of the file. */
 #define SEEK_END 2
 
 /** Arguments for the SEEK syscall. */

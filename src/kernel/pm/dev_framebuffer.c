@@ -1,3 +1,37 @@
+/* $Id$
+      _   _  ____   _____
+     | | (_)/ __ \ / ____|
+  ___| |_ _| |  | | (___
+ / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
+|  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
+ \___|\__|_|\____/|_____/
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * @file
+ * The framebuffer device. This provides a 80x25 pixels, 16 color video screen.
+ * Video output through the framebuffer device is much faster as it
+ * writes directly to the video memory and does not use the conversion
+ * functions of the vmonitors. Used primarily for the various demo games.
+ *
+ * @author Daniel Bader
+ * @author $LastChangedBy$
+ * @version $Rev$
+ */
+ 
 #include "../include/types.h"
 #include "../include/const.h"
 #include "../include/string.h"
@@ -23,14 +57,16 @@ int dev_framebuffer_read(void *dev, int fd, void *buf, int size)
         return -1;
 }
 
-//* Draws ASCII "pixels" directly to the video memory without using the vmonitors.
 int dev_framebuffer_write(void *dev, int fd, void *buf, int size)
 {
         //TODO: skip rendering if the active vmonitor is different from the caller's
+        
+        /* Allow the rendered area to be smaller than full screen. */
         if (size > 25 * 80) {
                 size = 25 * 80;
         }
         
+        /* Write colored ASCII "space" characters to the video memory. */
         uint16 *vid = (uint16*) VGA_DISPLAY;
         for (int i = 0; i < size; i++) {
                 *vid++ = *((uint8*)buf++) * 0x1000 + ' ';

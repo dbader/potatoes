@@ -62,6 +62,7 @@ typedef struct device_t {
         dev_read_func read;
         dev_write_func write;
         dev_seek_func seek;
+        
         struct device_t *next;
 } device_t;
 

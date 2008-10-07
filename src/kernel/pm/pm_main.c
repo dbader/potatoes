@@ -137,10 +137,10 @@ uint32 pm_schedule(uint32 context)
         active_proc->context = context;
 
         // Destroy all zombie processes up to the first alive process.
-        while (active_proc->next->state == PSTATE_DEAD) {
+        while (active_proc->next->state == PSTATE_DEAD) {        		
+        		process_t *next_proc = active_proc->next->next;                
                 pm_destroy_thread(active_proc->next);
-                // FIXME: active_proc->next is non existent here 
-                active_proc->next = active_proc->next->next;
+                active_proc->next = next_proc;
         }
 
         active_proc = active_proc->next;
@@ -259,7 +259,7 @@ void pm_destroy_thread(process_t *proc)
 /**
  * Gives a process the input focus.
  * 
- * @param pid the process id
+ * @param pid the pid of the process receiving the focus
  */
 void pm_set_focus_proc(uint32 pid)
 {

@@ -45,7 +45,7 @@ typedef struct {
         unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
         unsigned int int_no, err_code;
         unsigned int eip, cs, eflags, useresp, ss;
-} /*__attribute__((__packed__))*/ cpu_state_t;
+} /*__attribute__((__packed__))*/  cpu_state_t;
 
 #define PSTATE_ALIVE 0
 #define PSTATE_DEAD  1
@@ -82,15 +82,14 @@ typedef struct process_t {
         /** process file table */
         proc_file pft[NUM_PROC_FILES];
 
+		/** the virtual monitor this process is attached to */
         virt_monitor *vmonitor;
-
-        /* xxx *stdout */
-        /* llist *mem_blocks; */
 
         /** linked list next ptr */
         struct process_t *next;
 } process_t;
 
+/** Maximum number of input bytes the STDIN data structure can queue up */
 #define STDIN_QUEUE_SIZE 512
 
 extern process_t *procs_head;
@@ -98,7 +97,6 @@ extern process_t *active_proc;
 extern process_t *focus_proc;
 
 uint32 getpid();
-
 
 void pm_init();
 uint32 pm_schedule(uint32 context);

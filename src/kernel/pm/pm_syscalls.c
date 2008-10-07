@@ -60,10 +60,20 @@ syscall_handler syscall_table[] = {
         sys_free        // 9
 };
 
-//#define MAX_SYSCALL (sizeof(syscall_table) / sizeof(syscall_handler)) - 1
-
+/** Syscall trace macro. Uncomment to print a message everytime a syscall gets executed. */
 #define SYSCALL_TRACE //dprintf("[%u] ", getpid()); dprintf
 
+/**
+ * The syscall dispatch function. This gets called whenever a thread
+ * request a syscall by raising the syscall interrupt (int 0x42).
+ * It checks the syscall id for validity and calls the appropiate
+ * syscall handler.
+ * @see syscall_table
+ * @see syscalls_shared.h
+ * 
+ * @param id the syscall id number
+ * @param data pointer to the syscall argument structure
+ */
 void pm_syscall(uint32 id, void* data)
 {
         if (id > MAX_SYSCALL)
@@ -131,7 +141,6 @@ void sys_open(void *data)
         device_t *dev = pm_name2device(path);
         if (dev != NULL) {
                 // It's a device file
-                //dprintf("opening device %s\n", dev->name);
                 args->fd = dev->open(dev, path, args->oflag, args->mode);
         } else {
                 // It's a real file.
@@ -161,7 +170,10 @@ void sys_open(void *data)
         free(path);
 }
 
-void sys_close(void* data)
+/**
+ * int _close(int fd); 
+ */
+void sys_close(void *data)
 {
         sc_close_args_t *args = (sc_close_args_t*) data;
         SYSCALL_TRACE("SYS_CLOSE(%d)\n", args->fd);
@@ -192,6 +204,9 @@ void sys_close(void* data)
 void sys_read(void* data)
 {
         sc_read_write_args_t *args = (sc_read_write_args_t*) data;
+        
+        /* Tracing this syscall will drive you nuts as the shell
+         * is using this to poll for new input. */
         //SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
 
         if (args->fd < MAX_DEVICES) {
@@ -207,28 +222,23 @@ void sys_read(void* data)
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
                 args->rw_count = do_read(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
 
-                // Right now do_read() does not support partially successful reads.
-                // So we have to patch that up:
-                //if (args->rw_count != FALSE)
-                //      args->rw_count = args->size;
-
                 pft_entry->pf_pos += args->rw_count;
         }
 }
-
+/**
+ * int _write(int fd, void *buf, int size);
+ */
 void sys_write(void* data)
 {
         sc_read_write_args_t *args = (sc_read_write_args_t*) data;
         SYSCALL_TRACE("SYS_WRITE(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
 
-        //dprintf("writing to fd%d: ", args->fd);
         if (args->fd < MAX_DEVICES) {
                 // It's a device file
                 device_t *dev = pm_fd2device(args->fd);
                 if (!dev)
                         args->rw_count = -1;
                 else {
-                        //  dprintf("write func of %s is at 0x%x\n", dev->name, dev->write);
                         args->rw_count = dev->write(dev, args->fd, args->buf, args->size);
                 }
         } else {
@@ -236,15 +246,12 @@ void sys_write(void* data)
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
                 args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
 
-                // Right now do_write() does not support partially successful writes.
-                // So we have to patch that up:
-                //if (args->rw_count != FALSE)
-                //      args->rw_count = args->size;
-
                 pft_entry->pf_pos += args->rw_count;
         }
 }
-
+/**
+ * int _seek(int fd, int offset, int whence);
+ */
 void sys_seek(void* data)
 {
         sc_seek_args_t *args = (sc_seek_args_t*) data;
@@ -277,7 +284,9 @@ void sys_seek(void* data)
         }
 }
 
-
+/**
+ * void* _malloc(size_t size);
+ */
 void sys_malloc(void *data)
 {
         sc_malloc_args_t *args = (sc_malloc_args_t*) data;
@@ -285,9 +294,11 @@ void sys_malloc(void *data)
         args->mem = mallocn(args->size, active_proc->name);
 }
 
+/**
+ * void _free(void *block);
+ */
 void sys_free(void *data)
 {
         SYSCALL_TRACE("SYS_FREE(0x%x)\n", data);
-        //printf("SYS_FREE(0x%x)\n", data);
         free(data);
 }
