@@ -22,34 +22,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Headers for string.c
+ * Shell utility functions.
  *
- * @author Dmitriy Traytel
+ * @author Daniel Bader
  * @author $LastChangedBy$
  * @version $Rev$
  */
 
-#ifndef __STRING_H
-#define __STRING_H
+#ifndef __SHELL_UTILS_H
+#define __SHELL_UTILS_H
 
-#include "types.h"
+extern int STDIN;
+extern int STDOUT;
 
-uint32 strlen(char* str);
-char* strcpy(char *dest, char *src);
-char* strncpy(char *dest, char *src, size_t n);
-char* strchr(char *str, char ch);
-char* strcat(char *s1, char *s2);
-char* strncat(char *s1, char *s2, size_t n);
-char* strdup(char* str);
-char* strsep(char **str_ptr, char *delims);
-sint32 strcmp(char *s1, char *s2);
+int _fputch(char ch, int fd);
+int _fgetch(int fd);
+char* _fgets(char *s, int n, int fd);
+int _fputs(char *s, int fd);
+void _printf(char *fmt, ...);
+char* shell_makepath(char *path);
 
-void* memset(void *dest, uint8 value, size_t count);
-void bzero(void *dest, uint32 count);
-void* memcpy(void *dest, void *src, size_t count);
-void* memmove(void *dest, void *src, size_t count);
-
-char* strreverse(char *str);
-char* itoa(int n, char *str, unsigned int base);
-
-#endif /* string.h */
+#endif /* __SHELL_UTILS_H */

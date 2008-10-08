@@ -22,34 +22,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Headers for string.c
+ * etiOS shell main header file.
  *
- * @author Dmitriy Traytel
+ * @author Daniel Bader
  * @author $LastChangedBy$
  * @version $Rev$
  */
+ 
+#ifndef SHELL_MAIN_H_
+#define SHELL_MAIN_H_
 
-#ifndef __STRING_H
-#define __STRING_H
+/** A shell command function pointer. Entry point of all shell commands. */
+typedef void (*shell_cmd_func)(int argc, char *argv[]);
 
-#include "types.h"
+/** A single shell commmand. */
+typedef struct shell_cmd_t {
+        char name[16];
+        shell_cmd_func cmd;
+        char desc[100];
+} shell_cmd_t;
 
-uint32 strlen(char* str);
-char* strcpy(char *dest, char *src);
-char* strncpy(char *dest, char *src, size_t n);
-char* strchr(char *str, char ch);
-char* strcat(char *s1, char *s2);
-char* strncat(char *s1, char *s2, size_t n);
-char* strdup(char* str);
-char* strsep(char **str_ptr, char *delims);
-sint32 strcmp(char *s1, char *s2);
+extern struct shell_cmd_t shell_cmds[]; // Forward declaration.
 
-void* memset(void *dest, uint8 value, size_t count);
-void bzero(void *dest, uint32 count);
-void* memcpy(void *dest, void *src, size_t count);
-void* memmove(void *dest, void *src, size_t count);
+/** The current working directory. All relative paths are relative to this. */
+extern char cwd[255];
 
-char* strreverse(char *str);
-char* itoa(int n, char *str, unsigned int base);
+/** A buffer for shell_makepath() */
+extern char path_buf[sizeof(cwd)];
 
-#endif /* string.h */
+#endif /*SHELL_MAIN_H_*/
