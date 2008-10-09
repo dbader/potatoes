@@ -66,7 +66,7 @@ file_nr name2desc(char *name);
 file_nr inode2desc(m_inode *inode);
 
 void inc_count(file_nr fd);
-void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin);
+size_t lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin);
 
 /* definition */
 

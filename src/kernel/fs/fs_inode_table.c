@@ -64,7 +64,9 @@ void init_inode_table()
 void create_root()
 {
         m_inode *new_root = new_minode(ROOT_INODE_BLOCK, DIRECTORY, FALSE);
-        if (new_root == (m_inode*) NULL) return;
+        if (new_root == NULL){
+                return;
+        }
         memcpy(&inode_table[ROOT_INODE], new_root, sizeof(m_inode));
 
         root = &inode_table[ROOT_INODE];
@@ -224,6 +226,7 @@ m_inode* new_minode(block_nr adr, int mode, bool to_inode_table)
                 if (mi == NULL) {
                         return (m_inode *) NULL;
                 }
+                bzero(mi, sizeof(mi));
                 mi->i_num = NIL_INODE;
         } else {
                 mi = alloc_inode();

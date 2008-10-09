@@ -42,11 +42,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs_bmap.h"
 #include "../io/io_rtc.h"
 
-/**
- * Time function.
- * @return current system time.
+/*
+ * @see /kernel/io/io_harddisk.h
  */
-extern uint32 get_time();
 extern uint32 get_hdsize();
 
 /**

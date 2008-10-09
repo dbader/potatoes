@@ -43,7 +43,6 @@ struct super_block {
         block_nr s_first_data_block;
         uint32 s_max_file_size;
 
-        /* in mem */
         uint8 *s_bmap;                                  /* pointer to block bitmap */
         m_inode *s_iroot;                               /* pointer to root inode */
         time_t s_modify_ts;

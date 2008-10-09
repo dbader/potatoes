@@ -50,7 +50,7 @@ bool fs_delete(char *path);
 
 bool fs_create_delete(char *abs_path, int mode, int data_type);
 
-void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 originf);
+size_t lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 originf);
 
 
 extern void read_dinode(d_inode *inode, block_nr inode_blk);

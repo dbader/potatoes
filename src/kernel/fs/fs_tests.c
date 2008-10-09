@@ -391,5 +391,5 @@ void test_delete()
 
 void run_FS_tests()
 {
-        test_delete();
+        //test_delete();
 }

@@ -120,16 +120,16 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         } while (insert_pos == NOT_FOUND);
 
         (dir_inode->i_size)++;  //update #entries
+        dir_inode->i_modify_ts = time;
         write_inode(dir_inode); //write back modified directory inode
+        
         fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
-
-
+        
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
 
         clear_block(new_blk); //reset new block
-
         fs_dprintf("[fs_dir] new block allocated for inode: %d\n", new_blk);
-
+        
         if (dir_inode_blk != ROOT_INODE_BLOCK) {
                 free(dir_inode);
         }
@@ -190,7 +190,9 @@ block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name)
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
 
         (dir_inode->i_size)--;  //update #entries
+        dir_inode->i_modify_ts = time;
         write_inode(dir_inode); //write back modified directory inode
+        
         fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
 
         return delete_pos;

@@ -62,7 +62,8 @@ size_t do_read(file_nr fd, void *buf, size_t count, uint32 pos);
 /* WRITE */
 size_t do_write(file_nr fd, void *buf, size_t count, uint32 pos);
 
-
+/* LSEEK */
+size_t do_lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin);
 
 /* DEBUG */
 void dump_consts();

@@ -111,7 +111,7 @@ file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length
 {
         proc_file *fd = alloc_proc_file(pft);
 
-        if (fd == (proc_file *) NULL) {
+        if (fd == NULL) {
                 fs_dprintf("allocation of new proc_file not possible!\n");
                 return NOT_POSSIBLE;
         }
@@ -121,7 +121,7 @@ file_nr insert_proc_file(proc_file pft[NUM_PROC_FILES], file_nr glo_fd) //length
 
         file *f = get_file(glo_fd);
 
-        if (f != (file *) NULL) {
+        if (f != NULL) {
                 inc_count(glo_fd);
         }
 
@@ -204,14 +204,17 @@ proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
 void free_file(file_nr fd)
 {
         file *f = get_file(fd);
-        f->f_count--;
-        if (f->f_count == 0) {
-                f->f_desc = NIL_FILE;
-                free(f->f_name);
-                f->f_name = (char *) NULL;
-
-                if (f->f_inode->i_adr != ROOT_INODE_BLOCK)
-                        free_inode(f->f_inode->i_num);
+        
+        if (f != NULL){
+                f->f_count--;
+                if (f->f_count == 0) {
+                        f->f_desc = NIL_FILE;
+                        free(f->f_name);
+                        f->f_name = (char *) NULL;
+        
+                        if (f->f_inode->i_adr != ROOT_INODE_BLOCK)
+                                free_inode(f->f_inode->i_num);
+                }
         }
 }
 
@@ -224,10 +227,12 @@ void free_file(file_nr fd)
 void free_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
 {
         proc_file *pf = get_proc_file(pft, fd);
-
-        pf->pf_desc = NIL_PROC_FILE;
-        pf->pf_pos = 0;
-        pf->pf_f_desc = NIL_FILE;
+        
+        if(pf != NULL){
+                pf->pf_desc = NIL_PROC_FILE;
+                pf->pf_pos = 0;
+                pf->pf_f_desc = NIL_FILE;
+        }
 }
 
 /**
@@ -248,11 +253,18 @@ void inc_count(file_nr fd)
  * @param fd     file descriptor
  * @param offset offset
  * @param origin original position
+ * @return       new position or -1 if failed
  */
-void lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin)
+size_t lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin)
 {
         proc_file *pf = get_proc_file(pft, fd);
+        
+        if (pf == NULL){
+                return -1;
+        }
+        
         pf->pf_pos = origin + offset;
+        return pf->pf_pos;
 }
 
 /**

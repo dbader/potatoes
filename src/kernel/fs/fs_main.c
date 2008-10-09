@@ -167,6 +167,9 @@ int do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
         return EOF;
 }
 
+size_t do_lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin){
+        return lseek(pft, fd, offset, origin);
+}
 
 /**
  * Prints out all important constants concerning the file system.
