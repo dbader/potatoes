@@ -536,7 +536,7 @@ void nullptr_test()
 
 void print_time()
 {
-        char* ts = mallocn(23, "print_time test");
+        char* ts = mallocn(24, "print_time test");
         printf("%s\n", time2str(ts));
         free(ts);
 }

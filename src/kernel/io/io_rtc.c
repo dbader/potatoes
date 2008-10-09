@@ -109,7 +109,7 @@ void rtc_update()
  * @param timestamp the buffer for the date-string
  * @return the pointer to the same buffer now filled with the date string
  */
-char* time2str(char timestamp[23])
+char* time2str(char timestamp[24])
 {
         switch (time.weekday) {
         case 1:
@@ -182,5 +182,6 @@ char* time2str(char timestamp[23])
         } else {
                 itoa(time.sec, timestamp + 21, 16);
         }
+        timestamp[23] = 0;
         return timestamp;
 }

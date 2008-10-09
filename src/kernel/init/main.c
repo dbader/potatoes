@@ -98,7 +98,7 @@ int main(struct multiboot *mboot_ptr)
         pm_init();
 
         dprint_separator();
-        printf("%{main:} %d bytes kernel stack\n", RED, 0x300000 - (uint32)end);
+        printf("%{main:} %d bytes kernel stack\n", RED, 0x300000 - (uint32)&end);
         printf("%{main:} init complete at %d ticks.\n", RED, get_ticks());
 
         do_tests();

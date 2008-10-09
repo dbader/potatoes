@@ -37,7 +37,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 
 extern bool keyboard_state[256];
-
 void io_init()
 {
         dprint_separator();
@@ -62,7 +61,6 @@ void io_init()
         dprintf("%{io:} interrupts enabled\n", YELLOW);
         hd_init();
         dprintf("%{io:} hard disk initialized\n", YELLOW);
-
         memset(keyboard_state, FALSE, sizeof(keyboard_state));
 
         dprintf("%{io:} initialized\n", YELLOW);

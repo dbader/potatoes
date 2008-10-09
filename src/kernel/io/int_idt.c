@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * The structure of one IDT entry.
  */
-struct idt_entry { //16+16+8+8+16=64 bit
+struct idt_entry{ //16+16+8+8+16=64 bit
         uint16 low_offset;
         uint16 selector;
         uint8 separator; //always 0
@@ -73,8 +73,8 @@ void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg)
         idt[pos].selector = sel;
         idt[pos].flags = flg;
         idt[pos].separator = 0;
-        idt[pos].low_offset = offset % 65536;
-        idt[pos].high_offset = offset / 65536;
+        idt[pos].low_offset = offset & 0xFFFF;
+        idt[pos].high_offset = offset >> 16;
 }
 
 /**
@@ -83,8 +83,8 @@ void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg)
 extern void idt_flush(uint32);
 void idt_init()
 {
-        idtp.maxsize = (64 * 256) - 1;
-        idtp.start = (uint32) & idt;
+        idtp.maxsize = (sizeof(struct idt_entry) * 256) - 1;
+        idtp.start = (uint32)&idt;
         int i;
         for (i = 0; i < 256; i++) {             //fill with empty descriptors
                 idt_fill_entry(i, 0, 0, 0);

@@ -75,6 +75,9 @@ extern void idt_fill_entry(uint8 pos, uint32 offset, uint16 sel, uint8 flg);
  * P=segment present? DPL=descriptor priveledge level      *
  ***********************************************************/
 
+/**
+ * Fills the IDT with our interrupt service routines
+ */
 void isr_init()
 {
         idt_fill_entry(0, (uint32)isr0, 0x8, 0x8E);
@@ -148,6 +151,11 @@ char *ex_messages[] = {
         "reserved"
 };
 
+/**
+ * Handles all ISRs (for now just "panicing")
+ * 
+ * @param cpu_state a snapshot of the cpu registers at the time of the interrupt.
+ */
 void isr_handler(cpu_state_t *cpu_state)
 {
         //printf("got isr %u\n", cpu_state->int_no);

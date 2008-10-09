@@ -116,7 +116,8 @@ char *hw_messages[] = {
 };
 
 /**
- * The programable interrupt controller needs to be reactivated after every interrupt. This procedure provides this.
+ * The programable interrupt controller needs to be reactivated after every interrupt. 
+ * This procedure provides this.
  *
  * @param slave should the slave pic be remapped too? (0 if not)
  */
@@ -132,6 +133,7 @@ void reactivate_pic(bool slave)
  *
  * @param int_no the hardware interrupt number
  * @param context a snapshot of the cpu registers at the time of the interrupt.
+ * @return the context of the new active process (after scheduling)
  */
 uint32 irq_handler(uint32 int_no, uint32 context)
 {

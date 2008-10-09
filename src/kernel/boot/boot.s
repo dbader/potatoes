@@ -60,7 +60,7 @@ mboot:
 start:
 
         ; Execute the kernel:
-        ;cli
+        cli
          
         ; Relocate the stack.
         ; FIXME: we should somehow choose a proper adress. Right now this is kind of a hack.
@@ -69,7 +69,7 @@ start:
         ;cli 
         ; Load multiboot information:
         push ebx
-        ;cli                     ;Disable interrupts
+        cli                     ;Disable interrupts
         call main               ; call our main() function.
         jmp $                   ; Enter an infinite loop, to stop the processor
                                 ; executing whatever rubbish is in the memory
