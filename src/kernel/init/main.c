@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/stdio.h"
 #include "../include/debug.h"
+#include "../../apps/shell_main.h"
 #include "../io/io.h"
 #include "../pm/pm_main.h"
 #include "../io/io_virtual.h"
@@ -108,7 +109,7 @@ int main(struct multiboot *mboot_ptr)
         printf("%{main:} entering idle loop\n", RED);
 
         // launch the shell.
-        pm_create_thread("SHELL", shell_main, 4096);
+        new_shell();
 
         // kernel idle loop
         for (;;)

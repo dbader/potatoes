@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/include/string.h"
 #include "../kernel/include/const.h"
 #include "../kernel/pm/syscalls_cli.h"
+#include "../kernel/pm/pm_main.h"
 #include "shell_main.h"
 #include "shell_utils.h"
 
@@ -161,4 +162,19 @@ void shell_main()
                 shell_handle_command(cmd);
         }
         _exit(0);
+}
+
+/**
+ * Starts a new shell in an own thread.
+ */
+void new_shell()
+{
+        static int shellnum = 0;
+        char* name = _malloc(12);
+        char* temp = _malloc(12);
+        strcpy(name, "SHELL ");
+        strncat(name, itoa(shellnum++, temp, 10), 5);
+        pm_create_thread(name, shell_main, 4096);
+        _free(name);
+        _free(temp);
 }

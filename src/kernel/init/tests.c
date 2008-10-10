@@ -38,6 +38,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/util.h"
 #include "../include/debug.h"
 
+#include "../../apps/shell_main.h"
+
 #include "../io/io_virtual.h"
 #include "../io/io.h"
 #include "../io/io_harddisk.h"
@@ -567,6 +569,7 @@ void do_tests()
         //SHORTCUT_CTRL('s', syscall_test);
         SHORTCUT_CTRL('r', ralph_wiggum);
         //SHORTCUT_CTRL('t', print_time);
+        SHORTCUT_CTRL('\t', new_shell);
         //SHORTCUT_CTRL('f', fs_tests);
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);

@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SHELL_MAIN_H_
 #define SHELL_MAIN_H_
 
+void new_shell();
+
 /** A shell command function pointer. Entry point of all shell commands. */
 typedef void (*shell_cmd_func)(int argc, char *argv[]);
 
