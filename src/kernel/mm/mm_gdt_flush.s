@@ -30,12 +30,15 @@ gdt_flush:
         mov eax, [esp+4] ; the pointer to the GDT is passed from C as a parameter.
         lgdt [eax]
 
-        mov ax, 0x10 ; 0x10 is the offset in the GDT to our data segment
+        mov ax, 0x10 	; 0x10 is the offset in the GDT to our data segment
         mov ds, ax
         mov es, ax
         mov fs, ax
         mov gs, ax
         mov ss, ax
-        jmp 0x08:.flush ; 0x08 is the offset to our code segment ; TODO: why to flush()?
+        jmp 0x08:.flush ; 0x08 is the offset to our code segment,so we are doing a far 
+        				; jump which implicitly changes the code segment (cs) to 0x08;
+        				; (0x08 is the offset to the code segment in our GDT)
+        				; @see http://wiki.osdev.org/Segmentation#Far_Jump
 .flush:
            ret

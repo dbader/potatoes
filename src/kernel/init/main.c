@@ -93,6 +93,8 @@ int main(struct multiboot *mboot_ptr)
 
         //mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
         mm_init(0x300001, 0x100000 + mboot_ptr->mem_upper * 1024);
+        init_vmonitors();
+        mm_init2();
         io_init();
         fs_init();
         pm_init();
