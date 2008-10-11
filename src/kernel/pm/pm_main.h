@@ -40,6 +40,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../fs/fs_const.h"
 #include "../io/io_virtual.h"
 
+/**
+ * Represents the state of all cpu registers at a given time.
+ * Primarily used to provide additional information and error
+ * locations to the user in the exception handlers.
+ */
 typedef struct {
         unsigned int gs, fs, es, ds;
         unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
@@ -47,15 +52,24 @@ typedef struct {
         unsigned int eip, cs, eflags, useresp, ss;
 } /*__attribute__((__packed__))*/  cpu_state_t;
 
+/** 
+ * The process is alive, ie it will get executed in one of the
+ * next pm_schedule() calls. 
+ */
 #define PSTATE_ALIVE 0
+
+/**
+ * The process is dead, ie it will get purged in one of the
+ * next pm_schedule() calls.
+ */
 #define PSTATE_DEAD  1
 
 /**
- * Process structure.
+ * Structure describing a single process.
  * TODO: Maybe move this into pm_process.h
  */
 typedef struct process_t {
-        /** process name */
+        /** a readable name string */
         char *name;
 
         /** process id */
@@ -97,7 +111,6 @@ extern process_t *active_proc;
 extern process_t *focus_proc;
 
 uint32 getpid();
-
 void pm_init();
 uint32 pm_schedule(uint32 context);
 uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize);

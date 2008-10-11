@@ -66,7 +66,7 @@ int dev_null_seek(void *dev, int fd, int offset, int whence)
 
 device_t dev_null = {
         "/dev/null",    // name
-        0,              // fd
+        0,              // fd, make sure this is unique.
         NULL,           // data
         dev_null_open,
         dev_null_close,

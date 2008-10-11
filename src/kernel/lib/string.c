@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Basic functions for string manipulation.
  *
  * @author Dmitriy Traytel
+ * @author dbader
  * @author $LastChangedBy$
  * @version $Rev$
  */
@@ -148,23 +149,23 @@ char* strncat(char *s1, char *s2, size_t n)
  *
  * Example:
  * @code
- *      char path[] = "/usr/share/bin/editor";<p>
- *      char delim[] = "/";<p>
- *      char *tok;<p>
- *      char *copy = strdup(path);<p>
- *      char *work_copy = copy;<p><p>
+ *      char path[] = "/usr/share/bin/editor";
+ *      char delim[] = "/";
+ *      char *tok;
+ *      char *copy = strdup(path);
+ *      char *work_copy = copy;
  *
- *      do {<p>
- *              printf("strsep(\"%s\") ", work_copy);<p>
- *              tok = strsep(&work_copy, delim);<p>
- *              printf("-> \"%s\"\n", tok);<p>
- *      } while (tok != NULL);<p><p>
+ *      do {
+ *              printf("strsep(\"%s\") ", work_copy);
+ *              tok = strsep(&work_copy, delim);
+ *              printf("-> \"%s\"\n", tok);
+ *      } while (tok != NULL);
  *
- *      printf("\ncopy = %p\n", copy);<p>
- *      printf("work_copy = %p\n", work_copy);<p>
- *      puts("done.");<p>
+ *      printf("\ncopy = %p\n", copy);
+ *      printf("work_copy = %p\n", work_copy);
+ *      puts("done.");
  *
- *      free(copy);<p>
+ *      free(copy);
  * @endcode
  *
  * @bug The current implementation does not handle multiple delimiters (as specified in the
@@ -176,10 +177,9 @@ char* strncat(char *s1, char *s2, size_t n)
  */
 char* strsep(char **str_ptr, char *delims)
 {
-        //printf("strsep(\"%s\") ", *str_ptr);
-
-        if (*str_ptr == NULL)
+        if (*str_ptr == NULL) {
                 return NULL;
+        }
 
         char *ret = *str_ptr;
         char *offs = strchr(*str_ptr, *delims);
@@ -188,8 +188,6 @@ char* strsep(char **str_ptr, char *delims)
                 *str_ptr = NULL;
                 return ret;
         }
-
-        //printf("offs = '%s'\n", offs);
 
         *offs = '\0';
         *str_ptr = offs + 1;

@@ -47,12 +47,13 @@ typedef struct device_t {
         
         /** 
          * The devices file descriptor. Note that this is global
-         * and does not change from process to process.
+         * and does not change from process to process. Make sure
+         * it is unique.
          */
         int fd;
         
         /**
-         * The data pointer can be used by a device to safe
+         * The data pointer can be used by a device to save
          * state information which is unique to the device instance.
          */
         void *data;
@@ -63,6 +64,7 @@ typedef struct device_t {
         dev_write_func write;
         dev_seek_func seek;
         
+        /** Linked list next pointer. */
         struct device_t *next;
 } device_t;
 
