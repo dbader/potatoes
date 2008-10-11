@@ -48,6 +48,7 @@ int _write(int fd, void *buf, int size);
 int _seek(int fd, int offset, int whence);
 void* _malloc(size_t size);
 void _free(void *block);
+int _unlink(char* path);
 
 void _printf(char *fmt, ...);
 char* _fgets(char *s, int n, int fd);

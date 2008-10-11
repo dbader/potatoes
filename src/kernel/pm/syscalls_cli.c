@@ -188,3 +188,17 @@ void _free(void *block)
 {
         _syscall(SYS_FREE, block);
 }
+
+/**
+ * Deletes a filename and possible the file it refers to.
+ * 
+ * @param path the filename to remove
+ * @return zero on success, -1 on error
+ */
+int _unlink(char* path)
+{
+        sc_unlink_args_t args;
+        args.path = path;
+        _syscall(SYS_UNLINK, &args);
+        return args.success;
+}

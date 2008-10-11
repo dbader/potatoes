@@ -58,6 +58,9 @@ process_t *active_proc = NULL;
 /** Pointer to the process which has the input focus. */
 process_t *focus_proc = NULL;
 
+/** Pointer to the kernel process. */
+process_t *kernel_proc = NULL;
+
 /** Process ID of the next process that gets created. */
 uint32 next_pid = 0;
 
@@ -101,8 +104,10 @@ void pm_init()
         procs_head->next = procs_head;
         init_proc_file_table(procs_head->pft);
         procs_head->stdin = rf_alloc(STDIN_QUEUE_SIZE);
+        procs_head->vmonitor = get_active_virt_monitor();
 
         active_proc = procs_head;
+        kernel_proc = procs_head;
 
         dprintf("%{pm:} %d syscalls registered\n", VIOLET, MAX_SYSCALL);
 

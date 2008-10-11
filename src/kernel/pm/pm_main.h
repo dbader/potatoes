@@ -114,6 +114,7 @@ typedef struct process_t {
 extern process_t *procs_head;
 extern process_t *active_proc;
 extern process_t *focus_proc;
+extern process_t *kernel_proc;
 
 uint32 getpid();
 void pm_init();

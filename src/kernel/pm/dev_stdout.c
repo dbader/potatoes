@@ -34,7 +34,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/string.h"
 #include "../include/debug.h"
+#include "../io/io_virtual.h"
 #include "pm_devices.h"
+#include "pm_main.h"
 
 int dev_stdout_open(void *dev, char *path, int oflag, int mode)
 {
@@ -54,7 +56,7 @@ int dev_stdout_read(void *dev, int fd, void *buf, int size)
 int dev_stdout_write(void *dev, int fd, void *buf, int size)
 {
         for (int i = 0; i < size; i++)
-                putchar(*((char*)buf++));
+                virt_monitor_putc(active_proc->vmonitor, *((char*)buf++));
         return size;
 }
 

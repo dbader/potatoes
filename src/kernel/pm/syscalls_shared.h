@@ -47,9 +47,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SYS_SEEK        7
 #define SYS_MALLOC      8
 #define SYS_FREE        9
+#define SYS_UNLINK      10
 
 /** The highest syscall id that is still valid. Be sure to update this! */
-#define MAX_SYSCALL     9
+#define MAX_SYSCALL     10
 
 // Definitions for open()'s oflag argument
 /** 
@@ -109,5 +110,11 @@ typedef struct sc_malloc_args_t {
         void *mem; // return value
         int size;
 } sc_malloc_args_t;
+
+/** Arguments for the UNLINK syscall. */
+typedef struct sc_unlink_args_t {
+        int success; // return value
+        char *path;
+} sc_unlink_args_t;
 
 #endif /* syscalls_shared.h */

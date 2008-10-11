@@ -27,12 +27,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *      - contents of input.bin: "Hello, World. This is a test."
  *      - then run "bin2c input.bin > test.c"
  *      - you get:
+ * @code
  *               unsigned char data[] = {
  *                               0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f,
  *                               0x72, 0x6c, 0x64, 0x21, 0x20, 0x54, 0x68, 0x69, 0x73,
  *                               0x20, 0x69, 0x73, 0x20, 0x61, 0x20, 0x74, 0x65, 0x73,
  *                               0x74, 0x2e, 0x0a
  *               }
+ * @endcode
  *
  * Build via "gcc bin2c.c -o bin2c" (the makefile also has a target called bin2c)
  *

@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "syscalls_shared.h"
 #include "../fs/fs_file_table.h"
 #include "../fs/fs_main.h"
+#include "../fs/fs_io_functions.h"
 #include "../include/init.h"
 #include "pm_syscalls.h"
 #include "pm_devices.h"
@@ -57,7 +58,8 @@ syscall_handler syscall_table[] = {
         sys_write,      // 6
         sys_seek,       // 7
         sys_malloc,     // 8
-        sys_free        // 9
+        sys_free,       // 9
+        sys_unlink      // 10
 };
 
 /** Syscall trace macro. Uncomment to print a message everytime a syscall gets executed. */
@@ -241,11 +243,16 @@ void sys_write(void* data)
                 else {
                         args->rw_count = dev->write(dev, args->fd, args->buf, args->size);
                 }
-        } else {
-                // It's a regular file
+        } else {               
+                // It's a regular file or a dir
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
+                
+                if (is_directory(pft_entry->pf_f_desc)) {
+                        args->rw_count = -1;
+                        return;        
+                }
+                
                 args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
-
                 pft_entry->pf_pos += args->rw_count;
         }
 }
@@ -301,4 +308,19 @@ void sys_free(void *data)
 {
         SYSCALL_TRACE("SYS_FREE(0x%x)\n", data);
         free(data);
+}
+
+/**
+ * int _unlink(char *path)
+ */
+void sys_unlink(void *data)
+{
+        sc_unlink_args_t *args = (sc_unlink_args_t*) data;
+        SYSCALL_TRACE("SYS_UNLINK(%s)\n", args->path);
+               
+        if (fs_delete(args->path)) {
+                args->success = 0;
+        } else {
+                args->success = -1;
+        }
 }

@@ -241,11 +241,18 @@ void shell_cmd_write(int argc, char *argv[])
         int count = 0;
         for (int i = 2; i < argc; i++) {
                 count += _write(fd, argv[i], strlen(argv[i]));
-                count += _write(fd, " ", 1);
+                
+                if ((i+1) != argc) {
+                        count += _write(fd, " ", 1);
+                }
         }
 
-        count += _write(fd, "", 1); // append \0
-        _printf("wrote %d bytes.\n", count);//_seek(fd, 0, SEEK_CUR));
+        if (count < 0) {
+                _printf("%s: %s: Cannot write\n", argv[0], argv[1]);
+        } else {
+                _printf("wrote %d bytes.\n", count);//_seek(fd, 0, SEEK_CUR));
+        }
+        
         _close(fd);
 }
 
@@ -444,6 +451,26 @@ void shell_cmd_date(int argc, char *argv[])
         _printf("%s\n", buf);
 }
 
+/**
+ * Removes a file.
+ * 
+ * @param argc the number of argument strings in argv
+ * @param argv the argument vector. Contains all arguments of the command.
+ */
+void shell_cmd_rm(int argc, char *argv[])
+{
+        if (argc < 2) {
+                _printf("Usage: rm [path]\n");
+                return;
+        }
+               
+        int success = _unlink(shell_makepath(argv[1]));
+        
+        if (success == -1) {
+                _printf("%s: cannot remove '%s'\n", argv[0], argv[1]);
+        }
+}
+
 void make_snapshot();
 
 /** 
@@ -471,6 +498,7 @@ struct shell_cmd_t shell_cmds[] = {
         {"snake",       shell_cmd_snake,        "Another classic video game"},
         {"date",        shell_cmd_date,         "Display date and time"},
         {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
+        {"rm",          shell_cmd_rm,           "Removes a file"},
         {"",            NULL,                   ""} // The Terminator
 };
 

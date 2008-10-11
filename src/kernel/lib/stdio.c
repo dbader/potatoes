@@ -35,23 +35,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/stdio.h"
 
 #include "../io/io_virtual.h"
+#include "../pm/pm_main.h"
+
+
+/** 
+ * FIXME: 
+ * This is used to select a vmonitor for printing. Simply using the
+ * active monitor does not work, as kernel messages get printed to the vmonitors
+ * of other processes.
+ * Always using the kernel_proc vmonitor also fails because kernel_proc is
+ * initialized very late during boot which causes messages to be lost.
+ * 
+ * I feel this is quite hackish and should be changed as soon as anybody
+ * comes up with a proper solution. 
+ */
+#define SELECT_VMONITOR() ((kernel_proc == NULL) ? get_active_virt_monitor() : kernel_proc->vmonitor)
 
 /**
  * Writes a character to stdout.
  * @param c character to write
  * @return the character written
  */
-
 int putchar(char c)
-{
-        virt_monitor_putc(get_active_virt_monitor(), c);
+{        
+        virt_monitor_putc(SELECT_VMONITOR(), c);
         //monitor_putc(c);
         return c;
 }
 
 int cputchar(char c, uint8 fg, uint8 bg)
 {
-        virt_monitor_cputc(get_active_virt_monitor(), c, fg, bg);
+        virt_monitor_cputc(SELECT_VMONITOR(), c, fg, bg);
 }
 
 /**
@@ -63,13 +77,13 @@ int cputchar(char c, uint8 fg, uint8 bg)
  */
 int puts(char *s)
 {
-        return virt_monitor_puts(get_active_virt_monitor(), s);
+        return virt_monitor_puts(SELECT_VMONITOR(), s);
         //monitor_puts(s);
 }
 
 int cputs(char *s, uint8 fg, uint8 bg)
 {
-        return virt_monitor_cputs(get_active_virt_monitor(), s, fg, bg);
+        return virt_monitor_cputs(SELECT_VMONITOR(), s, fg, bg);
 }
 
 /**
