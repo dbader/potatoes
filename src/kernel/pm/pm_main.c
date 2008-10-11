@@ -135,12 +135,18 @@ uint32 pm_schedule(uint32 context)
         }
 
         active_proc->context = context;
-
-        // Destroy all zombie processes up to the first alive process.
-        while (active_proc->next->state == PSTATE_DEAD) {        		
+        
+        // Destroy all zombie- and jump over all sleeping processes up to the first alive process.
+        while (active_proc->next->state != PSTATE_ALIVE) {
+                while (active_proc->next->state == PSTATE_DEAD) {        		
         		process_t *next_proc = active_proc->next->next;                
-                pm_destroy_thread(active_proc->next);
-                active_proc->next = next_proc;
+        		pm_destroy_thread(active_proc->next);
+        		active_proc->next = next_proc;
+                }
+                //TODO: This is the PERFORMANCE FIX - schould be handled later in some other way
+                while (active_proc->next->state == PSTATE_STDINSLEEP) {
+                        active_proc = active_proc->next;
+                }
         }
 
         active_proc = active_proc->next;

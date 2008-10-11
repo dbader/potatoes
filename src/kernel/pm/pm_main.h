@@ -65,6 +65,11 @@ typedef struct {
 #define PSTATE_DEAD  1
 
 /**
+ * Process is sleeping, due to stdin requesting input, but none available. 
+ */
+#define PSTATE_STDINSLEEP  2
+
+/**
  * Structure describing a single process.
  * TODO: Maybe move this into pm_process.h
  */

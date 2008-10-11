@@ -54,6 +54,11 @@ void pm_handle_input(char c)
                 return;
         }
         
+        //TODO: This is the PERFORMANCE FIX
+        if (focus_proc->state == PSTATE_STDINSLEEP) {
+                focus_proc->state = PSTATE_ALIVE;
+        }
+        
         if (rf_write(focus_proc->stdin, &c, sizeof(c)) != sizeof(c)) {
                 dprintf("pm_handle_input: error writing to stdin\n");
         }

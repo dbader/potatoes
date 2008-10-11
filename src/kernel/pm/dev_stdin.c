@@ -50,6 +50,11 @@ int dev_stdin_close(void *dev, int fd)
 
 int dev_stdin_read(void *dev, int fd, void *buf, int size)
 {
+        //TODO: This is the PERFORMANCE FIX
+        while ((size > rf_getlength(active_proc->stdin)) && (active_proc != focus_proc)) {
+                active_proc->state = PSTATE_STDINSLEEP;
+                halt();
+        }
         return rf_read(active_proc->stdin, buf, size);
 }
 

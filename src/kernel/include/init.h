@@ -70,6 +70,7 @@ extern struct multiboot *g_mboot_ptr;
 
 //init-functions
 void mm_init(uint32 start, uint32 end);
+void mm_init2();
 void io_init();
 void pm_init();
 void fs_init();
