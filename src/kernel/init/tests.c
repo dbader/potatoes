@@ -45,6 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io_harddisk.h"
 #include "../io/io_rtc.h"
 #include "../mm/mm.h"
+#include "../mm/mm_paging.h"
 //#include "../fs/fs_main.h"
 #include "../pm/pm_main.h"
 #include "../pm/syscalls_cli.h"
@@ -178,72 +179,90 @@ void grubstruct_test(struct multiboot *mboot_ptr)
         monitor_puts("\n");
 }
 
-// print a part of the main memory
-void mm_print_memory()
+void malloc_test()
 {
         mm_header *ptr;
-        for (ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
+        printf("kernel_heap->start: 0x%x\n", (uint32)kernel_heap->start);
+        printf("kernel_heap->end: 0x%x\n", (uint32)kernel_heap->end);
+        void *test;
+        test = mallocn(0x200000, "test");
+        if(test == NULL) printf("allocation failed\n");
+        mem_dump();
+        //free(test);
+        //test = callocn(1, 0x100000, "calloc");
+        //mem_dump();
+        printf("\n\n");
+        /*heap_mallocn(17, "test2", 0, kernel_heap);
+        uint32 *p = heap_mallocn(23, "test3", 0, kernel_heap);
+        *p = 1234;
+        printf("Value of p: %d\n", *p);
+        
+        for(ptr = kernel_heap->start->next; ptr != kernel_heap->end->next; ptr = ptr->next) {
                 printf("%s (0x%x)", ptr->name, (uint32)ptr);
-                printf("\tnext: 0x%x", ptr->next);
-                printf("\tprev: 0x%x", ptr->prev);
+                printf("\tnext: 0x%x", (uint32)ptr->next);
+                printf("\tprev: 0x%x", (uint32)ptr->prev);
                 printf("\tsize: 0x%x\n", ptr->size);
 
         }
-}
+        heap_free(p, kernel_heap);
+        for(ptr = kernel_heap->start->next; ptr != kernel_heap->end->next; ptr = ptr->next) {
+                printf("%s (0x%x)", ptr->name, (uint32)ptr);
+                printf("\tnext: 0x%x", (uint32)ptr->next);
+                printf("\tprev: 0x%x", (uint32)ptr->prev);
+                printf("\tsize: 0x%x\n", ptr->size);
 
-void malloc_test()
-{
+        }*/
         void *mm_test[15];
-        uint32 free_start = free_memory();
+        //uint32 free_start = free_memory();
         // total allocation amount: 2535 bytes + 6 * 16 bytes
-        mm_test[1] = mallocn(100, "1");
-        printf("1: allocating 100 bytes...\n");
-        mm_test[2] = mallocn(100, "2");
-        printf("2: allocating 100 bytes...\n");
-        mm_test[3] = mallocn(300, "3");
-        printf("3: allocating 300 bytes...\n\n");
-        mm_print_memory();
+        mm_test[1] = mallocn(500000,"1");
+        printf("1: allocating 500.000 bytes... -> 0x%x\n", (uint32)mm_test[1]);
+        mm_test[2] = mallocn(500000,"2");
+        printf("2: allocating 500.000 bytes... -> 0x%x\n", (uint32)mm_test[2]);  
+        mm_test[3] = mallocn(1000000,"3");
+        printf("3: allocating 1.000.000 bytes... -> 0x%x\n", (uint32)mm_test[3]);
+        heap_mem_dump();
         free(mm_test[2]);
-        printf("\nfreeing 2 (100 bytes)...\n\n");
-        mm_print_memory();
-        printf("\ntrying to free 2 again...\n\n");
+        printf("\nfreeing 2 (5.000.000 bytes)...");
+        printf("\ntrying to free 2 again...\n");
         free(mm_test[2]);
-        mm_print_memory();
-        printf("\ntrying to free the block at 3 + 10 bytes...\n\n");
+        printf("\ntrying to free the block at 3 + 10 bytes...\n");
         free((void*)(mm_test[3] + 10));
-        mm_print_memory();
+        mm_test[4] = mallocn(200000,"4");
+        printf("\n4: allocating 200.000 bytes... -> 0x%x", (uint32)mm_test[4]);
+        mm_test[5] = mallocn(200000,"5");
+        printf("\n5: allocating 200.000 bytes... -> 0x%x\n", (uint32)mm_test[5]);
+        heap_mem_dump();
         mm_test[4] = mallocn(50, "4");
         printf("\n4: allocating 50 bytes...\n\n");
-        mm_print_memory();
+        heap_mem_dump();
         mm_test[5] = mallocn(50, "5");
         printf("\n5: allocating 50 bytes...\n\n");
-        mm_print_memory();
+        heap_mem_dump();
         mm_test[6] = mallocn(34, "6");
-        printf("\n6: allocating 34 bytes...\n\n");
-        mm_print_memory();
-        printf("\n7: reallocating 3 to 300 bytes...\n\n");
-        mm_test[7] = realloc(mm_test[3], 300);
-        mm_print_memory();
-        printf("\n8: reallocating 3 to 200 bytes...\n\n");
-        mm_test[8] = realloc(mm_test[7], 200);
-        mm_print_memory();
-        printf("\n9: reallocating 3 to 301 bytes...\n\n");
-        mm_test[9] = realloc(mm_test[8], 301);
-        mm_print_memory();
-        printf("\n");
-        mm_print_memory();
-        printf("\n10: callocn(5, sizeof(134), \"calloc\");\n\n");
+        printf("\n6: allocating 34 bytes... -> 0x%x", (uint32)mm_test[6]);
+        mm_test[7] = realloc(mm_test[3], 1000000);
+        printf("\n7: reallocating 3 to 1.000.000 bytes... -> 0x%x", (uint32)mm_test[7]);
+        mm_test[8] = realloc(mm_test[7], 800000);
+        printf("\n8: reallocating 3 to 800.000 bytes... -> 0x%x", (uint32)mm_test[8]);
+        mm_test[9] = realloc(mm_test[8], 2500000);
+        printf("\n9: reallocating 3 to 2.500.000 bytes... -> 0x%x", (uint32)mm_test[9]);
+        printf("\n10: callocn(5, sizeof(134), \"calloc\");");
         mm_test[10] = callocn(5, sizeof(134), "calloc");
         uint8* tmp;
-        printf("content of 10: ");
+        printf("\ncontent of 10: ");
         for (tmp = (uint8*)mm_test[10]; (uint32)tmp < (uint32)mm_test[10] + (5 * sizeof(134)); tmp++) {
                 printf("%d", *tmp);
         }
-        printf("\n\n");
-        mm_print_memory();
-        uint32 free_end = free_memory();
-        printf("free memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes",
-               free_end, free_start - free_end);
+        //uint32 free_end = free_memory();
+        /*printf("\nfree memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes", 
+                        free_end, free_start - free_end);*/
+}
+
+void mm_pagefault_test()
+{
+        uint32 *ptr2 = (uint32*)0xA0000000;
+        uint32 do_page_fault = *ptr2;
 }
 
 void sleep_test()
@@ -563,7 +582,8 @@ void do_tests()
         //SHORTCUT_CTRL('i', isr_test);
         //SHORTCUT_CTRL('1', assert_test);
         //SHORTCUT_CTRL_SUPER('p', printf_test);
-        //SHORTCUT_CTRL('m', malloc_test);
+        SHORTCUT_CTRL('m', malloc_test);
+        SHORTCUT_CTRL('p', mm_pagefault_test);
         //SHORTCUT_CTRL('h', hd_stresswrite_test);
         //SHORTCUT_CTRL_SUPER('h', hd_stressread_test);
         //SHORTCUT_CTRL('s', syscall_test);

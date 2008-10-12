@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 #include "../include/debug.h"
 #include "mm.h"
-        
+
 extern void gdt_flush();
 
 /**

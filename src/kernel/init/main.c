@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../../apps/shell_main.h"
 #include "../io/io.h"
 #include "../pm/pm_main.h"
+#include "../mm/mm.h"
 #include "../io/io_virtual.h"
 
 /**
@@ -95,7 +96,7 @@ int main(struct multiboot *mboot_ptr)
         //mm_init((uint32)&end, 0x100000 + mboot_ptr->mem_upper * 1024);
         mm_init(0x300001, 0x100000 + mboot_ptr->mem_upper * 1024);
         init_vmonitors();
-        mm_init2();
+        mm_init_output();
         io_init();
         fs_init();
         pm_init();

@@ -45,15 +45,27 @@ typedef struct mm_header {
         // uint8 pad[100];
 } mm_header;
 
-/**
- * the start address of the part of the memory that shall be managed
- */
-mm_header *mm_start;
+#define KHEAP_START             0xC0000000
+#define KHEAP_INITIAL_SIZE      0x500000
+#define HEAP_MIN_SIZE           0x70000
 
-/**
- * the end adress of the part of the memory that shall be managed
- */
-mm_header *mm_end;
+typedef struct
+{
+   mm_header *start;
+   mm_header *end;
+   uint32 max_addr;
+   uint8 supervisor;
+   uint8 readonly;
+} heap_t;
+
+void mm_init();
+void mm_init_output();
+
+heap_t* create_heap(uint32 start_addr, uint32 end_addr, uint32 max_addr, uint8 supervisor, uint8 readonly, uint32 heap_addr);
+void* heap_mallocn(size_t size, char *name, uint8 page_aligned, heap_t *heap);
+void heap_free(void *ptr, heap_t *heap);
+void heap_mem_dump();
+heap_t *kernel_heap;
 
 /**
  * The structure of one GDT entry.

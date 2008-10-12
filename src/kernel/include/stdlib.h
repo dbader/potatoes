@@ -44,6 +44,7 @@ void* calloc(size_t elements, size_t size);
 void* callocn(size_t elements, size_t size, char* name);
 void free(void *start);
 void* realloc(void *pointer, size_t size);
+void mem_dump();
 uint32 free_memory();
 
 #endif /* stdlib.h */

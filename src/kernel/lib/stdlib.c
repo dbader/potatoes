@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/debug.h"
 #include "../mm/mm.h"
+#include "../mm/mm_paging.h"
 
 
 //TODO: comment!
@@ -77,28 +78,7 @@ void* mallocn(size_t size, char *name)
         return ret;
 #endif
 
-        mm_header *ptr;
-        mm_header *new_header;
-        uint32 end_of_prev;
-        
-        for (ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
-                end_of_prev = ((uint32)(ptr->prev) + sizeof(mm_header) + (ptr->prev)->size);
-                if ((uint32)ptr - end_of_prev >= (size + sizeof(mm_header))) {
-
-                        new_header = (mm_header*) (end_of_prev);
-                        new_header->prev = ptr->prev;
-                        new_header->next = ptr;
-                        strncpy(new_header->name, name, sizeof(new_header->name) - 1);
-                        new_header->size = size;
-
-                        ptr->prev->next = new_header;
-                        ptr->prev = new_header;
-
-                        return (void*) ((uint32)new_header + sizeof(mm_header));
-                }
-        }
-
-        return NULL;
+        return heap_mallocn(size, name, 0, kernel_heap);
 }
 
 /**
@@ -144,20 +124,6 @@ void* calloc(size_t n, size_t size)
         return callocn(n, size, "noname");
 }
 
-void mem_dump()
-{
-        mm_header *ptr;
-        int total_bytes = 0;
-        int total_blocks = 0;
-        for (ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
-                dprintf("%d bytes \"%s\" at 0x%x\n", ptr->size, ptr->name, (uint32)ptr + sizeof(mm_header));
-                total_blocks++;
-                total_bytes += ptr->size;
-        }
-
-        dprintf("Total %d blocks (%d bytes)\n", total_blocks, total_bytes);
-}
-
 /**
  * Frees a memory block.
  *
@@ -169,14 +135,17 @@ void free(void *start)
         return;
 #endif
         //dprintf("free 0x%x\n", start);
-        mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
+        /*mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
         // check if there is a valid mm_header structure at start
         if ((this->prev)->next == this) {
                 (this->prev)->next = this->next;
                 (this->next)->prev = this->prev;
                 return;
         }
-        dprintf("ERROR: free(): attempt to free unallocated block 0x%x\n", start);
+        dprintf("ERROR: free(): attempt to free unallocated block 0x%x\n", start);*/
+        
+        //return;
+        return heap_free(start, kernel_heap);
 }
 
 /**
@@ -218,6 +187,10 @@ void* realloc(void *pointer, size_t size)
         return new;
 }
 
+void mem_dump()
+{
+        heap_mem_dump();
+}        
 /**
  * Function to return the free memory space.
  *
@@ -225,12 +198,12 @@ void* realloc(void *pointer, size_t size)
  */
 uint32 free_memory()
 {
-        mm_header *ptr;
+        /*mm_header *ptr;
         uint32 free = 0;
         
         for (ptr = mm_start->next; ptr != mm_end->next; ptr = ptr->next) {
                 free += (uint32)ptr - ((uint32)ptr->prev + sizeof(mm_header) + (ptr->prev)->size);
         }
 
-        return free;
+        return free;*/
 }
