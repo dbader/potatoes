@@ -582,8 +582,8 @@ void do_tests()
         //SHORTCUT_CTRL('i', isr_test);
         //SHORTCUT_CTRL('1', assert_test);
         //SHORTCUT_CTRL_SUPER('p', printf_test);
-        SHORTCUT_CTRL('m', malloc_test);
-        SHORTCUT_CTRL('p', mm_pagefault_test);
+        //SHORTCUT_CTRL('m', malloc_test);
+        //SHORTCUT_CTRL('p', mm_pagefault_test);
         //SHORTCUT_CTRL('h', hd_stresswrite_test);
         //SHORTCUT_CTRL_SUPER('h', hd_stressread_test);
         //SHORTCUT_CTRL('s', syscall_test);

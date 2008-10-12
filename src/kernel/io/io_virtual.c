@@ -57,7 +57,7 @@ void new_virt_monitor(virt_monitor *vm, uint32 pid)
         vm->begin = (uint16*)mon;
         vm->size = VIRTUAL_MONITOR_SIZE;
         vm->vis_begin = (uint16*)mon;
-        vm->charnum = 0;
+        vm->offset = 0;
         vm->scrolldown_limit = 0;
         vm->scrollup_limit = 0;
         vm->disable_refresh = FALSE;
@@ -95,7 +95,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
         uint32 i = 0;
         uint32 temp;
 
-        if (vm->charnum >= (VMONITOR_HEIGHT / 2 - 1)) {
+        if (vm->offset >= (VMONITOR_HEIGHT / 2 - 1)) {
                 if (vm->scrollup_limit < ((vm->size - VMONITOR_HEIGHT) / 0xA0)) vm->scrollup_limit++;
                 vm->vis_begin += LINE_WIDTH;
                 if (vm->vis_begin >= vm->begin + vm->size / 2) {
@@ -108,7 +108,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
                               *tmpptr;
                 for (tmpptr = ptr; tmpptr < ptr + LINE_WIDTH; tmpptr++)
                         *tmpptr = 0xF00;
-                vm->charnum -= LINE_WIDTH;
+                vm->offset -= LINE_WIDTH;
         }
         switch (ch) {
 //        case '\a':
@@ -118,28 +118,28 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
 //                virt_monitor_invert(get_active_virt_monitor());
 //                break;
         case '\n':
-                temp = LINE_WIDTH - (vm->charnum % LINE_WIDTH);
+                temp = LINE_WIDTH - (vm->offset % LINE_WIDTH);
                 while (i++ < temp) { //calculating the "new line" starting position
                         virt_monitor_cputc(vm, ' ', fg, bg);
                 }
                 break;
         case '\t':
-                temp = 8 - (vm->charnum % 8);
+                temp = 8 - (vm->offset % 8);
                 while (i++ < temp) { //calculating the "next tab" starting position
                         virt_monitor_cputc(vm, ' ', fg, bg);
                 }
                 break;
         case '\b':
-                if (vm->charnum) {
-                        vm->charnum--;
-                        *(vm->begin + (vm->vis_begin - vm->begin + vm->charnum) % (vm->size / 2))
+                if (vm->offset) {
+                        vm->offset--;
+                        *(vm->begin + (vm->vis_begin - vm->begin + vm->offset) % (vm->size / 2))
                         = bg * 0x1000 + fg * 0x100 + ' ';
                 }
                 break;
         default:
-                *(vm->begin + (vm->vis_begin - vm->begin + vm->charnum) % (vm->size / 2)) =
+                *(vm->begin + (vm->vis_begin - vm->begin + vm->offset) % (vm->size / 2)) =
                         bg * 0x1000 + fg * 0x100 + (ch & 0xFF); //print character to the display pointer
-                vm->charnum++;
+                vm->offset++;
         }
 }
 
@@ -197,26 +197,26 @@ void virt_cursor_move(virt_monitor *vm, uint8 dir)
 
         switch (dir) {
         case 0:
-                vm->charnum =
-                        (vm->charnum + (VMONITOR_HEIGHT / 2) - LINE_WIDTH) % (VMONITOR_HEIGHT / 2);
+                vm->offset =
+                        (vm->offset + (VMONITOR_HEIGHT / 2) - LINE_WIDTH) % (VMONITOR_HEIGHT / 2);
                 break;
         case 1:
-                vm->charnum = (vm->charnum + LINE_WIDTH) % (VMONITOR_HEIGHT / 2);
+                vm->offset = (vm->offset + LINE_WIDTH) % (VMONITOR_HEIGHT / 2);
                 break;
         case 2:
-                vm->charnum = (vm->charnum - vm->charnum % LINE_WIDTH) +
-                              (vm->charnum % LINE_WIDTH + 80 - 1) % LINE_WIDTH;
+                vm->offset = (vm->offset - vm->offset % LINE_WIDTH) +
+                              (vm->offset % LINE_WIDTH + 80 - 1) % LINE_WIDTH;
                 break;
         case 3:
-                vm->charnum =
-                        (vm->charnum - vm->charnum % LINE_WIDTH) + (vm->charnum + 1) % LINE_WIDTH;
+                vm->offset =
+                        (vm->offset - vm->offset % LINE_WIDTH) + (vm->offset + 1) % LINE_WIDTH;
                 break;
         }
         //Cursor update
         outb(0x3D4, 0x0E);
-        outb(0x3D5, (vm->charnum + CURSOR_OFFSET) >> 8);
+        outb(0x3D5, (vm->offset + CURSOR_OFFSET) >> 8);
         outb(0x3D4, 0x0F);
-        outb(0x3D5, (vm->charnum + CURSOR_OFFSET));
+        outb(0x3D5, (vm->offset + CURSOR_OFFSET));
 }
 
 /**
@@ -247,9 +247,9 @@ void update_virt_monitor(virt_monitor *vm)
         }
         //Cursor update
         outb(0x3D4, 0x0E);
-        outb(0x3D5, (vm->charnum + CURSOR_OFFSET) >> 8);
+        outb(0x3D5, (vm->offset + CURSOR_OFFSET) >> 8);
         outb(0x3D4, 0x0F);
-        outb(0x3D5, (vm->charnum + CURSOR_OFFSET));
+        outb(0x3D5, (vm->offset + CURSOR_OFFSET));
 }
 
 /**

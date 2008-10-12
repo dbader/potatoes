@@ -238,7 +238,7 @@ void* heap_mallocn(size_t size, char *name,  uint8 page_aligned, heap_t *heap)
                 }
         }
         
-        uint32 old_size = (uint32)kernel_heap->end + sizeof(mm_header) - (uint32)kernel_heap->start;
+        uint32 old_size = (uint32)kernel_heap->end + sizeof(mm_header) - (uint32)kernel_heap->start + 1;
         expand(old_size + size, kernel_heap);
         return heap_mallocn(size, name, page_aligned, heap);
         

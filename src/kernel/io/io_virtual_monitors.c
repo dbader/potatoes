@@ -77,7 +77,7 @@ void init_vmonitors()
                 (char*)callocn(num_vmonitor_limit * 81, sizeof(char), "vmonitor names array");
         ASSERT(vmonitor_names != 0);
         vmonitors =
-                (virt_monitor*)callocn(num_vmonitor_limit, sizeof(virt_monitor*), "vmonitors array");
+                (virt_monitor*)callocn(num_vmonitor_limit, sizeof(virt_monitor), "vmonitors array");
         ASSERT(vmonitors != 0);
         start_vmonitor("DEBUG MONITOR", 0);
 }

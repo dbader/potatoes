@@ -43,14 +43,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern uint16 maxvmonitor;
 extern uint16 active_monitor;
 
+/**
+ * Structure that represents a virtual monitor
+ */
 typedef struct {
+        /**
+         * Pointer to the start of the allocated memory
+         */
         uint16 *begin;
+        
+        /**
+         * Size of the allocated memory
+         */
         uint32 size;
+        
+        /**
+         * Pointer to the start of the visible pane
+         */
         uint16 *vis_begin;
-        uint32 charnum;
+        
+        /**
+         * Position of the cursor on the visible pane
+         */
+        uint32 offset;
+        
+        /**
+         * Number of lines beneath the visible pane
+         */
         uint32 scrolldown_limit;
+        
+        /**
+         * Number of lines above the visible pane
+         */
         uint32 scrollup_limit;
-        bool disable_refresh; // for framebuffer access. If this is false, the vm will not be painted.
+        
+        /**
+         * For framebuffer access. If this is false, the virtual monitor will not be painted.
+         */
+        bool disable_refresh;
+        
+        /**
+         * The PID of the process that owns this virtual monitor
+         */
         uint32 pid;
 }virt_monitor;
 
