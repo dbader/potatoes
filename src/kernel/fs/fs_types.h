@@ -117,5 +117,18 @@ typedef struct block_buffer {
 typedef block_buffer block_cache;
 
 
+/*
+ * A struct containing file information.
+ */
+typedef struct file_info {
+        char*  name;
+        uint16 mode;
+        uint32 size;
+        time_t create_ts;
+        time_t modify_ts;
+        uint16 links;
+} file_info_t;
+
+
 
 #endif /*__FS_TYPES_H_*/

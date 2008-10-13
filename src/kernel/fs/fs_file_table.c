@@ -315,26 +315,27 @@ bool contains_file(file_nr fd)
 }
 
 /**
- * Check whether a file descriptors belong to a directory.
+ * Get file further information.
  *
  * @param fd    file descriptor
- * @return      belongs to a directory?
+ * @return      file information
  */
-bool is_directory(file_nr fd)
+
+file_info_t* get_file_info(file_nr fd)
 {
-        return (get_file(fd)->f_inode)->i_mode == DIRECTORY;
+        file* f = get_file(fd);
+        file_info_t* info;
+        
+        info->name = f->f_name;
+        info->mode = f->f_mode;
+        info->size = (f->f_inode)->i_size;
+        info->create_ts = (f->f_inode)->i_create_ts;
+        info->modify_ts = (f->f_inode)->i_modify_ts;
+        info->links = f->f_count;
+        
+        return info;
 }
 
-/**
- * Get size of file/directory.
- * 
- * @param fd    file descriptor
- * @return      size
- */
-size_t get_size(file_nr fd)
-{
-        return (get_file(fd)->f_inode)->i_size;
-}
 
 /********* DEBUG *********/
 

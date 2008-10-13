@@ -247,10 +247,12 @@ void sys_write(void* data)
                 // It's a regular file or a dir
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
                 
-                if (is_directory(pft_entry->pf_f_desc)) {
+                //TODO: realize: changed by vdoelle, 2008-10-13 11:30
+                //FIXME: throws "page fault" error! - why?
+                /*if (get_file_info(pft_entry->pf_f_desc)->mode == DIRECTORY) {
                         args->rw_count = -1;
                         return;        
-                }
+                }*/
                 
                 args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
                 pft_entry->pf_pos += args->rw_count;
