@@ -125,16 +125,10 @@ void shell_cmd_ls(int argc, char *argv[])
         int num_bytes = _read(fd, directory, sizeof(directory));
         //_printf("%d bytes read.\n", num_bytes);
 
-        /*if (num_bytes != sizeof(directory)) {
-                _close(fd);
-                _printf("%s: Error reading directory\n", argv[0]);
-                return;
-        }*/
-
-        int i = 0;
-        while (directory[i].inode != 0) {
-                _printf("%s\n", directory[i].name);
-                i++;
+        for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
+                if (directory[i].inode != NULL) {
+                        _printf("%s\n", directory[i].name);
+                }
         }
 
         _close(fd);

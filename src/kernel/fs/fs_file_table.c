@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void init_file_table()
 {
         for (int i = 0; i < NUM_FILES; i++) {
-                gft[i].f_desc = NIL_FILE;               //desc = NIL_FILE = -1 => desc not assigned => file not used
+                gft[i].f_desc = NIL_FILE; //desc = NIL_FILE = -1 => desc not assigned => file not used
         }
 }
 
@@ -60,7 +60,7 @@ void init_proc_file_table(proc_file pft[NUM_PROC_FILES])
 {
         fs_dprintf("[fs_file_table] initialize proc_file_table at 0x%p\n", pft);
         for (int i = 0; i < NUM_PROC_FILES; i++) {
-                pft[i].pf_desc = NIL_PROC_FILE;         //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
+                pft[i].pf_desc = NIL_PROC_FILE; //desc = NIL_PROC_FILE = -1 => desc not assigned => file not used
         }
 }
 
@@ -76,9 +76,8 @@ file_nr insert_file(m_inode *inode, char *name, uint8 mode)
 {
         name = strdup(name);
 
-        file_nr old = name2desc(name);          //exists a file with the same path already?
+        file_nr old = name2desc(name); //exists a file with the same path already?
         if (old != NOT_FOUND) {
-                //inc_count(old);                 //increment reference counter
                 fs_dprintf("[fs_file_table] file already exists. returned old FD.\n");
                 free(name);
                 return old;
@@ -204,18 +203,21 @@ proc_file* get_proc_file(proc_file pft[NUM_PROC_FILES], file_nr fd)
 void free_file(file_nr fd)
 {
         file *f = get_file(fd);
-        
         if (f != NULL){
-                f->f_count--;
+                if (f->f_count > 0) {
+                        f->f_count--;
+                }
+                
                 if (f->f_count == 0) {
                         f->f_desc = NIL_FILE;
+                        bzero(f->f_name, strlen(f->f_name));
                         free(f->f_name);
-                        f->f_name = (char *) NULL;
-        
                         if (f->f_inode->i_adr != ROOT_INODE_BLOCK)
                                 free_inode(f->f_inode->i_num);
+                        
+
                 }
-        }
+        } 
 }
 
 /**
@@ -276,9 +278,10 @@ size_t lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 or
 file_nr name2desc(char *name) //in global file table
 {
         for (int i = 0; i < NUM_FILES; i++) {
-                //fs_dprintf("%s on 0x%d\n\n", gft[i].f_name, &gft[i].f_name);
-                if (gft[i].f_name != (char *) NULL && strcmp(name, gft[i].f_name) == 0) {
-                        fs_dprintf("[fs_file_table] %s and %s are equal -> return %d\n", name, gft[i].f_name, gft[i].f_desc);
+                if (gft[i].f_name != NULL && strcmp(name, gft[i].f_name) == 0) {
+                        fs_dprintf("[fs_file_table] %s and %s are equal -> gft[%d]: fd = %d\n", name, gft[i].f_name, i, gft[i].f_desc);
+                        dump_files();
+                        
                         return gft[i].f_desc;
                 }
         }

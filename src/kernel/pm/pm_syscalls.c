@@ -321,21 +321,30 @@ void sys_unlink(void *data)
         
         file_nr fd = do_open(args->path);
         
-        if (FALSE) {
-                dprintf("< max devices\n");
+        if (fd == NOT_FOUND) {
+                dprintf("%{ERROR: file does not exist or is a device!}\n", RED);
                 args->success = -1;
                 return;
         }
         
-        proc_file *pft_entry = get_proc_file(active_proc->pft, fd - MAX_DEVICES);
-        
+        if (get_file(fd)->f_count > 0){
+                dprintf("%{ERROR: file is still in use!}\n", RED);
+                do_close(fd);
+                args->success = -1;
+                return;
+        }
+
         file_info_t info;
-        get_file_info(pft_entry->pf_f_desc, &info);
+        get_file_info(fd, &info);
         
         if (info.mode == DIRECTORY && info.size > 0) {
+                dprintf("%{ERROR: directory is not empty!} (%d)\n", RED, info.size);
+                do_close(fd);
                 args->success = -1;
                 return;
         }
+        
+        do_close(fd);
         
         if (fs_delete(args->path)) {
                 args->success = 0;

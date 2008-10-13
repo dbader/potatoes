@@ -105,7 +105,9 @@ bool fs_close(file_nr fd)
         if (f == (file*) NULL || f->f_desc == NIL_FILE) {
                 return FALSE; //file does not exist
         }
-
+        
+        dprintf("CLOSING file %s\n", f->f_name);
+        
         write_inode(f->f_inode);
         free_file(fd);
 

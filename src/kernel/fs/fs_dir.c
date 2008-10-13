@@ -301,11 +301,13 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
 
         uint32 pos = 0;
         uint32 bytes_read = 0;
-        block_nr file_blk; //corresponding block number to filename
+        block_nr file_blk = NOT_FOUND; //corresponding block number to filename
         
         do {
                 bytes_read = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE); //read content = file list
-                file_blk = find_filename(dir_cache, tok);  //find current file in the directory cache
+                if (bytes_read != 0) { //otherwise dir_cache has not changed
+                        file_blk = find_filename(dir_cache, tok);  //find current file in the directory cache
+                }
                 pos += BLOCK_SIZE; //next data block with dir_entries
 
         } while (file_blk == NOT_FOUND && bytes_read != 0);

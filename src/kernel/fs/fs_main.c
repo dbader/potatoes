@@ -92,7 +92,6 @@ bool load_fs()
         init_file_table();
         load_root();
         load_super_block();
-
         return (super_block.s_magic_number == MAGIC_NUMBER);
 }
 
@@ -153,7 +152,7 @@ file_nr do_open(char *abs_path)
 
 int do_close(file_nr fd)
 {
-        return (fs_close(fd)) ? 0 : EOF;
+        return (fs_close(fd)) ? 0 : -1;
 }
 
 int do_close_pf(proc_file pft[NUM_PROC_FILES], file_nr pfd)
