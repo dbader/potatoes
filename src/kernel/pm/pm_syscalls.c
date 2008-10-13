@@ -247,12 +247,11 @@ void sys_write(void* data)
                 // It's a regular file or a dir
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
                 
-                //TODO: realize: changed by vdoelle, 2008-10-13 11:30
-                //FIXME: throws "page fault" error! - why?
-                /*if (get_file_info(pft_entry->pf_f_desc)->mode == DIRECTORY) {
+                file_info_t info;
+                if (get_file_info(pft_entry->pf_f_desc, &info)->mode == DIRECTORY) {
                         args->rw_count = -1;
                         return;        
-                }*/
+                }
                 
                 args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
                 pft_entry->pf_pos += args->rw_count;
@@ -319,7 +318,25 @@ void sys_unlink(void *data)
 {
         sc_unlink_args_t *args = (sc_unlink_args_t*) data;
         SYSCALL_TRACE("SYS_UNLINK(%s)\n", args->path);
-               
+        
+        file_nr fd = do_open(args->path);
+        
+        if (FALSE) {
+                dprintf("< max devices\n");
+                args->success = -1;
+                return;
+        }
+        
+        proc_file *pft_entry = get_proc_file(active_proc->pft, fd - MAX_DEVICES);
+        
+        file_info_t info;
+        get_file_info(pft_entry->pf_f_desc, &info);
+        
+        if (info.mode == DIRECTORY && info.size > 0) {
+                args->success = -1;
+                return;
+        }
+        
         if (fs_delete(args->path)) {
                 args->success = 0;
         } else {

@@ -66,7 +66,7 @@ size_t do_write(file_nr fd, void *buf, size_t count, uint32 pos);
 size_t do_lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 origin);
 
 /* FILE INFO */
-file_info_t* get_file_info(file_nr fd);
+file_info_t* get_file_info(file_nr fd, file_info_t* info);
 
 /* DEBUG */
 void dump_consts();

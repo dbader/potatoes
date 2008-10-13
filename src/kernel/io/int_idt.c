@@ -35,10 +35,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * The structure of one IDT entry.
  */
 struct idt_entry{ //16+16+8+8+16=64 bit
+        /**
+         * Lower 16 bit of the interrupt handler's code address
+         */
         uint16 low_offset;
+        
+        /**
+         * Code segment selector in the GDT.
+         */
         uint16 selector;
+        
+        /**
+         * Unused
+         */
         uint8 separator; //always 0
+        
+        /***********************************************
+         * 0_____1___________3_______________________7 *
+         * |  P  |    DPL    |         01110         | *
+         * |_____|___________|_______________________| *
+         * P=segment present?                          *
+         * DPL=descriptor priveledge level             *
+         ***********************************************/
         uint8 flags;
+        
+        /**
+         * Upper 16 bit of the interrupt handler's code address
+         */
         uint16 high_offset;
 }__attribute__((packed)); //gcc-flag to use 64 connected bits of memory for the struct
 

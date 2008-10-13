@@ -120,11 +120,7 @@ virt_monitor* get_active_virt_monitor()
  */
 char* get_active_virt_monitor_name()
 {
-        /* FIXME: This functions gets called repeatedly (every timer int, 100x/sec?)
-         *        and should use a static buffer for the timestamp.
-         */
-        char* timestamp = mallocn(24, "timestamp");
+        static char timestamp[24];
         memcpy(vmonitor_names + 81 * active_monitor + 55, time2str(timestamp), 23);
-        free(timestamp);
         return &(vmonitor_names[active_monitor*81]);
 }

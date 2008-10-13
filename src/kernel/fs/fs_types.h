@@ -121,12 +121,12 @@ typedef block_buffer block_cache;
  * A struct containing file information.
  */
 typedef struct file_info {
-        char*  name;
+        char name[NAME_SIZE];
         uint16 mode;
         uint32 size;
         time_t create_ts;
         time_t modify_ts;
-        uint16 links;
+        uint16 num_links;
 } file_info_t;
 
 

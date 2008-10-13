@@ -271,7 +271,7 @@ size_t lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 or
  * Find the descriptor of a file with the file name.
  *
  * @param name  file name
- * @return      found file descriptor
+ * @return      found file descriptor or NOT_FOUND
  */
 file_nr name2desc(char *name) //in global file table
 {
@@ -321,17 +321,16 @@ bool contains_file(file_nr fd)
  * @return      file information
  */
 
-file_info_t* get_file_info(file_nr fd)
+file_info_t* get_file_info(file_nr fd, file_info_t* info)
 {
         file* f = get_file(fd);
-        file_info_t* info;
         
-        info->name = f->f_name;
+        strncpy(info->name, f->f_name, sizeof(info->name));
         info->mode = f->f_mode;
         info->size = (f->f_inode)->i_size;
         info->create_ts = (f->f_inode)->i_create_ts;
         info->modify_ts = (f->f_inode)->i_modify_ts;
-        info->links = f->f_count;
+        info->num_links = f->f_count;
         
         return info;
 }
