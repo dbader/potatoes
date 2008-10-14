@@ -60,4 +60,7 @@ extern void read_minode(m_inode *inode, block_nr inode_blk);
 extern void write_inode(m_inode *inode);
 
 
+extern void free_data_blocks(char* abs_path);
+
+
 #endif /*FS_IO_FUNCTIONS_H_*/

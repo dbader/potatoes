@@ -124,6 +124,7 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
         if (mode == CREATE) {
                 file_block = insert_file_into_dir(dir_inode_block, file_name);
         } else if (mode == DELETE) {
+                free_data_blocks(abs_path);
                 file_block = delete_file_from_dir(dir_inode_block, file_name);
         }
 
@@ -147,7 +148,26 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
 
         free(file_name);
         free(path);
-
         return TRUE;
 }
 
+void free_data_blocks(char* abs_path)
+{
+        file_nr fd = fs_open(abs_path);
+        file* file = get_file(fd);
+        block_nr blk = NOT_FOUND;
+        size_t pos = 0;
+        
+        do { //scan through file in order to discover allocated blocks
+                blk = get_data_block(file->f_inode, pos, FALSE);
+                pos += BLOCK_SIZE;
+                
+                if (blk != NOT_FOUND) {
+                        mark_block(blk, FALSE); //set block as unused
+                        fs_dprintf("[fs_c_d] marked data block %d as FALSE\n", blk);
+                }
+                
+        } while(blk != NOT_FOUND);
+        
+        fs_close(fd);
+}
