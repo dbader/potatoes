@@ -562,9 +562,26 @@ void print_time()
         free(ts);
 }
 
+void test_batch_files()
+{
+        int fd = _open("/batch", O_CREAT, 0);
+        char* str = "\
+touch b\n\
+write b Hallo Welt\n\
+cat b\n\
+echo first ls:\n\
+ls\n\
+rm b\n\
+echo second ls:\n\
+ls";
+        _write(fd, str, strlen(str));
+        _close(fd);
+}
+
 void make_snapshot();
 void do_tests()
 {
+        test_batch_files();
         printf("\n%{Global keyboard shortcuts:}\n", LIGHTGREEN);
         //fs_tests();
         //grubstruct_test(g_mboot_ptr);

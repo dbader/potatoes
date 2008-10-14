@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file
@@ -96,7 +96,7 @@ void shell_cmd_echo(int argc, char *argv[])
         for (int i = 1; i < argc; i++) {
                 _printf("%s ", argv[i]);
         }
-        
+
         _printf("\n");
 }
 
@@ -235,7 +235,7 @@ void shell_cmd_write(int argc, char *argv[])
         int count = 0;
         for (int i = 2; i < argc; i++) {
                 count += _write(fd, argv[i], strlen(argv[i]));
-                
+
                 if ((i+1) != argc) {
                         count += _write(fd, " ", 1);
                 }
@@ -246,7 +246,7 @@ void shell_cmd_write(int argc, char *argv[])
         } else {
                 _printf("wrote %d bytes.\n", count);//_seek(fd, 0, SEEK_CUR));
         }
-        
+
         _close(fd);
 }
 
@@ -457,12 +457,53 @@ void shell_cmd_rm(int argc, char *argv[])
                 _printf("Usage: rm [path]\n");
                 return;
         }
-               
+
         int success = _unlink(shell_makepath(argv[1]));
-        
+
         if (success == -1) {
                 _printf("%s: cannot remove '%s'\n", argv[0], argv[1]);
         }
+}
+
+/**
+ * Removes a file.
+ * 
+ * @param argc the number of argument strings in argv
+ * @param argv the argument vector. Contains all arguments of the command.
+ */
+void shell_cmd_run(int argc, char *argv[])
+{
+        if (argc < 2) {
+                _printf("Usage: run [path]\n");
+                return;
+        }
+
+        int fd = _open(shell_makepath(argv[1]), 0, 0);
+        if (fd < 0) {
+                _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
+                return;
+        }
+        
+        char* str = _malloc(81);
+        bzero(str, 81);
+        char* temp = str;
+        while(_read(fd, temp++, 1) > 0 && (temp - str) < 80) {
+                //_printf(str);
+                if(*(temp - 1) == '\n') {
+                        //_printf(str);
+                        shell_handle_command(str);
+                        bzero(str, 80);
+                        temp = str;
+                }
+        }
+        
+        //FIXME: HACK
+        if(*(str+strlen(str)) != '\n') {
+                *(str+strlen(str)) = '\n';
+        }
+        
+        shell_handle_command(str);
+        _free(str);
 }
 
 void make_snapshot();
@@ -471,28 +512,29 @@ void make_snapshot();
  * The shell command table. Every shell command must be registered here
  * to be accessible. */
 struct shell_cmd_t shell_cmds[] = {
-        {"test",        shell_cmd_test,         "Test argument parsing"},
-        {"cmdlist",     shell_cmd_cmdlist,      "List available commands"},
-        {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
-        {"ls",          shell_cmd_ls,           "List directory"},
-        {"touch",       shell_cmd_touch,        "Create regular file"},
-        {"mkdir",       shell_cmd_mkdir,        "Create directory"},
-        {"cat",         shell_cmd_cat,          "Print file contents"},
-        {"write",       shell_cmd_write,        "Write text to file"},
-        {"cd",          shell_cmd_cd,           "Change directory"},
-        {"clear",       shell_cmd_clear,        "Clear the screen"},
-        {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
-        {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
-        {"pwd",         shell_cmd_pwd,          "Print working directory"},
-        {"cp",          shell_cmd_cp,           "Copy files"},
-        {"ps",          shell_cmd_ps,           "List processes"},
-        {"exit",        shell_cmd_exit,         "Quit the shell"},
-        {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
-        {"pong",        shell_cmd_pong,         "A classic video game"},
-        {"snake",       shell_cmd_snake,        "Another classic video game"},
-        {"date",        shell_cmd_date,         "Display date and time"},
-        {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
-        {"rm",          shell_cmd_rm,           "Removes a file"},
-        {"",            NULL,                   ""} // The Terminator
+                {"test",        shell_cmd_test,         "Test argument parsing"},
+                {"cmdlist",     shell_cmd_cmdlist,      "List available commands"},
+                {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
+                {"ls",          shell_cmd_ls,           "List directory"},
+                {"touch",       shell_cmd_touch,        "Create regular file"},
+                {"mkdir",       shell_cmd_mkdir,        "Create directory"},
+                {"cat",         shell_cmd_cat,          "Print file contents"},
+                {"write",       shell_cmd_write,        "Write text to file"},
+                {"cd",          shell_cmd_cd,           "Change directory"},
+                {"clear",       shell_cmd_clear,        "Clear the screen"},
+                {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
+                {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
+                {"pwd",         shell_cmd_pwd,          "Print working directory"},
+                {"cp",          shell_cmd_cp,           "Copy files"},
+                {"ps",          shell_cmd_ps,           "List processes"},
+                {"exit",        shell_cmd_exit,         "Quit the shell"},
+                {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
+                {"pong",        shell_cmd_pong,         "A classic video game"},
+                {"snake",       shell_cmd_snake,        "Another classic video game"},
+                {"date",        shell_cmd_date,         "Display date and time"},
+                {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
+                {"rm",          shell_cmd_rm,           "Removes a file"},
+                {"run",          shell_cmd_run,         "Executes a \"batch\" file"},
+                {"",            NULL,                   ""} // The Terminator
 };
 

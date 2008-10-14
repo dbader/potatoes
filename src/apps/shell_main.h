@@ -52,4 +52,6 @@ extern char cwd[255];
 /** A buffer for shell_makepath() */
 extern char path_buf[sizeof(cwd)];
 
+void shell_handle_command(char *cmd);
+
 #endif /*SHELL_MAIN_H_*/
