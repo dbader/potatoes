@@ -51,7 +51,7 @@ int dev_clock_close(void *dev, int fd)
 int dev_clock_read(void *dev, int fd, void *buf, int size)
 {
         char* timestamp = mallocn(24, "dev_clock");
-        strncpy(buf, time2str(timestamp), size);
+        strncpy(buf, time2str(time, timestamp), size);
         free(timestamp);
         return strlen(buf);
 }

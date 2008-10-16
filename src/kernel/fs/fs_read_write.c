@@ -142,7 +142,7 @@ size_t fs_write(m_inode *inode, void *buf, size_t num_bytes, uint32 pos, bool al
         inode->i_modify_ts = time;
         
         char* timestamp = mallocn(24, "dev_clock");
-        fs_dprintf("[fs_r_w] new file's i_modify_ts: %s\n", time2str(timestamp));
+        fs_dprintf("[fs_r_w] new file's i_modify_ts: %s\n", time2str(time, timestamp));
         free(timestamp);
         
         write_inode(inode);

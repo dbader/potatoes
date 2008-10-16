@@ -109,79 +109,79 @@ void rtc_update()
  * @param timestamp the buffer for the date-string
  * @return the pointer to the same buffer now filled with the date string
  */
-char* time2str(char timestamp[24])
+char* time2str(time_t timestamp, char buf[24])
 {
-        switch (time.weekday) {
+        switch (timestamp.weekday) {
         case 1:
-                strcpy(timestamp, "SUN");
+                strcpy(buf, "SUN");
                 break;
         case 2:
-                strcpy(timestamp, "MON");
+                strcpy(buf, "MON");
                 break;
         case 3:
-                strcpy(timestamp, "TUE");
+                strcpy(buf, "TUE");
                 break;
         case 4:
-                strcpy(timestamp, "WEN");
+                strcpy(buf, "WEN");
                 break;
         case 5:
-                strcpy(timestamp, "THU");
+                strcpy(buf, "THU");
                 break;
         case 6:
-                strcpy(timestamp, "FRI");
+                strcpy(buf, "FRI");
                 break;
         case 7:
-                strcpy(timestamp, "SAT");
+                strcpy(buf, "SAT");
                 break;
         default:
                 return "Date error              ";
         }
-        timestamp[3] = ' ';
-        if (time.day < 10) {
-                timestamp[4] = '0';
-                itoa(time.day, timestamp + 5, 16);
+        buf[3] = ' ';
+        if (timestamp.day < 10) {
+                buf[4] = '0';
+                itoa(timestamp.day, buf + 5, 16);
         } else {
-                itoa(time.day, timestamp + 4, 16);
+                itoa(timestamp.day, buf + 4, 16);
         }
-        timestamp[6] = '.';
-        if (time.month < 10) {
-                timestamp[7] = '0';
-                itoa(time.month, timestamp + 8, 16);
+        buf[6] = '.';
+        if (timestamp.month < 10) {
+                buf[7] = '0';
+                itoa(timestamp.month, buf + 8, 16);
         } else {
-                itoa(time.month, timestamp + 7, 16);
+                itoa(timestamp.month, buf + 7, 16);
         }
-        timestamp[9] = '.';
-        if (time.year < 10) {
-                strcpy(timestamp + 10, "200");
-                itoa(time.year, timestamp + 13, 16);
-        } else if (time.year < 100) {
-                strcpy(timestamp + 10, "20");
-                itoa(time.month, timestamp + 12, 16);
+        buf[9] = '.';
+        if (timestamp.year < 10) {
+                strcpy(buf + 10, "200");
+                itoa(timestamp.year, buf + 13, 16);
+        } else if (timestamp.year < 100) {
+                strcpy(buf + 10, "20");
+                itoa(timestamp.month, buf + 12, 16);
         } else {
-                strcpy(timestamp + 10, "2");
-                itoa(time.month, timestamp + 11, 16);
+                strcpy(buf + 10, "2");
+                itoa(timestamp.month, buf + 11, 16);
         }
-        timestamp[14] = ' ';
-        if (time.hour < 10) {
-                timestamp[15] = '0';
-                itoa(time.hour, timestamp + 16, 16);
+        buf[14] = ' ';
+        if (timestamp.hour < 10) {
+                buf[15] = '0';
+                itoa(timestamp.hour, buf + 16, 16);
         } else {
-                itoa(time.hour, timestamp + 15, 16);
+                itoa(timestamp.hour, buf + 15, 16);
         }
-        timestamp[17] = ':';
-        if (time.min < 10) {
-                timestamp[18] = '0';
-                itoa(time.min, timestamp + 19, 16);
+        buf[17] = ':';
+        if (timestamp.min < 10) {
+                buf[18] = '0';
+                itoa(timestamp.min, buf + 19, 16);
         } else {
-                itoa(time.min, timestamp + 18, 16);
+                itoa(timestamp.min, buf + 18, 16);
         }
-        timestamp[20] = ':';
-        if (time.sec < 10) {
-                timestamp[21] = '0';
-                itoa(time.sec, timestamp + 22, 16);
+        buf[20] = ':';
+        if (timestamp.sec < 10) {
+                buf[21] = '0';
+                itoa(timestamp.sec, buf + 22, 16);
         } else {
-                itoa(time.sec, timestamp + 21, 16);
+                itoa(timestamp.sec, buf + 21, 16);
         }
-        timestamp[23] = 0;
-        return timestamp;
+        buf[23] = 0;
+        return buf;
 }
