@@ -33,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __SYSCALLS_CLI_H
 
 #include "../include/types.h"
+#include "../fs/fs_types.h"
+#include "syscalls_shared.h"
 
 /*FIXME: These will be refactored to lose the leading underscore as soon
  *       as we have external programs. Right now I want to minimize
@@ -49,6 +51,7 @@ int _seek(int fd, int offset, int whence);
 void* _malloc(size_t size);
 void _free(void *block);
 int _unlink(char* path);
+int _stat(char *path, stat *buf);
 
 void _printf(char *fmt, ...);
 char* _fgets(char *s, int n, int fd);

@@ -33,6 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __SYSCALLS_SHARED_H
 #define __SYSCALLS_SHARED_H
 
+#include "../fs/fs_types.h"
+#include "../io/io_rtc.h"
+
 /** Stops execution until the next interrupt occurs. */
 #define WAIT_FOR_INTERRUPT() __asm__("hlt");
 
@@ -48,9 +51,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SYS_MALLOC      8
 #define SYS_FREE        9
 #define SYS_UNLINK      10
+#define SYS_STAT        11
 
 /** The highest syscall id that is still valid. Be sure to update this! */
-#define MAX_SYSCALL     10
+#define MAX_SYSCALL     11
 
 // Definitions for open()'s oflag argument
 /** 
@@ -116,5 +120,15 @@ typedef struct sc_unlink_args_t {
         int success; // return value
         char *path;
 } sc_unlink_args_t;
+
+/** Stat structure returned by the STAT syscall. @see file_info_t */
+typedef file_info_t stat;
+
+/** Arguments for the STAT syscall. */
+typedef struct sc_stat_args_t {
+        int success; // return value
+        stat *buf;
+        char *path;
+} sc_stat_args_t;
 
 #endif /* syscalls_shared.h */

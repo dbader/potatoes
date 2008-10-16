@@ -202,3 +202,19 @@ int _unlink(char* path)
         _syscall(SYS_UNLINK, &args);
         return args.success;
 }
+
+/**
+ * Returns extended file information for a single filename.
+ * 
+ * @param path the filename
+ * @param buf the stat structure to receive the results
+ * @return zero on success, -1 on error
+ */
+int _stat(char *path, stat *buf)
+{
+        sc_stat_args_t args;
+        args.path = path;
+        args.buf = buf;
+        _syscall(SYS_STAT, &args);
+        return args.success;
+}

@@ -48,6 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/include/stdlib.h"
 #include "../kernel/include/stdio.h"
 #include "../kernel/fs/fs_types.h"
+#include "../kernel/fs/fs_const.h"
 #include "../kernel/pm/syscalls_shared.h"
 #include "../kernel/pm/syscalls_cli.h"
 #include "games.h"
@@ -111,26 +112,56 @@ void shell_cmd_ls(int argc, char *argv[])
         dir_entry directory [DIR_ENTRIES_PER_BLOCK];
         bzero(directory, sizeof(directory));
 
+        char path[255];
+        
         int fd = -1;
-        if (argc < 2)
+        if (argc < 2) {
                 fd = _open(cwd, 0, 0);   // current directory
-        else
-                fd = _open(shell_makepath(argv[1]), 0, 0);
-
+                strncpy(path, cwd, sizeof(path));
+        } else {
+                strncpy(path, shell_makepath(argv[1]), sizeof(path));
+                fd = _open(path, 0, 0);
+        }
+        
+        if (path[strlen(path)-1] != '/')
+                strcat(path, "/");
+        
         if (fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
 
-        int num_bytes = _read(fd, directory, sizeof(directory));
-        //_printf("%d bytes read.\n", num_bytes);
-
+        _read(fd, directory, sizeof(directory));
+       
+        int total = 0;
+        
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
                 if (directory[i].inode != NULL) {
-                        _printf("%s\n", directory[i].name);
+                        stat stat_buf;                       
+                        char abs_path[255];
+                        char time[25];
+                        
+                        strncpy(abs_path, path, sizeof(abs_path));
+                        strcat(abs_path, directory[i].name);
+                        
+                        if (_stat(abs_path, &stat_buf) == 0) {
+                                total += stat_buf.size;
+                                _printf("%d\t%s %s", 
+                                                stat_buf.size,
+                                                time2str(stat_buf.modify_ts, time),
+                                                directory[i].name);
+                                if (stat_buf.mode == DIRECTORY) {
+                                        _printf("/");
+                                }
+                                
+                                _printf("\n");
+                        } else {
+                                _printf("%s ERROR: stat() failed.\n", directory[i].name);
+                        }
                 }
         }
-
+        
+        _printf("total %d bytes\n", total);
         _close(fd);
 }
 

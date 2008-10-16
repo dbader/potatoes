@@ -59,7 +59,8 @@ syscall_handler syscall_table[] = {
         sys_seek,       // 7
         sys_malloc,     // 8
         sys_free,       // 9
-        sys_unlink      // 10
+        sys_unlink,     // 10
+        sys_stat
 };
 
 /** Syscall trace macro. Uncomment to print a message everytime a syscall gets executed. */
@@ -78,8 +79,9 @@ syscall_handler syscall_table[] = {
  */
 void pm_syscall(uint32 id, void* data)
 {
-        if (id > MAX_SYSCALL)
+        if (id > MAX_SYSCALL) {
                 panic("pm_syscall: id > MAX_SYSCALL"); // more verbosity, ie pid, name, regs, stack
+        }
         set_interrupts(); //FIXME: I don't know why, but without this, it won't work in virtualbox
         syscall_table[id](data);
 }
@@ -351,4 +353,31 @@ void sys_unlink(void *data)
         } else {
                 args->success = -1;
         }
+}
+
+/**
+ * int _stat(char *path, stat *buf)
+ */
+void sys_stat(void *data)
+{
+        sc_stat_args_t *args = (sc_stat_args_t*) data;
+        SYSCALL_TRACE("SYS_STAT(%s, 0x%x)\n", args->path, args->buf);
+        
+        bzero(args->buf, sizeof(stat));
+        
+        file_nr fd = do_open(args->path);
+
+        if (fd == NOT_FOUND) {
+                dprintf("%{ERROR: file does not exist or is a device!}\n", RED);
+                args->success = -1;
+                return;
+        }
+
+        file_info_t info;
+        get_file_info(fd, &info);
+
+        do_close(fd);
+        
+        memcpy(args->buf, &info, sizeof(stat));
+        args->success = 0;
 }
