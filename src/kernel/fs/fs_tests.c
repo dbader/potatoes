@@ -389,7 +389,30 @@ void test_delete()
 
 }
 
+void test_open_close()
+{
+        if (!fs_create("/file1", DIRECTORY)) dprintf("creation unsuccessful!\n");
+        
+        proc_file *pft = malloc(sizeof(proc_file)*2);
+        init_proc_file_table(pft);
+        
+        int fd1 = fs_open("/file1"); insert_proc_file(pft, fd1);
+        int fd2 = fs_open("/file1"); insert_proc_file(pft, fd2);
+        
+        dump_files();
+        
+        fs_close(fd1);
+        free_proc_file(pft, fd1);
+        
+        dump_files();
+        
+        fs_close(fd2);
+        free_proc_file(pft, fd2);
+        
+        dump_files();
+}
+
 void run_FS_tests()
 {
-        //test_delete();
+        test_open_close();
 }

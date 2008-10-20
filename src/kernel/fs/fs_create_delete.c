@@ -148,6 +148,7 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
 
         free(file_name);
         free(path);
+
         return TRUE;
 }
 
