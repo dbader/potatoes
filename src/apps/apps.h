@@ -32,5 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __APPS_H
 
 void shell_cmd_snapshot(int argc, char *argv[]);
+void shell_cmd_speed(int argc, char *argv[]);
 
 #endif /*__APPS_H*/

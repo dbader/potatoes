@@ -502,7 +502,7 @@ void shell_cmd_rm(int argc, char *argv[])
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
-void shell_cmd_run(int argc, char *argv[])
+void shell_cmd_exec(int argc, char *argv[])
 {
         if (argc < 2) {
                 _printf("Usage: run [path]\n");
@@ -523,7 +523,7 @@ void shell_cmd_run(int argc, char *argv[])
                 if(*(temp - 1) == '\n') {
                         //_printf(str);
                         shell_handle_command(str);
-                        bzero(str, 80);
+                        bzero(str, 81);
                         temp = str;
                 }
         }
@@ -534,6 +534,7 @@ void shell_cmd_run(int argc, char *argv[])
         }
         
         shell_handle_command(str);
+        _close(fd);
         _free(str);
 }
 
@@ -565,7 +566,8 @@ struct shell_cmd_t shell_cmds[] = {
                 {"date",        shell_cmd_date,         "Display date and time"},
                 {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
                 {"rm",          shell_cmd_rm,           "Removes a file"},
-                {"run",          shell_cmd_run,         "Executes a \"batch\" file"},
+                {"exec",         shell_cmd_exec,        "Executes a \"batch\" file"},
+                {"speed",       shell_cmd_speed,        "Simple potatoes/etios editor"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

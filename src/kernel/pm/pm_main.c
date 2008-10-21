@@ -273,6 +273,17 @@ void pm_destroy_thread(process_t *proc)
  * @param pid the pid of the process receiving the focus
  */
 void pm_set_focus_proc(uint32 pid)
+{        
+        focus_proc = pm_get_proc(pid);
+}
+
+/**
+ * Returns the process that belongs to the given pid.
+ * 
+ * @param pid the pid
+ * @return process that belongs to the given pid
+ */
+process_t* pm_get_proc(uint32 pid)
 {
         process_t *p = procs_head;
         do {
@@ -281,7 +292,7 @@ void pm_set_focus_proc(uint32 pid)
                 p = p->next;
         } while (p != procs_head);
         
-        focus_proc = p;
+        return p;
 }
 
 /**

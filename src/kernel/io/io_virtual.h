@@ -88,7 +88,9 @@ typedef struct {
         uint32 pid;
 }virt_monitor;
 
+//FIXME: vmonitors as linked list
 extern virt_monitor *vmonitors;
+extern char *vmonitor_names;
 
 virt_monitor* get_active_virt_monitor();
 char* get_active_virt_monitor_name();
