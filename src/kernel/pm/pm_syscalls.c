@@ -323,6 +323,9 @@ void sys_unlink(void *data)
         
         file_nr fd = do_open(args->path);
         
+        
+        //TODO: This should be handled by the file system.
+        
         if (fd == NOT_FOUND) {
                 dprintf("%{ERROR: file does not exist or is a device!}\n", RED);
                 args->success = -1;
@@ -348,11 +351,7 @@ void sys_unlink(void *data)
         
         do_close(fd);
         
-        if (fs_delete(args->path)) {
-                args->success = 0;
-        } else {
-                args->success = -1;
-        }
+        args->success = do_remove(args->path);
 }
 
 /**
@@ -372,11 +371,13 @@ void sys_stat(void *data)
                 args->success = -1;
                 return;
         }
+        
+        int pft_fd = insert_proc_file(active_proc->pft, fd);
 
         file_info_t info;
         get_file_info(fd, &info);
 
-        do_close(fd);
+        do_close_pf(active_proc->pft, pft_fd);
         
         memcpy(args->buf, &info, sizeof(stat));
         args->success = 0;

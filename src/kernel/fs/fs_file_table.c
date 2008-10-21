@@ -210,8 +210,8 @@ void free_file(file_nr fd)
                 
                 if (f->f_count == 0) {
                         f->f_desc = NIL_FILE;
-                        bzero(f->f_name, strlen(f->f_name));
                         free(f->f_name);
+                        f->f_name = NULL;
                         if (f->f_inode->i_adr != ROOT_INODE_BLOCK)
                                 free_inode(f->f_inode->i_num);
                         
@@ -280,7 +280,6 @@ file_nr name2desc(char *name) //in global file table
         for (int i = 0; i < NUM_FILES; i++) {
                 if (gft[i].f_name != NULL && strcmp(name, gft[i].f_name) == 0) {
                         fs_dprintf("[fs_file_table] %s and %s are equal -> gft[%d]: fd = %d\n", name, gft[i].f_name, i, gft[i].f_desc);
-                        dump_files();
                         
                         return gft[i].f_desc;
                 }
@@ -348,7 +347,7 @@ file_info_t* get_file_info(file_nr fd, file_info_t* info)
  */
 void dump_file(file *f)
 {
-        fs_dprintf("[fs_file_table] FILE: '%s': f_desc = %d; f_inode (nr)= %d; f_count = %d; f_mode = %d\n",
+        fs_dprintf("FILE: '%s': f_desc = %d; f_inode (nr)= %d; f_count = %d; f_mode = %d\n",
                    f->f_name, f->f_desc, (f->f_inode)->i_num, f->f_count, f->f_mode);
 }
 
@@ -357,6 +356,7 @@ void dump_file(file *f)
  */
 void dump_files()
 {
+        fs_dprintf("FILE_TABLE:\n");
         for (int i = 0; i < NUM_FILES; i++) {
                 dump_file(&gft[i]);
         }
@@ -369,7 +369,7 @@ void dump_files()
  */
 void dump_proc_file(proc_file *pf)
 {
-        fs_dprintf("[fs_file_table] PROC_FILE: pf_desc = %d; pf_f_desc %d; pf_pos = %d\n",
+        fs_dprintf("PROC_FILE: pf_desc = %d; pf_f_desc %d; pf_pos = %d\n",
                    pf->pf_desc, pf->pf_f_desc, pf->pf_pos);
 }
 
@@ -378,6 +378,7 @@ void dump_proc_file(proc_file *pf)
  */
 void dump_proc_files(proc_file pft[NUM_PROC_FILES])
 {
+        fs_dprintf("PROC_FILE_TABLE:\n");
         for (int i = 0; i < NUM_PROC_FILES; i++) {
                 dump_proc_file(&pft[i]);
         }

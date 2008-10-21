@@ -117,7 +117,18 @@ bool create_fs()
 
 size_t do_read(file_nr fd, void *buf, size_t count, uint32 pos)
 {
-        return fs_read(buf, get_file(fd)->f_inode, count, pos, FALSE);
+        file_info_t info;
+        get_file_info(fd, &info);
+        
+        int to_read;
+        
+        if (info.mode == DIRECTORY) {
+                to_read = sizeof(dir_entry) * DIR_ENTRIES_PER_BLOCK;
+        } else {
+                to_read = (count > info.size) ? info.size : count;
+        }
+        
+        return fs_read(buf, get_file(fd)->f_inode, to_read, pos, FALSE);
 }
 
 size_t do_write(file_nr fd, void *buf, size_t count, uint32 pos)

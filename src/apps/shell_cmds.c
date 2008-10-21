@@ -394,9 +394,14 @@ void shell_cmd_cp(int argc, char *argv[])
                 return;
         }
 
-        char ch;
-        while (_read(src_fd, &ch, sizeof(ch)) != 0)
-                _fputch(ch, target_fd);
+        char buf[1024 * 8];
+        int read;
+        
+        do {
+                read = _read(src_fd, buf, sizeof(buf));
+                _write(target_fd, buf, read);
+                
+        } while (read == sizeof(buf));
 
         _close(src_fd);
         _close(target_fd);

@@ -110,6 +110,8 @@ bool fs_close(file_nr fd)
         
         write_inode(f->f_inode);
         free_file(fd);
+        
+        dump_files();
 
         return TRUE;
 }
