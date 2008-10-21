@@ -1,4 +1,4 @@
-/* $Id: apps.h 195 2008-08-29 22:54:26Z dtraytel $
+/* $Id$
       _   _  ____   _____
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Header file for the applications.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 195 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #ifndef __APPS_H
 #define __APPS_H

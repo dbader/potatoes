@@ -1,4 +1,4 @@
-/* $Id: editor.h 201 2008-10-03 09:47:59Z dbader $
+/* $Id$
       _   _  ____   _____
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___
@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Simple Potatoes/Etios EDitor header.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 201 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #ifndef __EDITOR_H
 #define __EDITOR_H

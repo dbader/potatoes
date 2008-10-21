@@ -1,4 +1,4 @@
-/* $Id: games.h 195 2008-08-29 22:54:26Z dtraytel $
+/* $Id$
       _   _  ____   _____
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___
@@ -26,8 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Daniel Bader
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 195 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #ifndef __GAMES_H
 #define __GAMES_H
