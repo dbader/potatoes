@@ -125,9 +125,9 @@ size_t do_read(file_nr fd, void *buf, size_t count, uint32 pos)
         if (info.mode == DIRECTORY) {
                 to_read = sizeof(dir_entry) * DIR_ENTRIES_PER_BLOCK;
         } else {
-                to_read = (count > info.size) ? info.size : count;
+                to_read = (count > info.size - pos) ? info.size - pos : count;
         }
-        
+        fs_dprintf("trying to read %d bytes\n", to_read);
         return fs_read(buf, get_file(fd)->f_inode, to_read, pos, FALSE);
 }
 

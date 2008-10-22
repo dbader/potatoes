@@ -56,7 +56,7 @@ int dev_brainfuck_read(void *dev, int fd, void *buf, int size)
 int dev_brainfuck_write(void *dev, int fd, void *buf, int size)
 {
         for (int i = 0; i < size; i++) {
-                char ch = *((char*)buf++);
+                char ch = *((char*)buf + i);
                 if (     ch != '.' &&
                                 ch != ',' &&
                                 ch != '+' &&
@@ -65,7 +65,7 @@ int dev_brainfuck_write(void *dev, int fd, void *buf, int size)
                                 ch != '>' &&
                                 ch != '[' &&
                                 ch != ']')
-                        return 0;
+                        continue;
                 interpret_bf(ch);
         }
         return size;

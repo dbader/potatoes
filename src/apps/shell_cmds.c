@@ -113,7 +113,7 @@ void shell_cmd_ls(int argc, char *argv[])
         bzero(directory, sizeof(directory));
 
         char path[255];
-        
+
         int fd = -1;
         if (argc < 2) {
                 fd = _open(cwd, 0, 0);   // current directory
@@ -122,28 +122,28 @@ void shell_cmd_ls(int argc, char *argv[])
                 strncpy(path, shell_makepath(argv[1]), sizeof(path));
                 fd = _open(path, 0, 0);
         }
-        
+
         if (path[strlen(path)-1] != '/')
                 strcat(path, "/");
-        
+
         if (fd < 0) {
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
 
         _read(fd, directory, sizeof(directory));
-       
+
         int total = 0;
-        
+
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
                 if (directory[i].inode != NULL) {
                         stat stat_buf;                       
                         char abs_path[255];
                         char time[25];
-                        
+
                         strncpy(abs_path, path, sizeof(abs_path));
                         strcat(abs_path, directory[i].name);
-                        
+
                         if (_stat(abs_path, &stat_buf) == 0) {
                                 total += stat_buf.size;
                                 _printf("%d\t%s %s", 
@@ -153,14 +153,14 @@ void shell_cmd_ls(int argc, char *argv[])
                                 if (stat_buf.mode == DIRECTORY) {
                                         _printf("/");
                                 }
-                                
+
                                 _printf("\n");
                         } else {
                                 _printf("%s ERROR: stat() failed.\n", directory[i].name);
                         }
                 }
         }
-        
+
         _printf("total %d bytes\n", total);
         _close(fd);
 }
@@ -235,10 +235,13 @@ void shell_cmd_cat(int argc, char *argv[])
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
-
-        char ch;
-        while (_read(fd, &ch, sizeof(ch)) > 0)
-                _fputch(ch, STDOUT);
+        
+        char buf[512];
+        int read;
+        do {
+                read = _read(fd, buf, sizeof(buf));
+                _write(STDOUT, buf, read);
+        } while (read == sizeof(buf));
 
         _fputch('\n', STDOUT);
         _close(fd);
@@ -394,13 +397,13 @@ void shell_cmd_cp(int argc, char *argv[])
                 return;
         }
 
-        char buf[1024 * 8];
+        char buf[512];
         int read;
-        
+
         do {
                 read = _read(src_fd, buf, sizeof(buf));
                 _write(target_fd, buf, read);
-                
+
         } while (read == sizeof(buf));
 
         _close(src_fd);
@@ -430,8 +433,9 @@ void reset_bf();
  */
 void shell_cmd_bf(int argc, char *argv[])
 {
+        int bf = _open("/dev/brainfuck", 0, 0);
         if (!strcmp(argv[1], "-i")) {
-                _write(5, argv[2], strlen(argv[2]));
+                _write(bf, argv[2], strlen(argv[2]));
         } else {
                 reset_bf();
                 int fd = _open(shell_makepath(argv[1]), 0, 0);
@@ -440,16 +444,21 @@ void shell_cmd_bf(int argc, char *argv[])
                         _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                         return;
                 }
-                char ch;
-                while (_read(fd, &ch, sizeof(ch)) != 0) {
-                        _fputch(ch, 5);
-                }
+
+                char buf[512];
+                int read;
+                do {
+                        read = _read(fd, buf, sizeof(buf));
+                        _write(bf, buf, read);
+                } while (read == sizeof(buf));
+
                 temp = get_ticks() - temp;
                 (temp < 0) ? temp += UINT32_MAX : temp;
                 _printf("time elapsed: %d ticks\n", temp);
                 _close(fd);
                 reset_bf();
         }
+        _close(bf);
 }
 
 /**
@@ -519,7 +528,7 @@ void shell_cmd_exec(int argc, char *argv[])
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
-        
+
         char* str = _malloc(81);
         bzero(str, 81);
         char* temp = str;
@@ -532,12 +541,12 @@ void shell_cmd_exec(int argc, char *argv[])
                         temp = str;
                 }
         }
-        
+
         //FIXME: HACK
         if(*(str+strlen(str)) != '\n') {
                 *(str+strlen(str)) = '\n';
         }
-        
+
         shell_handle_command(str);
         _close(fd);
         _free(str);

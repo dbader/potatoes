@@ -59,7 +59,7 @@ size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool all
         block_nr data_blk = get_data_block(inode, pos, allow_enlargement); //see block_dev.c
 
         fs_dprintf("[fs_r_w] found block to read content from: %d\n", data_blk);
-
+        
         if (data_blk == NOT_FOUND) {
                 return 0;
         }
@@ -81,7 +81,7 @@ size_t fs_read(void *buf, m_inode *inode, size_t num_bytes, uint32 pos, bool all
                 fs_dprintf("[fs_r_w] reading over block edge...\n");
                 fs_dprintf("[fs_r_w] num_readable_bytes = %d, left bytes = %d, new pos = %d\n", num_readable_bytes, num_bytes - (num_readable_bytes), pos + num_readable_bytes);
 
-                return num_readable_bytes + fs_read(buf + num_readable_bytes, inode, num_bytes - (num_readable_bytes), pos + num_readable_bytes, allow_enlargement);
+                return num_readable_bytes + fs_read(buf + num_readable_bytes, inode, num_bytes - num_readable_bytes, pos + num_readable_bytes, allow_enlargement);
         }
 
         return num_readable_bytes;
