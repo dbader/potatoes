@@ -58,6 +58,7 @@ void speed()
 
         line *startline = _malloc(sizeof(line));
         startline->num_chars=0;
+        startline->offset=0;
         startline->next = NULL;
         startline->prev = NULL;
         line * actualline = startline;
@@ -95,7 +96,7 @@ void speed()
                         if(actualline == startline && startline->num_chars == 0) { //nothing to erase
                                 break;                                
                         }
-                        if(actualline->num_chars == 0) { //erase '\n' or '\t'
+                        if(str[pos - 1]=='\n' || str[pos - 1]=='\t') { //erase '\n' or '\t'
                                 PREV_LINE
                         } else { //erase 1 character
                                 actualline->num_chars--;
@@ -109,18 +110,19 @@ void speed()
                         break;
                 default:
                         _printf("%c", ch);
+                        str[pos] = ch;
                         if(ch == '\n' || ch == '\t') {
                                 NEXT_LINE
                         } else {
                                 actualline->num_chars++;
                         }
-                        str[pos++] = ch;
+                        pos++;
                 }
         }
 
         //flush stdin
         while (_read(stdin, &ch, sizeof(ch)) != 0) ;
-
+        //DUMP_LINES
         _unlink(active_proc->name);
         //        fd = _open(active_proc->name, 0, 0);
         //        int fsize = _seek(fd, 0, SEEK_END);

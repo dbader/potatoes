@@ -31,32 +31,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __EDITOR_H
 #define __EDITOR_H
 
+#include "../kernel/include/debug.h"
+
 typedef struct line {
         int num_chars;
+        int offset;
         unsigned char linewidth;
         struct line *next;
         struct line *prev;
 } line;
 
 #define NEXT_LINE \
+        actualline->next = _malloc(sizeof(line));\
         if(str[pos] == '\n') {\
                 actualline->linewidth = 80;\
+                if(actualline->prev->linewidth == 8) {\
+                        actualline->offset = actualline->prev->offset;\
+                }\
         } else {\
                 actualline->linewidth = 8;\
+                actualline->offset = actualline->prev->offset + actualline->num_chars + 8 - actualline->num_chars % 8;\
         }\
-        actualline->next = _malloc(sizeof(line));\
         actualline->next->prev = actualline;\
         actualline = actualline->next;\
-        actualline->num_chars=0;\
+        actualline->num_chars = 0;\
+        actualline->offset = 0;\
         actualline->next = NULL;
 
 #define PREV_LINE \
+        line *temp = actualline;\
         actualline = actualline->prev;\
-        _free(actualline->next);\
-        actualline->next = NULL;\
+        actualline->next = temp->next;\
+        if(temp->next!=NULL) {\
+                temp->next->prev = actualline;\
+        }\
+        _free(temp);\
+        if(actualline->linewidth == 8) {\
+                actualline->offset=0;\
+        }\
         for(int i = 0;\
-                i< actualline->linewidth - (actualline->num_chars % actualline->linewidth); i++) {\
+        i< actualline->linewidth - actualline->offset - (actualline->num_chars % actualline->linewidth); i++) {\
                 _printf("\b");\
+        }
+
+#define DUMP_LINES \
+        dprintf("NUM_CHARS\tOFFSET\t\tTYPE\n");\
+        for(line* temp = startline; temp != NULL; temp = temp->next) {\
+                dprintf("%d\t\t%d\t\t%s\n",\
+                        temp->num_chars,\
+                        temp->offset,\
+                        (temp->prev->linewidth == 80)? "\\n" : "\\t");\
         }
 
 #endif /*__EDITOR_H*/
