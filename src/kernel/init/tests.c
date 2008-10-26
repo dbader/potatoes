@@ -582,7 +582,7 @@ void make_snapshot();
 void do_tests()
 {
         test_batch_files();
-        printf("\n%{Global keyboard shortcuts:}\n", LIGHTGREEN);
+        printf("\n#{LGR}Global keyboard shortcuts:##\n");
         //fs_tests();
         //grubstruct_test(g_mboot_ptr);
         //strings_test();

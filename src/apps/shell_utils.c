@@ -33,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/include/const.h"
 #include "../kernel/pm/syscalls_cli.h"
 #include "../kernel/include/string.h"
+#include "../kernel/include/stdarg.h"
+#include "../kernel/include/stdio.h"
 #include "shell_main.h"
 
 /** The shell's STDIN file descriptor. Used by all internal commands. */
@@ -134,59 +136,14 @@ int _fputs(char *s, int fd)
  */
 void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution possible?
 {
-        if (fmt == NULL)
-                return;
-
-        char **arg = &fmt + 1;
-        char ch;
-        int character;
-        char buf[40];
-
-        while ((ch = *fmt++) != '\0')
-                if (ch == '%') {
-                        ch = *fmt++;
-                        switch (ch) {
-                        case '%': // print '%'
-                                _fputch(ch, STDOUT);
-                                break;
-                        case 'i': // signed integer
-                        case 'd':
-                                _fputs(itoa((sint32)*arg++, buf, 10), STDOUT);
-                                break;
-                        case 'u': // unsigned integer
-                                _fputs(itoa((uint32)*arg++, buf, 10), STDOUT);
-                                break;
-                        case 'o': // octal
-                                _fputs(itoa((uint32)*arg++, buf, 8), STDOUT);
-                                break;
-                        case 'b': // binary
-                                _fputs(itoa((uint32)*arg++, buf, 2), STDOUT);
-                                break;
-                        case 'c': // character
-                                /* This is a bit peculiar but needed to shut up the
-                                 * "cast from pointer to integer of different size"
-                                 * compiler warning.
-                                 * Code was: putchar((char)*arg++);
-                                 */
-                                character = (int) * arg++;
-                                _fputch((char)character, STDOUT);
-                                break;
-                        case 's': // string
-                                if (*arg != NULL) {
-                                        while ((ch = *(*arg)++) != '\0')
-                                                _fputch(ch, STDOUT);
-                                } else {
-                                        _fputs("(null)", STDOUT);
-                                }
-                                *arg++;
-                                break;
-                        case 'x': // hexadecimal integer
-                        case 'p': // pointer
-                                _fputs(itoa((uint32)*arg++, buf, 16), STDOUT);
-                                break;
-                        }
-                } else
-                        _fputch(ch, STDOUT);
+        char buf[255];
+        va_list arg_list;
+        va_start(arg_list, fmt);
+        
+        vsnprintf(buf, sizeof(buf), fmt, arg_list);
+        _write(STDOUT, buf, sizeof(buf));
+        
+        va_end(arg_list);
 }
 
 /**

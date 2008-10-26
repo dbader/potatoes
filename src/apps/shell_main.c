@@ -137,8 +137,8 @@ void shell_main()
         STDIN = _open("/dev/stdin", 0, 0);
         STDOUT = _open("/dev/stdout", 0, 0);
 
-        _printf("Welcome to POTATOES!\n");
-        _printf("Try \"cmdlist\" for a list of commands.\n\n");
+        _printf("#{LGR}Welcome to POTATOES!##\n");
+        _printf("#{LGR}Try \"cmdlist\" for a list of commands.##\n\n");
 
         strcpy(cwd, "/");
 
@@ -146,7 +146,7 @@ void shell_main()
         while (1) {
                 STDIN = _open("/dev/stdin", 0, 0);
                 STDOUT = _open("/dev/stdout", 0, 0);
-                _printf("%s$ ", cwd);
+                _printf("#{LBL}%s$## ", cwd);
                 char cmd[512];
                 memset(cmd, 0, sizeof(cmd));
 

@@ -40,14 +40,14 @@ extern bool keyboard_state[256];
 void io_init()
 {
         dprint_separator();
-        dprintf("%{io:} init\n", YELLOW);
+        dprintf("#{YEL}io:## init\n");
 
         idt_init();
-        dprintf("%{io:} IDT initialized\n", YELLOW);
+        dprintf("#{YEL}io:## IDT initialized\n");
         isr_init();
-        dprintf("%{io:} ISRs initialized\n", YELLOW);
+        dprintf("#{YEL}io:## ISRs initialized\n");
         irq_init();
-        dprintf("%{io:} IRQs initialized\n", YELLOW);
+        dprintf("#{YEL}io:## IRQs initialized\n");
 
         //dprintf("0x%p\n",(get_active_virt_monitor())->begin);
         //dprintf("0x%p\n",(get_active_virt_monitor())->vis_begin);
@@ -56,12 +56,12 @@ void io_init()
 
 //        monitor_init();                 dprintf("io: monitor initialized\n");
         timer_init(FREQUENCY);
-        dprintf("%{io:} timer initialized (%dHz)\n", YELLOW, FREQUENCY);
+        dprintf("#{YEL}io:## timer initialized (%dHz)\n", FREQUENCY);
         set_interrupts();
-        dprintf("%{io:} interrupts enabled\n", YELLOW);
+        dprintf("#{YEL}io:## interrupts enabled\n");
         hd_init();
-        dprintf("%{io:} hard disk initialized\n", YELLOW);
+        dprintf("#{YEL}io:## hard disk initialized\n");
         memset(keyboard_state, FALSE, sizeof(keyboard_state));
 
-        dprintf("%{io:} initialized\n", YELLOW);
+        dprintf("#{YEL}io:## initialized\n");
 }

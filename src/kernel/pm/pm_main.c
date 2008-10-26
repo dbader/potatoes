@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * @file
@@ -90,8 +90,8 @@ uint32 getpid()
 void pm_init()
 {
         dprint_separator();
-        dprintf("%{pm:} init\n", VIOLET);
-        dprintf("%{pm:} setting up kernel task...\n", VIOLET);
+        dprintf("#{VIO}pm:## init\n");
+        dprintf("#{VIO}pm:## setting up kernel task...\n");
 
         procs_head = (process_t*) malloc(sizeof(process_t));
 
@@ -109,10 +109,10 @@ void pm_init()
         active_proc = procs_head;
         kernel_proc = procs_head;
 
-        dprintf("%{pm:} %d syscalls registered\n", VIOLET, MAX_SYSCALL);
+        dprintf("#{VIO}pm:## %d syscalls registered\n", MAX_SYSCALL);
 
-        dprintf("%{pm:} creating /dev\n", VIOLET);
-        
+        dprintf("#{VIO}pm:## creating /dev\n");
+
         if (!do_file_exists("/dev")) {
                 do_mkdir("/dev");
         }
@@ -126,7 +126,7 @@ void pm_init()
         pm_register_device(&dev_brainfuck);
         pm_register_device(&dev_clock);
 
-        dprintf("%{pm:} scheduler initialized\n", VIOLET);
+        dprintf("#{VIO}pm:## scheduler initialized\n");
 }
 
 /**
@@ -143,13 +143,13 @@ uint32 pm_schedule(uint32 context)
         }
 
         active_proc->context = context;
-        
+
         // Destroy all zombie- and jump over all sleeping processes up to the first alive process.
         while (active_proc->next->state != PSTATE_ALIVE) {
                 while (active_proc->next->state == PSTATE_DEAD) {        		
-        		process_t *next_proc = active_proc->next->next;                
-        		pm_destroy_thread(active_proc->next);
-        		active_proc->next = next_proc;
+                        process_t *next_proc = active_proc->next->next;                
+                        pm_destroy_thread(active_proc->next);
+                        active_proc->next = next_proc;
                 }
                 //TODO: This is the PERFORMANCE FIX - schould be handled later in some other way
                 while (active_proc->next->state == PSTATE_STDINSLEEP) {
@@ -182,7 +182,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         if (proc == NULL) {
                 panic("pm_create_thread: out of memory");
         }
-                
+
         proc->name = strdup(name);
         proc->pid = next_pid++;
         proc->state = PSTATE_ALIVE;
@@ -195,7 +195,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         if (proc->stack_start == NULL) {
                 panic("pm_create_thread: could not allocate stack");
         }
-                
+
         proc->stdin = rf_alloc(STDIN_QUEUE_SIZE);
 
         if (proc->stdin == NULL) {
@@ -237,9 +237,9 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 
         proc->context = (uint32) stack;
 
-        dprintf("%{pm:} created thread \"%s\"\n    "
-                "entry at 0x%x, stack at 0x%x (%u bytes). pid = %u\n\n",
-                VIOLET, proc->name, entry, proc->context, stacksize, proc->pid);
+        dprintf("#{VIO}pm:## created thread \"%s\"\n    "
+                        "entry at 0x%x, stack at 0x%x (%u bytes). pid = %u\n\n",
+                        proc->name, entry, proc->context, stacksize, proc->pid);
 
         focus_proc = proc; //FIXME: hackhackhack
 
@@ -259,12 +259,12 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
  */
 void pm_destroy_thread(process_t *proc)
 {
-        dprintf("%{pm:} destroy thread \"%s\" pid = %u\n\n", VIOLET, proc->name, proc->pid);
-        
+        dprintf("#{VIO}pm:## destroy thread \"%s\" pid = %u\n\n", proc->name, proc->pid);
+
         if (proc->stdin != NULL) {
                 rf_free(proc->stdin);
         }
-        
+
         free(proc->name);
         free(proc->stack_start);
         free(proc);
@@ -294,7 +294,7 @@ process_t* pm_get_proc(uint32 pid)
                         break;
                 p = p->next;
         } while (p != procs_head);
-        
+
         return p;
 }
 
@@ -302,17 +302,15 @@ void aprintf(char *fmt, ...)
 {
         va_list arg_list;
         va_start(arg_list, fmt);
-        
+
         //dprintf(fmt, arg);
-        
+
         char buf[255];
         vsnprintf(buf, sizeof(buf), fmt, arg_list);
-        
+
         char *msg = buf;
         
-        while (*msg) {
-                virt_monitor_putc(active_proc->vmonitor, *(msg++));
-        }
+        virt_monitor_puts(active_proc->vmonitor, msg);
         va_end(arg_list);
 }
 
@@ -323,11 +321,11 @@ void aprintf(char *fmt, ...)
 void pm_dump()
 {
         //aprintf("hello, world %s %s %c", 0, "hello", 'x');
-        aprintf("PID\tNAME\t\tCONTEXT\n");
-        aprintf("----------------------------------\n");
+        aprintf("#{VIO}PID##\tNAME\t\tCONTEXT\n");
+        aprintf("#{VIO}----------------------------------##\n");
         process_t *p = procs_head;
         do {
-                aprintf("%d\t%s\t\t0x%x\n", p->pid, p->name, p->context);
+                aprintf("#{VIO}%d##\t%s\t\t0x%x\n", p->pid, p->name, p->context);
                 p = p->next;
         } while (p != procs_head);
 

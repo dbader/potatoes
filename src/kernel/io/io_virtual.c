@@ -77,7 +77,7 @@ void free_virt_monitor(virt_monitor *vm)
         } else {
                 vmonitors[active_monitor] = vmonitors[maxvmonitor];
                 strncpy(vmonitor_names + 81 * active_monitor, 
-                        vmonitor_names + 81 * maxvmonitor, 81);
+                                vmonitor_names + 81 * maxvmonitor, 81);
         }
         memset(&(vmonitors[maxvmonitor--]), 0, sizeof(virt_monitor));
         pm_get_proc(vmonitors[active_monitor].pid)->vmonitor = &vmonitors[active_monitor];
@@ -105,20 +105,20 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
                 }
                 //scroll, if outside of display-memory
                 uint16 *ptr = vm->begin +
-                              (vm->vis_begin + (VMONITOR_HEIGHT / 2) - LINE_WIDTH - vm->begin)
-                              % (vm->size / 2),
-                              *tmpptr;
+                (vm->vis_begin + (VMONITOR_HEIGHT / 2) - LINE_WIDTH - vm->begin)
+                % (vm->size / 2),
+                *tmpptr;
                 for (tmpptr = ptr; tmpptr < ptr + LINE_WIDTH; tmpptr++)
                         *tmpptr = 0xF00;
                 vm->offset -= LINE_WIDTH;
         }
         switch (ch) {
-//        case '\a':
-//                virt_monitor_invert(get_active_virt_monitor());
-//                update_virt_monitor(get_active_virt_monitor());
-//                sleep_ticks(15); // FIXME: RACE CONDITION. Disable sleep altogether.
-//                virt_monitor_invert(get_active_virt_monitor());
-//                break;
+        //        case '\a':
+        //                virt_monitor_invert(get_active_virt_monitor());
+        //                update_virt_monitor(get_active_virt_monitor());
+        //                sleep_ticks(15); // FIXME: RACE CONDITION. Disable sleep altogether.
+        //                virt_monitor_invert(get_active_virt_monitor());
+        //                break;
         case '\n':
                 temp = LINE_WIDTH - (vm->offset % LINE_WIDTH);
                 while (i++ < temp) { //calculating the "new line" starting position
@@ -146,6 +146,65 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
 }
 
 /**
+ * Decodes the color tag on the beginning of the given string as a color
+ * 
+ * @param str string starting with a tag
+ * @return the decoded
+ */
+uint8 get_color_tag(char *str)
+{
+        char buf[6];
+        buf[5] = '\0';
+        memcpy(buf, str, 5);
+        if(strcmp(buf, "{BLA}") == 0){
+                return BLACK;
+        }
+        if(strcmp(buf, "{BLU}") == 0){
+                return BLUE;
+        }
+        if(strcmp(buf, "{GRE}") == 0){
+                return GREEN;
+        }
+        if(strcmp(buf, "{CYA}") == 0){
+                return CYAN;
+        }
+        if(strcmp(buf, "{RED}") == 0){
+                return RED;
+        }
+        if(strcmp(buf, "{VIO}") == 0){
+                return VIOLET;
+        }
+        if(strcmp(buf, "{ORA}") == 0){
+                return ORANGE;
+        }
+        if(strcmp(buf, "{DAR}") == 0){
+                return DARKGREY;
+        }
+        if(strcmp(buf, "{LIG}") == 0){
+                return LIGHTGREY;
+        }
+        if(strcmp(buf, "{LBL}") == 0){
+                return LIGHTBLUE;
+        }
+        if(strcmp(buf, "{LGR}") == 0){
+                return LIGHTGREEN;
+        }
+        if(strcmp(buf, "{TUR}") == 0){
+                return TURQUOISE;
+        }
+        if(strcmp(buf, "{PIN}") == 0){
+                return PINK;
+        }
+        if(strcmp(buf, "{MAG}") == 0){
+                return MAGENTA;
+        }
+        if(strcmp(buf, "{YEL}") == 0){
+                return YELLOW;
+        }
+        return WHITE;
+}
+
+/**
  *  Writes a colored null-terminated string to the virtual monitor.
  *
  * @param *vm virtual monitor, on which the string shall be written
@@ -155,10 +214,23 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
  */
 int virt_monitor_cputs(virt_monitor *vm, char *str, uint8 fg, uint8 bg)
 {
+        int tempcolor = fg;
         int res = 0;
         while (*str != 0) {
-                virt_monitor_cputc(vm, *str, fg, bg);
-                str += 1;
+                if(*str == '#') {
+                        tempcolor = get_color_tag(++str);
+                        if(tempcolor != WHITE) {
+                                str+=5;
+                        } else if (*str != '#'){
+                                virt_monitor_cputc(vm, '#', tempcolor, bg);
+                        } else {
+                                str++;
+                        }
+                        if(*str == '\0') {
+                                break;
+                        }
+                }
+                virt_monitor_cputc(vm, *str++, tempcolor, bg);
                 res++;
         }
         return res;
@@ -207,7 +279,7 @@ void virt_cursor_move(virt_monitor *vm, uint8 dir)
                 break;
         case 2:
                 vm->offset = (vm->offset - vm->offset % LINE_WIDTH) +
-                              (vm->offset % LINE_WIDTH + 80 - 1) % LINE_WIDTH;
+                (vm->offset % LINE_WIDTH + 80 - 1) % LINE_WIDTH;
                 break;
         case 3:
                 vm->offset =
@@ -242,10 +314,10 @@ void update_virt_monitor(virt_monitor *vm)
                 memcpy((void*)MONITOR_START, (void*)(vm->vis_begin), VMONITOR_HEIGHT);
         } else {
                 memcpy((void*)MONITOR_START, (void*)(vm->vis_begin),
-                       2*(vm->begin + vm->size / 2 - vm->vis_begin));
+                                2*(vm->begin + vm->size / 2 - vm->vis_begin));
                 memcpy((void*)MONITOR_START + 2*(vm->begin + vm->size / 2 - vm->vis_begin),
-                       (void*)(vm->begin),
-                       2*(VMONITOR_HEIGHT - (vm->begin + vm->size / 2 - vm->vis_begin)));
+                                (void*)(vm->begin),
+                                2*(VMONITOR_HEIGHT - (vm->begin + vm->size / 2 - vm->vis_begin)));
         }
         //Cursor update
         outb(0x3D4, 0x0E);
@@ -292,6 +364,6 @@ void virt_monitor_scrolldown(virt_monitor *vm)
 void virt_monitor_invert(virt_monitor *vm)
 {
         for (uint8 *temp = (uint8*)vm->vis_begin + 1;
-                        temp <= (uint8*)(vm->vis_begin + VMONITOR_HEIGHT); temp += 2)
+        temp <= (uint8*)(vm->vis_begin + VMONITOR_HEIGHT); temp += 2)
                 * temp = 0xFF - *temp;
 }

@@ -266,6 +266,7 @@ void heap_free(void *start, heap_t *heap)
         dprintf("ERROR: free(): attempt to free unallocated block 0x%x\n", start);
 }
 
+extern void _printf(char *fmt, ...);
 /**
  * Dumps the heap.
  */
@@ -275,10 +276,10 @@ void heap_mem_dump()
         int total_bytes = 0;
         int total_blocks = 0;
         for (ptr = kernel_heap->start->next; ptr != kernel_heap->end->next; ptr = ptr->next) {
-                dprintf("%d bytes \"%s\" at 0x%x\n", ptr->size, ptr->name, (uint32)ptr + sizeof(mm_header));
+                _printf("%d bytes #{LBL}\"%s\"## at 0x%x\n", ptr->size, ptr->name, (uint32)ptr + sizeof(mm_header));
                 total_blocks++;
                 total_bytes += ptr->size;
         }
 
-        dprintf("Total %d blocks (%d bytes)\n", total_blocks, total_bytes);
+        _printf("#{LBL}Total %d blocks (%d bytes)##\n", total_blocks, total_bytes);
 }

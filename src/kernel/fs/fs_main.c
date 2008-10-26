@@ -52,10 +52,10 @@ extern void panic(char *msg);
 void fs_init()
 {
         dprint_separator();
-        dprintf("%{FS:} init\n", GREEN);
+        dprintf("#{GRE}fs:## init\n");
 
         if (!load_fs()) {
-                printf("%{FS:} %{FS loading failed.}\n", GREEN, RED);
+                printf("#{GRE}fs:## #{RED}FS loading failed.##\n");
                 if (!create_fs()) {
                         panic("FS cannot be initialized!\n");
                 }
@@ -68,7 +68,7 @@ void fs_init()
  */
 void fs_shutdown()
 {
-        printf("%{FS:} shutting down FS..\n", GREEN);
+        printf("#{GRE}fs:## shutting down FS..\n");
         write_root();
 
         //close all open files
@@ -86,7 +86,7 @@ void fs_shutdown()
  */
 bool load_fs()
 {
-        printf("%{FS:} loading FS from HD..\n", GREEN);
+        printf("#{GRE}fs:## loading FS from HD..\n");
         load_bmap();
         init_inode_table();
         init_file_table();
@@ -100,7 +100,7 @@ bool load_fs()
  */
 bool create_fs()
 {
-        printf("%{FS:} creating new FS...\n", GREEN);
+        printf("#{GRE}fs:## creating new FS...\n");
         init_bmap();
         init_inode_table();
         init_file_table();

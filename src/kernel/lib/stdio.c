@@ -78,7 +78,7 @@ int cputchar(char c, uint8 fg, uint8 bg)
  */
 int puts(char *s)
 {
-        return virt_monitor_puts(SELECT_VMONITOR(), s);
+        return virt_monitor_cputs(SELECT_VMONITOR(), s, WHITE, BLACK);
         //monitor_puts(s);
 }
 
@@ -106,7 +106,7 @@ int vsnprintf(char *s, int n, char *format, va_list ap)
                 if (ch == '%') {
                         ch = *format++;
                         switch (ch) {
-                        case '{': int_arg = va_arg(ap, int);
+                        //case '{': int_arg = va_arg(ap, int);
                         case '%': // print '%'
                                 *(s++) = ch;
                                 break;

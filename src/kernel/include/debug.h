@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io.h"
 
 #define dprintf printf
-#define dprint_separator() dprintf("%{--------------------------------------------------------------------------------}", 2);
+#define dprint_separator() dprintf("#{GRE}--------------------------------------------------------------------------------##");
 #define fs_dprintf //dprintf
 //dprintf("%s ln %d%{:} ", __FILE__, __LINE__, RED); dprintf
 

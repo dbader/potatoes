@@ -94,13 +94,13 @@ void mm_init(uint32 start, uint32 end)
  * uses dprintf() )
  */
 void mm_init_output() {
-        printf("%{POTATOES - $Rev$ - "__DATE__" "__TIME__"\n", LIGHTGREEN);
+        printf("#{LGR}POTATOES - $Rev$ - "__DATE__" "__TIME__"##\n");
         dprint_separator();
 
-        dprintf("%{mm:} init\n", LIGHTBLUE);
+        dprintf("#{LBL}mm:## init\n");
         //dprintf("size of struct mm_header: %d\n",sizeof(mm_header));
         gdt_init();
-        dprintf("%{mm:} GDT initialized\n", LIGHTBLUE);  
+        dprintf("#{LBL}mm:## GDT initialized\n");  
 //        dprintf("mm_start.next: 0x%x\n", mm_start->next);
 //        dprintf("mm_start.prev: 0x%x\n", mm_start->prev);
 //        dprintf("mm_start.name: %s\n", mm_start->name);
@@ -110,8 +110,8 @@ void mm_init_output() {
 //        dprintf("mm_end.name: %s\n", mm_end->name);
 //        dprintf("mm_end.size: %d\n", mm_end->size);
         
-        dprintf("%{mm:} memory 0x%x - 0x%x (%dmb)\n",
-                        LIGHTBLUE, (uint32)kernel_heap->start, (uint32)kernel_heap->end + sizeof(mm_header), ((uint32)kernel_heap->end + sizeof(mm_header) - (uint32)kernel_heap->start) / (1024 * 1024));
+        dprintf("#{LBL}mm:## memory 0x%x - 0x%x (%dmb)\n",
+                        (uint32)kernel_heap->start, (uint32)kernel_heap->end + sizeof(mm_header), ((uint32)kernel_heap->end + sizeof(mm_header) - (uint32)kernel_heap->start) / (1024 * 1024));
 }
 
 /**

@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/string.h"
 #include "../include/debug.h"
 #include "../io/io_virtual.h"
+#include "syscalls_cli.h"
 #include "pm_devices.h"
 #include "pm_main.h"
 
@@ -55,8 +56,11 @@ int dev_stdout_read(void *dev, int fd, void *buf, int size)
 
 int dev_stdout_write(void *dev, int fd, void *buf, int size)
 {
-        for (int i = 0; i < size; i++)
-                virt_monitor_putc(active_proc->vmonitor, *((char*)buf++));
+        char* temp = _malloc(size+1);
+        temp[size] = '\0';
+        memcpy(temp, buf, size);
+        virt_monitor_puts(active_proc->vmonitor, temp);
+        _free(temp);
         return size;
 }
 
