@@ -558,30 +558,36 @@ void make_snapshot();
  * The shell command table. Every shell command must be registered here
  * to be accessible. */
 struct shell_cmd_t shell_cmds[] = {
+                {"cmdlist",     shell_cmd_cmdlist,      "List available commands\n"},
+                
                 {"test",        shell_cmd_test,         "Test argument parsing"},
-                {"cmdlist",     shell_cmd_cmdlist,      "List available commands"},
-                {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
-                {"ls",          shell_cmd_ls,           "List directory"},
-                {"touch",       shell_cmd_touch,        "Create regular file"},
-                {"mkdir",       shell_cmd_mkdir,        "Create directory"},
-                {"cat",         shell_cmd_cat,          "Print file contents"},
-                {"write",       shell_cmd_write,        "Write text to file"},
-                {"cd",          shell_cmd_cd,           "Change directory"},
-                {"clear",       shell_cmd_clear,        "Clear the screen"},
                 {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
+                {"exec",        shell_cmd_exec,         "Executes a \"batch\" file"},
+                {"exit",        shell_cmd_exit,         "Quit the shell\n"},
+                
                 {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
+                {"ps",          shell_cmd_ps,           "List processes\n"},
+                
+                {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
+                {"clear",       shell_cmd_clear,        "Clear the screen"},
+                {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
+                {"date",        shell_cmd_date,         "Display date and time\n"},
+                
                 {"pwd",         shell_cmd_pwd,          "Print working directory"},
+                {"ls",          shell_cmd_ls,           "List directory"},
+                {"cd",          shell_cmd_cd,           "Change directory"},
+                {"mkdir",       shell_cmd_mkdir,        "Create directory"},
+                {"touch",       shell_cmd_touch,        "Create regular file"},
                 {"cp",          shell_cmd_cp,           "Copy files"},
-                {"ps",          shell_cmd_ps,           "List processes"},
-                {"exit",        shell_cmd_exit,         "Quit the shell"},
+                {"rm",          shell_cmd_rm,           "Removes a file\n"},
+                
+                {"cat",         shell_cmd_cat,          "Print file contents"},
+                {"write",       shell_cmd_write,        "Write text to file\n"},
+
+                {"speed",       shell_cmd_speed,        "Simple potatoes/etios editor"},
                 {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
                 {"pong",        shell_cmd_pong,         "A classic video game"},
                 {"snake",       shell_cmd_snake,        "Another classic video game"},
-                {"date",        shell_cmd_date,         "Display date and time"},
-                {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
-                {"rm",          shell_cmd_rm,           "Removes a file"},
-                {"exec",         shell_cmd_exec,        "Executes a \"batch\" file"},
-                {"speed",       shell_cmd_speed,        "Simple potatoes/etios editor"},
                 {"",            NULL,                   ""} // The Terminator
 };
 
