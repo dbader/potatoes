@@ -112,7 +112,10 @@ void pm_init()
         dprintf("%{pm:} %d syscalls registered\n", VIOLET, MAX_SYSCALL);
 
         dprintf("%{pm:} creating /dev\n", VIOLET);
-        do_mkdir("/dev");
+        
+        if (!do_file_exists("/dev")) {
+                do_mkdir("/dev");
+        }
 
         pm_register_device(&dev_null);
         pm_register_device(&dev_stdout);
@@ -295,17 +298,36 @@ process_t* pm_get_proc(uint32 pid)
         return p;
 }
 
+void aprintf(char *fmt, ...)
+{
+        va_list arg_list;
+        va_start(arg_list, fmt);
+        
+        //dprintf(fmt, arg);
+        
+        char buf[255];
+        vsnprintf(buf, sizeof(buf), fmt, arg_list);
+        
+        char *msg = buf;
+        
+        while (*msg) {
+                virt_monitor_putc(active_proc->vmonitor, *(msg++));
+        }
+        va_end(arg_list);
+}
+
 /**
  * Prints some status information about all processes. Can be used as a crude form 
  * of unix's "ps" command.
  */
 void pm_dump()
 {
-        dprintf("PID\tNAME\t\tCONTEXT\n");
-        dprintf("----------------------------------\n");
+        //aprintf("hello, world %s %s %c", 0, "hello", 'x');
+        aprintf("PID\tNAME\t\tCONTEXT\n");
+        aprintf("----------------------------------\n");
         process_t *p = procs_head;
         do {
-                dprintf("%d\t%s\t\t0x%x\n", p->pid, p->name, p->context);
+                aprintf("%d\t%s\t\t0x%x\n", p->pid, p->name, p->context);
                 p = p->next;
         } while (p != procs_head);
 

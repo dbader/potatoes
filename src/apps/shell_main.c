@@ -102,7 +102,7 @@ void shell_handle_command(char *cmd)
  * Attempts to autocomplete a given partial shell command.
  * 
  * @param partial the partial command string. Will be extended by the first
- * 				  valid completion found.
+ *                valid completion found.
  */
 void shell_autocomplete(char *partial)
 {
@@ -137,7 +137,7 @@ void shell_main()
         STDIN = _open("/dev/stdin", 0, 0);
         STDOUT = _open("/dev/stdout", 0, 0);
 
-        _printf("Welcome to etiOS!\n");
+        _printf("Welcome to POTATOES!\n");
         _printf("Try \"cmdlist\" for a list of commands.\n\n");
 
         strcpy(cwd, "/");

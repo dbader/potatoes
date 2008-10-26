@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __STDIO_H
 
 #include "types.h"
+#include "stdarg.h"
 
 enum colors {
         BLACK = 0x0,
@@ -76,6 +77,8 @@ int putchar(char c);
 int cputchar(char c, uint8 fg, uint8 bg);
 int puts(char *s);
 int cputs(char *s, uint8 fg, uint8 bg);
+int vsnprintf(char *s, int n, char *format, va_list ap);
+int snprintf(char *buf, int size, char *fmt, ...);
 void printf(char *fmt, ...);
 
 void hd_write_sector(uint32 dest, void* src);

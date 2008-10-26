@@ -400,11 +400,16 @@ void shell_cmd_cp(int argc, char *argv[])
         char buf[512];
         int read;
 
+        int total = 0;
+
         do {
                 read = _read(src_fd, buf, sizeof(buf));
                 _write(target_fd, buf, read);
-
+                total += read;
         } while (read == sizeof(buf));
+
+        _printf("%d bytes copied.\n", total);
+
 
         _close(src_fd);
         _close(target_fd);

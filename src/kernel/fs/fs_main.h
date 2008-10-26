@@ -68,6 +68,9 @@ size_t do_lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32
 /* FILE INFO */
 file_info_t* get_file_info(file_nr fd, file_info_t* info);
 
+/* FILE EXISTS */
+bool do_file_exists(char *path);
+
 /* DEBUG */
 void dump_consts();
 

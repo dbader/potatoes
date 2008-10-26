@@ -181,6 +181,12 @@ size_t do_lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32
         return lseek(pft, fd, offset, origin);
 }
 
+extern block_nr search_file(char *path);
+bool do_file_exists(char *path)
+{
+        return (search_file(path) != NOT_FOUND);        
+}
+
 /**
  * Prints out all important constants concerning the file system.
  * For debug purposes only.

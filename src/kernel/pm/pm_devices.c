@@ -152,7 +152,9 @@ void pm_register_device(device_t *dev)
         dev->next = devices_head;
         devices_head = dev;
 
-        do_create(dev->name, 0);
+        if (!do_file_exists(dev->name)) {
+                do_create(dev->name, 0);
+        }
 
         dprintf("%{pm:} registered device %s\n", VIOLET, dev->name);
 }

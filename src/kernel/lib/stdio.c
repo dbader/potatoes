@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/const.h"
 #include "../include/string.h"
 #include "../include/stdio.h"
+#include "../include/stdarg.h"
 
 #include "../io/io_virtual.h"
 #include "../pm/pm_main.h"
@@ -86,6 +87,94 @@ int cputs(char *s, uint8 fg, uint8 bg)
         return virt_monitor_cputs(SELECT_VMONITOR(), s, fg, bg);
 }
 
+int vsnprintf(char *s, int n, char *format, va_list ap)
+{      
+        if (format == NULL) {
+                return 0;
+        }
+
+        char ch;
+        char buf[40];
+        char null_msg[] = "(null)";
+        int written = 0;      
+        char *buf_ptr;
+        int int_arg;
+        char char_arg;
+        char *str_arg;
+
+        while (((ch = *format++) != '\0') && (written++ < n-1))
+                if (ch == '%') {
+                        ch = *format++;
+                        switch (ch) {
+                        case '{': int_arg = va_arg(ap, int);
+                        case '%': // print '%'
+                                *(s++) = ch;
+                                break;
+                        case 'i': // signed integer
+                        case 'd':
+                        case 'u':        
+                                int_arg = va_arg(ap, int);
+                                itoa(int_arg, buf, 10);
+                                buf_ptr = buf;
+                                while (*buf_ptr && written++ < n-1)
+                                        *(s++) = *(buf_ptr++);
+                                break;
+                        case 'o': // octal
+                                int_arg = va_arg(ap, int);
+                                itoa(int_arg, buf, 8);
+                                buf_ptr = buf;
+                                while (*buf_ptr && written++ < n-1)
+                                        *(s++) = *(buf_ptr++);
+                                break;
+                        case 'b': // binary
+                                int_arg = va_arg(ap, int);
+                                itoa(int_arg, buf, 2);
+                                buf_ptr = buf;
+                                while (*buf_ptr && written++ < n-1)
+                                        *(s++) = *(buf_ptr++);
+                                break;
+                        case 'c': // character (note that chars get promoted to int when passed through "...")
+                                int_arg = va_arg(ap, int);
+                                *(s++) = (char)int_arg;
+                                break;
+                        case 's': // string
+                                str_arg = va_arg(ap, char*);
+                                                                
+                                if (str_arg != NULL) {
+                                        buf_ptr = str_arg;
+                                } else {
+                                        buf_ptr = null_msg;
+                                        
+                                }
+                                while (*buf_ptr && written < n-1) {
+                                        *(s++) = *(buf_ptr++);
+                                }
+                                break;
+                        case 'x': // hexadecimal integer
+                        case 'p': // pointer
+                                int_arg = va_arg(ap, int);
+                                itoa(int_arg, buf, 16);
+                                buf_ptr = buf;
+                                while (*buf_ptr && written++ < n-1)
+                                        *(s++) = *(buf_ptr++);
+                                break;
+                        }
+                } else {
+                        *(s++) = ch;
+                }
+        
+        *(s++) = '\0';
+        return (++written);
+}
+
+int snprintf(char *buf, int size, char *fmt, ...)
+{
+        va_list arg_list;
+        va_start(arg_list, fmt);
+        vsnprintf(buf, size, fmt, arg_list);
+        va_end(arg_list);
+}
+
 /**
  * Prints formatted output. The following format specifiers are supported:
  *      %% - prints the % character.
@@ -105,65 +194,75 @@ int cputs(char *s, uint8 fg, uint8 bg)
  */
 void printf(char *fmt, ...)
 {
-        if (fmt == NULL)
-                return;
-
-        char **arg = &fmt + 1;
-        char ch;
-        int character;
-        int color;
-        char buf[40];
-
-        while ((ch = *fmt++) != '\0')
-                if (ch == '%') {
-                        ch = *fmt++;
-                        switch (ch) {
-                        case '{': //print colored until }
-                                color = (int) * arg++;
-                                while ((ch = *fmt++) != '}' && ch != '\0') {
-                                        cputchar(ch, color, BLACK);
-                                }
-                                if (ch = '\0') fmt--; //to break out from the while loop
-                                break;
-                        case '%': // print '%'
-                                putchar(ch);
-                                break;
-                        case 'i': // signed integer
-                        case 'd':
-                                puts(itoa((sint32)*arg++, buf, 10));
-                                break;
-                        case 'u': // unsigned integer
-                                puts(itoa((uint32)*arg++, buf, 10));
-                                break;
-                        case 'o': // octal
-                                puts(itoa((uint32)*arg++, buf, 8));
-                                break;
-                        case 'b': // binary
-                                puts(itoa((uint32)*arg++, buf, 2));
-                                break;
-                        case 'c': // character
-                                /* This is a bit peculiar but needed to shut up the
-                                 * "cast from pointer to integer of different size"
-                                 * compiler warning.
-                                 * Code was: putchar((char)*arg++);
-                                 */
-                                character = (int) * arg++;
-                                putchar((char)character);
-                                break;
-                        case 's': // string
-                                if (*arg != NULL) {
-                                        while ((ch = *(*arg)++) != '\0')
-                                                putchar(ch);
-                                } else {
-                                        puts("(null)");
-                                }
-                                *arg++;
-                                break;
-                        case 'x': // hexadecimal integer
-                        case 'p': // pointer
-                                puts(itoa((uint32)*arg++, buf, 16));
-                                break;
-                        }
-                } else
-                        putchar(ch);
+        char buf[255];
+        va_list arg_list;
+        va_start(arg_list, fmt);
+        
+        vsnprintf(buf, sizeof(buf), fmt, arg_list);
+        puts(buf);
+        
+        va_end(arg_list);
+        
+//       
+//        if (fmt == NULL)
+//                return;
+//
+//        char **arg = &fmt + 1;
+//        char ch;
+//        int character;
+//        int color;
+//        char buf[40];
+//
+//        while ((ch = *fmt++) != '\0')
+//                if (ch == '%') {
+//                        ch = *fmt++;
+//                        switch (ch) {
+//                        case '{': //print colored until }
+//                                color = (int) * arg++;
+//                                while ((ch = *fmt++) != '}' && ch != '\0') {
+//                                        cputchar(ch, color, BLACK);
+//                                }
+//                                if (ch = '\0') fmt--; //to break out from the while loop
+//                                break;
+//                        case '%': // print '%'
+//                                putchar(ch);
+//                                break;
+//                        case 'i': // signed integer
+//                        case 'd':
+//                                puts(itoa((sint32)*arg++, buf, 10));
+//                                break;
+//                        case 'u': // unsigned integer
+//                                puts(itoa((uint32)*arg++, buf, 10));
+//                                break;
+//                        case 'o': // octal
+//                                puts(itoa((uint32)*arg++, buf, 8));
+//                                break;
+//                        case 'b': // binary
+//                                puts(itoa((uint32)*arg++, buf, 2));
+//                                break;
+//                        case 'c': // character
+//                                /* This is a bit peculiar but needed to shut up the
+//                                 * "cast from pointer to integer of different size"
+//                                 * compiler warning.
+//                                 * Code was: putchar((char)*arg++);
+//                                 */
+//                                character = (int) * arg++;
+//                                putchar((char)character);
+//                                break;
+//                        case 's': // string
+//                                if (*arg != NULL) {
+//                                        while ((ch = *(*arg)++) != '\0')
+//                                                putchar(ch);
+//                                } else {
+//                                        puts("(null)");
+//                                }
+//                                *arg++;
+//                                break;
+//                        case 'x': // hexadecimal integer
+//                        case 'p': // pointer
+//                                puts(itoa((uint32)*arg++, buf, 16));
+//                                break;
+//                        }
+//                } else
+//                        putchar(ch);
 }

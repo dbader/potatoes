@@ -94,7 +94,7 @@ void mm_init(uint32 start, uint32 end)
  * uses dprintf() )
  */
 void mm_init_output() {
-        printf("%{etiOS - $Rev$ - "__DATE__" "__TIME__"\n", LIGHTGREEN);
+        printf("%{POTATOES - $Rev$ - "__DATE__" "__TIME__"\n", LIGHTGREEN);
         dprint_separator();
 
         dprintf("%{mm:} init\n", LIGHTBLUE);
