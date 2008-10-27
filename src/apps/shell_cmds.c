@@ -235,7 +235,7 @@ void shell_cmd_cat(int argc, char *argv[])
                 _printf("%s: %s: No such file or directory\n", argv[0], argv[1]);
                 return;
         }
-        
+
         char buf[512];
         int read;
         do {
@@ -324,10 +324,13 @@ void shell_cmd_cd(int argc, char *argv[])
  */
 void shell_cmd_clear(int argc, char *argv[])
 {
-        for (int i = 0; i < 24 * 80; i++)
-                _fputch(' ', STDOUT);
-        for (int i = 0; i < 24 * 80; i++)
-                _fputch('\b', STDOUT);
+        char* str = _malloc(24 * 80 + 1);
+        str[24 * 80] = 0;
+        memset(str, ' ', 24 * 80);
+        _fputs(str, STDOUT);
+        memset(str, '\b', 24 * 80);
+        _fputs(str, STDOUT);
+        _free(str);
 }
 
 extern void fs_shutdown();
@@ -564,20 +567,20 @@ void make_snapshot();
  * to be accessible. */
 struct shell_cmd_t shell_cmds[] = {
                 {"cmdlist",     shell_cmd_cmdlist,      "List available commands\n"},
-                
+
                 {"test",        shell_cmd_test,         "Test argument parsing"},
                 {"sync",        shell_cmd_sync,         "Writes the filesystem to disk"},
                 {"exec",        shell_cmd_exec,         "Executes a \"batch\" file"},
                 {"exit",        shell_cmd_exit,         "Quit the shell\n"},
-                
+
                 {"memdump",     shell_cmd_memdump,      "Dump allocated blocks"},
                 {"ps",          shell_cmd_ps,           "List processes\n"},
-                
+
                 {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
                 {"clear",       shell_cmd_clear,        "Clear the screen"},
                 {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
                 {"date",        shell_cmd_date,         "Display date and time\n"},
-                
+
                 {"pwd",         shell_cmd_pwd,          "Print working directory"},
                 {"ls",          shell_cmd_ls,           "List directory"},
                 {"cd",          shell_cmd_cd,           "Change directory"},
@@ -585,7 +588,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"touch",       shell_cmd_touch,        "Create regular file"},
                 {"cp",          shell_cmd_cp,           "Copy files"},
                 {"rm",          shell_cmd_rm,           "Removes a file\n"},
-                
+
                 {"cat",         shell_cmd_cat,          "Print file contents"},
                 {"write",       shell_cmd_write,        "Write text to file\n"},
 

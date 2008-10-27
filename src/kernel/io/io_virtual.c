@@ -221,16 +221,18 @@ int virt_monitor_cputs(virt_monitor *vm, char *str, uint8 fg, uint8 bg)
                         tempcolor = get_color_tag(++str);
                         if(tempcolor != WHITE) {
                                 str+=5;
+                                fg = tempcolor;
                         } else if (*str != '#'){
-                                virt_monitor_cputc(vm, '#', tempcolor, bg);
+                                virt_monitor_cputc(vm, '#', fg, bg);
                         } else {
                                 str++;
+                                fg = tempcolor;
                         }
                         if(*str == '\0') {
                                 break;
                         }
                 }
-                virt_monitor_cputc(vm, *str++, tempcolor, bg);
+                virt_monitor_cputc(vm, *str++, fg, bg);
                 res++;
         }
         return res;
