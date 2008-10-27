@@ -51,21 +51,24 @@ void speed()
 {
         int keyboard = _open("/dev/keyboard", 0, 0);
         int stdin = _open("/dev/stdin", 0, 0);
-        int size = 2;
         char ch;
         int fd = _open(active_proc->name, 0, 0);
+        int size = _seek(fd, 0, SEEK_END);
+        size++; //terminating '\0'
+        _seek(fd, 0, SEEK_SET);
         char* str = _malloc(size);
-
+        bzero(str, size);
+        _read(fd, str, size);
         line *startline = _malloc(sizeof(line));
         startline->num_chars=0;
         startline->offset=0;
         startline->next = NULL;
         startline->prev = NULL;
         line * actualline = startline;
-
-        bzero(str, size);
+        
         int pos = 0;
-        while (_read(fd, str+pos, 1) > 0 && str[pos]!='\0') {
+        while (str[pos]!='\0') {
+                _printf("%c", str[pos]);
                 if(str[pos] == '\n' || str[pos] == '\t') {
                         NEXT_LINE
                 } else {
@@ -78,7 +81,6 @@ void speed()
                 }
         }
         _close(fd);
-        _printf(str);
 
         //flush stdin
         while (_read(stdin, &ch, sizeof(ch)) != 0) ;
@@ -136,7 +138,9 @@ void speed()
 
         fd = _open(active_proc->name, O_CREAT, 0);
         _write(fd, str, strlen(str));
-        _free(startline);
+        for(line *temp = startline; temp != NULL; temp = temp->next) {
+                _free(temp);
+        }
         _free(str);
         _close(keyboard);
         _close(stdin);
