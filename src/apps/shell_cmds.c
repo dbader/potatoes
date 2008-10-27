@@ -146,15 +146,16 @@ void shell_cmd_ls(int argc, char *argv[])
 
                         if (_stat(abs_path, &stat_buf) == 0) {
                                 total += stat_buf.size;
-                                _printf("%d\t%s %s", 
+                                _printf("%d\t%s ", 
                                                 stat_buf.size,
-                                                time2str(stat_buf.modify_ts, time),
-                                                directory[i].name);
+                                                time2str(stat_buf.modify_ts, time));
+                                                
                                 if (stat_buf.mode == DIRECTORY) {
-                                        _printf("/");
+                                        _printf("#{GRE}%s/\n", directory[i].name);
+                                } else {
+                                        _printf("%s\n", directory[i].name);
                                 }
-
-                                _printf("\n");
+                                
                         } else {
                                 _printf("%s ERROR: stat() failed.\n", directory[i].name);
                         }
