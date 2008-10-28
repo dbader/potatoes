@@ -194,7 +194,11 @@ block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name)
         write_inode(dir_inode); //write back modified directory inode
         
         fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
-
+        
+        if (dir_inode_blk != ROOT_INODE_BLOCK) {
+                free(dir_inode);
+        }
+        
         return delete_pos;
 }
 

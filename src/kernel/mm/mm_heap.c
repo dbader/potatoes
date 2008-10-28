@@ -228,6 +228,7 @@ void* heap_mallocn(size_t size, char *name,  uint8 page_aligned, heap_t *heap)
                         new_header->prev = ptr->prev;
                         new_header->next = ptr;
                         strncpy(new_header->name, name, sizeof(new_header->name) - 1);
+                        new_header->name[sizeof(new_header->name) - 1] = '\0';
                         new_header->size = size;
                         
                         ptr->prev->next = new_header;
