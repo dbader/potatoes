@@ -268,7 +268,7 @@ void* memcpy(void *dest, void *src, size_t count)
  */
 void* memmove(void *dest, void *src, size_t count)
 {
-        void *temp = malloc(count);
+        void *temp = mallocn(count,"memmove");
 
         memcpy(temp, src, count);
         memcpy(dest, temp, count);

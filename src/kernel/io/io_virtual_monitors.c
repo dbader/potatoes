@@ -52,7 +52,7 @@ void switch_monitor_up()
 {
         if (active_monitor < maxvmonitor) active_monitor++;
         else if (active_monitor == maxvmonitor) active_monitor = 0;
-        
+
         pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
@@ -63,7 +63,7 @@ void switch_monitor_down()
 {
         if (active_monitor > 0) active_monitor--;
         else if (active_monitor == 0) active_monitor = maxvmonitor;
-        
+
         pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
@@ -84,7 +84,7 @@ void init_vmonitors()
 
 /**
  * Initializes and registers a virtual monitor.
- * 
+ *
  * @param *name name of the new virtual monitor
  * @param pid PID of the appropriate process
  * @return pointer to the new virtual monitor
@@ -105,7 +105,7 @@ virt_monitor* start_vmonitor(char *name, uint32 pid)
 
 /**
  * Returns the pointer to the active virtual monitor
- * 
+ *
  * @return pointer to the active virtual monitor
  */
 virt_monitor* get_active_virt_monitor()
@@ -115,7 +115,7 @@ virt_monitor* get_active_virt_monitor()
 
 /**
  * Returns the name of the active virtual monitor
- * 
+ *
  * @return pointer to the name string
  */
 char* get_active_virt_monitor_name()

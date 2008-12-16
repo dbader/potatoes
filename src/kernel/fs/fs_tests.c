@@ -378,7 +378,7 @@ void test_delete()
 {
         if (!fs_create("/dir1", DIRECTORY)) dprintf("creation unsuccessful!\n");
         if (!fs_create("/dir1/dir2", DIRECTORY)) dprintf("creation unsuccessful!\n");
-        
+
         dump_bmap();
         __ls("/dir1");
         //fs_delete("/dir1/dir2");
@@ -392,23 +392,23 @@ void test_delete()
 void test_open_close()
 {
         if (!fs_create("/file1", DIRECTORY)) dprintf("creation unsuccessful!\n");
-        
-        proc_file *pft = malloc(sizeof(proc_file)*2);
+
+        proc_file *pft = mallocn(sizeof(proc_file)*2,"test_open_close pft");
         init_proc_file_table(pft);
-        
+
         int fd1 = fs_open("/file1"); insert_proc_file(pft, fd1);
         int fd2 = fs_open("/file1"); insert_proc_file(pft, fd2);
-        
+
         dump_files();
-        
+
         fs_close(fd1);
         free_proc_file(pft, fd1);
-        
+
         dump_files();
-        
+
         fs_close(fd2);
         free_proc_file(pft, fd2);
-        
+
         dump_files();
 }
 

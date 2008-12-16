@@ -38,6 +38,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../io/io_rtc.h"
 #include "../io/io_virtual.h"
 #include "../pm/pm_main.h"
+
+#define TIMER_COUNTER0 0x40
+#define TIMER_CONTROL 0x43
 /**
  * This variable is incremented after every IRQ0 (or reseted to 0)
  */
@@ -109,7 +112,7 @@ void sleep_ticks(sint32 num)
 void timer_init(sint32 freq)
 {
         int counter = 1193180 / freq; //1193180Hz - base 8254 frequency
-        outb(0x43, 0x36);
+        outb(TIMER_CONTROL, 0x36);
         /* 0x36=00.11.011.0b
          * ---------------------------------------
          * 00-Select counter 0
@@ -118,6 +121,6 @@ void timer_init(sint32 freq)
          * 0-Binary counter
          */
 
-        outb(0x40, counter % 0xFF); //LSB
-        outb(0x40, counter / 0xFF); //MSB
+        outb(TIMER_COUNTER0, counter % 0xFF); //LSB
+        outb(TIMER_COUNTER0, counter / 0xFF); //MSB
 }

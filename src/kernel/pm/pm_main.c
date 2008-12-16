@@ -75,7 +75,7 @@ extern device_t dev_clock;
 
 /**
  * Returns the PID of the active process.
- * 
+ *
  * @return the PID
  */
 uint32 getpid()
@@ -93,7 +93,7 @@ void pm_init()
         dprintf("#{VIO}pm:## init\n");
         dprintf("#{VIO}pm:## setting up kernel task...\n");
 
-        procs_head = (process_t*) malloc(sizeof(process_t));
+        procs_head = (process_t*) mallocn(sizeof(process_t),"pKERNEL PROC");
 
         memset(procs_head, 0, sizeof(process_t));
 
@@ -131,7 +131,7 @@ void pm_init()
 
 /**
  * Switch to the next process in a round robin fashion.
- * 
+ *
  * @param context the tasks context on the stack
  * @return the context of the process which becomes active
  */
@@ -146,8 +146,8 @@ uint32 pm_schedule(uint32 context)
 
         // Destroy all zombie- and jump over all sleeping processes up to the first alive process.
         while (active_proc->next->state != PSTATE_ALIVE) {
-                while (active_proc->next->state == PSTATE_DEAD) {        		
-                        process_t *next_proc = active_proc->next->next;                
+                while (active_proc->next->state == PSTATE_DEAD) {
+                        process_t *next_proc = active_proc->next->next;
                         pm_destroy_thread(active_proc->next);
                         active_proc->next = next_proc;
                 }
@@ -161,9 +161,9 @@ uint32 pm_schedule(uint32 context)
         return active_proc->context;
 }
 
-/** 
+/**
  * Creates a new thread.
- * 
+ *
  * @param name the process's name
  * @param entry the entry point
  * @param stacksize the stack size
@@ -177,7 +177,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         ASSERT(name != NULL);
         ASSERT(entry != NULL);
 
-        process_t *proc = malloc(sizeof(process_t));
+        process_t *proc = mallocn(sizeof(process_t), name);
 
         if (proc == NULL) {
                 panic("pm_create_thread: out of memory");
@@ -190,7 +190,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
         proc->next = procs_head->next;
         procs_head->next = proc;
 
-        proc->stack_start = malloc(stacksize);
+        proc->stack_start = mallocn(stacksize,"STACK");
 
         if (proc->stack_start == NULL) {
                 panic("pm_create_thread: could not allocate stack");
@@ -253,7 +253,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 /**
  * Releases a thread's resources. The only place this should be called from
  * is pm_schedule() - to mark a process for destruction, set its "dead" flag.
- * 
+ *
  * @see pm_schedule
  * @param proc the process to destroy
  */
@@ -264,7 +264,6 @@ void pm_destroy_thread(process_t *proc)
         if (proc->stdin != NULL) {
                 rf_free(proc->stdin);
         }
-
         free(proc->name);
         free(proc->stack_start);
         free(proc);
@@ -272,17 +271,17 @@ void pm_destroy_thread(process_t *proc)
 
 /**
  * Gives a process the input focus.
- * 
+ *
  * @param pid the pid of the process receiving the focus
  */
 void pm_set_focus_proc(uint32 pid)
-{        
+{
         focus_proc = pm_get_proc(pid);
 }
 
 /**
  * Returns the process that belongs to the given pid.
- * 
+ *
  * @param pid the pid
  * @return process that belongs to the given pid
  */
@@ -309,13 +308,13 @@ void aprintf(char *fmt, ...)
         vsnprintf(buf, sizeof(buf), fmt, arg_list);
 
         char *msg = buf;
-        
+
         virt_monitor_puts(active_proc->vmonitor, msg);
         va_end(arg_list);
 }
 
 /**
- * Prints some status information about all processes. Can be used as a crude form 
+ * Prints some status information about all processes. Can be used as a crude form
  * of unix's "ps" command.
  */
 void pm_dump()

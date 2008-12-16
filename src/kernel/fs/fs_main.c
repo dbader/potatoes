@@ -56,6 +56,8 @@ void fs_init()
 
         if (!load_fs()) {
                 printf("#{GRE}fs:## #{RED}FS loading failed.##\n");
+                free(bmap); //free bmap created during failed load_bmap()
+
                 if (!create_fs()) {
                         panic("FS cannot be initialized!\n");
                 }
@@ -119,9 +121,9 @@ size_t do_read(file_nr fd, void *buf, size_t count, uint32 pos)
 {
         file_info_t info;
         get_file_info(fd, &info);
-        
+
         int to_read;
-        
+
         if (info.mode == DIRECTORY) {
                 to_read = sizeof(dir_entry) * DIR_ENTRIES_PER_BLOCK;
         } else {
@@ -184,7 +186,7 @@ size_t do_lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32
 extern block_nr search_file(char *path);
 bool do_file_exists(char *path)
 {
-        return (search_file(path) != NOT_FOUND);        
+        return (search_file(path) != NOT_FOUND);
 }
 
 /**

@@ -44,13 +44,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 ring_fifo* rf_alloc(uint32 size)
 {
-        ring_fifo *fifo = (ring_fifo*) malloc(sizeof(ring_fifo));
+        ring_fifo *fifo = (ring_fifo*) mallocn(sizeof(ring_fifo),"rf_alloc: ring_fifo");
 
         if (fifo == NULL)
                 return NULL;
 
         fifo->size = size;
-        fifo->data = (uint8*) malloc(size);
+        fifo->data = (uint8*) mallocn(size,"rf_alloc: data");
 
         if (fifo->data == NULL)
                 return NULL;

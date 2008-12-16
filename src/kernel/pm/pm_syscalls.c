@@ -73,7 +73,7 @@ syscall_handler syscall_table[] = {
  * syscall handler.
  * @see syscall_table
  * @see syscalls_shared.h
- * 
+ *
  * @param id the syscall id number
  * @param data pointer to the syscall argument structure
  */
@@ -141,7 +141,7 @@ void sys_open(void *data)
         SYSCALL_TRACE("SYS_OPEN(\"%s\", 0x%x, 0x%x)\n", args->path, args->oflag, args->mode);
 
         char* path = strdup(args->path);
-        
+
         device_t *dev = pm_name2device(path);
         if (dev != NULL) {
                 // It's a device file
@@ -157,7 +157,7 @@ void sys_open(void *data)
                                 // Kill trailing slash.
                                 path[strlen(path)-1] = '\0';
                                 do_mkdir(path);
-                                
+
                         } else
                                 do_mkfile(path);
 
@@ -170,12 +170,12 @@ void sys_open(void *data)
                         args->fd = insert_proc_file(active_proc->pft, fd) + MAX_DEVICES;
                 }
         }
-        
+
         free(path);
 }
 
 /**
- * int _close(int fd); 
+ * int _close(int fd);
  */
 void sys_close(void *data)
 {
@@ -208,7 +208,7 @@ void sys_close(void *data)
 void sys_read(void* data)
 {
         sc_read_write_args_t *args = (sc_read_write_args_t*) data;
-        
+
         /* Tracing this syscall will drive you nuts as the shell
          * is using this to poll for new input. */
         //SYSCALL_TRACE("SYS_READ(%d, 0x%x, %d)\n", args->fd, args->buf, args->size);
@@ -245,16 +245,16 @@ void sys_write(void* data)
                 else {
                         args->rw_count = dev->write(dev, args->fd, args->buf, args->size);
                 }
-        } else {               
+        } else {
                 // It's a regular file or a dir
                 proc_file *pft_entry = get_proc_file(active_proc->pft, args->fd - MAX_DEVICES);
-                
+
                 file_info_t info;
                 if (get_file_info(pft_entry->pf_f_desc, &info)->mode == DIRECTORY) {
                         args->rw_count = -1;
-                        return;        
+                        return;
                 }
-                
+
                 args->rw_count = do_write(pft_entry->pf_f_desc, args->buf, args->size, pft_entry->pf_pos);
                 pft_entry->pf_pos += args->rw_count;
         }
@@ -320,18 +320,18 @@ void sys_unlink(void *data)
 {
         sc_unlink_args_t *args = (sc_unlink_args_t*) data;
         SYSCALL_TRACE("SYS_UNLINK(%s)\n", args->path);
-        
+
         file_nr fd = do_open(args->path);
-        
-        
+
+
         //TODO: This should be handled by the file system.
-        
+
         if (fd == NOT_FOUND) {
                 dprintf("%{ERROR: file does not exist or is a device!}\n", RED);
                 args->success = -1;
                 return;
         }
-        
+
         if (get_file(fd)->f_count > 0){
                 dprintf("%{ERROR: file is still in use!}\n", RED);
                 do_close(fd);
@@ -341,16 +341,16 @@ void sys_unlink(void *data)
 
         file_info_t info;
         get_file_info(fd, &info);
-        
+
         if (info.mode == DIRECTORY && info.size > 0) {
                 dprintf("%{ERROR: directory is not empty!} (%d)\n", RED, info.size);
                 do_close(fd);
                 args->success = -1;
                 return;
         }
-        
+
         do_close(fd);
-        
+
         args->success = do_remove(args->path);
 }
 
@@ -361,9 +361,9 @@ void sys_stat(void *data)
 {
         sc_stat_args_t *args = (sc_stat_args_t*) data;
         SYSCALL_TRACE("SYS_STAT(%s, 0x%x)\n", args->path, args->buf);
-        
+
         bzero(args->buf, sizeof(stat));
-        
+
         file_nr fd = do_open(args->path);
 
         if (fd == NOT_FOUND) {
@@ -371,14 +371,14 @@ void sys_stat(void *data)
                 args->success = -1;
                 return;
         }
-        
+
         int pft_fd = insert_proc_file(active_proc->pft, fd);
 
         file_info_t info;
         get_file_info(fd, &info);
 
         do_close_pf(active_proc->pft, pft_fd);
-        
+
         memcpy(args->buf, &info, sizeof(stat));
         args->success = 0;
 }

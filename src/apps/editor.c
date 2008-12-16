@@ -47,7 +47,7 @@ char* resize_buf(int newsize, char* buf)
         return buf;
 }
 
-void speed() 
+void speed()
 {
         int keyboard = _open("/dev/keyboard", 0, 0);
         int stdin = _open("/dev/stdin", 0, 0);
@@ -65,7 +65,7 @@ void speed()
         startline->next = NULL;
         startline->prev = NULL;
         line * actualline = startline;
-        
+
         int pos = 0;
         while (str[pos]!='\0') {
                 _printf("%c", str[pos]);
@@ -92,11 +92,11 @@ void speed()
                 }
                 ch = _fgetch(stdin);
                 switch(ch){
-                case '\a': 
+                case '\a':
                         break;
                 case '\b':
                         if(actualline == startline && startline->num_chars == 0) { //nothing to erase
-                                break;                                
+                                break;
                         }
                         if(str[pos - 1]=='\n' || str[pos - 1]=='\t') { //erase '\n' or '\t'
                                 PREV_LINE
@@ -162,5 +162,5 @@ void shell_cmd_speed(int argc, char *argv[])
                 return;
         }
         _close(fd);
-        pm_create_thread(strdup(path), speed, 4096);
+        pm_create_thread(path, speed, 4096);
 }

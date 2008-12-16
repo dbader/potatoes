@@ -196,7 +196,7 @@ void malloc_test()
         uint32 *p = heap_mallocn(23, "test3", 0, kernel_heap);
         *p = 1234;
         printf("Value of p: %d\n", *p);
-        
+
         for(ptr = kernel_heap->start->next; ptr != kernel_heap->end->next; ptr = ptr->next) {
                 printf("%s (0x%x)", ptr->name, (uint32)ptr);
                 printf("\tnext: 0x%x", (uint32)ptr->next);
@@ -218,7 +218,7 @@ void malloc_test()
         mm_test[1] = mallocn(500000,"1");
         printf("1: allocating 500.000 bytes... -> 0x%x\n", (uint32)mm_test[1]);
         mm_test[2] = mallocn(500000,"2");
-        printf("2: allocating 500.000 bytes... -> 0x%x\n", (uint32)mm_test[2]);  
+        printf("2: allocating 500.000 bytes... -> 0x%x\n", (uint32)mm_test[2]);
         mm_test[3] = mallocn(1000000,"3");
         printf("3: allocating 1.000.000 bytes... -> 0x%x\n", (uint32)mm_test[3]);
         heap_mem_dump();
@@ -255,7 +255,7 @@ void malloc_test()
                 printf("%d", *tmp);
         }
         //uint32 free_end = free_memory();
-        /*printf("\nfree memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes", 
+        /*printf("\nfree memory space: %d bytes\ntotal space allocated in mm_test(): %d bytes",
                         free_end, free_start - free_end);*/
 }
 
@@ -578,6 +578,11 @@ ls";
         _close(fd);
 }
 
+extern bool create_fs();
+void new_fs(){
+        create_fs();
+}
+
 void make_snapshot();
 void do_tests()
 {
@@ -614,6 +619,7 @@ void do_tests()
         SHORTCUT_CTRL('+', switch_monitor_up);
         SHORTCUT_CTRL('-', switch_monitor_down);
         SHORTCUT_CTRL('s', make_snapshot);
+        SHORTCUT_CTRL_SUPER('f',new_fs);
         dprint_separator();
         //fs_tests();
 }

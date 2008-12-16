@@ -22,13 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * etiOS shell entry point and main source file. 
+ * etiOS shell entry point and main source file.
  *
  * @author Daniel Bader
  * @author $LastChangedBy$
  * @version $Rev$
  */
- 
+
 #include "../kernel/include/string.h"
 #include "../kernel/include/const.h"
 #include "../kernel/pm/syscalls_cli.h"
@@ -44,7 +44,7 @@ char path_buf[sizeof(cwd)];
 
 /**
  * Parses and executes a given shell command.
- * 
+ *
  * @param cmd string to containing the shell command
  */
 void shell_handle_command(char *cmd)
@@ -85,7 +85,7 @@ void shell_handle_command(char *cmd)
                         break;
                 }
         }
-        
+
         // Execute it if possible
         if (command) {
                 command->cmd(argc, argv);
@@ -100,7 +100,7 @@ void shell_handle_command(char *cmd)
 
 /**
  * Attempts to autocomplete a given partial shell command.
- * 
+ *
  * @param partial the partial command string. Will be extended by the first
  *                valid completion found.
  */

@@ -98,7 +98,7 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
                 dir_entry_blk = get_data_block(dir_inode, pos, TRUE);
 
                 if (dir_entry_blk == NOT_POSSIBLE) {
-                        return NOT_POSSIBLE; 
+                        return NOT_POSSIBLE;
                 }
 
                 if (fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, TRUE) == 0) {
@@ -122,14 +122,14 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
         (dir_inode->i_size)++;  //update #entries
         dir_inode->i_modify_ts = time;
         write_inode(dir_inode); //write back modified directory inode
-        
+
         fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
-        
+
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
 
         clear_block(new_blk); //reset new block
         fs_dprintf("[fs_dir] new block allocated for inode: %d\n", new_blk);
-        
+
         if (dir_inode_blk != ROOT_INODE_BLOCK) {
                 free(dir_inode);
         }
@@ -170,7 +170,7 @@ block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name)
                 dir_entry_blk = get_data_block(dir_inode, pos, FALSE);
 
                 if (dir_entry_blk == NOT_POSSIBLE) {
-                        return NOT_POSSIBLE; 
+                        return NOT_POSSIBLE;
                 }
 
                 if (fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE) == 0) {
@@ -192,13 +192,13 @@ block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name)
         (dir_inode->i_size)--;  //update #entries
         dir_inode->i_modify_ts = time;
         write_inode(dir_inode); //write back modified directory inode
-        
+
         fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
-        
+
         if (dir_inode_blk != ROOT_INODE_BLOCK) {
                 free(dir_inode);
         }
-        
+
         return delete_pos;
 }
 
@@ -237,7 +237,7 @@ uint32 delete_entry(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
                         mark_block(file_list[i].inode, FALSE);
                         fs_dprintf("[fs_dir] marked inode block %d as FALSE\n", file_list[i].inode);
                         file_list[i].inode = NULL;
-                        
+
                         return i*sizeof(dir_entry); //delete position
                 }
         }
@@ -272,6 +272,7 @@ block_nr search_file(char *path)
 
         if (strcmp(tok, "") != 0) {
                 fs_dprintf("[fs_dir] first token != NULL! ('%s')\n", tok);
+                free(copy);
                 return NOT_POSSIBLE; //wrong format
         }
 
@@ -307,7 +308,7 @@ block_nr rfsearch(block_nr crt_dir, char *path, char *tok, char delim[])
         uint32 pos = 0;
         uint32 bytes_read = 0;
         block_nr file_blk = NOT_FOUND; //corresponding block number to filename
-        
+
         do {
                 bytes_read = fs_read(dir_cache, dir_inode, sizeof(dir_cache), pos, FALSE); //read content = file list
                 if (bytes_read != 0) { //otherwise dir_cache has not changed

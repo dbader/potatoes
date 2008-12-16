@@ -165,12 +165,12 @@ endif
 	@echo "\n*** THIS WILL ERASE ALL DATA ON $(TARGET_DEV) ***\n"
 	@read -p "Do you want to proceed? [yes/no]: " REPLY ; test $$REPLY = "yes"
 	@echo "Partitioning..."
-	@sudo parted $(TARGET_DEV) rm 1
-	@sudo parted $(TARGET_DEV) mkpart primary fat32 0 $(PART_SIZE)
+	@sudo parted -s $(TARGET_DEV) rm 1
+	@sudo parted -s $(TARGET_DEV) mkpart primary fat32 0 $(PART_SIZE)
 	@echo "Formatting..."
-	@sudo parted $(TARGET_DEV) mkfs 1 fat32
-	@sudo parted $(TARGET_DEV) toggle 1 boot
-	@sudo parted $(TARGET_DEV) print
+	@sudo parted -s $(TARGET_DEV) mkfs 1 fat32
+	@sudo parted -s $(TARGET_DEV) toggle 1 boot
+	@sudo parted -s $(TARGET_DEV) print
 	@echo "Waiting for automounter..."
 	@sleep 5
 	@# Unmount target device (sometimes the automounter mounts it)

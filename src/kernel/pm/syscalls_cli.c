@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Writes a string to the kernel debug monitor. Useful to dump
  * strings that should not be displayed in the process's own
  * vmonitor.
- * 
+ *
  * @param msg the text to print
  */
 void _log(char* msg)
@@ -52,7 +52,7 @@ void _log(char* msg)
 
 /**
  * Exits the calling process and releases its resources.
- * 
+ *
  * @param status the return status
  */
 void _exit(int status)
@@ -60,12 +60,12 @@ void _exit(int status)
         _syscall(SYS_EXIT, (void*)status);
 
         // Never return.
-        WAIT_FOR_INTERRUPT();
+        while(1) WAIT_FOR_INTERRUPT();
 }
 
 /**
  * Returns the PID (process id) of the calling process.
- * 
+ *
  * @return the process id
  */
 int _getpid()
@@ -77,9 +77,9 @@ int _getpid()
 
 /**
  * Opens a file or a device.
- * 
+ *
  * @param path the path of the file to open
- * @param oflag the open flag. @see O_OPEN @see O_CREAT 
+ * @param oflag the open flag. @see O_OPEN @see O_CREAT
  * @param mode not used as of now. Set to 0.
  * @return a valid handle on success or -1 if failed
  */
@@ -95,7 +95,7 @@ int _open(char *path, int oflag, int mode)
 
 /**
  * Closes a open file handle.
- * 
+ *
  * @param fd the file descriptor of the file to close
  * @return 0 on success, -1 on error
  */
@@ -109,7 +109,7 @@ int _close(int fd)
 
 /**
  * Reads data from a file or device.
- * 
+ *
  * @param fd the file descriptor
  * @param buf the buffer to receive the data read
  * @param size the number of bytes to read
@@ -127,7 +127,7 @@ int _read(int fd, void *buf, int size)
 
 /**
  * Writes data into a file or device.
- * 
+ *
  * @param fd the file descriptor
  * @param buf the buffer containing the data to write
  * @param size the number of bytes to write
@@ -146,11 +146,11 @@ int _write(int fd, void *buf, int size)
 /**
  * Moves the file pointer in a file or device. The file pointer
  * determines the current read and write position inside a file.
- * 
+ *
  * @param fd the file descriptor
  * @param offset the offset from the position specified by the "whence" argument
- * @param whence the starting position of the seek operation. 
- * 			@see SEEK_SET 
+ * @param whence the starting position of the seek operation.
+ * 			@see SEEK_SET
  * 			@see SEEK_CUR
  * 			@see SEEK_END
  * @return the new position of the file pointer
@@ -167,7 +167,7 @@ int _seek(int fd, int offset, int whence)
 
 /**
  * Allocates new memory. @see _free
- * 
+ *
  * @param size the number of bytes to allocate
  * @return a pointer to the new memory area or NULL if allocation failed
  */
@@ -181,7 +181,7 @@ void* _malloc(size_t size)
 
 /**
  * Frees memory previously allocated through malloc(). @see _malloc
- * 
+ *
  * @param block pointer to a memory block allocated through malloc
  */
 void _free(void *block)
@@ -191,7 +191,7 @@ void _free(void *block)
 
 /**
  * Deletes a filename and possible the file it refers to.
- * 
+ *
  * @param path the filename to remove
  * @return zero on success, -1 on error
  */
@@ -205,7 +205,7 @@ int _unlink(char* path)
 
 /**
  * Returns extended file information for a single filename.
- * 
+ *
  * @param path the filename
  * @param buf the stat structure to receive the results
  * @return zero on success, -1 on error

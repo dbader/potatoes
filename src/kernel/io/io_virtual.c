@@ -43,7 +43,7 @@ along with this program->  If not, see <http://www->gnu->org/licenses/>->
 
 /**
  * Creates a new virtual output.
- * 
+ *
  * @param *vm pointer to the virtual monitor struct, where the data should be written to
  * @param pid PID of the appropriate process
  */
@@ -66,7 +66,7 @@ void new_virt_monitor(virt_monitor *vm, uint32 pid)
 
 /**
  * Deletes a virtual output.
- * 
+ *
  * @param *vm virtual monitor to be deleted
  */
 void free_virt_monitor(virt_monitor *vm)
@@ -76,7 +76,7 @@ void free_virt_monitor(virt_monitor *vm)
                 active_monitor--;
         } else {
                 vmonitors[active_monitor] = vmonitors[maxvmonitor];
-                strncpy(vmonitor_names + 81 * active_monitor, 
+                strncpy(vmonitor_names + 81 * active_monitor,
                                 vmonitor_names + 81 * maxvmonitor, 81);
         }
         memset(&(vmonitors[maxvmonitor--]), 0, sizeof(virt_monitor));
@@ -147,7 +147,7 @@ void virt_monitor_cputc(virt_monitor *vm, char ch, uint8 fg, uint8 bg)
 
 /**
  * Decodes the color tag on the beginning of the given string as a color
- * 
+ *
  * @param str string starting with a tag
  * @return the decoded
  */
@@ -360,7 +360,7 @@ void virt_monitor_scrolldown(virt_monitor *vm)
 
 /**
  * Inverts a virtual monitor.
- * 
+ *
  * @param *vm virtual monitor to invert
  */
 void virt_monitor_invert(virt_monitor *vm)

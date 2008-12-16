@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * Implementations of the shell commands.
- * 
+ *
  * TODO: nice to have:
  *
  * proper tab completion
@@ -58,7 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A simple test command that prints all of its arguments to the screen.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -70,7 +70,7 @@ void shell_cmd_test(int argc, char *argv[])
 
 /**
  * Lists all available arguments.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -88,7 +88,7 @@ void shell_cmd_cmdlist(int argc, char *argv[])
 
 /**
  * Prints its arguments to the screen.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -102,8 +102,8 @@ void shell_cmd_echo(int argc, char *argv[])
 }
 
 /**
- * Lists directory contents. 
- * 
+ * Lists directory contents.
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -137,7 +137,7 @@ void shell_cmd_ls(int argc, char *argv[])
 
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
                 if (directory[i].inode != NULL) {
-                        stat stat_buf;                       
+                        stat stat_buf;
                         char abs_path[255];
                         char time[25];
 
@@ -146,16 +146,16 @@ void shell_cmd_ls(int argc, char *argv[])
 
                         if (_stat(abs_path, &stat_buf) == 0) {
                                 total += stat_buf.size;
-                                _printf("%d\t%s ", 
+                                _printf("%d\t%s ",
                                                 stat_buf.size,
                                                 time2str(stat_buf.modify_ts, time));
-                                                
+
                                 if (stat_buf.mode == DIRECTORY) {
                                         _printf("#{GRE}%s/\n", directory[i].name);
                                 } else {
                                         _printf("%s\n", directory[i].name);
                                 }
-                                
+
                         } else {
                                 _printf("%s ERROR: stat() failed.\n", directory[i].name);
                         }
@@ -168,7 +168,7 @@ void shell_cmd_ls(int argc, char *argv[])
 
 /**
  * Creates an empty file.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -192,7 +192,7 @@ void shell_cmd_touch(int argc, char *argv[])
 
 /**
  * Creates a new directory.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -220,7 +220,7 @@ void shell_cmd_mkdir(int argc, char *argv[])
 
 /**
  * Prints file contents.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -250,7 +250,7 @@ void shell_cmd_cat(int argc, char *argv[])
 
 /**
  * Writes text into a file.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -287,7 +287,7 @@ void shell_cmd_write(int argc, char *argv[])
 
 /**
  * Changes the current directory.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -319,7 +319,7 @@ void shell_cmd_cd(int argc, char *argv[])
 
 /**
  * Clears the screen.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -336,11 +336,10 @@ void shell_cmd_clear(int argc, char *argv[])
 
 extern void fs_shutdown();
 extern void fs_init();
-extern bool create_fs();
 
 /**
  * Flushes all fs memory buffers to disk.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -355,7 +354,7 @@ extern void mem_dump();
 /**
  * Dumps memory stats and allocated blocks.
  * @see mem_dump
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -366,7 +365,7 @@ void shell_cmd_memdump(int argc, char *argv[])
 
 /**
  * Prints the current working directory.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -377,7 +376,7 @@ void shell_cmd_pwd(int argc, char *argv[])
 
 /**
  * Copies a file.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -423,7 +422,7 @@ extern void pm_dump();
 
 /**
  * Prints info about running processes.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -436,7 +435,7 @@ void reset_bf();
 
 /**
  * Interface to the brainfuck interpreter device.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -472,19 +471,22 @@ void shell_cmd_bf(int argc, char *argv[])
 
 /**
  * Exits the shell.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
 void shell_cmd_exit(int argc, char *argv[])
 {
         _printf("Bye.\n");
+        for (int i = 0; i < argc; i++) {
+                _free(argv[i]);
+        }
         _exit(0);
 }
 
 /**
  * Prints the current time and date.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -501,7 +503,7 @@ void shell_cmd_date(int argc, char *argv[])
 
 /**
  * Removes a file.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -521,7 +523,7 @@ void shell_cmd_rm(int argc, char *argv[])
 
 /**
  * Removes a file.
- * 
+ *
  * @param argc the number of argument strings in argv
  * @param argv the argument vector. Contains all arguments of the command.
  */
@@ -563,7 +565,7 @@ void shell_cmd_exec(int argc, char *argv[])
 
 void make_snapshot();
 
-/** 
+/**
  * The shell command table. Every shell command must be registered here
  * to be accessible. */
 struct shell_cmd_t shell_cmds[] = {
