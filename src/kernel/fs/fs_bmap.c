@@ -58,6 +58,7 @@ size_t malloc_bmap()
 
         bmap = mallocn(size, "block bitmap");
 
+        //SHORTCUT_CTRL('b',dump_bmap);
         if (bmap == NULL) {
                 return 0;
         } else {
@@ -116,7 +117,7 @@ void write_bmap()
  * Search linear from the "start" block number.
  *
  * @param start  search offset (start to search linear from block number "start")
- * 
+ *
  * @return block number of the unused block
  */
 block_nr get_free_block(block_nr start)
@@ -155,6 +156,10 @@ void mark_block(block_nr blk_nr, bool flag)
         byte = (byte >> bit) | (byte << (8 - bit)); //rotate right (back)
 
         bmap[blk_nr / 8] = byte;
+
+        //to ensure data consistency
+        fs_dprintf("[fs_bmap] updating block nr %d at byte %d\n", FIRST_BMAP_BLOCK + (blk_nr / 8 / BLOCK_SIZE), (blk_nr / 8 / BLOCK_SIZE) * BLOCK_SIZE);
+        wrt_block(FIRST_BMAP_BLOCK + (blk_nr / 8 / BLOCK_SIZE), &bmap[(blk_nr / 8 / BLOCK_SIZE) * BLOCK_SIZE], BLOCK_SIZE);
 }
 
 /**

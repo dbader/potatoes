@@ -93,7 +93,7 @@ void pm_init()
         dprintf("#{VIO}pm:## init\n");
         dprintf("#{VIO}pm:## setting up kernel task...\n");
 
-        procs_head = (process_t*) mallocn(sizeof(process_t),"pKERNEL PROC");
+        procs_head = (process_t*) mallocn(sizeof(process_t),"KERNEL PROC");
 
         memset(procs_head, 0, sizeof(process_t));
 

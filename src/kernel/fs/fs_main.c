@@ -110,6 +110,8 @@ bool create_fs()
         init_super_block();
         dump_super();
 
+        write_super_block(); //to ensure consistency
+
         return TRUE;
 }
 
