@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_STATB 11
 #define RTC_STATC 12
 #define RTC_STATD 13
-
+#define RTC_CENTURY 50
 /**
  * Global time struct.
  */
@@ -63,6 +63,7 @@ struct time {
         uint8 day;
         uint8 month;
         uint8 year;
+        uint8 century;
 }time;
 
 void rtc_init();

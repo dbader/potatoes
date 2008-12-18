@@ -39,11 +39,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../include/types.h"
 
 /**
+ * Converts a bcd-value into a binary value
+ *
+ * @param num the bcd-value to convert
+ * @return the corresponding binary value
+ */
+uint8 bcd2bin(uint8 num)
+{
+        return (num / 16) * 10 + (num % 16);
+}
+
+/**
+ * Calculates the weekday with the algorithm from
+ * http://en.wikipedia.org/wiki/Calculating_the_day_of_the_week
+ *
+ * @param ts the pointer to the time struct which weekday shall be calculated
+ */
+void calculate_weekday(time_t *ts)
+{
+        int month[] = {0,3,3,6,1,4,6,2,5,0,3,5};
+        int year = bcd2bin(ts->year) + (bcd2bin(ts->year) / 4);
+        int century = 2 * (3 - (20 % 4));
+
+        //January/February of a leap year
+        int correction = (bcd2bin(ts->year)%4==0 &&
+                        (bcd2bin(ts->year)%100!=0 || bcd2bin(ts->year)%400==0))&&
+                        (bcd2bin(ts->month)<3)?6:0;
+
+        ts->weekday = (century +
+                        year +
+                        month[bcd2bin(ts->month) - 1] +
+                        bcd2bin(ts->day) +
+                        correction
+        ) % 7;
+}
+
+/**
  * Initializes the global data struct
  */
 void rtc_init()
 {
-        // TODO: is this necessary? 
+        // TODO: is this necessary?
         // sets rtc parameters
         // outb(RTC_ADDR, RTC_STATB);
         // outb(RTC_DATA, 0x7E);
@@ -56,17 +92,14 @@ void rtc_init()
         time.hour = inb(RTC_DATA);
         outb(RTC_ADDR, RTC_DAY);
         time.day = inb(RTC_DATA);
-        outb(RTC_ADDR, RTC_WEEKDAY);
-        time.weekday = inb(RTC_DATA);
-        
-// FIXME: this is dirty: QEMU's rtc encodes the weekday differently from other rtcs
-#ifdef QEMU
-        time.weekday++;
-#endif
         outb(RTC_ADDR, RTC_MONTH);
         time.month = inb(RTC_DATA);
         outb(RTC_ADDR, RTC_YEAR);
         time.year = inb(RTC_DATA);
+        outb(RTC_ADDR, RTC_CENTURY);
+        time.century = inb(RTC_DATA);
+
+        calculate_weekday(&time);
 }
 
 /**
@@ -85,19 +118,19 @@ void rtc_update()
                         if (time.hour == 0) {
                                 outb(RTC_ADDR, RTC_DAY);
                                 time.day = inb(RTC_DATA);
-                                outb(RTC_ADDR, RTC_WEEKDAY);
-                                time.weekday = inb(RTC_DATA);
-#ifdef QEMU
-                                time.weekday++;
-#endif
                                 if (time.day == 1) {
                                         outb(RTC_ADDR, RTC_MONTH);
                                         time.month = inb(RTC_DATA);
-                                        if (time.sec == 1) {
+                                        if (time.month == 1) {
                                                 outb(RTC_ADDR, RTC_YEAR);
                                                 time.year = inb(RTC_DATA);
+                                                if (time.year == 1) {
+                                                        outb(RTC_ADDR, RTC_CENTURY);
+                                                        time.century = inb(RTC_DATA);
+                                                }
                                         }
                                 }
+                                calculate_weekday(&time);
                         }
                 }
         }
@@ -105,32 +138,33 @@ void rtc_update()
 
 /**
  * Converts the data in the global time struct into a readable string
- * 
- * @param timestamp the buffer for the date-string
+ *
+ * @param timestamp the actual time struct to be converted
+ * @param buf the buffer for the date-string
  * @return the pointer to the same buffer now filled with the date string
  */
 char* time2str(time_t timestamp, char buf[24])
 {
         switch (timestamp.weekday) {
-        case 1:
+        case 0:
                 strcpy(buf, "SUN");
                 break;
-        case 2:
+        case 1:
                 strcpy(buf, "MON");
                 break;
-        case 3:
+        case 2:
                 strcpy(buf, "TUE");
                 break;
-        case 4:
+        case 3:
                 strcpy(buf, "WEN");
                 break;
-        case 5:
+        case 4:
                 strcpy(buf, "THU");
                 break;
-        case 6:
+        case 5:
                 strcpy(buf, "FRI");
                 break;
-        case 7:
+        case 6:
                 strcpy(buf, "SAT");
                 break;
         default:
@@ -151,15 +185,17 @@ char* time2str(time_t timestamp, char buf[24])
                 itoa(timestamp.month, buf + 7, 16);
         }
         buf[9] = '.';
-        if (timestamp.year < 10) {
-                strcpy(buf + 10, "200");
-                itoa(timestamp.year, buf + 13, 16);
-        } else if (timestamp.year < 100) {
-                strcpy(buf + 10, "20");
-                itoa(timestamp.month, buf + 12, 16);
+        if (timestamp.century < 10) {
+                strcpy(buf + 10, "0");
+                itoa(timestamp.century, buf + 11, 16);
         } else {
-                strcpy(buf + 10, "2");
-                itoa(timestamp.month, buf + 11, 16);
+                itoa(timestamp.century, buf + 10, 16);
+        }
+        if (timestamp.year < 10) {
+                strcpy(buf + 12, "0");
+                itoa(timestamp.year, buf + 13, 16);
+        } else {
+                itoa(timestamp.year, buf + 12, 16);
         }
         buf[14] = ' ';
         if (timestamp.hour < 10) {
