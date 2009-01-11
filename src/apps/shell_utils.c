@@ -162,7 +162,7 @@ char* shell_makepath(char *path)
 
         if (path[0] == '/') {
                 // absolute path
-                return path;
+                return path_buf;
         } else {
                 // Relative path.
 
