@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author $LastChangedBy$
  * @version $Rev$
  */
- 
+
 #include "../kernel/include/types.h"
 #include "../kernel/include/const.h"
 #include "../kernel/pm/syscalls_cli.h"
@@ -45,7 +45,7 @@ int STDOUT = -1;
 
 /**
  * Writes a character to the given file.
- * 
+ *
  * @param ch the character to write
  * @param fd the file descriptor
  * @return the number of bytes written, -1 on error
@@ -59,7 +59,7 @@ extern void halt();
 
 /**
  * Waits until a character from the given file could be read and returns it.
- * 
+ *
  * @param fd the file descriptor
  * @return the character that was read
  */
@@ -73,11 +73,11 @@ int _fgetch(int fd)
 
 /**
  * Reads a string from a file descriptor into a buffer.
- * 
+ *
  * @param s the string buffer
  * @param n the maximum number of bytes to read (ie the buffer size)
  * @param fd the file descriptor
- * @return the string buffer 
+ * @return the string buffer
  */
 char* _fgets(char *s, int n, int fd)
 {
@@ -116,7 +116,7 @@ char* _fgets(char *s, int n, int fd)
 
 /**
  * Writes a string into a given file.
- * 
+ *
  * @param s the string to write
  * @param fd the file descriptor
  * @return the number of bytes written, -1 on error
@@ -131,18 +131,18 @@ int _fputs(char *s, int fd)
  * Prints formatted output to STDOUT. @see printf
  * This exists as a stub to ease the separation of the shell
  * from the kernel code (as of now, the shell could simply call the kernel printf).
- * 
- * TODO: refactor format logic into vprintf()  
+ *
+ * TODO: refactor format logic into vprintf()
  */
 void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution possible?
 {
         char buf[255];
         va_list arg_list;
         va_start(arg_list, fmt);
-        
+
         vsnprintf(buf, sizeof(buf), fmt, arg_list);
         _write(STDOUT, buf, sizeof(buf));
-        
+
         va_end(arg_list);
 }
 
@@ -151,20 +151,20 @@ void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution pos
  * in path to decide whether a given path is already absolute. If the path is not absolute
  * it will be appended to the current working directory.
  * Calling this will invalidate the last result.
- * 
+ *
  * @param path the path to make absolute
  * @return the absolute path. This pointer is only valid until the next call to
  * 		   shell_makepath().
  */
 char* shell_makepath(char *path)
 {
-        strcpy(path_buf, cwd);
-
         if (path[0] == '/') {
+                strcpy(path_buf, path);
                 // absolute path
                 return path_buf;
         } else {
                 // Relative path.
+                strcpy(path_buf, cwd);
 
                 // Append trailing slash
                 if (path_buf[strlen(path_buf)-1] != '/')
