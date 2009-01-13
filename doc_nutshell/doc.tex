@@ -97,14 +97,17 @@ Using a clear specification of the subsystems' interfaces and well defined commu
 
 A schematic overview of the \textit{POTATOES}'s kernel and user space looks as follows:\\\\
 
+\begin{figure}[h]
 \includegraphics[width=\textwidth]{subsystems.png}
+\caption{\textit{POTATOES}'s system overview}
+\end{figure}
 \pagebreak
 
 \section{Memory Management}
 
 \subsection{GDT}
-The Global Decriptor Table (GDT) is an array of GDT entries describing the segmentation system.
-Our bootloader \textit{GRUB} already creates a GDT for our system, but we need to create our own one because we don't know where \textit{GRUB} stores its GDT. Thus it could be accidentally overwritten.\\
+The Global Descriptor Table (GDT) is an array of GDT entries describing the segmentation system.
+Our boot loader \textit{GRUB} already creates a GDT for our system, but we need to create our own one because we don't know where \textit{GRUB} stores its GDT. Thus it could be accidentally overwritten.\\
 
 \begin{code}[kernel/mm/mm.h]
 struct gdt_entry {
@@ -192,7 +195,7 @@ When a block shall be freed, it is removed from the list. Although the block's c
 \pagebreak
 
 \section{Input/Output}
-Most of the \textit{POTATOES} I/O-Management is handled by usage of Port Mapped I/O (PMIO). PMIO is a method to communicate with peripheral devices using some special instructions. In our case, these are above all the IN- and OUT-instructions of x86-compatible processors. Concretely that means, that after reading the next section you will fall in love with \textbf{outb} und \textbf{inb} - our C wrapper functions for the mentioned x86-assembler instructions.
+Most of the \textit{POTATOES} I/O-Management is handled by usage of Port Mapped I/O (PMIO). PMIO is a method to communicate with peripheral devices using some special instructions. In our case, these are above all the IN- and OUT-instructions of x86-compatible processors. Concretely that means, that after reading the next section you will fall in love with \textbf{outb} and \textbf{inb} - our C wrapper functions for the mentioned x86-assembler instructions.
 Memory Mapped I/O (MMIO) is also used in some subsystems, e.g. the VGA display driver. MMIO is another method to communicate with peripheral devices. The difference to PMIO is that there is no need for special instructions. The peripheral ports are mapped into RAM and can be accessed in the same way as common memory.
 
 \subsection{Monitor}
@@ -262,7 +265,7 @@ struct idt_entry{ //16+16+8+8+16=64 bit
 	 * |  P  |    DPL    |	 01110	 | *
 	 * |_____|___________|_______________________| *
 	 * P=segment present?			  *
-	 * DPL=descriptor priveledge level	     *
+	 * DPL=descriptor privilege level	     *
 	 ***********************************************/
 	uint8 flags;
 	
@@ -334,7 +337,7 @@ The disadvantage of providing only "normal" keys to the process manager, is the 
 The dullest and most annoying thing in implementing the keyboard handler is writing the keycode-to-key map. A good advice is to use a ready-made one. We did not do it... and spent hours to find out which keycode belongs to which key.
 \subsection{Virtual monitors}
 \hypertarget{VMONITOR}{}
-The idea of the virtual monitors is to use a larger allocated piece of memory as a bigger display, but only a small moveable pane (24-lines) is really visible.
+The idea of the virtual monitors is to use a larger allocated piece of memory as a bigger display, but only a small movable pane (24-lines) is really visible.
 
 A single virtual monitor is represented by the following structure:
 \begin{code}[kernel/io/io\_virtual.h]
@@ -461,7 +464,7 @@ This struct is printed (converted to a string) on the virtual monitor's headline
 \pagebreak
 
 \section{Process Management}
-A key concept in all operating systems is the process, which basically is a program in execution. A running program consists of its executable code, allocated ressources (e.g. file descriptors and memory blocks) as well as its processor state or \textit{context}. 
+A key concept in all operating systems is the process, which basically is a program in execution. A running program consists of its executable code, allocated resources (e.g. file descriptors and memory blocks) as well as its processor state or \textit{context}. 
 
 \subsection{Processes}
 \textit{\textit{POTATOES}'} process control block is defined in \textbf{pm\_main.h}:
@@ -564,7 +567,7 @@ Incoming syscalls are handled by the kernel via the \textbf{incoming\_syscall()}
 /**
  * The syscall dispatch function. This gets called whenever a thread
  * request a syscall by raising the syscall interrupt (int 0x42).
- * It checks the syscall id for validity and calls the appropiate
+ * It checks the syscall id for validity and calls the appropriate
  * syscall handler.
  * @see syscall_table
  * @see syscalls_shared.h
@@ -653,7 +656,7 @@ In order to provide a clean syscall interface \textit{POTATOES} supports device 
 Most resources can be modeled this way. \textit{POTATOES} currently provides the following devices by default:
 
 \subsubsection{null - The NULL device}
-The NULL device is simply a dummy device that can be written to or read from. Everything written to it is simply discarded and the \textit{read} operation returns a buffer filled with zeroes.
+The NULL device is simply a dummy device that can be written to or read from. Everything written to it is simply discarded and the \textit{read} operation returns a buffer filled with zeros.
 Yet the NULL device has its uses. For example its code serves well as a template for new devices you want to implement.
 
 \subsubsection{stdin - The Standard Input device}
@@ -747,8 +750,12 @@ The block bitmap's\footnote{kernel/fs/fs\_bmap.h} purpose is to tell the file sy
 
 \subsubsection{Inodes}
 According to the philosophy "everything is a file", the \textit{POTATOES} file system treats files and directories equally. Each file consists of an index node (inode) - describing the file's structure and meta information (e.g. mode, modify\_ts, ...) - and data blocks arbitrarily distributed over the disk. The structure is defined by direct, single indirect and double indirect pointers "spanning up" the actual data tree.
- 
-\includegraphics[width=\textwidth]{inode_concept.png}
+
+\begin{figure}
+\hspace{0.1cm}
+\includegraphics[width=0.65\textwidth]{inode_concept.png}
+\caption {The inode concept}
+\end{figure}
 
 The file system's inode (on disk) looks as follows:
 
@@ -884,7 +891,7 @@ typedef struct dir_entry {
 For now every process in \textit{POTATOES} has an own virtual monitor. The focused process is the process with the presently active virtual monitor. You can switch the focus by using the shotrcuts \textbf{Ctrl + '+'} and \textbf{Ctrl + '-'}. These shortcuts are only setting the next/previous virtual monitor as the new active monitor.
 
 \subsection{Shell}
-The \textit{POTATOES} shell is the main point of interaction between the user and the system. After bootup the kernel launches one shell instance as a separate process. You can start additional instances in separate vmonitors by pressing \textbf{Ctrl + TAB}.
+The \textit{POTATOES} shell is the main point of interaction between the user and the system. After boot up the kernel launches one shell instance as a separate process. You can start additional instances in separate vmonitors by pressing \textbf{Ctrl + TAB}.
 
 The shell's user interface consists of a prompt that displays the \textit{current working directory} (which can be changed using the \textbf{cd} command). Commands can take (among other things) \textit{relative} as well as \textit{absolute} paths:
 
@@ -912,7 +919,7 @@ Snapshot is a small tool for taking and viewing screenshots in \textit{POTATOES}
 
 \subsection{Games}
 
-No operating system is complete without any game to play. Also, interactive games require a lot more ressources in comparison to most applications, which makes them an ideal stability and performance test. They are nice to play, as well.
+No operating system is complete without any game to play. Also, interactive games require a lot more resources in comparison to most applications, which makes them an ideal stability and performance test. They are nice to play, as well.
 
 \subsubsection{Pong}
 
@@ -922,7 +929,7 @@ No operating system is complete without any game to play. Also, interactive game
 \caption {Pong game}
 \end{wrapfigure}
 
-Pong is a simplistic game from the old age of computing, popularized by the american game console manufacturer Atari. 
+Pong is a simplistic game from the old age of computing, popularized by the American game console manufacturer Atari. 
 
 \textit{POTATOES} contains an implementation of Pong that is also multiplayer capable. You can launch the game by running the \textbf{pong} or \textbf{pong -2p} command in the shell.
 Pong's need for fast access to user input as well as high video refresh rate led to the addition of the \textit{keyboard} and \textit{framebuffer} device to \textit{POTATOES}. Also, it is cool and popular with little girls, i.e. my cousin.
@@ -941,9 +948,9 @@ Snake uses almost the same resources as Pong, in particular the keyboard and the
 
 \subsection{Brainfuck interpreter}
 
-As an special delicacy \textit{POTATOES} has an own \textbf{brainfuck interpreter}. Brainfuck is an esoteric turing-complete programming language, consisting of only eight commands\footnote{\url{http://en.wikipedia.org/wiki/Brainfuck}}. The corresponding shell command is \textbf{bf [filename]}. It executes the given file which should contain a brainfuck programm. 
+As an special delicacy \textit{POTATOES} has an own \textbf{brainfuck interpreter}. Brainfuck is an esoteric turing-complete programming language, consisting of only eight commands\footnote{\url{http://en.wikipedia.org/wiki/Brainfuck}}. The corresponding shell command is \textbf{bf [filename]}. It executes the given file which should contain a brainfuck program. 
 
-That is the functionality every interpreter will provide. The brainfuck interpreter in \textit{POTATOES} can do even more. It can interpret single brainfuck commands on the fly. That made it possible to create an interactive brainfuck mode for our shell. It can be launched with the command \textbf{bf -i [sequence]} where [sequence] is an arbitrary sequence of brainfuck command e.g. the simple sequence \textbf{,.[,.]} is a short echo programm in brainfuck.  Because of the interactivity we can split this example sequence into single commands:
+That is the functionality every interpreter will provide. The brainfuck interpreter in \textit{POTATOES} can do even more. It can interpret single brainfuck commands on the fly. That made it possible to create an interactive brainfuck mode for our shell. It can be launched with the command \textbf{bf -i [sequence]} where [sequence] is an arbitrary sequence of brainfuck command e.g. the simple sequence \textbf{,.[,.]} is a short echo program in brainfuck.  Because of the interactivity we can split this example sequence into single commands:
 \begin{code}[]
 bf -i ,
 bf -i .
@@ -953,7 +960,7 @@ bf -i .
 bf -i ]
 \end{code}
 
-Executing these commands one after another results in the same echo programm as interpreting the whole sequence at once.
+Executing these commands one after another results in the same echo program as interpreting the whole sequence at once.
 
 \pagebreak
 %\lstlistoflistings
