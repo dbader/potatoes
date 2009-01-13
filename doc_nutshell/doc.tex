@@ -104,7 +104,8 @@ A schematic overview of the \textit{POTATOES}'s kernel and user space looks as f
 \pagebreak
 
 \section{Memory Management}
-
+An important task of the operating system is to manage the main memory.
+Therefore it needs a memory manager which provides possibilities to programs and the kernel to allocate and free space dynamically.
 \subsection{GDT}
 The Global Descriptor Table (GDT) is an array of GDT entries describing the segmentation system.
 Our boot loader \textit{GRUB} already creates a GDT for our system, but we need to create our own one because we don't know where \textit{GRUB} stores its GDT. Thus it could be accidentally overwritten.\\
@@ -119,7 +120,8 @@ struct gdt_entry {
 	uint8  base_high;
 } __attribute__((packed));
 \end{code}
-As we don't actually use segmentation in \textit{POTATOES}, each segment (code and data) has access to the whole address space (0x0 - 0xFFFFFFFF considering a 32bit processor). So we set the GDT entries to cover the whole address space.
+One GDT entry represents one certain segment (code or data) its start, end and the access levels.
+So it is possible to divide the main memory into one segment for data and another segment for code, but as we don't actually use segmentation in \textit{POTATOES}, each segment has access to the whole address space (0x0 - 0xFFFFFFFF considering a 32bit processor). So we set the GDT entries to cover the whole address space.
 
 \subsection{Paging}
 Paging is used for two main goals: memory protection and virtual memory.
@@ -162,7 +164,7 @@ The second main ability of paging (along with virtual memory) is memory protecti
 \item An \textbf{invalid page fault} occurs when a program tries to read memory referenced by a null pointer.
 \item A \textbf{protection fault} occurs when a program attempts invalid page accesses (for example accessing pages which do not exist, writing to read-only pages or trying to modify privileged pages).
 \end{list}
-As we don't use swapping (a technique to swap pages to the hard drive if the main memory is full), every existing page is loaded to the memory. So, the major page fault isn't relevant for our system.
+As we don't use swapping (a technique to swap pages to the hard drive if all available frames are occupied), every existing page is loaded to the memory. So, the major page fault isn't relevant for our system.
 \subsubsection{Heap}
 Now that we have enabled paging, we need a heap to handle the memory requests from our kernel.
 
