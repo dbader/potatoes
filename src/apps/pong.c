@@ -33,9 +33,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/pm/syscalls_cli.h"
 #include "../kernel/include/stdio.h"
 #include "../kernel/include/string.h"
+#include "../kernel/include/const.h"
 #include "../kernel/io/io.h"
 
 extern int STDIN;
+bool pong_endbeep = FALSE;
 
 bool keydown(char key, int fd)
 {
@@ -50,19 +52,19 @@ void shell_cmd_pong(int argc, char *argv[])
 
         if (!multiplayer) {
                 _printf("+++ P O N G +++\n\nControl your paddle with the cursor UP and DOWN keys\n"
-                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                        "To play a two player game run \"pong -2p\"\n"
-                        "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
+                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                                "To play a two player game run \"pong -2p\"\n"
+                                "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
         } else {
                 _printf("+++ P O N G +++\n\nMULTIPLAYER MODE\n\n"
-                        "Controls for player one (blue):\n"
-                        "\tPaddle up = A\n"
-                        "\tPaddle down = S\n\n"
-                        "Controls for player two (red):\n"
-                        "\tPaddle up = K\n"
-                        "\tPaddle down = L\n\n"
-                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                        "HAVE FUN!\n\n\n[Press any key to start playing]\n");
+                                "Controls for player one (blue):\n"
+                                "\tPaddle up = A\n"
+                                "\tPaddle down = S\n\n"
+                                "Controls for player two (red):\n"
+                                "\tPaddle up = K\n"
+                                "\tPaddle down = L\n\n"
+                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                                "HAVE FUN!\n\n\n[Press any key to start playing]\n");
         }
         _fgetch(STDIN);
 
@@ -92,6 +94,11 @@ void shell_cmd_pong(int argc, char *argv[])
 
         // The rendering loop
         while (!keydown(ESCAPE, keyboard)) {
+                //Test end sound
+                if(pong_endbeep == TRUE) {
+                        end_beep();
+                        pong_endbeep = FALSE;
+                }
                 // Game over check
                 if (player_score > 9 || cpu_score > 9)
                         break;
@@ -137,15 +144,19 @@ void shell_cmd_pong(int argc, char *argv[])
                 LIMIT(ball_y, 0, 2400);
 
                 // Ceiling hit / Floor hit
-                if (ball_y == 0 || ball_y == 2400)
+                if (ball_y == 0 || ball_y == 2400) {
                         ball_vel_y = -ball_vel_y;
-
+                        start_beep(HIT_SIDE_SOUND);
+                        pong_endbeep=TRUE;
+                }
                 // Paddle hit
                 if (ball_x <= 0) {
                         if (HIT_PADDLE(l_paddle_y, ball_y / 100)) {
                                 ball_vel_x = -ball_vel_x;
                                 ball_vel_y = -ball_vel_y + PADDLE_DEFLECTION(l_paddle_y, ball_y / 100);
                                 ball_x += 100;
+                                start_beep(HIT_RPADDLE_SOUND);
+                                pong_endbeep=TRUE;
                         } else {
                                 cpu_score++;
                                 ball_x = 4000;
@@ -158,6 +169,8 @@ void shell_cmd_pong(int argc, char *argv[])
                                 ball_vel_x = -ball_vel_x;
                                 ball_vel_y = -ball_vel_y - PADDLE_DEFLECTION(r_paddle_y, ball_y / 100);
                                 ball_x -= 100;
+                                start_beep(HIT_LPADDLE_SOUND);
+                                pong_endbeep=TRUE;
                         } else {
                                 player_score++;
                                 ball_x = 4000;

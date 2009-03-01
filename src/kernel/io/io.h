@@ -70,4 +70,7 @@ extern void halt();
 void reactivate_pic();
 void monitor_invert();
 
+void start_beep(uint32 freq);
+void end_beep();
+
 #endif /*__IO_MAIN_H_*/

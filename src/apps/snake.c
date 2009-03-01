@@ -42,6 +42,7 @@ ring_fifo *snake1 = NULL;
 ring_fifo *snake2 = NULL;
 uint8 direction1 = 0;
 uint8 direction2 = 0;
+bool snake_endbeep = FALSE;
 
 // the backbuffer
 uint8 bbuf[25 * 80];
@@ -81,24 +82,24 @@ void shell_cmd_snake(int argc, char *argv[])
 
         if (!multiplayer) {
                 _printf("+++ S N A K E +++\n\n"
-                        "Control your snake with the cursor UP, DOWN, LEFT & RIGHT keys\n"
-                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                        "To play a two player game run \"snake -2p\"\n"
-                        "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
+                                "Control your snake with the cursor UP, DOWN, LEFT & RIGHT keys\n"
+                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                                "To play a two player game run \"snake -2p\"\n"
+                                "HAVE FUN!\n\n\n[Press any key to start playing]\n\n");
         } else {
                 _printf("+++ S N A K E +++\n\nMULTIPLAYER MODE\n\n"
-                        "Controls for player one (green):\n"
-                        "\tUp = W\n"
-                        "\tDown = S\n"
-                        "\tLeft = A\n"
-                        "\tRight = D\n"
-                        "Controls for player two (blue):\n"
-                        "\tUp = I\n"
-                        "\tDown = J\n"
-                        "\tLeft = K\n"
-                        "\tRight = L\n"
-                        "You can leave the game at any time by pressing the ESCAPE key.\n\n"
-                        "HAVE FUN!\n\n\n[Press any key to start playing]\n");
+                                "Controls for player one (green):\n"
+                                "\tUp = W\n"
+                                "\tDown = S\n"
+                                "\tLeft = A\n"
+                                "\tRight = D\n"
+                                "Controls for player two (blue):\n"
+                                "\tUp = I\n"
+                                "\tDown = J\n"
+                                "\tLeft = K\n"
+                                "\tRight = L\n"
+                                "You can leave the game at any time by pressing the ESCAPE key.\n\n"
+                                "HAVE FUN!\n\n\n[Press any key to start playing]\n");
         }
         _fgetch(STDIN);
 
@@ -136,7 +137,11 @@ void shell_cmd_snake(int argc, char *argv[])
 
         // The rendering loop
         while (!keydown(ESCAPE, keyboard)) {
-
+                //Test end sound
+                if(snake_endbeep == TRUE) {
+                        end_beep();
+                        snake_endbeep = FALSE;
+                }
                 // Test collision
                 if (body_collision(snake1, head1)) {
                         SET_PIXEL(head1 >> 8, head1 & 0xFF, RED);
@@ -187,6 +192,8 @@ void shell_cmd_snake(int argc, char *argv[])
                                 if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
+                                        start_beep(EAT_APPLE_SOUND);
+                                        snake_endbeep=TRUE;
                                         while (head1 == apple || body_collision(snake1, apple)) {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
                                         }
@@ -198,6 +205,8 @@ void shell_cmd_snake(int argc, char *argv[])
                                 if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
+                                        start_beep(EAT_APPLE_SOUND);
+                                        snake_endbeep=TRUE;
                                         while (head1 == apple || body_collision(snake1, apple)) {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
                                         }
@@ -209,6 +218,8 @@ void shell_cmd_snake(int argc, char *argv[])
                                 if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
+                                        start_beep(EAT_APPLE_SOUND);
+                                        snake_endbeep=TRUE;
                                         while (head1 == apple || body_collision(snake1, apple)) {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
                                         }
@@ -220,6 +231,8 @@ void shell_cmd_snake(int argc, char *argv[])
                                 if (head1 != apple) {
                                         rf_read(snake1, (uint8*)&trash, 2);
                                 } else {
+                                        start_beep(EAT_APPLE_SOUND);
+                                        snake_endbeep=TRUE;
                                         while (head1 == apple || body_collision(snake1, apple)) {
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
                                         }
@@ -264,7 +277,7 @@ void shell_cmd_snake(int argc, char *argv[])
                                                 apple = ((rand() % 80) << 8) + (rand() % 25);
                                         }
                                         head2 = ((((head2 >> 8) - 1 + 80) % 80) << 8)
-                                                + (head2 & 0xFF);
+                                        + (head2 & 0xFF);
                                         rf_write(snake2, (uint8*)&head2, 2);
                                         break;
                                 }
@@ -303,18 +316,18 @@ void shell_cmd_snake(int argc, char *argv[])
 
         if (multiplayer) {
                 if (loser == 3) {
-                        printf("\nBoth players lost!\n");
+                        _printf("\nBoth players lost!\n");
                 }
                 if (loser == 2) {
-                        printf("\nPlayer 2 lost!\n");
+                        _printf("\nPlayer 2 lost!\n");
                 }
                 if (loser == 1) {
-                        printf("\nPlayer 1 lost!\n");
+                        _printf("\nPlayer 1 lost!\n");
                 }
-                printf("Player 1:\t%d pts\nPlayer 2:\t%d pts\n",
-                       (rf_getlength(snake1) / 2) - 3, (rf_getlength(snake2) / 2) - 3);
+                _printf("Player 1:\t%d pts\nPlayer 2:\t%d pts\n",
+                                (rf_getlength(snake1) / 2) - 3, (rf_getlength(snake2) / 2) - 3);
         } else {
-                printf("\nGame over!\nYour points:\t%d\n", (rf_getlength(snake1) / 2) - 3);
+                _printf("\nGame over!\nYour points:\t%d\n", (rf_getlength(snake1) / 2) - 3);
         }
         rf_free(snake1);
         if (multiplayer) {

@@ -1,4 +1,4 @@
-/* $Id$
+/*$Id: io_timer.h 244 2008-12-16 18:47:14Z dtraytel $
       _   _  ____   _____
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___
@@ -22,18 +22,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Header-file for specific hardware interrupt-handlers.
+ * header file for the timer-handler
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 244 $
  */
 
-#ifndef __INT_HANDLER_H_
-#define __INT_HANDLER_H_
+#ifndef __IO_TIMER_H_
+#define __IO_TIMER_H_
 
-void kb_handler();
-uint32 timer_handler(uint32 context);
-void hd_handler();
+#define PIT_COUNTER0 0x40
+#define PIT_COUNTER1 0x41
+#define PIT_COUNTER2 0x42
+#define PIT_CONTROL 0x43
 
-#endif /*_INT_HANDLER_H_*/
+/* 0x36=00.11.011.0b
+ * ---------------------------------------
+ * 00-Select counter 0
+ * 11-Read/load LSB first then MSB of the counter
+ * 011-Mode 3: Square wave rate Generator
+ * 0-Binary counter
+ */
+#define PIT_INIT_CMD 0x36
+
+/* 0xB6=10.11.011.0b
+ * 10-Select counter 2
+ * 11-Read/load LSB first then MSB of the counter
+ * 011-Mode 3: Square wave rate Generator
+ * 0-Binary counter
+ */
+#define PIT_SOUND_CMD 0xB6
+
+#endif /* __IO_TIMER_H_ */

@@ -563,8 +563,6 @@ void shell_cmd_exec(int argc, char *argv[])
         _free(str);
 }
 
-void make_snapshot();
-
 /**
  * The shell command table. Every shell command must be registered here
  * to be accessible. */
@@ -581,7 +579,7 @@ struct shell_cmd_t shell_cmds[] = {
 
                 {"echo",        shell_cmd_echo,         "Print text to STDOUT"},
                 {"clear",       shell_cmd_clear,        "Clear the screen"},
-                {"view",        shell_cmd_snapshot,     "Displays an etiOS snapshot"},
+                {"view",        shell_cmd_snapshot,     "Displays an POTATOES snapshot"},
                 {"date",        shell_cmd_date,         "Display date and time\n"},
 
                 {"pwd",         shell_cmd_pwd,          "Print working directory"},
@@ -595,10 +593,11 @@ struct shell_cmd_t shell_cmds[] = {
                 {"cat",         shell_cmd_cat,          "Print file contents"},
                 {"write",       shell_cmd_write,        "Write text to file\n"},
 
-                {"speed",       shell_cmd_speed,        "Simple potatoes/etios editor"},
+                {"speed",       shell_cmd_speed,        "Simple POTATOES/etiOS editor"},
                 {"bf",          shell_cmd_bf,           "Brainfuck interpreter"},
                 {"pong",        shell_cmd_pong,         "A classic video game"},
                 {"snake",       shell_cmd_snake,        "Another classic video game"},
+                {"synth",       shell_cmd_synth,        "Synthesizer tool"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

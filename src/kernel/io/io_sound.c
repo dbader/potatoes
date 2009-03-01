@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: io_sound.c 239 2008-10-26 23:19:15Z dtraytel $
       _   _  ____   _____
      | | (_)/ __ \ / ____|
   ___| |_ _| |  | | (___
@@ -22,18 +22,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * Header-file for specific hardware interrupt-handlers.
+ * Sound driver
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 239 $
  */
+#include "../include/types.h"
+#include "io_sound.h"
+#include "io_timer.h"
+#include "io.h"
 
-#ifndef __INT_HANDLER_H_
-#define __INT_HANDLER_H_
+void start_beep(uint32 freq){
+        uint16 note = (uint16)(1193180 / freq);
+        outb(PIT_CONTROL, PIT_SOUND_CMD);
+        outb(PIT_COUNTER2, note % 0xFF); //LSB
+        outb(PIT_COUNTER2, note / 0xFF); //MSB
 
-void kb_handler();
-uint32 timer_handler(uint32 context);
-void hd_handler();
+        uint8 tmp = inb(IO_SPEAKER_PORT);
+        if (tmp != (tmp | 3)) {
+                outb(IO_SPEAKER_PORT, tmp | 3);
+        }
+}
 
-#endif /*_INT_HANDLER_H_*/
+void end_beep() {
+        outb(IO_SPEAKER_PORT, inb(IO_SPEAKER_PORT) & 0xFC);
+}

@@ -712,6 +712,10 @@ void new_fs(){
         create_fs();
 }
 
+void reboot() {
+        outb(0x64,0xFE);
+}
+
 void make_snapshot();
 void do_tests()
 {
@@ -749,6 +753,7 @@ void do_tests()
         SHORTCUT_CTRL('-', switch_monitor_down);
         SHORTCUT_CTRL('s', make_snapshot);
         SHORTCUT_CTRL_SUPER('f',new_fs);
+        SHORTCUT_CTRL_SUPER('\b',reboot);
         dprint_separator();
         //fs_tests();
 }
