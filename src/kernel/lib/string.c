@@ -342,3 +342,24 @@ char* itoa(int n, char *str, unsigned int base)
         } else
                 return strreverse(ret);
 }
+
+/**
+ * Converts an string into an integer (base 10 is assumed).
+ * The string should really represent a positive integer.
+ * Nonsense inputs like characters won't produce reasonable results.
+ *
+ * @param str the source string buffer
+ * @return The conversion result
+ */
+int atoi(char *str)
+{
+	int res = 0;
+	int len = strlen(str);
+	if (len>10) {
+		return 0xFFFFFFFF; //string too long; return maximum integer
+	}
+	for (int i = 0; i<strlen(str); i++) {
+		res = 10 * res + ((str[i] - 48) % 10); // horner scheme
+	}
+	return res;
+}

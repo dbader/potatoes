@@ -707,12 +707,27 @@ void test_batch_files()
         _close(fd);
 }
 
-extern bool create_fs();
-void new_fs(){
-        create_fs();
+void atoi_test()
+{
+		dprintf("ATOI test:\n%i - should be 42\n"
+				"%i - should be 1337\n"
+				"%i - should be 1234567890\n"
+				"%i - should be 0\n",
+				atoi("42"),
+				atoi("1337"),
+				atoi("1234567890"),
+				atoi("0")
+				);
 }
 
-void reboot() {
+extern bool create_fs();
+void new_fs()
+{
+create_fs();
+}
+
+void reboot()
+{
         outb(0x64,0xFE);
 }
 
@@ -737,6 +752,7 @@ void do_tests()
         //SHORTCUT_CTRL('i', isr_test);
         //SHORTCUT_CTRL('1', assert_test);
         //SHORTCUT_CTRL_SUPER('p', printf_test);
+        SHORTCUT_CTRL('x', atoi_test);
         //SHORTCUT_CTRL('m', malloc_test);
         //SHORTCUT_CTRL('p', mm_pagefault_test);
         //SHORTCUT_CTRL('h', hd_stresswrite_test);
@@ -752,7 +768,7 @@ void do_tests()
         SHORTCUT_CTRL('+', switch_monitor_up);
         SHORTCUT_CTRL('-', switch_monitor_down);
         SHORTCUT_CTRL('s', make_snapshot);
-        SHORTCUT_CTRL_SUPER('f',new_fs);
+        //SHORTCUT_CTRL_SUPER('f',new_fs);
         SHORTCUT_CTRL_SUPER('\b',reboot);
         dprint_separator();
         //fs_tests();

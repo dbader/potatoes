@@ -51,5 +51,6 @@ void* memmove(void *dest, void *src, size_t count);
 
 char* strreverse(char *str);
 char* itoa(int n, char *str, unsigned int base);
+int atoi(char *str);
 
 #endif /* string.h */
