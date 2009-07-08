@@ -564,6 +564,25 @@ void shell_cmd_exec(int argc, char *argv[])
 }
 
 /**
+ * Kills a process.
+ * 
+ * @param argc the number of argument strings in argv
+ * @param argv the argument vector. Contains all arguments of the command.
+ */
+void shell_cmd_kill(int argc, char *argv[])
+{
+        if (argc < 2) {
+                _printf("Usage: kill [pid]\n");
+                return;
+        }
+        
+        int pid = atoi(argv[1]);             
+        _printf("attempting to kill process with pid %d\n", pid);
+        
+        _kill(pid);
+}
+
+/**
  * The shell command table. Every shell command must be registered here
  * to be accessible. */
 struct shell_cmd_t shell_cmds[] = {
@@ -598,6 +617,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"pong",        shell_cmd_pong,         "A classic video game"},
                 {"snake",       shell_cmd_snake,        "Another classic video game"},
                 {"synth",       shell_cmd_synth,        "Synthesizer tool"},
+                {"kill",        shell_cmd_kill,         "Terminates the given process"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

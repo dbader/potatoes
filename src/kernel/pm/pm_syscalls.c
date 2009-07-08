@@ -60,7 +60,8 @@ syscall_handler syscall_table[] = {
         sys_malloc,     // 8
         sys_free,       // 9
         sys_unlink,     // 10
-        sys_stat
+        sys_stat,       // 11
+        sys_kill        // 12
 };
 
 /** Syscall trace macro. Uncomment to print a message everytime a syscall gets executed. */
@@ -115,8 +116,9 @@ void sys_exit(void *data)
 
         dprintf("exit %u: %d\n", getpid(), (sint32)data);
         active_proc->state = PSTATE_DEAD; // pm_schedule will then unlink and destroy it.
-
-        free_virt_monitor(active_proc->vmonitor);
+        
+        // This should be done in pm_schedule().      
+//        free_virt_monitor(active_proc->vmonitor);
         //TODO: return status to waiting parents
 }
 
@@ -381,4 +383,13 @@ void sys_stat(void *data)
 
         memcpy(args->buf, &info, sizeof(stat));
         args->success = 0;
+}
+
+/**
+ * void _kill(int pid)
+ */
+void sys_kill(void *data)
+{
+        SYSCALL_TRACE("SYS_KILL(%d)\n", data);
+        pm_kill_proc((uint32)data);
 }

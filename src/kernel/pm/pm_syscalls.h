@@ -44,6 +44,7 @@ void sys_malloc(void *data);
 void sys_free(void *data);
 void sys_unlink(void *data);
 void sys_stat(void *data);
+void sys_kill(void *data);
 
 /** Pointer to void sys_XXX(void *data) function */
 typedef void (*syscall_handler)(void *data);

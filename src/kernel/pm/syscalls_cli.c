@@ -218,3 +218,13 @@ int _stat(char *path, stat *buf)
         _syscall(SYS_STAT, &args);
         return args.success;
 }
+
+/**
+ * Kills the process with the given pid.
+ * 
+ * @param pid process id
+ */
+void _kill(int pid)
+{
+        _syscall(SYS_KILL, (void*)pid);
+}

@@ -52,9 +52,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SYS_FREE        9
 #define SYS_UNLINK      10
 #define SYS_STAT        11
+#define SYS_KILL        12
 
 /** The highest syscall id that is still valid. Be sure to update this! */
-#define MAX_SYSCALL     11
+#define MAX_SYSCALL     12
 
 // Definitions for open()'s oflag argument
 /** 

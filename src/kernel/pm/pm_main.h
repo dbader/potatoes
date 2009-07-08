@@ -123,6 +123,7 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize);
 void pm_destroy_thread(process_t *proc);
 process_t* pm_get_proc(uint32 pid);
 void pm_set_focus_proc(uint32 pid);
+void pm_kill_proc(uint32 pid);
 extern void _syscall(uint32 id, void *data);
 
 #endif /* pm_main.h */

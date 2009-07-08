@@ -146,9 +146,9 @@ uint32 pm_schedule(uint32 context)
 
         // Destroy all zombie- and jump over all sleeping processes up to the first alive process.
         while (active_proc->next->state != PSTATE_ALIVE) {
-                while (active_proc->next->state == PSTATE_DEAD) {
-                        process_t *next_proc = active_proc->next->next;
-                        pm_destroy_thread(active_proc->next);
+                while (active_proc->next->state == PSTATE_DEAD) {                                              
+                        process_t *next_proc = active_proc->next->next;                        
+                        pm_destroy_thread(active_proc->next);                                                                       
                         active_proc->next = next_proc;
                 }
                 //TODO: This is the PERFORMANCE FIX - schould be handled later in some other way
@@ -259,8 +259,22 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
  */
 void pm_destroy_thread(process_t *proc)
 {
-        dprintf("#{VIO}pm:## destroy thread \"%s\" pid = %u\n\n", proc->name, proc->pid);
-
+        dprintf("#{VIO}pm:## destroy thread \"%s\" pid = %u\n\n", proc->name, proc->pid);        
+        
+        //TODO: FIXME: This does not work reliably as of now, free_virt_monitor() no longer switches
+        // to the next virtual monitor or page faults. I moved it here from sys_exit() because this
+        // is the only place where ressources should be freed.
+        //
+        // I believe I tracked it down somewhat:
+        // Exiting / killing a process that currently is in focus works perfectly, but
+        // killing a background process, ie one that is not displayed on the active vmonitor, 
+        // blows up.
+        free_virt_monitor(proc->vmonitor);
+        
+        //TODO: The PFT is never cleared! We should release all allocated ressources
+        // when the process terminates. This also includes memory blocks the process
+        // might still be holding.
+        
         if (proc->stdin != NULL) {
                 rf_free(proc->stdin);
         }
@@ -283,26 +297,42 @@ void pm_set_focus_proc(uint32 pid)
  * Returns the process that belongs to the given pid.
  *
  * @param pid the pid
- * @return process that belongs to the given pid
+ * @return process that belongs to the given pid, NULL if not found.
  */
 process_t* pm_get_proc(uint32 pid)
 {
         process_t *p = procs_head;
         do {
                 if (p->pid == pid)
-                        break;
+                        return p;
                 p = p->next;
         } while (p != procs_head);
 
-        return p;
+        return NULL;
 }
 
+/**
+ * Kills the process with the given pid.
+ * 
+ * @param pid the process id
+ */
+void pm_kill_proc(uint32 pid)
+{
+        process_t *p = pm_get_proc(pid);
+        if (p) {
+                p->state = PSTATE_DEAD;
+        }
+}
+
+/**
+ * Prints text to the active process' vmonitor.
+ * @param fmt format string, sprintf formatting rules apply.
+ * @param ... any remaining arguments
+ */
 void aprintf(char *fmt, ...)
 {
         va_list arg_list;
         va_start(arg_list, fmt);
-
-        //dprintf(fmt, arg);
 
         char buf[255];
         vsnprintf(buf, sizeof(buf), fmt, arg_list);

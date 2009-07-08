@@ -52,6 +52,7 @@ void* _malloc(size_t size);
 void _free(void *block);
 int _unlink(char* path);
 int _stat(char *path, stat *buf);
+void _kill(int pid);
 
 void _printf(char *fmt, ...);
 char* _fgets(char *s, int n, int fd);
