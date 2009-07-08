@@ -51,37 +51,42 @@ typedef struct {
          * Pointer to the start of the allocated memory
          */
         uint16 *begin;
-        
+
+        /**
+         * VMonitor name
+         */
+        char *name;
+
         /**
          * Size of the allocated memory
          */
         uint32 size;
-        
+
         /**
          * Pointer to the start of the visible pane
          */
         uint16 *vis_begin;
-        
+
         /**
          * Position of the cursor on the visible pane
          */
         uint32 offset;
-        
+
         /**
          * Number of lines beneath the visible pane
          */
         uint32 scrolldown_limit;
-        
+
         /**
          * Number of lines above the visible pane
          */
         uint32 scrollup_limit;
-        
+
         /**
          * For framebuffer access. If this is false, the virtual monitor will not be painted.
          */
         bool disable_refresh;
-        
+
         /**
          * The PID of the process that owns this virtual monitor
          */
@@ -90,7 +95,6 @@ typedef struct {
 
 //FIXME: vmonitors as linked list
 extern virt_monitor *vmonitors;
-extern char *vmonitor_names;
 
 virt_monitor* get_active_virt_monitor();
 char* get_active_virt_monitor_name();

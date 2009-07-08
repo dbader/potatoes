@@ -43,7 +43,6 @@ uint16 active_monitor = -1;
 uint16 maxvmonitor = -1;
 virt_monitor *vmonitors;
 uint16 num_vmonitor_limit = 1000;
-char *vmonitor_names;
 
 /**
  * Switches to the next virtual monitor.
@@ -73,9 +72,6 @@ void switch_monitor_down()
 void init_vmonitors()
 {
         rtc_init();
-        vmonitor_names =
-                (char*)callocn(num_vmonitor_limit * 81, sizeof(char), "vmonitor names array");
-        ASSERT(vmonitor_names != 0);
         vmonitors =
                 (virt_monitor*)callocn(num_vmonitor_limit, sizeof(virt_monitor), "vmonitors array");
         ASSERT(vmonitors != 0);
@@ -94,12 +90,12 @@ virt_monitor* start_vmonitor(char *name, uint32 pid)
         maxvmonitor++;
         new_virt_monitor(&vmonitors[maxvmonitor], pid);
         active_monitor = maxvmonitor;
-        memset(vmonitor_names + 81 * active_monitor, '=', 80);
-        memcpy(vmonitor_names + 81 * active_monitor + 2, name, strlen(name));
-        *(vmonitor_names + 81 * active_monitor + 1) = ' ';
-        *(vmonitor_names + 81 * active_monitor + 1 + strlen(name) + 1) = ' ';
-        *(vmonitor_names + 81 * active_monitor + 54) = ' ';
-        *(vmonitor_names + 81 * active_monitor + 78) = ' ';
+        memset(vmonitors[active_monitor].name, '=', 80);
+        memcpy(vmonitors[active_monitor].name + 2, name, strlen(name));
+        *(vmonitors[active_monitor].name + 1) = ' ';
+        *(vmonitors[active_monitor].name + 1 + strlen(name) + 1) = ' ';
+        *(vmonitors[active_monitor].name + 54) = ' ';
+        *(vmonitors[active_monitor].name + 78) = ' ';
         return &(vmonitors[maxvmonitor]);
 }
 
@@ -121,6 +117,6 @@ virt_monitor* get_active_virt_monitor()
 char* get_active_virt_monitor_name()
 {
         static char timestamp[24];
-        memcpy(vmonitor_names + 81 * active_monitor + 55, time2str(time, timestamp), 23);
-        return &(vmonitor_names[active_monitor*81]);
+        memcpy(vmonitors[active_monitor].name + 55, time2str(time, timestamp), 23);
+        return vmonitors[active_monitor].name;
 }

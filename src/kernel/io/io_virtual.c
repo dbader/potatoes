@@ -51,10 +51,13 @@ void new_virt_monitor(virt_monitor *vm, uint32 pid)
 {
         void *mon = mallocn(VIRTUAL_MONITOR_SIZE, "virtual monitor");
         ASSERT(mon != 0);
+        void *name = mallocn(81, "virtual monitor name");
+        ASSERT(name != 0);
         for (uint16 *temp = mon; temp < (uint16*)mon + VMONITOR_HEIGHT; temp++) {
                 *temp = 0xF00;
         }
         vm->begin = (uint16*)mon;
+        vm->name = (char*)name;
         vm->size = VIRTUAL_MONITOR_SIZE;
         vm->vis_begin = (uint16*)mon;
         vm->offset = 0;
@@ -71,14 +74,23 @@ void new_virt_monitor(virt_monitor *vm, uint32 pid)
  */
 void free_virt_monitor(virt_monitor *vm)
 {
-        free((void*)vm->begin);
-        if (active_monitor == maxvmonitor) {
-                active_monitor--;
+        if (vm == &vmonitors[active_monitor]) {
+                free((void*)vm->begin);
+                free((void*)vm->name);
+                if (active_monitor == maxvmonitor) {
+                        active_monitor--;
+                } else {
+                        *vm = vmonitors[maxvmonitor];
+                }
         } else {
-                vmonitors[active_monitor] = vmonitors[maxvmonitor];
-                strncpy(vmonitor_names + 81 * active_monitor,
-                                vmonitor_names + 81 * maxvmonitor, 81);
+                free((void*)vm->begin);
+                free((void*)vm->name);
+                *vm = vmonitors[maxvmonitor];
+                if (active_monitor == maxvmonitor) {
+                        active_monitor = vm - vmonitors;
+                }
         }
+
         memset(&(vmonitors[maxvmonitor--]), 0, sizeof(virt_monitor));
         pm_get_proc(vmonitors[active_monitor].pid)->vmonitor = &vmonitors[active_monitor];
         pm_set_focus_proc(vmonitors[active_monitor].pid);
