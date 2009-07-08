@@ -74,26 +74,27 @@ void new_virt_monitor(virt_monitor *vm, uint32 pid)
  */
 void free_virt_monitor(virt_monitor *vm)
 {
-        if (vm == &vmonitors[active_monitor]) {
-                free((void*)vm->begin);
-                free((void*)vm->name);
+        free((void*)vm->begin);
+        free((void*)vm->name);
+        if (vm == &vmonitors[maxvmonitor]) {
                 if (active_monitor == maxvmonitor) {
                         active_monitor--;
-                } else {
-                        *vm = vmonitors[maxvmonitor];
                 }
         } else {
-                free((void*)vm->begin);
-                free((void*)vm->name);
-                *vm = vmonitors[maxvmonitor];
+                bool active_deleted = FALSE;
                 if (active_monitor == maxvmonitor) {
                         active_monitor = vm - vmonitors;
+                } else if (&vmonitors[active_monitor] == vm) {
+                        active_deleted = TRUE;
+                }
+                *vm = vmonitors[maxvmonitor];
+                pm_get_proc(vmonitors[maxvmonitor].pid)->vmonitor = vm;
+                if (active_deleted) {
+                        pm_set_focus_proc(vm->pid);
                 }
         }
 
         memset(&(vmonitors[maxvmonitor--]), 0, sizeof(virt_monitor));
-        pm_get_proc(vmonitors[active_monitor].pid)->vmonitor = &vmonitors[active_monitor];
-        pm_set_focus_proc(vmonitors[active_monitor].pid);
 }
 
 /**
