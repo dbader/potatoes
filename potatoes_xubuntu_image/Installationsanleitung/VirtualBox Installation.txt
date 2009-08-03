@@ -1,0 +1,8 @@
+Download: 
+http://www.virtualbox.org/wiki/Downloads
+http://www.virtualbox.org/wiki/Linux_Downloads
+
+
+USB-Controller
+Netzwerkadapter
+Netzwerkdienst
