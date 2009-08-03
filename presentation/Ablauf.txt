@@ -1,0 +1,22 @@
+- Vorstellung POTATOES ~10 min
+- Demo vom System
+- Anwendung im Lehrbetrieb der TU ~20 min
+    * Vorstellung der Arbeitsumgebung
+    * Bsp. Aufgabe (Syscall) -> Umsetzung (Schaubild: wie funktioniert das?)
+    * mögliche Aufgaben <-> Lehrplan der Vorlesung
+       -> schließt den Kreis -> Diskussion, 4-Tupel-Schema
+
+Arbeitsumgebung:
+- Motto: lowlevel != no usability
+- Virtualboximage (+ Erklärung: Was ist Virtualbox?)
+- Installation per Doppelklick
+
+Demo: (wahrscheinlich kaum relevant, weil die Demo ja schon steht, aber ich tipps trotzdem mal ab)
+- Bootmeldungen (kurz)
+- Shell + cmdlist
+- Dateisystem
+- Batch
+- Brainfuck
+- Games
+- ps, memdump, shells (Multitasking!!)
+- devices: framebuffer (Spiel), bf?
