@@ -1,24 +1,16 @@
 /* $Id$
-      _   _  ____   _____ 
-     | | (_)/ __ \ / ____|
-  ___| |_ _| |  | | (___  
- / _ \ __| | |  | |\___ \  Copyright 2008 Daniel Bader, Vincenz Doelle,
-|  __/ |_| | |__| |____) |        Johannes Schamburger, Dmitriy Traytel
- \___|\__|_|\____/|_____/ 
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+********************************************************************************
+* _____   ____ _______    _______ ____  ______  _____                          *
+*|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
+*| |__) | |  | | | |  /  \  | | | |  | | |__  | (___              Daniel Bader *
+*|  ___/| |  | | | | / /\ \ | | | |  | |  __|  \___ \           Vincenz Doelle *
+*| |    | |__| | | |/ ____ \| | | |__| | |____ ____) |    Johannes Schamburger *
+*|_|     \____/  |_/_/    \_\_|  \____/|______|_____/          Dmitriy Traytel *
+*                                                                              *
+*      Practical Oriented TeAching Tool, Operating (and) Educating System      *
+*                                                                              *
+*                           www.potatoes-project.tk                            *
+*******************************************************************************/
 
 /**
  * @file
@@ -38,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Marks a frame as occupied.
- * 
+ *
  * @param frame_addr address of the frame
  */
 void set_frame(uint32 frame_addr)
@@ -50,7 +42,7 @@ void set_frame(uint32 frame_addr)
 
 /**
  * Marks a frame as free.
- * 
+ *
  * @param frame_addr address of the frame
  */
 void clear_frame(uint32 frame_addr)
@@ -61,7 +53,7 @@ void clear_frame(uint32 frame_addr)
 
 /**
  * Tests if a frame is free.
- * 
+ *
  * @param frame_addr address of the frame
  * @return 0: frame is occupied; any other value: frame is free
  */
@@ -76,7 +68,7 @@ bool test_frame(uint32 frame_addr)
 
 /**
  * Finds the first free frame in the bitset.
- * 
+ *
  * @return number of the first free frame
  */
 uint32 first_free_frame()
@@ -95,9 +87,9 @@ uint32 first_free_frame()
         return -1;
 }
 
-/** 
+/**
  * Allocates a frame.
- * 
+ *
  * @param page          the page
  * @param kernel        1: frame is only accessible from the kernel
  * @param writable      1: frame is writable; 0: frame is read-only
@@ -122,7 +114,7 @@ void alloc_frame(page_t *page, int kernel, int writeable)
 
 /**
  * Deallocates a frame.
- * 
+ *
  * @param page the page
  */
 void free_frame(page_t *page)
@@ -144,7 +136,7 @@ void bitset_test()
         uint32 i = 0;
         uint32 j;
         uint32 *ptr;
-        
+
         uint32 first;
         /*set_frame(0x1002);
         set_frame(0x2005);
@@ -156,7 +148,7 @@ void bitset_test()
         set_frame(0x22000);
         clear_frame(0x22000);*/
         printf("\n\nallocated frames: \n");
-        
+
         for(j = 0; j <= nframes; j++) {
                 if(test_frame(j * 0x1000)) {
                         printf("%d ", j);
@@ -164,7 +156,7 @@ void bitset_test()
         }
         first = first_free_frame();
         printf("\nfirst free frame: 0x%x\n", first);
-        
+
         bool test = test_frame(first * 0x1000);
         printf("test_frame(first): %b\n",test);
         if(test) {
@@ -176,22 +168,22 @@ void bitset_test()
         if(test_frame(first * 0x1000)) {
                 printf("frame first is set!\n");
         }
-        
+
         // set all frames as occupied
         /*for(uint32 f = 0; f < nframes; f++) {
                 set_frame(0x1000*f);
         }
         first = first_free_frame();
-        
+
         printf("\n\nbitset: \n");
-        
+
         j = 0;
         for(ptr = frames; j <= 5; ptr++) {
                 printf("%b",*ptr);
                 j++;
                 printf("\n");
         }
-        
+
         printf("\nfirst free frame: 0x%x (nframes: 0x%x)\n", first, nframes);
         if(first == -1) {
                 printf("no free frames");
