@@ -207,6 +207,11 @@ LOC:
   		 *) rm temp ;;\
   	 esac\
 
+zip:
+	@Xdialog --stdout --no-cancel --inputbox "Please enter your name:" 0 0 > ./temp
+	@zip "`date +%Y-%m-%d-%T`-`cat temp`".zip $(SRCFILES) $(HDRFILES)
+	@rm temp
+
 kernel: $(OBJFILES) Makefile
 	@echo " LD	src/kernel/kernel"
 	@$(LD) $(LDFLAGS) -Map src/kernel/kernel.map -o src/kernel/kernel $(OBJFILES)
