@@ -209,7 +209,7 @@ LOC:
 
 zip:
 	@Xdialog --stdout --no-cancel --inputbox "Please enter your name:" 0 0 > ./temp
-	@zip "`date +%Y-%m-%d-%T`-`cat temp`".zip $(SRCFILES) $(HDRFILES)
+	@zip "`date +%Y-%m-%d-%H.%M.%S`-`cat temp`".zip $(SRCFILES) $(HDRFILES)
 	@rm temp
 
 kernel: $(OBJFILES) Makefile
