@@ -224,4 +224,4 @@ kernel: $(OBJFILES) Makefile
 
 %.o: %.c Makefile
 	@echo " CC	$(patsubst functions/%,%,$@)"
-	@$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -MMD -MP -MT "$*.d $*.t" -g -c $< -o $@
+	@$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -m32 -MMD -MP -MT "$*.d $*.t" -g -c $< -o $@
