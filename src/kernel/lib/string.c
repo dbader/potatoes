@@ -351,6 +351,9 @@ int atoi(char *str)
 		return 0xFFFFFFFF; //string too long; return maximum integer
 	}
 	for (int i = 0; i<strlen(str); i++) {
+		if (str[i]<48 || str[i]>57) {
+			return 0;
+		}
 		res = 10 * res + ((str[i] - 48) % 10); // horner scheme
 	}
 	return res;
