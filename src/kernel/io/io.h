@@ -14,7 +14,7 @@
 
 /**
  * @file
- * The globel io functions header
+ * The global IO functions header
  *
  * @author Dmitriy Traytel
  * @author $LastChangedBy$
@@ -37,6 +37,9 @@ sint32 get_ticks();
 void set_disp(uint32 addr);
 
 void add_shortcut(bool control_flag, bool super_flag, uint8 character, void (*function)());
+
+extern void mutex_lock(int *lock);
+extern void mutex_unlock(int *lock);
 
 /**
  * Permits interrupts

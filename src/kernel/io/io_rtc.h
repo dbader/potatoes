@@ -58,6 +58,7 @@ struct time {
         uint8 century;
 }time;
 
+uint8 bcd2bin(uint8 num);
 void rtc_init();
 void rtc_update();
 char* time2str(time_t timestamp, char buf[24]);

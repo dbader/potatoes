@@ -13,6 +13,27 @@
 
 ;@author Dmitriy Traytel
 
+[GLOBAL mutex_lock]
+[GLOBAL mutex_unlock]
+mutex_lock:
+        cli ;instead of tsl (no tsl in nasm!)
+        mov eax, [esp+4]
+        mov ebx, [eax]
+        mov dword [eax], 1
+        sti
+        cmp dword ebx, 0
+        jne do_loop
+        ret
+
+do_loop:
+        hlt
+        jmp mutex_lock
+
+mutex_unlock:
+        mov dword eax,[esp+4]
+        mov dword [eax], 0
+        ret
+
 [GLOBAL set_interrupts]
 set_interrupts:
         sti

@@ -1,16 +1,16 @@
 /* $Id$
-********************************************************************************
-* _____   ____ _______    _______ ____  ______  _____                          *
-*|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
-*| |__) | |  | | | |  /  \  | | | |  | | |__  | (___              Daniel Bader *
-*|  ___/| |  | | | | / /\ \ | | | |  | |  __|  \___ \           Vincenz Doelle *
-*| |    | |__| | | |/ ____ \| | | |__| | |____ ____) |    Johannes Schamburger *
-*|_|     \____/  |_/_/    \_\_|  \____/|______|_____/          Dmitriy Traytel *
-*                                                                              *
-*      Practical Oriented TeAching Tool, Operating (and) Educating System      *
-*                                                                              *
-*                           www.potatoes-project.tk                            *
-*******************************************************************************/
+ ********************************************************************************
+ * _____   ____ _______    _______ ____  ______  _____                          *
+ *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
+ *| |__) | |  | | | |  /  \  | | | |  | | |__  | (___              Daniel Bader *
+ *|  ___/| |  | | | | / /\ \ | | | |  | |  __|  \___ \           Vincenz Doelle *
+ *| |    | |__| | | |/ ____ \| | | |__| | |____ ____) |    Johannes Schamburger *
+ *|_|     \____/  |_/_/    \_\_|  \____/|______|_____/          Dmitriy Traytel *
+ *                                                                              *
+ *      Practical Oriented TeAching Tool, Operating (and) Educating System      *
+ *                                                                              *
+ *                           www.potatoes-project.tk                            *
+ *******************************************************************************/
 
 /**
  * @file
@@ -363,7 +363,7 @@ int fgetch(int fd)
 }
 
 char* fgets(char *s, int n, int fd)
-{
+                                {
         char ch = 0;
         while ((n-- > 0) && (ch != '\n')) {
                 ch = fgetch(fd);
@@ -371,7 +371,7 @@ char* fgets(char *s, int n, int fd)
         }
         return s;
 
-}
+                                }
 
 void syscall_test_thread()
 {
@@ -509,24 +509,46 @@ void isr_test()
         __asm__ ("int $0x3");
 }
 
+int mutex = 0;
+
 void threadA()
 {
-        _log("hello from task A\n");
-
+        uint8 seconds;
         for (;;) {
-                //for (int i = 0; i < 9999; i++) ;
-                _log("A");
+                char* str = (char*)_malloc(24);
+                _printf("entered critical section at %s\n",time2str(time,str));
+                seconds = bcd2bin(time.sec);
+                for (int i = 1; i <= 10; i++) {
+                        _log("A");
+                        while ((bcd2bin(time.sec) > 50 && (seconds + i) % 60 < 10) ||
+                                        bcd2bin(time.sec) < (seconds + i) % 60) {
+                                halt();
+                        }
+                }
+                _log("\n");
+                _printf("left critical section at %s\n",time2str(time,str));
+                _free(str);
                 halt();
         }
 }
 
 void threadB()
 {
-        _log("hello from task B\n"); // log()
-
+        uint8 seconds;
         for (;;) {
-                //for (int i = 0; i < 9999; i++) ;
-                _log("B");
+                char* str = (char*)_malloc(24);
+                _printf("entered critical section at %s\n",time2str(time,str));
+                seconds = bcd2bin(time.sec);
+                for (int i = 1; i <= 10; i++) {
+                        _log("B");
+                        while ((bcd2bin(time.sec) > 50 && (seconds + i) % 60 < 10) ||
+                                        bcd2bin(time.sec) < (seconds + i) % 60) {
+                                halt();
+                        }
+                }
+                _log("\n");
+                _printf("left critical section at %s\n",time2str(time,str));
+                _free(str);
                 halt();
         }
 }
@@ -558,14 +580,14 @@ void test_batch_files()
 {
         int fd = _open("/batch", O_CREAT, 0);
         char* str =
-                "touch b\n"
-                "write b Hallo Welt\n"
-                "cat b\n"
-                "echo first ls:\n"
-                "ls\n"
-                "rm b\n"
-                "echo second ls:\n"
-                "ls";
+                        "touch b\n"
+                        "write b Hallo Welt\n"
+                        "cat b\n"
+                        "echo first ls:\n"
+                        "ls\n"
+                        "rm b\n"
+                        "echo second ls:\n"
+                        "ls";
         _write(fd, str, strlen(str));
         _close(fd);
 
@@ -701,21 +723,21 @@ void test_batch_files()
 
 void atoi_test()
 {
-		dprintf("ATOI test:\n%i - should be 42\n"
-				"%i - should be 1337\n"
-				"%i - should be 1234567890\n"
-				"%i - should be 0\n",
-				atoi("42"),
-				atoi("1337"),
-				atoi("1234567890"),
-				atoi("0")
-				);
+        dprintf("ATOI test:\n%i - should be 42\n"
+                        "%i - should be 1337\n"
+                        "%i - should be 1234567890\n"
+                        "%i - should be 0\n",
+                        atoi("42"),
+                        atoi("1337"),
+                        atoi("1234567890"),
+                        atoi("0")
+        );
 }
 
 extern bool create_fs();
 void new_fs()
 {
-create_fs();
+        create_fs();
 }
 
 void reboot()

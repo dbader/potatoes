@@ -71,6 +71,7 @@ void free_virt_monitor(virt_monitor *vm)
         if (vm == &vmonitors[maxvmonitor]) {
                 if (active_monitor == maxvmonitor) {
                         active_monitor--;
+                        pm_set_focus_proc(vmonitors[active_monitor].pid);
                 }
         } else {
                 bool active_deleted = FALSE;
