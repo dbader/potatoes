@@ -17,8 +17,8 @@
  * Standard I/O functions
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  *
  */
 

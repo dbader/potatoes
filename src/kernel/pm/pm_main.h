@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: pm_main.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Process management main header file.
  *
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 //FIXME: This is a mess. Cleanup needed.
@@ -98,14 +98,6 @@ typedef struct process_t {
 
         /** linked list next ptr */
         struct process_t *next;
-
-        /** number of consecutive timeslices the process is offered
-         *  everytime it becomes active */
-        uint32 priority;
-
-        /** decremented every timer interrupt. The process becomes inactive when
-         *  remaining_timeslices is 0 */
-        uint32 remaining_timeslices;
 } process_t;
 
 /** Maximum number of input bytes the STDIN data structure can queue up */
@@ -122,7 +114,6 @@ uint32 pm_schedule(uint32 context);
 uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize);
 void pm_destroy_thread(process_t *proc);
 process_t* pm_get_proc(uint32 pid);
-void pm_set_thread_priority(uint32 pid, uint32 prio);
 void pm_set_focus_proc(uint32 pid);
 void pm_kill_proc(uint32 pid);
 extern void _syscall(uint32 id, void *data);

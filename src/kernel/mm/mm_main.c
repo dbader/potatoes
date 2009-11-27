@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: mm_main.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Initializes memory management.
  *
  * @author Johannes Schamburger
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../include/types.h"
@@ -86,7 +86,7 @@ void mm_init(uint32 start, uint32 end)
  * uses dprintf() )
  */
 void mm_init_output() {
-        printf("#{LGR}POTATOES (DEV) - $Rev$ - "__DATE__" "__TIME__"##\n");
+        printf("#{LGR}POTATOES - $Rev: 266 $ - "__DATE__" "__TIME__"##\n");
         dprint_separator();
 
         dprintf("#{LBL}mm:## init\n");

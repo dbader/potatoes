@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: fs_super.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * The superblock table.
  *
  * @author Vincenz Doelle
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #ifndef __SUPER_H_

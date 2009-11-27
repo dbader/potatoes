@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: pm_input.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Input management header.
  *
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #ifndef __PM_INPUT_H

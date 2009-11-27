@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: io_virtual.c 273 2009-11-19 15:14:14Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Function used by virtual outputs.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 273 $
  */
 #include "../include/stdlib.h"
 #include "../include/stdio.h"

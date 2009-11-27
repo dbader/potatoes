@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: io_timer.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Timer-handler
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../include/const.h"
@@ -105,6 +105,6 @@ void timer_init(sint32 freq)
         int counter = 1193180 / freq; //1193180Hz - base 8254 frequency
         outb(PIT_CONTROL, PIT_INIT_CMD);
 
-        outb(PIT_COUNTER0, counter % 0x100); //LSB
-        outb(PIT_COUNTER0, counter / 0x100); //MSB
+        outb(PIT_COUNTER0, counter % 0xFF); //LSB
+        outb(PIT_COUNTER0, counter / 0xFF); //MSB
 }

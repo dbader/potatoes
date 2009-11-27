@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: fs_bmap.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Functions to manage the block bitmap (bmap)
  *
  * @author Vincenz Doelle
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../include/const.h"
@@ -189,6 +189,9 @@ block_nr alloc_block(block_nr start)
  */
 void dump_bmap()
 {
+        uint8 byte = 0;
+        uint8 bit  = 0;
+
         if (bmap == NULL) {
                 fs_dprintf("[fs_bmap] BMAP is NULL\n");
                 return;

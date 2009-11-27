@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: shell_utils.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Shell utility functions.
  *
  * @author Daniel Bader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../kernel/include/types.h"
@@ -123,8 +123,10 @@ int _fputs(char *s, int fd)
  * Prints formatted output to STDOUT. @see printf
  * This exists as a stub to ease the separation of the shell
  * from the kernel code (as of now, the shell could simply call the kernel printf).
+ *
+ * TODO: refactor format logic into vprintf()
  */
-void _printf(char *fmt, ...)
+void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution possible?
 {
         char buf[255];
         va_list arg_list;

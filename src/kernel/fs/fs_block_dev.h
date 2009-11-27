@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: fs_block_dev.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Basic definitions of all block based functions.
  *
  * @author Vincenz Doelle
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #ifndef __FS_BLOCK_DEV_H_

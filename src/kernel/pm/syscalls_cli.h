@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: syscalls_cli.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Header file for the "client" side syscall magic.
  *
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #ifndef __SYSCALLS_CLI_H

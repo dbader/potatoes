@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: debug.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -18,8 +18,8 @@
  * a small toolbox of useful debugging functions, eg debug printf, stack crawling etc.
  *
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #ifndef __DEBUG_H
@@ -30,8 +30,8 @@
 
 #define dprintf printf
 #define dprint_separator() dprintf("#{GRE}--------------------------------------------------------------------------------##");
-#define fs_dprintf(a, ...) ((void)0)
-//#define fs_dprintf dprintf("%s ln %d%{:} ", __FILE__, __LINE__, RED); dprintf
+#define fs_dprintf //dprintf
+//dprintf("%s ln %d%{:} ", __FILE__, __LINE__, RED); dprintf
 
 #define SHORTCUT_CTRL(ch, func) add_shortcut(TRUE, FALSE, ch, func); \
         printf("\tCTRL + %c ==> %s()\n", ch, #func)

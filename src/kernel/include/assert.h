@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: assert.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Definition of the ASSERT() macro.
  *
  * @author Daniel Bader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 #ifndef __ASSERT_H
 #define __ASSERT_H

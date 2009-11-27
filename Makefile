@@ -37,9 +37,15 @@ HDASIZE=20
 # The name of the OS in virtualbox
 OSNAME=ETIOS
 
-.PHONY: all bin2c chips chipsfs clean fiximg runbochs doc todo fdimage link tools
+# The loopback device for the image
+LOOPDEV=/dev/loop0
 
-all: kernel fdimage hda.img doc tools
+# The mount point for the loopback image
+LOOPMNT=/mnt2
+
+.PHONY: all bin2c clean fiximg runbochs doc todo fdimage hdimage link tools
+
+all: kernel fdimage hdimage doc tools
 
 help:
 	@echo "Available make targets:"
@@ -50,7 +56,7 @@ help:
 	@echo "doc		- builds doxygen documentation"
 	@echo "fiximg		- unmounts the image and disables loopback"
 	@echo "fdimage		- builds floppy image (floppy.img)"
-	@echo "hda.img		- builds hard disk image (hda.img)"
+	@echo "hdimage		- builds hard disk image (hda.img)"
 	@echo "kernel		- builds the kernel"
 	@echo "mac_runbochs	- starts bochs (mac)"
 	@echo "mac_image	- update floppy.img (mac)"
@@ -66,19 +72,16 @@ help:
 clean:
 	@echo " CLEAN"
 	-@for file in $(OBJFILES) $(DEPFILES) $(GENFILES); do if [ -f $$file ]; then rm $$file; fi; done
-	-@#for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
+	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
-runbochs: fdimage hda.img
+runbochs: fdimage hdimage
 	@bochs -f src/tools/bochsrc
 
-runvirtualbox: fdimage hda.img
+runvirtualbox: fdimage	
 	@VBoxManage startvm $(OSNAME)
 	
-runqemu: fdimage hda.img
+runqemu: fdimage
 	@qemu -localtime -fda floppy.img -soundhw pcspk -hda hda.img #--full-screen
-	
-runqemu_debug: fdimage hda.img
-	@qemu -localtime -fda floppy.img -soundhw pcspk -hda hda.img -s -S
 	
 mac_runbochs: mac_image
 	@/Applications/bochs.app/Contents/MacOS/bochs -q -f src/tools/bochsrc
@@ -86,12 +89,16 @@ mac_runbochs: mac_image
 doc: $(OBJFILES) Makefile
 	@echo " DOXYGEN"
 	@doxygen > /dev/null
-	@#cd doc/latex && $(MAKE) > /dev/null 2> /dev/null
-	@#cp doc/latex/refman.pdf ./etios.pdf
+	@cd doc/latex && $(MAKE) > /dev/null 2> /dev/null
+	@cp doc/latex/refman.pdf ./etios.pdf
 	
 # Sometimes the image remains mounted after an error, use this target to fix this.	
 fiximg:
-	@echo "Doing nothing as no loop devices are used anymore"
+	@echo "Unmounting image..."
+	-@sudo umount $(LOOPDEV)
+	@echo "Disabling loopback..."
+	-@sudo /sbin/losetup -d $(LOOPDEV)
+	@echo "Done."
 	
 todo:
 	@echo "TODO:"
@@ -100,20 +107,25 @@ todo:
 fdimage: kernel
 	@echo " FDIMAGE floppy.img"
 	@dd if=/dev/zero of=floppy.img bs=1024 count=1440 status=noxfer 2> /dev/null
-	@mkfs -t vfat floppy.img
+	@sudo /sbin/losetup $(LOOPDEV) floppy.img
+	@sudo mkfs -t vfat $(LOOPDEV) > /dev/null 2> /dev/null
 
-	@mmd -i floppy.img ::/grub
-	@mcopy -i floppy.img -s image/* ::/           # -s: recursive copy
-	@mcopy -i floppy.img -o src/kernel/kernel ::/ # -o: no confirmation of overwrites
+	@sudo mount -t vfat $(LOOPDEV) $(LOOPMNT)
+	@sudo mkdir $(LOOPMNT)/grub
+	@-sudo cp -r image/* $(LOOPMNT)
+	@sudo cp src/kernel/kernel $(LOOPMNT)
+	@sudo umount $(LOOPDEV)
 	
-	@echo "(fd0) floppy.img" > grubdevice.map
+	@echo "(fd0) $(LOOPDEV)" > grubdevice.map
 	@echo "root (fd0)" > grubconf.conf
 	@echo "setup (fd0)" >> grubconf.conf
 	@echo "quit" >> grubconf.conf
-	@cat grubconf.conf | grub --batch --device-map=grubdevice.map floppy.img > /dev/null 2> /dev/null
+	@sudo cat grubconf.conf | sudo grub --batch --device-map=grubdevice.map $(LOOPDEV) > /dev/null 2> /dev/null
 	@rm grubdevice.map grubconf.conf
 	
-hda.img:
+	@sudo /sbin/losetup -d $(LOOPDEV)
+	
+hdimage:
 	@echo " HDIMAGE hda.img"
 	@rm -f hda.img
 	@bximage -q -hd -mode=flat -size=$(HDASIZE) hda.img | grep ata0-master > temp
@@ -132,16 +144,8 @@ bin2c: src/tools/bin2c/bin2c.c
 	@echo "Building bin2c..."
 	@echo " CC	$(patsubst functions/%,%,$@)"
 	@gcc src/tools/bin2c/bin2c.c -o bin2c
-
-chips:
-	@echo "Building chips..."
-	@(cd src/tools/chips; $(MAKE) ../../../chips)
-
-chipsfs:
-	@echo "Building chipsfs..."
-	@(cd src/tools/chips; $(MAKE) ../../../chipsfs)
-
-tools: bin2c chips chipsfs
+	
+tools: bin2c
 
 # If the USB-Stick is for the EEEPC use:
 #

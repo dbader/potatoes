@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: fs_file_table.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * The file descriptor table functions.
  *
  * @author Vincenz Doelle
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 #include "../include/const.h"
 #include "../include/types.h"
@@ -350,8 +350,7 @@ void dump_files()
 {
         fs_dprintf("FILE_TABLE:\n");
         for (int i = 0; i < NUM_FILES; i++) {
-                if(gft[i].f_desc >= 0)
-                        dump_file(&gft[i]);
+                dump_file(&gft[i]);
         }
 }
 

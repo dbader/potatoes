@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: stdio.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Standard I/O functions.
  *
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../include/types.h"
@@ -104,7 +104,7 @@ int vsnprintf(char *s, int n, char *format, va_list ap)
                                 break;
                         case 'i': // signed integer
                         case 'd':
-                        case 'u': // FIXME: unsigned should actually print unsigned values. (dbader)
+                        case 'u':        
                                 int_arg = va_arg(ap, int);
                                 itoa(int_arg, buf, 10);
                                 buf_ptr = buf;

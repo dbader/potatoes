@@ -1,5 +1,5 @@
 timeout 1
 
-title	POTATOES Kernel
+title	etiOS Kernel
 	root (fd0)
 	kernel /kernel

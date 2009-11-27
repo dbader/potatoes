@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: pm_main.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Process management main source file.
  *
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../include/assert.h"
@@ -97,8 +97,6 @@ void pm_init()
         init_proc_file_table(procs_head->pft);
         procs_head->stdin = rf_alloc(STDIN_QUEUE_SIZE);
         procs_head->vmonitor = get_active_virt_monitor();
-        procs_head->priority = 1;
-        procs_head->remaining_timeslices = 1;
 
         active_proc = procs_head;
         kernel_proc = procs_head;
@@ -136,12 +134,6 @@ uint32 pm_schedule(uint32 context)
                 return context;
         }
 
-        // Keep the process active if it has timeslices remaining
-        if (active_proc->remaining_timeslices > 1) {
-        	active_proc->remaining_timeslices--;
-        	return context;
-        }
-
         active_proc->context = context;
 
         // Destroy all zombie- and jump over all sleeping processes up to the first alive process.
@@ -158,11 +150,6 @@ uint32 pm_schedule(uint32 context)
         }
 
         active_proc = active_proc->next;
-
-        // Give the process a number of timeslices to work with according
-        // to its priority
-        active_proc->remaining_timeslices = active_proc->priority;
-
         return active_proc->context;
 }
 
@@ -242,10 +229,6 @@ uint32 pm_create_thread(char *name, void (*entry)(), uint32 stacksize)
 
         proc->context = (uint32) stack;
 
-        // Initialize priority and initial timeslices to reasonable values
-        proc->remaining_timeslices = 1;
-        proc->priority = 1;
-
         dprintf("#{VIO}pm:## created thread \"%s\"\n    "
                         "entry at 0x%x, stack at 0x%x (%u bytes). pid = %u\n\n",
                         proc->name, entry, proc->context, stacksize, proc->pid);
@@ -290,25 +273,6 @@ void pm_destroy_thread(process_t *proc)
         free(proc->name);
         free(proc->stack_start);
         free(proc);
-}
-
-/**
- * Modifies a thread's priority. Note that this will not affect the remaining
- * timeslices of a thread that is currently active in order to keep other threads
- * from starving.
- *
- * @param pid the process id
- * @param prio the new priority
- */
-void pm_set_thread_priority(uint32 pid, uint32 prio)
-{
-        process_t *p = pm_get_proc(pid);
-        if (!p) {
-            dprintf("pm_set_thread_priority: invalid pid %u", pid);
-            return;
-        }
-
-        p->priority = prio;
 }
 
 /**
@@ -378,11 +342,11 @@ void aprintf(char *fmt, ...)
 void pm_dump()
 {
         //aprintf("hello, world %s %s %c", 0, "hello", 'x');
-        aprintf("#{VIO}PID##\tNAME\t\tCONTEXT\t\tPRIO\n");
-        aprintf("#{VIO}-----------------------------------------------##\n");
+        aprintf("#{VIO}PID##\tNAME\t\tCONTEXT\n");
+        aprintf("#{VIO}----------------------------------##\n");
         process_t *p = procs_head;
         do {
-                aprintf("#{VIO}%d##\t%s\t\t0x%x\t%u\n", p->pid, p->name, p->context, p->priority);
+                aprintf("#{VIO}%d##\t%s\t\t0x%x\n", p->pid, p->name, p->context);
                 p = p->next;
         } while (p != procs_head);
 

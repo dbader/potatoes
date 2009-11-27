@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: apps.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,14 +17,13 @@
  * Header file for the applications.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 #ifndef __APPS_H
 #define __APPS_H
 
 void shell_cmd_snapshot(int argc, char *argv[]);
 void shell_cmd_speed(int argc, char *argv[]);
-void shell_cmd_memview(int argc, char *argv[]);
 
 #endif /*__APPS_H*/

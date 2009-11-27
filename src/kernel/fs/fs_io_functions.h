@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: fs_io_functions.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Functions definitions concerning read, write, open, close, create, delete.
  *
  * @author Vincenz Doelle
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #ifndef FS_IO_FUNCTIONS_H_
@@ -42,8 +42,6 @@ bool fs_delete(char *path);
 
 bool fs_create_delete(char *abs_path, int mode, int data_type);
 
-bool fs_truncate(char *abs_path, uint32 size);
-
 size_t lseek(proc_file pft[NUM_PROC_FILES], file_nr fd, sint32 offset, uint32 originf);
 
 
@@ -52,5 +50,9 @@ extern void read_dinode(d_inode *inode, block_nr inode_blk);
 extern void read_minode(m_inode *inode, block_nr inode_blk);
 
 extern void write_inode(m_inode *inode);
+
+
+extern void free_data_blocks(char* abs_path);
+
 
 #endif /*FS_IO_FUNCTIONS_H_*/

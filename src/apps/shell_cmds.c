@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: shell_cmds.c 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -29,8 +29,8 @@
  * exec
  *
  * @author Daniel Bader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../kernel/io/io.h"
@@ -43,7 +43,6 @@
 #include "../kernel/fs/fs_const.h"
 #include "../kernel/pm/syscalls_shared.h"
 #include "../kernel/pm/syscalls_cli.h"
-#include "../kernel/pm/pm_main.h"
 #include "games.h"
 #include "apps.h"
 #include "shell_main.h"
@@ -124,34 +123,33 @@ void shell_cmd_ls(int argc, char *argv[])
                 return;
         }
 
+        _read(fd, directory, sizeof(directory));
+
         int total = 0;
 
-        while(_read(fd, directory, sizeof(directory)) != 0)
-        {
-                for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
-                        if (directory[i].inode != NULL) {
-                                stat stat_buf;
-                                char abs_path[255];
-                                char time[25];
+        for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
+                if (directory[i].inode != NULL) {
+                        stat stat_buf;
+                        char abs_path[255];
+                        char time[25];
 
-                                strncpy(abs_path, path, sizeof(abs_path));
-                                strcat(abs_path, directory[i].name);
+                        strncpy(abs_path, path, sizeof(abs_path));
+                        strcat(abs_path, directory[i].name);
 
-                                if (_stat(abs_path, &stat_buf) == 0) {
-                                        total += stat_buf.size;
-                                        _printf("%d\t%s ",
-                                                        stat_buf.size,
-                                                        time2str(stat_buf.modify_ts, time));
+                        if (_stat(abs_path, &stat_buf) == 0) {
+                                total += stat_buf.size;
+                                _printf("%d\t%s ",
+                                                stat_buf.size,
+                                                time2str(stat_buf.modify_ts, time));
 
-                                        if (stat_buf.mode == DIRECTORY) {
-                                                _printf("#{GRE}%s/\n", directory[i].name);
-                                        } else {
-                                                _printf("%s\n", directory[i].name);
-                                        }
-
+                                if (stat_buf.mode == DIRECTORY) {
+                                        _printf("#{GRE}%s/\n", directory[i].name);
                                 } else {
-                                        _printf("%s ERROR: stat() failed.\n", directory[i].name);
+                                        _printf("%s\n", directory[i].name);
                                 }
+
+                        } else {
+                                _printf("%s ERROR: stat() failed.\n", directory[i].name);
                         }
                 }
         }
@@ -577,26 +575,6 @@ void shell_cmd_kill(int argc, char *argv[])
 }
 
 /**
- * Modifies a process' priority.
- *
- * @param argc the number of argument strings in argv
- * @param argv the argument vector. Contains all arguments of the command.
- */
-void shell_cmd_nice(int argc, char *argv[])
-{
-        if (argc < 3) {
-                _printf("Usage: nice [pid] [priority]\n");
-                return;
-        }
-
-        int pid = atoi(argv[1]);
-        int prio = atoi(argv[2]);
-        _printf("nice: setting priority of process with pid %u to %u\n", pid, prio);
-
-        pm_set_thread_priority(pid, prio);
-}
-
-/**
  * The shell command table. Every shell command must be registered here
  * to be accessible. */
 struct shell_cmd_t shell_cmds[] = {
@@ -632,8 +610,6 @@ struct shell_cmd_t shell_cmds[] = {
                 {"snake",       shell_cmd_snake,        "Another classic video game"},
                 {"synth",       shell_cmd_synth,        "Synthesizer tool"},
                 {"kill",        shell_cmd_kill,         "Terminates the given process"},
-                {"nice",        shell_cmd_nice,         "Modifies thread priorities"},
-                {"memview",     shell_cmd_memview,      "Memory viewer tool"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

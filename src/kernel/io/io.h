@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: io.h 273 2009-11-19 15:14:14Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * The global IO functions header
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 273 $
  */
 #ifndef __IO_H_
 #define __IO_H_

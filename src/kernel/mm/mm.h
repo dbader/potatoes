@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: mm.h 266 2009-10-14 08:15:36Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Definitions for the functions and variables used in the memory management.
  *
  * @author Johannes Schamburger
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 266 $
  */
 
 #include "../include/types.h"
@@ -27,7 +27,7 @@
 #define __MM_H_
 
 /**
- * the structure of a header of an occupied memory block
+ * the structure of a header of an occupied memory block (size: 4 * 32bit = 128bit)
  */
 typedef struct mm_header {
         struct mm_header *prev;         // pointer to the header of the previous occupied block
@@ -40,10 +40,6 @@ typedef struct mm_header {
 #define KHEAP_START             0xC0000000
 #define KHEAP_INITIAL_SIZE      0x500000
 #define HEAP_MIN_SIZE           0x70000
-/**
- * the heap is expanded only by steps of a certain size.
- */
-#define HEAP_EXPAND_STEP_SIZE   1048576 // 1 MB
 
 typedef struct
 {

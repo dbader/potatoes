@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: string.c 270 2009-11-09 21:41:13Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -18,8 +18,8 @@
  *
  * @author Dmitriy Traytel
  * @author dbader
- * @author $LastChangedBy$
- * @version $Rev$
+ * @author $LastChangedBy: dtraytel $
+ * @version $Rev: 270 $
  */
 #include "../include/const.h"
 #include "../include/types.h"
@@ -290,20 +290,6 @@ char* strreverse(char *str)
 }
 
 /**
- * Test if a character represents whitespace
- *
- * @param c the character to be tested
- * @returns whether the character is to be considered whitespace
- *
- * For the purposes of this function space, horizontal tab, newline,
- * carriage return, form feed and vertical tab are considered whitespace.
- */
-int isspace(char c)
-{
-        return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
-}
-
-/**
  * Converts an integer into a string using an arbitrary base. Make sure the buffer for
  * the converted string is large enough. The smaller the base the more space is required, eg
  * for converting a 32 bit integer you can expect 35 bytes to be sufficient
@@ -350,96 +336,25 @@ char* itoa(int n, char *str, unsigned int base)
 }
 
 /**
- * Converts an string into an integer.
- *
- * Bases in the range from 2 to 36 are handled, with a-z and A-Z being treated
- * as the digits with values 10 to 35.
- *
- * If @a base is 0, try to guess the base, if the string starts with "0x" it
- * will be treated as base 16, if it starts with "0" it will be treated as base
- * 8, otherwise base 10 is assumed.
- *
- * No range check is performed, so if the value is greater than or equal to
- * 2^31-1 or less than -2^31 the results will be undefined.
- *
- * @param str    the source string buffer
- * @param endptr if this not equal to NULL, the address of the first character
- *               that was not parsed is written to this address
- * @param base   the base to be used for conversion
- * @returns      the result of the conversion
- *
- */
-int strtol(char *nptr, char **endptr, int base)
-{
-        long int ret = 0;
-        int sign = -1; // sign is inverted so we can actually convert the
-                      // lowest possible integer
-
-        // skip leading whitespace
-        while(isspace(*nptr))
-                ++nptr;
-
-        // read the sign, if any
-        if(*nptr == '-')
-        {
-                sign = 1;
-                ++nptr;
-        }
-        else if(*nptr == '+')
-                ++nptr;
-
-        // guess the base, if requested
-        if(base == 0) {
-                if(*nptr != '0') {
-                        base = 10;
-                } else {
-                        ++nptr;
-                        if(*nptr == 'X' || *nptr == 'x') {
-                                ++nptr;
-                                base = 16;
-                        } else {
-                                base = 8;
-                        }
-                }
-        }
-
-
-        // read the actual number
-        for(; *nptr != '\0'; ++nptr) {
-                // convert the next digit
-                int value = -1;
-                if(*nptr >= '0' && *nptr <= '9')
-                        value = *nptr - '0';
-                else if(*nptr >= 'A' && *nptr <= 'Z')
-                        value = *nptr - 'A' + 10;
-                else if(*nptr >= 'a' && *nptr <= 'z')
-                        value = *nptr - 'a' + 10;
-
-                // check bounds
-                if(value < 0 || value >= base)
-                        break;
-
-                // "append" value to the number
-                ret = ret * base - value;
-        }
-
-        // write back the end pointer, if requested
-        if(endptr != NULL)
-                *endptr = nptr;
-
-        return ret * sign;
-}
-
-/**
  * Converts an string into an integer (base 10 is assumed).
- *
- * This function will skip whitespace and read a (possibly) signed number until
- * it reaches a char that can't be part of the number.
+ * The string should really represent a positive integer.
+ * Nonsense inputs like characters won't produce reasonable results.
  *
  * @param str the source string buffer
  * @return The conversion result
  */
 int atoi(char *str)
 {
-        return strtol(str, NULL, 10);
+	int res = 0;
+	int len = strlen(str);
+	if (len>10) {
+		return 0xFFFFFFFF; //string too long; return maximum integer
+	}
+	for (int i = 0; i<strlen(str); i++) {
+		if (str[i]<48 || str[i]>57) {
+			return 0;
+		}
+		res = 10 * res + ((str[i] - 48) % 10); // horner scheme
+	}
+	return res;
 }
