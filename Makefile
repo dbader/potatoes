@@ -37,12 +37,6 @@ HDASIZE=20
 # The name of the OS in virtualbox
 OSNAME=ETIOS
 
-# The loopback device for the image
-LOOPDEV=/dev/loop0
-
-# The mount point for the loopback image
-LOOPMNT=/mnt2
-
 .PHONY: all bin2c clean fiximg runbochs doc todo fdimage hdimage link tools
 
 all: kernel fdimage hdimage doc tools
@@ -94,11 +88,7 @@ doc: $(OBJFILES) Makefile
 	
 # Sometimes the image remains mounted after an error, use this target to fix this.	
 fiximg:
-	@echo "Unmounting image..."
-	-@sudo umount $(LOOPDEV)
-	@echo "Disabling loopback..."
-	-@sudo /sbin/losetup -d $(LOOPDEV)
-	@echo "Done."
+	@echo "Doing nothing as no loop devices are used anymore"
 	
 todo:
 	@echo "TODO:"
@@ -107,23 +97,18 @@ todo:
 fdimage: kernel
 	@echo " FDIMAGE floppy.img"
 	@dd if=/dev/zero of=floppy.img bs=1024 count=1440 status=noxfer 2> /dev/null
-	@sudo /sbin/losetup $(LOOPDEV) floppy.img
-	@sudo mkfs -t vfat $(LOOPDEV) > /dev/null 2> /dev/null
+	@mkfs -t vfat floppy.img
 
-	@sudo mount -t vfat $(LOOPDEV) $(LOOPMNT)
-	@sudo mkdir $(LOOPMNT)/grub
-	@-sudo cp -r image/* $(LOOPMNT)
-	@sudo cp src/kernel/kernel $(LOOPMNT)
-	@sudo umount $(LOOPDEV)
+	@mmd -i floppy.img ::/grub
+	@mcopy -i floppy.img -s image/* ::/           # -s: recursive copy
+	@mcopy -i floppy.img -o src/kernel/kernel ::/ # -o: no confirmation of overwrites
 	
-	@echo "(fd0) $(LOOPDEV)" > grubdevice.map
+	@echo "(fd0) floppy.img" > grubdevice.map
 	@echo "root (fd0)" > grubconf.conf
 	@echo "setup (fd0)" >> grubconf.conf
 	@echo "quit" >> grubconf.conf
-	@sudo cat grubconf.conf | sudo grub --batch --device-map=grubdevice.map $(LOOPDEV) > /dev/null 2> /dev/null
+	@cat grubconf.conf | grub --batch --device-map=grubdevice.map floppy.img > /dev/null 2> /dev/null
 	@rm grubdevice.map grubconf.conf
-	
-	@sudo /sbin/losetup -d $(LOOPDEV)
 	
 hdimage:
 	@echo " HDIMAGE hda.img"
