@@ -37,9 +37,9 @@ HDASIZE=20
 # The name of the OS in virtualbox
 OSNAME=ETIOS
 
-.PHONY: all bin2c clean fiximg runbochs doc todo fdimage hdimage link tools
+.PHONY: all bin2c clean fiximg runbochs doc todo fdimage link tools
 
-all: kernel fdimage hdimage doc tools
+all: kernel fdimage hda.img doc tools
 
 help:
 	@echo "Available make targets:"
@@ -50,7 +50,7 @@ help:
 	@echo "doc		- builds doxygen documentation"
 	@echo "fiximg		- unmounts the image and disables loopback"
 	@echo "fdimage		- builds floppy image (floppy.img)"
-	@echo "hdimage		- builds hard disk image (hda.img)"
+	@echo "hda.img		- builds hard disk image (hda.img)"
 	@echo "kernel		- builds the kernel"
 	@echo "mac_runbochs	- starts bochs (mac)"
 	@echo "mac_image	- update floppy.img (mac)"
@@ -68,13 +68,13 @@ clean:
 	-@for file in $(OBJFILES) $(DEPFILES) $(GENFILES); do if [ -f $$file ]; then rm $$file; fi; done
 	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
-runbochs: fdimage hdimage
+runbochs: fdimage hda.img
 	@bochs -f src/tools/bochsrc
 
-runvirtualbox: fdimage	
+runvirtualbox: fdimage hda.img
 	@VBoxManage startvm $(OSNAME)
 	
-runqemu: fdimage
+runqemu: fdimage hda.img
 	@qemu -localtime -fda floppy.img -soundhw pcspk -hda hda.img #--full-screen
 	
 mac_runbochs: mac_image
@@ -110,7 +110,7 @@ fdimage: kernel
 	@cat grubconf.conf | grub --batch --device-map=grubdevice.map floppy.img > /dev/null 2> /dev/null
 	@rm grubdevice.map grubconf.conf
 	
-hdimage:
+hda.img:
 	@echo " HDIMAGE hda.img"
 	@rm -f hda.img
 	@bximage -q -hd -mode=flat -size=$(HDASIZE) hda.img | grep ata0-master > temp
@@ -129,8 +129,16 @@ bin2c: src/tools/bin2c/bin2c.c
 	@echo "Building bin2c..."
 	@echo " CC	$(patsubst functions/%,%,$@)"
 	@gcc src/tools/bin2c/bin2c.c -o bin2c
-	
-tools: bin2c
+
+chips:
+	@echo "Building chips..."
+	@(cd src/tools/chips; $(MAKE) ../../../chips)
+
+chipsfs:
+	@echo "Building chipsfs..."
+	@(cd src/tools/chips; $(MAKE) ../../../chipsfs)
+
+tools: bin2c chips chipsfs
 
 # If the USB-Stick is for the EEEPC use:
 #

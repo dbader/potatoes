@@ -350,7 +350,8 @@ void dump_files()
 {
         fs_dprintf("FILE_TABLE:\n");
         for (int i = 0; i < NUM_FILES; i++) {
-                dump_file(&gft[i]);
+                if(gft[i].f_desc >= 0)
+                        dump_file(&gft[i]);
         }
 }
 

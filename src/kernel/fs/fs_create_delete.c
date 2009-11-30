@@ -116,7 +116,7 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
         if (mode == CREATE) {
                 file_block = insert_file_into_dir(dir_inode_block, file_name);
         } else if (mode == DELETE) {
-                free_data_blocks(abs_path);
+                free_data_blocks(abs_path, 0);
                 file_block = delete_file_from_dir(dir_inode_block, file_name);
         }
 
@@ -144,23 +144,108 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
         return TRUE;
 }
 
-void free_data_blocks(char* abs_path)
+/**
+ * Set the size of file @a abs_path to be exactly @a size, deleting or allocating blocks as necessary.
+ */
+bool fs_truncate(char *abs_path, uint32 size)
+{
+        int fd = fs_open(abs_path);
+        if(fd < 0)
+            return FALSE;
+
+        m_inode *inode = get_file(fd)->f_inode;
+
+        if(size < inode->i_size)
+        {
+                int start = (size + BLOCK_SIZE - 1) / BLOCK_SIZE; // first block to be freed
+
+                int i, j, blk;
+                for(i = start; i < NUM_DIRECT_POINTER; ++i)
+                {
+                        blk = inode->i_direct_pointer[i];
+                        if(blk != NULL)
+                        {
+                            mark_block(blk, FALSE); //set block as unused
+                            inode->i_direct_pointer[i] = NULL;
+                        }
+                }
+
+                if(inode->i_single_indirect_pointer != NULL && start < NUM_DIRECT_POINTER + ADDRS_PER_BLOCK)
+                {
+                        rd_block(addr_cache, inode->i_single_indirect_pointer, sizeof(addr_cache));
+
+                        for(i = MAX(start, NUM_DIRECT_POINTER); i < NUM_DIRECT_POINTER + ADDRS_PER_BLOCK; ++i)
+                        {
+                                blk = addr_cache[i - NUM_DIRECT_POINTER];
+                                if(blk != NULL)
+                                {
+                                    mark_block(blk, FALSE); //set block as unused
+                                    addr_cache[i - NUM_DIRECT_POINTER] = NULL;
+                                }
+                        }
+
+                        wrt_block(inode->i_single_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
+                }
+
+                if(inode->i_double_indirect_pointer != NULL)
+                {
+                        rd_block(addr_cache, inode->i_double_indirect_pointer, sizeof(addr_cache));
+                        for(j = MAX(0, (start - NUM_DIRECT_POINTER - ADDRS_PER_BLOCK) / ADDRS_PER_BLOCK); j < ADDRS_PER_BLOCK; ++j)
+                        {
+                                blk = addr_cache[j];
+                                if(blk == NULL)
+                                        break;
+                                block_nr addr_cache2[ADDRS_PER_BLOCK];
+                                rd_block(addr_cache2, blk, sizeof(addr_cache2));
+                                for(i = MAX(0, start - NUM_DIRECT_POINTER - (j + 1) * ADDRS_PER_BLOCK); i < ADDRS_PER_BLOCK; ++i)
+                                {
+                                        int blk2 = addr_cache2[i];
+                                        if(blk2 != NULL)
+                                        {
+                                                mark_block(blk2, FALSE);
+                                                addr_cache2[i] = NULL;
+                                        }
+                                }
+                                wrt_block(blk, addr_cache2, sizeof(addr_cache2));
+                        }
+                        wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
+                }
+
+        }
+        else if(size > inode->i_size)
+                get_data_block(inode, size, TRUE);
+
+        inode->i_size = size;
+        write_inode(inode);
+
+        fs_close(fd);
+
+        return TRUE;
+}
+
+/**
+ * Free all data blocks that contain only data at or after @a pos.
+ */
+void free_data_blocks(char* abs_path, uint32 pos)
 {
         file_nr fd = fs_open(abs_path);
+        if(fd < 0)
+                return;
         file* file = get_file(fd);
         block_nr blk = NOT_FOUND;
-        size_t pos = 0;
-        
+
+        pos = (pos + BLOCK_SIZE - 1) / BLOCK_SIZE * BLOCK_SIZE;
+
         do { //scan through file in order to discover allocated blocks
                 blk = get_data_block(file->f_inode, pos, FALSE);
                 pos += BLOCK_SIZE;
-                
+
                 if (blk != NOT_FOUND) {
                         mark_block(blk, FALSE); //set block as unused
                         fs_dprintf("[fs_c_d] marked data block %d as FALSE\n", blk);
                 }
-                
-        } while(blk != NOT_FOUND);
-        
+
+        } while(blk != NOT_FOUND && pos + BLOCK_SIZE < file->f_inode->i_size);
+
         fs_close(fd);
 }
