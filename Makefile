@@ -27,7 +27,7 @@ ALLFILES := $(SRCFILES) $(HDRFILES) $(ASMFILES)
 GENFILES := src/kernel/kernel src/kernel/kernel.map etios.pdf
 
 # Toolflags
-CFLAGS=-DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
+CFLAGS=-Os -DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
 LDFLAGS=-m elf_i386 -Tsrc/kernel/link.ld
 ASFLAGS=-felf
 
@@ -66,7 +66,7 @@ help:
 clean:
 	@echo " CLEAN"
 	-@for file in $(OBJFILES) $(DEPFILES) $(GENFILES); do if [ -f $$file ]; then rm $$file; fi; done
-	-@for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
+	-@#for dir in doc/html doc/latex; do if [ -d $$dir ]; then rm -r $$dir; fi; done
 	
 runbochs: fdimage hda.img
 	@bochs -f src/tools/bochsrc
@@ -83,8 +83,8 @@ mac_runbochs: mac_image
 doc: $(OBJFILES) Makefile
 	@echo " DOXYGEN"
 	@doxygen > /dev/null
-	@cd doc/latex && $(MAKE) > /dev/null 2> /dev/null
-	@cp doc/latex/refman.pdf ./etios.pdf
+	@#cd doc/latex && $(MAKE) > /dev/null 2> /dev/null
+	@#cp doc/latex/refman.pdf ./etios.pdf
 	
 # Sometimes the image remains mounted after an error, use this target to fix this.	
 fiximg:
