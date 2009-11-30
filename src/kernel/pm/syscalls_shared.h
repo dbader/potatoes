@@ -1,4 +1,4 @@
-/* $Id: syscalls_shared.h 266 2009-10-14 08:15:36Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -18,8 +18,8 @@
  * the syscall subsystem and the client side.
  *
  * @author dbader
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef __SYSCALLS_SHARED_H

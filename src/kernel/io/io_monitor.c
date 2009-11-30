@@ -17,8 +17,8 @@
  * Functions to print things on the monitor
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  *
  */
 

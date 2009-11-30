@@ -1,4 +1,4 @@
-/* $Id: pm_syscalls.h 266 2009-10-14 08:15:36Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Header file for the kernel side syscall implementations.
  *
  * @author dbader
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef __SYSCALLS_KERNEL_H

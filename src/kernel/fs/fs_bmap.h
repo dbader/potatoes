@@ -1,4 +1,4 @@
-/* $Id: fs_bmap.h 266 2009-10-14 08:15:36Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Basic definitions concerning the block bitmap (bmap)
  *
  * @author Vincenz Doelle
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef FS_BMAP_H_

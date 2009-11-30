@@ -1,4 +1,4 @@
-/* $Id: string.c 270 2009-11-09 21:41:13Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -18,8 +18,8 @@
  *
  * @author Dmitriy Traytel
  * @author dbader
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 270 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #include "../include/const.h"
 #include "../include/types.h"

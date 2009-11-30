@@ -1,4 +1,4 @@
-/* $Id: int_handler.h 266 2009-10-14 08:15:36Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Header-file for specific hardware interrupt-handlers.
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef __INT_HANDLER_H_

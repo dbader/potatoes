@@ -1,4 +1,4 @@
-/* $Id: tests.c 273 2009-11-19 15:14:14Z dtraytel $
+/* $Id$
  ********************************************************************************
  * _____   ____ _______    _______ ____  ______  _____                          *
  *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Basic difinitions for functions used in the main()-function of the kernel
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 273 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #include "../include/const.h"
 #include "../include/types.h"

@@ -1,4 +1,4 @@
-/* $Id: bin2c.c 266 2009-10-14 08:15:36Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -31,8 +31,8 @@
  * Build via "gcc bin2c.c -o bin2c" (the makefile also has a target called bin2c)
  *
  * @author dbader
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include <stdio.h>

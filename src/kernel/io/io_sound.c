@@ -1,4 +1,4 @@
-/* $Id: io_sound.c 239 2008-10-26 23:19:15Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * Sound driver
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 239 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 #include "../include/types.h"
 #include "io_sound.h"

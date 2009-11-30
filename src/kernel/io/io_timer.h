@@ -1,4 +1,4 @@
-/*$Id: io_timer.h 244 2008-12-16 18:47:14Z dtraytel $
+/*$Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -17,8 +17,8 @@
  * header file for the timer-handler
  *
  * @author Dmitriy Traytel
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 244 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #ifndef __IO_TIMER_H_

@@ -1,4 +1,4 @@
-/* $Id: syscalls_cli.c 266 2009-10-14 08:15:36Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -23,8 +23,8 @@
  * See syscalls_shared.h for the definitions of the argument data structures (sc_XXX_args_t).
  *
  * @author dbader
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
 
 #include "pm_main.h"

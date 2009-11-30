@@ -1,4 +1,4 @@
-/* $Id: dev_framebuffer.c 266 2009-10-14 08:15:36Z dtraytel $
+/* $Id$
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -20,8 +20,8 @@
  * functions of the vmonitors. Used primarily for the various demo games.
  *
  * @author Daniel Bader
- * @author $LastChangedBy: dtraytel $
- * @version $Rev: 266 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  */
  
 #include "../include/types.h"

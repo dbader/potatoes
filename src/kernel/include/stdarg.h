@@ -17,8 +17,8 @@
  * Macros dealing with variable argument lists.
  *
  * @author Daniel Bader
- * @author $LastChangedBy: dbader $
- * @version $Rev: 201 $
+ * @author $LastChangedBy$
+ * @version $Rev$
  *
  */
 
