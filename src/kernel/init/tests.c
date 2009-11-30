@@ -519,11 +519,10 @@ void threadA()
                 char* str = (char*)_malloc(24);
                 mutex_lock(&mutex);
                 _printf("entered critical section at %s\n",time2str(time,str));
-                seconds = bcd2bin(time.sec);
                 for (int i = 1; i <= 10; i++) {
+                        seconds = bcd2bin(time.sec);
                         _log("A");
-                        while ((bcd2bin(time.sec) > 50 && (seconds + i) % 60 < 10) ||
-                                        bcd2bin(time.sec) < (seconds + i) % 60) {
+                        while (seconds == bcd2bin(time.sec)) {
                                 halt();
                         }
                 }
@@ -543,11 +542,10 @@ void threadB()
                 char* str = (char*)_malloc(24);
                 mutex_lock(&mutex);
                 _printf("entered critical section at %s\n",time2str(time,str));
-                seconds = bcd2bin(time.sec);
                 for (int i = 1; i <= 10; i++) {
+                        seconds = bcd2bin(time.sec);
                         _log("B");
-                        while ((bcd2bin(time.sec) > 50 && (seconds + i) % 60 < 10) ||
-                                        bcd2bin(time.sec) < (seconds + i) % 60) {
+                        while (seconds == bcd2bin(time.sec)) {
                                 halt();
                         }
                 }
