@@ -105,6 +105,6 @@ void timer_init(sint32 freq)
         int counter = 1193180 / freq; //1193180Hz - base 8254 frequency
         outb(PIT_CONTROL, PIT_INIT_CMD);
 
-        outb(PIT_COUNTER0, counter % 0xFF); //LSB
-        outb(PIT_COUNTER0, counter / 0xFF); //MSB
+        outb(PIT_COUNTER0, counter % 0x100); //LSB
+        outb(PIT_COUNTER0, counter / 0x100); //MSB
 }
