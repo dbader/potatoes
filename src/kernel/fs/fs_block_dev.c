@@ -186,23 +186,26 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_enlargement)
                         fs_dprintf("[fs_block_dev] dip == NULL --> dip = %d\n", dip);
                 }
 
-                rd_block(addr_cache, inode->i_double_indirect_pointer, sizeof(addr_cache));
+                rd_block(addr_cache, dip, sizeof(addr_cache));
 
                 blk_nr = (pos - BYTES_DIRECT - BYTES_SINGLE_INDIRECT) / BLOCK_SIZE; //block nr with the desired data
                 block_nr addr_block = blk_nr / ADDRS_PER_BLOCK; //address block pointing to the data block
 
-                if (addr_cache[addr_block] == NULL) {
+                block_nr sip = addr_cache[addr_block];
+
+                if (sip == NULL) {
                         if (!allow_enlargement) {
                                 return NOT_EXISTENT;
                         }
 
-                        block_nr new_addr_block = enlarge_file(&addr_cache[addr_block], inode->i_double_indirect_pointer);
+                        sip = enlarge_file(&addr_cache[addr_block], dip);
 
-                        wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
+                        wrt_block(dip, addr_cache, sizeof(addr_cache)); //write changes
 
-                        fs_dprintf("[fs_block_dev] addr_cache[%d] == NULL --> addr_cache[%d] = %d\n", addr_block, addr_block, new_addr_block);
+                        fs_dprintf("[fs_block_dev] addr_cache[%d] == NULL --> addr_cache[%d] = %d\n", addr_block, addr_block, sip);
                 }
-                rd_block(addr_cache, addr_cache[addr_block], sizeof(addr_cache));
+
+                rd_block(addr_cache, sip, sizeof(addr_cache));
 
                 data_blk = addr_cache[blk_nr % ADDRS_PER_BLOCK];
 
@@ -211,11 +214,11 @@ block_nr get_data_block(m_inode *inode, uint32 pos, bool allow_enlargement)
                                 return NOT_EXISTENT;
                         }
 
-                        data_blk = enlarge_file(&addr_cache[blk_nr % ADDRS_PER_BLOCK], inode->i_double_indirect_pointer);
+                        data_blk = enlarge_file(&addr_cache[blk_nr % ADDRS_PER_BLOCK], dip);
 
-                        wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
+                        wrt_block(sip, addr_cache, sizeof(addr_cache)); //write changes
 
-                        fs_dprintf("[fs_block_dev] addr_cache[%d \% ADDRS_PER_BLOCK] == NULL --> addr_cache[%d\% ADDRS_PER_BLOCK] = %d\n", blk_nr, blk_nr, data_blk);
+                        fs_dprintf("[fs_block_dev] addr_cache[%d %% ADDRS_PER_BLOCK] == NULL --> addr_cache[%d %% ADDRS_PER_BLOCK] = %d\n", blk_nr, blk_nr, data_blk);
                 }
 
         } else {

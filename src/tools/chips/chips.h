@@ -66,6 +66,8 @@ void potatoes_disc_destroy(PotatoesDisk *disk);
 
 void potatoes_set_current_disk(PotatoesDisk *disk);
 
+void dump_consts();
+
 void fs_init();
 void fs_shutdown();
 

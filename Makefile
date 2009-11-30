@@ -27,7 +27,7 @@ ALLFILES := $(SRCFILES) $(HDRFILES) $(ASMFILES)
 GENFILES := src/kernel/kernel src/kernel/kernel.map etios.pdf
 
 # Toolflags
-CFLAGS=-Os -DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
+CFLAGS=-DNDEBUG -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=c99
 LDFLAGS=-m elf_i386 -Tsrc/kernel/link.ld
 ASFLAGS=-felf
 
@@ -37,7 +37,7 @@ HDASIZE=20
 # The name of the OS in virtualbox
 OSNAME=ETIOS
 
-.PHONY: all bin2c clean fiximg runbochs doc todo fdimage link tools
+.PHONY: all bin2c chips chipsfs clean fiximg runbochs doc todo fdimage link tools
 
 all: kernel fdimage hda.img doc tools
 

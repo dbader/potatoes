@@ -11,6 +11,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+static int chips_consts(int argc, char **argv)
+{
+	dump_consts();
+	return 0;
+}
 static int chips_cat(int argc, char **argv)
 {
 	if(argc < 2)
@@ -206,6 +211,7 @@ typedef struct
 } command_t;
 
 static const command_t chips_commands[] = {
+	{chips_consts, "consts", "Dump a list of constants used by the file system."},
 	{chips_cat,    "cat",    "Dump contents of files to stdout."},
 	{chips_append, "append", "Append stdin to a file, possibly creating it."},
 	{chips_trunc,  "trunc",  "Set file size."},

@@ -116,7 +116,7 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
         if (mode == CREATE) {
                 file_block = insert_file_into_dir(dir_inode_block, file_name);
         } else if (mode == DELETE) {
-                free_data_blocks(abs_path, 0);
+                fs_truncate(abs_path, 0);
                 file_block = delete_file_from_dir(dir_inode_block, file_name);
         }
 
@@ -145,10 +145,55 @@ bool fs_create_delete(char *abs_path, int mode, int data_type)
 }
 
 /**
+ * Mark all the children of @a block after and including @a start as unused.
+ *
+ * If start == 0 also mark the block itself as unused and write NULL to @a block.
+ */
+static void shrink_file(block_nr *block, uint32 start)
+{
+        fs_dprintf("[shrink_file] shrink_file(&%x, %x).\n", *block, start);
+
+        if(start >= ADDRS_PER_BLOCK)
+        {
+                fs_dprintf("[shrink_file] superflously called.\n");
+                return; // nothing to do.
+        }
+
+        block_nr addr_cache2[ADDRS_PER_BLOCK];
+
+        rd_block(addr_cache2, *block, sizeof(addr_cache2));
+
+        int i;
+        for(i = start; i < ADDRS_PER_BLOCK; ++i)
+        {
+                if(addr_cache2[i] != NULL)
+                {
+                        mark_block(addr_cache2[i], FALSE); // set block as unused
+                        addr_cache2[i] = NULL;
+                }
+        }
+
+        if(start != 0)
+        {
+                // the block is still used; write the new block.
+                wrt_block(*block, addr_cache2, sizeof(addr_cache2));
+        }
+        else
+        {
+                // the block itself is obsolete; mark it as unused and delete it from its parent.
+                mark_block(*block, FALSE); // set block as unused
+                *block = NULL;
+                // no need to write the block: nothing should reference it anymore.
+        }
+}
+
+/**
  * Set the size of file @a abs_path to be exactly @a size, deleting or allocating blocks as necessary.
  */
 bool fs_truncate(char *abs_path, uint32 size)
 {
+        fs_dprintf("[fs_truncate] fs_truncate(%s, %x)", abs_path, size);
+
         int fd = fs_open(abs_path);
         if(fd < 0)
             return FALSE;
@@ -158,57 +203,47 @@ bool fs_truncate(char *abs_path, uint32 size)
         if(size < inode->i_size)
         {
                 int start = (size + BLOCK_SIZE - 1) / BLOCK_SIZE; // first block to be freed
-
                 int i, j, blk;
+
+                // delete all obsolete direct pointers.
                 for(i = start; i < NUM_DIRECT_POINTER; ++i)
                 {
                         blk = inode->i_direct_pointer[i];
                         if(blk != NULL)
                         {
-                            mark_block(blk, FALSE); //set block as unused
+                            mark_block(blk, FALSE); // set block as unused
                             inode->i_direct_pointer[i] = NULL;
                         }
                 }
 
+                // delete all indirect pointers and the indirect block itself, if necessary.
                 if(inode->i_single_indirect_pointer != NULL && start < NUM_DIRECT_POINTER + ADDRS_PER_BLOCK)
-                {
-                        rd_block(addr_cache, inode->i_single_indirect_pointer, sizeof(addr_cache));
+                        shrink_file(&inode->i_single_indirect_pointer, MAX(0, start - NUM_DIRECT_POINTER));
 
-                        for(i = MAX(start, NUM_DIRECT_POINTER); i < NUM_DIRECT_POINTER + ADDRS_PER_BLOCK; ++i)
-                        {
-                                blk = addr_cache[i - NUM_DIRECT_POINTER];
-                                if(blk != NULL)
-                                {
-                                    mark_block(blk, FALSE); //set block as unused
-                                    addr_cache[i - NUM_DIRECT_POINTER] = NULL;
-                                }
-                        }
-
-                        wrt_block(inode->i_single_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
-                }
-
+                // delete all doubly indirect pointers.
                 if(inode->i_double_indirect_pointer != NULL)
                 {
                         rd_block(addr_cache, inode->i_double_indirect_pointer, sizeof(addr_cache));
+
                         for(j = MAX(0, (start - NUM_DIRECT_POINTER - ADDRS_PER_BLOCK) / ADDRS_PER_BLOCK); j < ADDRS_PER_BLOCK; ++j)
                         {
-                                blk = addr_cache[j];
-                                if(blk == NULL)
+                                if(addr_cache[j] == NULL)
                                         break;
-                                block_nr addr_cache2[ADDRS_PER_BLOCK];
-                                rd_block(addr_cache2, blk, sizeof(addr_cache2));
-                                for(i = MAX(0, start - NUM_DIRECT_POINTER - (j + 1) * ADDRS_PER_BLOCK); i < ADDRS_PER_BLOCK; ++i)
-                                {
-                                        int blk2 = addr_cache2[i];
-                                        if(blk2 != NULL)
-                                        {
-                                                mark_block(blk2, FALSE);
-                                                addr_cache2[i] = NULL;
-                                        }
-                                }
-                                wrt_block(blk, addr_cache2, sizeof(addr_cache2));
+
+                                shrink_file(&addr_cache[j], MAX(0, start - NUM_DIRECT_POINTER - (j + 1) * ADDRS_PER_BLOCK));
                         }
-                        wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); //write changes
+
+                        if(start < NUM_DIRECT_POINTER + ADDRS_PER_BLOCK)
+                        {
+                                // the block is obsolete; mark it as unused.
+                                mark_block(inode->i_double_indirect_pointer, FALSE);
+                                inode->i_double_indirect_pointer = NULL;
+                        }
+                        else
+                        {
+                                // we still need the block; write it back to disk.
+                                wrt_block(inode->i_double_indirect_pointer, addr_cache, sizeof(addr_cache)); // write changes
+                        }
                 }
 
         }
@@ -221,31 +256,4 @@ bool fs_truncate(char *abs_path, uint32 size)
         fs_close(fd);
 
         return TRUE;
-}
-
-/**
- * Free all data blocks that contain only data at or after @a pos.
- */
-void free_data_blocks(char* abs_path, uint32 pos)
-{
-        file_nr fd = fs_open(abs_path);
-        if(fd < 0)
-                return;
-        file* file = get_file(fd);
-        block_nr blk = NOT_FOUND;
-
-        pos = (pos + BLOCK_SIZE - 1) / BLOCK_SIZE * BLOCK_SIZE;
-
-        do { //scan through file in order to discover allocated blocks
-                blk = get_data_block(file->f_inode, pos, FALSE);
-                pos += BLOCK_SIZE;
-
-                if (blk != NOT_FOUND) {
-                        mark_block(blk, FALSE); //set block as unused
-                        fs_dprintf("[fs_c_d] marked data block %d as FALSE\n", blk);
-                }
-
-        } while(blk != NOT_FOUND && pos + BLOCK_SIZE < file->f_inode->i_size);
-
-        fs_close(fd);
 }
