@@ -239,6 +239,7 @@ void shell_cmd_synth(int argc, char *argv[])
                         play_tone(tone);
 
                 free(tones);
+                free(str);
 
                 return;
         } else {
