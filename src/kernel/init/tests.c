@@ -363,7 +363,7 @@ int fgetch(int fd)
 }
 
 char* fgets(char *s, int n, int fd)
-                                {
+                                                {
         char ch = 0;
         while ((n-- > 0) && (ch != '\n')) {
                 ch = fgetch(fd);
@@ -371,7 +371,7 @@ char* fgets(char *s, int n, int fd)
         }
         return s;
 
-                                }
+                                                }
 
 void syscall_test_thread()
 {
@@ -513,9 +513,11 @@ int mutex = 0;
 
 void threadA()
 {
+        _log("hello from task A\n");
         uint8 seconds;
         for (;;) {
                 char* str = (char*)_malloc(24);
+                mutex_lock(&mutex);
                 _printf("entered critical section at %s\n",time2str(time,str));
                 seconds = bcd2bin(time.sec);
                 for (int i = 1; i <= 10; i++) {
@@ -526,6 +528,7 @@ void threadA()
                         }
                 }
                 _log("\n");
+                mutex_unlock(&mutex);
                 _printf("left critical section at %s\n",time2str(time,str));
                 _free(str);
                 halt();
@@ -534,9 +537,11 @@ void threadA()
 
 void threadB()
 {
+        _log("hello from task B\n"); // log()
         uint8 seconds;
         for (;;) {
                 char* str = (char*)_malloc(24);
+                mutex_lock(&mutex);
                 _printf("entered critical section at %s\n",time2str(time,str));
                 seconds = bcd2bin(time.sec);
                 for (int i = 1; i <= 10; i++) {
@@ -547,6 +552,7 @@ void threadB()
                         }
                 }
                 _log("\n");
+                mutex_unlock(&mutex);
                 _printf("left critical section at %s\n",time2str(time,str));
                 _free(str);
                 halt();
@@ -561,6 +567,81 @@ void threadA_test()
 void threadB_test()
 {
         pm_create_thread("test-B", threadB, 4096);
+}
+
+struct Semaphore
+{
+        int lock;      // enables atomic access to semaphore
+        int count;     // depicts semaphore cardinality
+};
+
+void sema_init(struct Semaphore *semaphore, int count)
+{
+        semaphore->count = count;
+        semaphore->lock = 0;
+}
+
+void p(struct Semaphore *semaphore) {
+        while (1) {
+                mutex_lock(&semaphore->lock);
+                if (semaphore->count > 0) {
+                        semaphore->count--;
+                        break;
+                } else {
+                        mutex_unlock(&semaphore->lock);
+                        halt();
+                }
+        }
+        mutex_unlock(&semaphore->lock);
+}
+
+void v(struct Semaphore *semaphore) {
+        mutex_lock(&semaphore->lock);
+        semaphore->count++;
+        mutex_unlock(&semaphore->lock);
+}
+
+struct Semaphore *sema_free;
+struct Semaphore *sema_full;
+struct Semaphore *sema_access;
+int elements = 0;
+
+void threadProducer()
+{
+        for(;;) {
+                p(sema_free);
+                p(sema_access);
+                elements++;
+                _printf("element inserted, %d free places left\n", 10-elements);
+                v(sema_access);
+                v(sema_full);
+                halt();
+        }
+}
+
+void threadConsumer()
+{
+        for(;;) {
+                p(sema_full);
+                p(sema_full);
+                p(sema_access);
+                elements-=2;
+                _printf("two elements extracted, %d elements left\n", elements);
+                v(sema_access);
+                v(sema_free);
+                v(sema_free);
+                halt();
+        }
+}
+
+void threadConsumer_test()
+{
+        pm_create_thread("Consumer", threadConsumer, 4096);
+}
+
+void threadProducer_test()
+{
+        pm_create_thread("Producer", threadProducer, 4096);
 }
 
 void nullptr_test()
@@ -778,6 +859,15 @@ void do_tests()
         //SHORTCUT_CTRL('f', fs_tests);
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);
+
+        sema_free = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        sema_full = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        sema_access = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        sema_init(sema_free, 10);
+        sema_init(sema_full, 0);
+        sema_init(sema_access, 1);
+        SHORTCUT_CTRL('p', threadProducer_test);
+        SHORTCUT_CTRL('c', threadConsumer_test);
         //SHORTCUT_CTRL('n', nullptr_test);
         SHORTCUT_CTRL('+', switch_monitor_up);
         SHORTCUT_CTRL('-', switch_monitor_down);
