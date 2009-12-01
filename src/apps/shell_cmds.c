@@ -123,33 +123,34 @@ void shell_cmd_ls(int argc, char *argv[])
                 return;
         }
 
-        _read(fd, directory, sizeof(directory));
-
         int total = 0;
 
-        for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
-                if (directory[i].inode != NULL) {
-                        stat stat_buf;
-                        char abs_path[255];
-                        char time[25];
+        while(_read(fd, directory, sizeof(directory)) != 0)
+        {
+                for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
+                        if (directory[i].inode != NULL) {
+                                stat stat_buf;
+                                char abs_path[255];
+                                char time[25];
 
-                        strncpy(abs_path, path, sizeof(abs_path));
-                        strcat(abs_path, directory[i].name);
+                                strncpy(abs_path, path, sizeof(abs_path));
+                                strcat(abs_path, directory[i].name);
 
-                        if (_stat(abs_path, &stat_buf) == 0) {
-                                total += stat_buf.size;
-                                _printf("%d\t%s ",
-                                                stat_buf.size,
-                                                time2str(stat_buf.modify_ts, time));
+                                if (_stat(abs_path, &stat_buf) == 0) {
+                                        total += stat_buf.size;
+                                        _printf("%d\t%s ",
+                                                        stat_buf.size,
+                                                        time2str(stat_buf.modify_ts, time));
 
-                                if (stat_buf.mode == DIRECTORY) {
-                                        _printf("#{GRE}%s/\n", directory[i].name);
+                                        if (stat_buf.mode == DIRECTORY) {
+                                                _printf("#{GRE}%s/\n", directory[i].name);
+                                        } else {
+                                                _printf("%s\n", directory[i].name);
+                                        }
+
                                 } else {
-                                        _printf("%s\n", directory[i].name);
+                                        _printf("%s ERROR: stat() failed.\n", directory[i].name);
                                 }
-
-                        } else {
-                                _printf("%s ERROR: stat() failed.\n", directory[i].name);
                         }
                 }
         }

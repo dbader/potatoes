@@ -55,12 +55,16 @@ static int chips_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 		return -ENOENT;
 
 	potatoes_dir_entry dir[POTATOES_DIR_ENTRIES_PER_BLOCK];
-	int count = do_read(fd, dir, POTATOES_BLOCK_SIZE, 0) / POTATOES_DIR_ENTRY_SIZE;
+	int count, pos = 0;
 	int i;
-	for(i = 0; i < count && dir[i].inode != 0; ++i)
+	while((count = do_read(fd, dir, sizeof(dir), pos)) != 0)
 	{
-		printf("%s\n", dir[i].name);
-		filler(buf, dir[i].name, NULL, 0);
+		for(i = 0; i < count/sizeof(dir[0]) && dir[i].inode != 0; ++i)
+		{
+			printf("%s\n", dir[i].name);
+			filler(buf, dir[i].name, NULL, 0);
+		}
+		pos += count;
 	}
 
 	do_close(fd);

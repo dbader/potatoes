@@ -203,7 +203,7 @@ bool fs_truncate(char *abs_path, uint32 size)
         if(size < inode->i_size)
         {
                 int start = (size + BLOCK_SIZE - 1) / BLOCK_SIZE; // first block to be freed
-                int i, j, blk;
+                int i, blk;
 
                 // delete all obsolete direct pointers.
                 for(i = start; i < NUM_DIRECT_POINTER; ++i)
@@ -225,12 +225,12 @@ bool fs_truncate(char *abs_path, uint32 size)
                 {
                         rd_block(addr_cache, inode->i_double_indirect_pointer, sizeof(addr_cache));
 
-                        for(j = MAX(0, (start - NUM_DIRECT_POINTER - ADDRS_PER_BLOCK) / ADDRS_PER_BLOCK); j < ADDRS_PER_BLOCK; ++j)
+                        for(i = MAX(0, (start - NUM_DIRECT_POINTER - ADDRS_PER_BLOCK) / ADDRS_PER_BLOCK); i < ADDRS_PER_BLOCK; ++i)
                         {
-                                if(addr_cache[j] == NULL)
+                                if(addr_cache[i] == NULL)
                                         break;
 
-                                shrink_file(&addr_cache[j], MAX(0, start - NUM_DIRECT_POINTER - (j + 1) * ADDRS_PER_BLOCK));
+                                shrink_file(&addr_cache[i], MAX(0, start - NUM_DIRECT_POINTER - (i + 1) * ADDRS_PER_BLOCK));
                         }
 
                         if(start < NUM_DIRECT_POINTER + ADDRS_PER_BLOCK)

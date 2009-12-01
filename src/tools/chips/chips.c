@@ -16,6 +16,7 @@ static int chips_consts(int argc, char **argv)
 	dump_consts();
 	return 0;
 }
+
 static int chips_cat(int argc, char **argv)
 {
 	if(argc < 2)
@@ -146,10 +147,15 @@ static int chips_ls(int argc, char **argv)
 	}
 
 	potatoes_dir_entry dir[POTATOES_DIR_ENTRIES_PER_BLOCK];
-	int count = do_read(fd, dir, POTATOES_BLOCK_SIZE, 0) / POTATOES_DIR_ENTRY_SIZE;
+	int count, pos = 0;
 	int i;
-	for(i = 0; i < count && dir[i].inode != 0; ++i)
-		printf("%s\n", dir[i].name);
+	while((count = do_read(fd, dir, sizeof(dir), pos)) != 0)
+	{
+		for(i = 0; i < count/sizeof(dir[0]) && dir[i].inode != 0; ++i)
+			printf("%s\n", dir[i].name);
+
+		pos += count;
+	}
 
 	do_close(fd);
 
