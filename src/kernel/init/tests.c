@@ -824,6 +824,225 @@ void reboot()
         outb(0x64,0xFE);
 }
 
+/******************************************************************************/
+int betten = 0;
+int schraenke = 0;
+struct Semaphore *lager_betten;
+struct Semaphore *lager_schraenke;
+struct Semaphore *lager_free;
+struct Semaphore *lager_access;
+
+int rbetten = 0;
+int rschraenke = 0;
+struct Semaphore *rampe_betten;
+struct Semaphore *rampe_schraenke;
+struct Semaphore *rampe_free;
+struct Semaphore *rampe_access;
+
+int g1betten = 0;
+struct Semaphore *g1_full;
+struct Semaphore *g1_free;
+struct Semaphore *g1_access;
+
+int g2betten = 0;
+int g2schraenke = 0;
+struct Semaphore *g2b_full;
+struct Semaphore *g2b_free;
+struct Semaphore *g2s_full;
+struct Semaphore *g2s_free;
+struct Semaphore *g2_access;
+
+void threadFabrik() {
+        for(;;) {
+                p(lager_free);
+                p(lager_free);
+                p(lager_access);
+                betten++;
+                schraenke++;
+                _printf("Im Lager sind %d Betten und %d Schraenke\n", betten, schraenke);
+                v(lager_access);
+                v(lager_betten);
+                v(lager_schraenke);
+                halt();
+        }
+}
+
+void threadMitarbeiter() {
+        for(int i = 1;;i=1-i) {
+                p(rampe_free);
+                if (i == 0) {
+                        p(lager_betten);
+                } else {
+                        p(lager_schraenke);
+                }
+                p(lager_access);
+                if (i == 0) {
+                        betten--;
+                } else {
+                        schraenke--;
+                }
+                _printf("Im Lager sind %d Betten und %d Schraenke\n", betten, schraenke);
+                v(lager_access);
+                v(lager_free);
+                p(rampe_access);
+                rbetten = i==0?rbetten+1:rbetten;
+                rschraenke = i==1?rschraenke+1:rschraenke;
+                _printf("Auf der Rampe sind %d Betten und %d Schraenke\n", rbetten, rschraenke);
+                v(rampe_access);
+                if (i == 0) {
+                        v(rampe_betten);
+                } else {
+                        v(rampe_schraenke);
+                }
+                halt();
+        }
+}
+
+void threadLastwagen1() {
+        for(;;) {
+                p(g1_free);
+                p(rampe_betten);
+                p(rampe_access);
+                rbetten--;
+                _printf("Auf der Rampe sind %d Betten und %d Schraenke\n", rbetten, rschraenke);
+                v(rampe_access);
+                v(rampe_free);
+                p(g1_access);
+                g1betten++;
+                _printf("%d Betten im Geschaeft 1\n", g1betten);
+                v(g1_access);
+                v(g1_full);
+                halt();
+        }
+}
+
+void threadLastwagen2() {
+        for(int i = 1;;i=1-i) {
+                p(rampe_access);
+                if (i == 0 && rbetten == 0) {
+                        i = 1;
+                } else if (i == 1 && rschraenke == 0) {
+                        i = 0;
+                }
+                v(rampe_access);
+                if (i == 0) {
+                        p(g2b_free);
+                        p(rampe_betten);
+                } else {
+                        p(g2s_free);
+                        p(rampe_schraenke);
+                }
+                p(rampe_access);
+                if (i == 0) {
+                        rbetten--;
+                } else {
+                        rschraenke--;
+                }
+                _printf("Auf der Rampe sind %d Betten und %d Schraenke\n", rbetten, rschraenke);
+                v(rampe_access);
+                v(rampe_free);
+                p(g2_access);
+                if(i==0) {
+                        g2betten++;
+                        _printf("Im Geschaeft 2 sind %d Betten und %d Schraenke\n", g2betten, g2schraenke);
+                        v(g2_access);
+                        v(g2b_full);
+                } else {
+                        g2schraenke++;
+                        _printf("Im Geschaeft 2 sind %d Betten und %d Schraenke\n", g2betten, g2schraenke);
+                        v(g2_access);
+                        v(g2s_full);
+                }
+                halt();
+        }
+}
+
+void threadGeschaeft1() {
+        for(;;) {
+                p(g1_full);
+                p(g1_access);
+                g1betten--;
+                _printf("Bett verkauft, %d Betten noch im Geschaeft\n", g1betten);
+                v(g1_access);
+                v(g1_free);
+                halt();
+        }
+}
+
+void threadGeschaeft2() {
+        for(int i = 0;;i = 1-i) {
+                p(g2_access);
+                if (i == 0 && g2betten == 0) {
+                        i = 1;
+                } else if (i == 1 && g2schraenke == 0) {
+                        i = 0;
+                }
+                v(g2_access);
+                if (i == 1) {
+                        p(g2s_full);
+                        p(g2_access);
+                        g2schraenke--;
+                        _printf("Schrank verkauft, %d Schraenke noch im Geschaeft\n", g2schraenke);
+                        v(g2_access);
+                        v(g2s_free);
+                } else {
+                        p(g2b_full);
+                        p(g2_access);
+                        g2betten--;
+                        _printf("Bett verkauft, %d Betten noch im Geschaeft\n", g2betten);
+                        v(g2_access);
+                        v(g2b_free);
+                }
+                halt();
+        }
+}
+
+void paralleleModellierung() {
+        lager_betten = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        lager_schraenke = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        lager_free = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        lager_access = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        sema_init(lager_betten, 0);
+        sema_init(lager_schraenke, 0);
+        sema_init(lager_free, 500);
+        sema_init(lager_access, 1);
+
+        rampe_betten = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        rampe_schraenke = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        rampe_free = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        rampe_access = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        sema_init(rampe_betten, 0);
+        sema_init(rampe_schraenke, 0);
+        sema_init(rampe_free, 10);
+        sema_init(rampe_access, 1);
+
+        g1_full = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        g1_free = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        g1_access = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        sema_init(g1_full, 0);
+        sema_init(g1_free, 30);
+        sema_init(g1_access, 1);
+
+        g2b_full = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        g2b_free = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        g2s_full = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        g2s_free = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        g2_access = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
+        sema_init(g2b_full, 0);
+        sema_init(g2b_free, 20);
+        sema_init(g2s_full, 0);
+        sema_init(g2s_free, 20);
+        sema_init(g2_access, 1);
+
+        pm_create_thread("Fabrik", threadFabrik, 4096);
+        pm_create_thread("Mitarbeiter", threadMitarbeiter, 4096);
+        pm_create_thread("Lastwagen1", threadLastwagen1, 4096);
+        pm_create_thread("Lastwagen2", threadLastwagen2, 4096);
+        pm_create_thread("Geschaeft1", threadGeschaeft1, 4096);
+        pm_create_thread("Geschaeft2", threadGeschaeft2, 4096);
+}
+/******************************************************************************/
+
 void make_snapshot();
 void do_tests()
 {
@@ -866,6 +1085,7 @@ void do_tests()
         sema_init(sema_access, 1);
         SHORTCUT_CTRL('p', threadProducer_test);
         SHORTCUT_CTRL('c', threadConsumer_test);
+        SHORTCUT_CTRL('m', paralleleModellierung);
         //SHORTCUT_CTRL('n', nullptr_test);
         SHORTCUT_CTRL('+', switch_monitor_up);
         SHORTCUT_CTRL('-', switch_monitor_down);
