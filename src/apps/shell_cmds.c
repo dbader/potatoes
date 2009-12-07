@@ -611,6 +611,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"snake",       shell_cmd_snake,        "Another classic video game"},
                 {"synth",       shell_cmd_synth,        "Synthesizer tool"},
                 {"kill",        shell_cmd_kill,         "Terminates the given process"},
+                {"memview",     shell_cmd_memview,      "Memory viewer tool"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

@@ -104,7 +104,7 @@ int vsnprintf(char *s, int n, char *format, va_list ap)
                                 break;
                         case 'i': // signed integer
                         case 'd':
-                        case 'u':        
+                        case 'u': // FIXME: unsigned should actually print unsigned values. (dbader)
                                 int_arg = va_arg(ap, int);
                                 itoa(int_arg, buf, 10);
                                 buf_ptr = buf;
