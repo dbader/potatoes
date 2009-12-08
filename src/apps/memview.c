@@ -116,7 +116,10 @@ bool allocate_dummy_block(uint32 size)
  */
 bool free_dummy_block()
 {
-        for (int i=0; i<MEMVIEW_MAX_DUMMY_BLOCKS; i++) {
+        /* Use this to free the youngest block instead of the oldest: */
+        // for (int i = MEMVIEW_MAX_DUMMY_BLOCKS-1; i >= 0; i--) {
+
+        for (int i = 0; i < MEMVIEW_MAX_DUMMY_BLOCKS; i++) {
                 if (mv_allocated_blocks[i] != 0) {
                         _free(mv_allocated_blocks[i]);
                         mv_allocated_blocks[i] = NULL;
@@ -161,8 +164,15 @@ void mark_visual_block(uint32 start, uint32 size)
  */
 void update_view()
 {
-        memset(mv_disp, GREEN, sizeof(mv_disp));
+        memset(mv_disp, DARKGREY, sizeof(mv_disp));
 
+        // Mark current maximum length of the kernel heap
+        mv_total_mem = (uint32)kernel_heap->end + sizeof(mm_header) - (uint32)kernel_heap->start;
+        for (int i = 0; i < mv_total_mem / mv_bytes_per_block; i++) {
+                mv_disp[i] = GREEN;
+        }
+
+        // Mark all allocated blocks
         mm_header *block;
         for (block = kernel_heap->start->next; block != kernel_heap->end->next; block = block->next) {
                 mark_visual_block((uint32)block, block->size);
@@ -190,7 +200,8 @@ void memview_main(void)
         _printf("%dkb heap size\nNote: the kernel heap size changes as the heap expands and contracts\n", mv_total_mem / 1024);
         _printf("Initial resolution: 1 block = %dkb\n\n", mv_bytes_per_block / 1024);
         _printf("\n#{YEL}Usage:##\nu - update view\na - allocate block\nf - free block\ni - zoom in\no - zoom out\nESCAPE - exit memview\n\n");
-        _printf("#{YEL}Block types:##\n#{GRE}### - completely free region\n#{YEL}### - only partly occupied by first allocation\n#{RED}### - completely filled region\n\n[Press any key to start]\n");
+        _printf("#{YEL}Block types:##\n#{GRE}### - completely free region\n#{YEL}### - only partly occupied by first allocation\n");
+        _printf("#{RED}### - completely filled region\n#{DAR}### - region outside kernel heap\n\n[Press any key to start]\n");
 
         // Wait for keypress to display welcome message and usage.
         _fgetch(stdin);
@@ -216,8 +227,10 @@ void memview_main(void)
                         break;
 
                 case 'i': // zoom in
-                        mv_bytes_per_block -= 512;
-                        update_view();
+                        if (mv_bytes_per_block > 512) {
+                                mv_bytes_per_block -= 512;
+                                update_view();
+                        }
                         break;
 
                 case 'o': // zoom out
