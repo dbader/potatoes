@@ -40,6 +40,10 @@ typedef struct mm_header {
 #define KHEAP_START             0xC0000000
 #define KHEAP_INITIAL_SIZE      0x500000
 #define HEAP_MIN_SIZE           0x70000
+/**
+ * the heap is expanded only by steps of a certain size.
+ */
+#define HEAP_EXPAND_STEP_SIZE   1048576 // 1 MB
 
 typedef struct
 {
