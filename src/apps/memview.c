@@ -92,6 +92,7 @@ void free_all_dummy_blocks()
         for (int i=0; i<MEMVIEW_MAX_DUMMY_BLOCKS; i++) {
                 if (mv_allocated_blocks[i] != 0) {
                         _free(mv_allocated_blocks[i]);
+                        mv_allocated_blocks[i] = NULL;
                 }
         }
 }
