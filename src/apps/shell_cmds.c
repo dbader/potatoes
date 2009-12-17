@@ -575,6 +575,26 @@ void shell_cmd_kill(int argc, char *argv[])
 }
 
 /**
+ * Modifies a process' priority.
+ *
+ * @param argc the number of argument strings in argv
+ * @param argv the argument vector. Contains all arguments of the command.
+ */
+void shell_cmd_nice(int argc, char *argv[])
+{
+        if (argc < 3) {
+                _printf("Usage: nice [pid] [priority]\n");
+                return;
+        }
+
+        int pid = atoi(argv[1]);
+        int prio = atoi(argv[2]);
+        _printf("nice: setting priority of process with pid %u to %u\n", pid, prio);
+
+        pm_set_thread_priority(pid, prio);
+}
+
+/**
  * The shell command table. Every shell command must be registered here
  * to be accessible. */
 struct shell_cmd_t shell_cmds[] = {
@@ -610,6 +630,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"snake",       shell_cmd_snake,        "Another classic video game"},
                 {"synth",       shell_cmd_synth,        "Synthesizer tool"},
                 {"kill",        shell_cmd_kill,         "Terminates the given process"},
+                {"nice",        shell_cmd_nice,         "Modifies thread priorities"},
                 {"",            NULL,                   ""} // The Terminator
 };
 

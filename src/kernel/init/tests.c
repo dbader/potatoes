@@ -363,7 +363,7 @@ int fgetch(int fd)
 }
 
 char* fgets(char *s, int n, int fd)
-                                                {
+                                                                {
         char ch = 0;
         while ((n-- > 0) && (ch != '\n')) {
                 ch = fgetch(fd);
@@ -371,7 +371,7 @@ char* fgets(char *s, int n, int fd)
         }
         return s;
 
-                                                }
+                                                                }
 
 void syscall_test_thread()
 {
@@ -522,9 +522,9 @@ void threadA()
                 for (int i = 1; i <= 10; i++) {
                         seconds = bcd2bin(time.sec);
                         _log("A");
-                        while (seconds == bcd2bin(time.sec)) {
-                                halt();
-                        }
+                        //while (seconds == bcd2bin(time.sec)) {
+                        //       halt();
+                        //}
                 }
                 _log("\n");
                 mutex_unlock(&mutex);
@@ -545,9 +545,9 @@ void threadB()
                 for (int i = 1; i <= 10; i++) {
                         seconds = bcd2bin(time.sec);
                         _log("B");
-                        while (seconds == bcd2bin(time.sec)) {
-                                halt();
-                        }
+                        //while (seconds == bcd2bin(time.sec)) {
+                        //        halt();
+                        //}
                 }
                 _log("\n");
                 mutex_unlock(&mutex);
@@ -564,7 +564,40 @@ void threadA_test()
 
 void threadB_test()
 {
-        pm_create_thread("test-B", threadB, 4096);
+        uint32 pid = pm_create_thread("test-B", threadB, 4096);
+        //pm_set_thread_priority(pid, 200);
+}
+
+void threadC()
+{
+        for (;;) {
+                _log("C");
+
+                // Now give up the rest of our timeslice. We want one letter
+                // printed per timeslice 'tick'.
+                halt();
+        }
+}
+
+void threadD()
+{
+        for (;;) {
+                _log("D");
+                halt();
+        }
+}
+
+void threadC_test()
+{
+        pm_create_thread("test-C", threadC, 4096);
+}
+
+void threadD_test()
+{
+        uint32 pid = pm_create_thread("test-D", threadD, 4096);
+
+        // Raise its priority. We expect a lot more 'D's than 'C's now :-)
+        pm_set_thread_priority(pid, 100);
 }
 
 struct Semaphore
@@ -1076,6 +1109,9 @@ void do_tests()
         //SHORTCUT_CTRL('f', fs_tests);
         SHORTCUT_CTRL('a', threadA_test);
         SHORTCUT_CTRL('b', threadB_test);
+
+        SHORTCUT_CTRL('e', threadC_test);
+        SHORTCUT_CTRL('f', threadD_test);
 
         sema_free = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
         sema_full = (struct Semaphore*)_malloc(sizeof(struct Semaphore));
