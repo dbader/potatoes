@@ -43,6 +43,7 @@
 #include "../kernel/fs/fs_const.h"
 #include "../kernel/pm/syscalls_shared.h"
 #include "../kernel/pm/syscalls_cli.h"
+#include "../kernel/pm/pm_main.h"
 #include "games.h"
 #include "apps.h"
 #include "shell_main.h"
