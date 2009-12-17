@@ -1,16 +1,16 @@
 /* $Id$
-********************************************************************************
-* _____   ____ _______    _______ ____  ______  _____                          *
-*|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
-*| |__) | |  | | | |  /  \  | | | |  | | |__  | (___              Daniel Bader *
-*|  ___/| |  | | | | / /\ \ | | | |  | |  __|  \___ \           Vincenz Doelle *
-*| |    | |__| | | |/ ____ \| | | |__| | |____ ____) |    Johannes Schamburger *
-*|_|     \____/  |_/_/    \_\_|  \____/|______|_____/          Dmitriy Traytel *
-*                                                                              *
-*      Practical Oriented TeAching Tool, Operating (and) Educating System      *
-*                                                                              *
-*                           www.potatoes-project.tk                            *
-*******************************************************************************/
+ ********************************************************************************
+ * _____   ____ _______    _______ ____  ______  _____                          *
+ *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
+ *| |__) | |  | | | |  /  \  | | | |  | | |__  | (___              Daniel Bader *
+ *|  ___/| |  | | | | / /\ \ | | | |  | |  __|  \___ \           Vincenz Doelle *
+ *| |    | |__| | | |/ ____ \| | | |__| | |____ ____) |    Johannes Schamburger *
+ *|_|     \____/  |_/_/    \_\_|  \____/|______|_____/          Dmitriy Traytel *
+ *                                                                              *
+ *      Practical Oriented TeAching Tool, Operating (and) Educating System      *
+ *                                                                              *
+ *                           www.potatoes-project.tk                            *
+ *******************************************************************************/
 
 /**
  * @file
@@ -43,9 +43,10 @@
  * @param heap_addr     physical address of the heap structure
  * @return              the created heap
  */
-heap_t* create_heap(uint32 start_addr, uint32 end_addr, uint32 max_addr, uint8 supervisor, uint8 readonly, uint32 heap_addr)
+heap_t* create_heap(uint32 start_addr, uint32 end_addr, uint32 max_addr, uint8 supervisor, uint8 readonly,
+                uint32 heap_addr)
 {
-        heap_t *kheap = (heap_t*)heap_addr;
+        heap_t *kheap = (heap_t*) heap_addr;
         //dprintf("heap position: 0x%x\n", (uint32)kheap);
         // All our assumptions are made on startAddress and endAddress being page-aligned.
 
@@ -75,11 +76,11 @@ heap_t* create_heap(uint32 start_addr, uint32 end_addr, uint32 max_addr, uint8 s
         //dprintf("start.prev: 0x%x\n", start_header->prev);
         //dprintf("start.name: %s\n", start_header->name);
         //dprintf("start.size: %d\n", start_header->size);
-//        dprintf("end: 0x%x\n", (uint32)end_header);
-//        dprintf("end.next: 0x%x\n", end_header->next);
-//        dprintf("end.prev: 0x%x\n", end_header->prev);
-//        dprintf("end.name: %s\n", end_header->name);
-//        dprintf("end.size: %d\n", end_header->size);
+        //        dprintf("end: 0x%x\n", (uint32)end_header);
+        //        dprintf("end.next: 0x%x\n", end_header->next);
+        //        dprintf("end.prev: 0x%x\n", end_header->prev);
+        //        dprintf("end.name: %s\n", end_header->name);
+        //        dprintf("end.size: %d\n", end_header->size);
 
         kernel_heap->start = start_header;
         kernel_heap->end = end_header;
@@ -91,18 +92,30 @@ heap_t* create_heap(uint32 start_addr, uint32 end_addr, uint32 max_addr, uint8 s
 }
 
 /**
+ * Returns the total size of a heap.
+ *
+ * @param heap  the heap
+ * @return      size of the heap
+ */
+uint32 heap_get_size(heap_t *heap)
+{
+        return (uint32) heap->end + sizeof(mm_header) - (uint32) heap->start + 1;
+}
+
+/**
  * Expands 'heap' to 'new_size'.
  *
  * @param new_size      new size of the heap
  * @param heap          the heap that shall be expanded
  */
-void expand(uint32 new_size, heap_t *heap)
+void heap_expand(uint32 new_size, heap_t *heap)
 {
 
+        uint32 old_size = heap_get_size(heap);
         // Sanity check.
-        ASSERT(new_size > (uint32)heap->end + sizeof(mm_header) - (uint32)heap->start);
+        ASSERT(new_size > old_size);
         // Get the nearest following page boundary.
-        if (new_size&0xFFFFF000 != 0) {
+        if (new_size & 0xFFFFF000 != 0) {
                 new_size &= 0xFFFFF000;
                 new_size += 0x1000;
         }
@@ -112,14 +125,15 @@ void expand(uint32 new_size, heap_t *heap)
         ASSERT((uint32)heap->start + new_size <= heap->max_addr);
 
         // This should always be on a page boundary.
-        uint32 old_size = (uint32)heap->end + sizeof(mm_header) - (uint32)heap->start;
+
         uint32 i = old_size;
         while (i <= new_size) {
-                alloc_frame( get_page((uint32)heap->start+i, 1, kernel_dir),(heap->supervisor)?1:0, (heap->readonly)?0:1);
+                alloc_frame(get_page((uint32) heap->start + i, 1, kernel_dir), (heap->supervisor) ? 1 : 0,
+                                (heap->readonly) ? 0 : 1);
                 i += 0x1000;
         }
 
-        uint32 end_address = (uint32)heap->start + new_size;
+        uint32 end_address = (uint32) heap->start + new_size;
 
         //dprintf("end_address: 0x%x\n", end_address);
         // modify the headers for heap->start and heap->end
@@ -145,13 +159,15 @@ void expand(uint32 new_size, heap_t *heap)
  * @param heap          the heap that shall be contracted
  * @return              new size of the heap
  */
-uint32 contract(uint32 new_size, heap_t *heap)
+uint32 heap_contract(uint32 new_size, heap_t *heap)
 {
+
+        uint32 old_size = heap_get_size(heap);
         // Sanity check.
-        ASSERT(new_size < (uint32)heap->end + sizeof(mm_header) - (uint32)heap->start);
+        ASSERT(new_size < old_size);
 
         // Get the nearest following page boundary.
-        if (new_size&0x1000) {
+        if (new_size & 0x1000) {
                 new_size &= 0x1000;
                 new_size += 0x1000;
         }
@@ -159,14 +175,14 @@ uint32 contract(uint32 new_size, heap_t *heap)
         if (new_size < HEAP_MIN_SIZE) {
                 new_size = HEAP_MIN_SIZE;
         }
-        uint32 old_size = (uint32)heap->end - (uint32)heap->start;
+
         uint32 i = old_size - 0x1000;
         while (new_size < i) {
-                free_frame(get_page((uint32)heap->start + i, 0, kernel_dir));
+                free_frame(get_page((uint32) heap->start + i, 0, kernel_dir));
                 i -= 0x1000;
         }
 
-        uint32 end_address = (uint32)heap->start + new_size;
+        uint32 end_address = (uint32) heap->start + new_size;
 
         // modify the headers for heap->start and heap->end
         mm_header *end_header = (mm_header*) (end_address - sizeof(mm_header));
@@ -183,10 +199,38 @@ uint32 contract(uint32 new_size, heap_t *heap)
         return new_size;
 }
 
+/**
+ * Sets up a new block in the heap.
+ *
+ * @param ptr           pointer to the block after the one to be inserted
+ * @param end_of_prev   end of the block before the one to be inserted
+ * @param size          size of the new block
+ * @param name          name of the new block
+ *
+ * @return              the header of the new block
+ */
+mm_header* heap_setup_block(mm_header* next_block, uint32 position, size_t size, char* name)
+{
+        mm_header *new_header = (mm_header*) (position);
+
+        // set the properties of the new block
+        new_header->prev = next_block->prev;
+        new_header->next = next_block;
+        strncpy(new_header->name, name, sizeof(new_header->name) - 1);
+        new_header->name[sizeof(new_header->name) - 1] = '\0';
+        new_header->size = size;
+
+        // insert the new block into the linked list
+        next_block->prev->next = new_header;
+        next_block->prev = new_header;
+
+        return new_header;
+}
+
 //#define MEM_FAILSAFE
 
 #ifdef MEM_FAILSAFE
-        void* mem = (void*) 0x500000; // assume this is past the kernel code...
+void* mem = (void*) 0x500000; // assume this is past the kernel code...
 #endif
 /**
  * Allocates 'size' bytes and additionally saves a name in the header of the block.
@@ -197,7 +241,7 @@ uint32 contract(uint32 new_size, heap_t *heap)
  * @param heap          the heap in which the block shall be allocated
  * @return              pointer to the allocated space
  */
-void* heap_mallocn(size_t size, char *name,  uint8 page_aligned, heap_t *heap)
+void* heap_mallocn(size_t size, char *name, uint8 page_aligned, heap_t *heap)
 {
 #ifdef MEM_FAILSAFE
         void *ret = mem;
@@ -205,36 +249,43 @@ void* heap_mallocn(size_t size, char *name,  uint8 page_aligned, heap_t *heap)
         return ret;
 #endif
         //dprintf("allocating %d bytes; name: %s", size, name);
-        mm_header *ptr;
+        mm_header *current_block;
         mm_header *new_header;
-        uint32 end_of_prev;
+        uint32 position;
         //dprintf("kernel_heap->start: 0x%x; kernel_heap->end: 0x%x\n", (uint32)kernel_heap->start, (uint32)kernel_heap->end);
         //dprintf("kernel_heap->start->next: 0x%x; kernel_heap->end->next: 0x%x\n", (uint32)kernel_heap->start->next, (uint32)kernel_heap->end->next);
-        for(ptr = kernel_heap->start->next; ptr != kernel_heap->end->next; ptr = ptr->next) {
-                end_of_prev = ((uint32)(ptr->prev) + sizeof(mm_header) + (ptr->prev)->size);
-                //dprintf("end_of_prev: 0x%x, ptr: 0x%x, diff: 0x%x\n", (uint32)end_of_prev, (uint32)ptr, (uint32)ptr - (uint32)end_of_prev);
-                if((uint32)ptr - end_of_prev >= (size + sizeof(mm_header))) {
 
-                        new_header = (mm_header*) (end_of_prev);
-                        new_header->prev = ptr->prev;
-                        new_header->next = ptr;
-                        strncpy(new_header->name, name, sizeof(new_header->name) - 1);
-                        new_header->name[sizeof(new_header->name) - 1] = '\0';
-                        new_header->size = size;
+        /********************************************FIRST FIT*********************************************/
+        // we loop through the whole list of allocated blocks and search for a hole which is big enough
+        for (current_block = heap->start->next; current_block != heap->end->next; current_block = current_block->next) {
 
-                        ptr->prev->next = new_header;
-                        ptr->prev = new_header;
-                        //dprintf("return address: 0x%x\n", (uint32)new_header + sizeof(mm_header));
+                // compute the beginning of the current hole
+                position = ((uint32) (current_block->prev) + sizeof(mm_header) + (current_block->prev)->size);
 
-                        return (void*) ((uint32)new_header + sizeof(mm_header));
+                // is the current hole big enough?
+                if ((uint32) current_block - position >= (size + sizeof(mm_header))) {
+
+                        // setup the new block
+                        new_header = heap_setup_block(current_block, position, size, name);
+
+                        // we need to return a void-pointer pointing to the start of the block (and not of the header)
+                        return (void*) ((uint32) new_header + sizeof(mm_header));
                 }
         }
+        /**************************************************************************************************/
 
-        uint32 old_size = (uint32)kernel_heap->end + sizeof(mm_header) - (uint32)kernel_heap->start + 1;
-        expand(old_size + size, kernel_heap);
+        // we found no hole that is big enough -> the heap needs to be expanded
+        uint32 old_size = heap_get_size(heap);
+        heap_expand(old_size + (size / (HEAP_EXPAND_STEP_SIZE) + 1) * HEAP_EXPAND_STEP_SIZE, heap);
+
+        uint32 new_size = heap_get_size(heap);
+
+        // check if the heap has reached the memory limit
+        if(new_size < old_size + size) {
+                return (void*) NULL;
+        }
+
         return heap_mallocn(size, name, page_aligned, heap);
-
-        return (void*) NULL;
 }
 
 /**
@@ -245,11 +296,11 @@ void* heap_mallocn(size_t size, char *name,  uint8 page_aligned, heap_t *heap)
 void heap_free(void *start, heap_t *heap)
 {
 #ifdef MEM_FAILSAFE
-       return;
+        return;
 #endif
-        mm_header *this = (mm_header*) ((uint32)start - sizeof(mm_header));
+        mm_header *this = (mm_header*) ((uint32) start - sizeof(mm_header));
         // check if there is a valid mm_header structure at start
-        if((this->prev)->next == this) {
+        if ((this->prev)->next == this) {
                 (this->prev)->next = this->next;
                 (this->next)->prev = this->prev;
                 return;
@@ -267,7 +318,7 @@ void heap_mem_dump()
         int total_bytes = 0;
         int total_blocks = 0;
         for (ptr = kernel_heap->start->next; ptr != kernel_heap->end->next; ptr = ptr->next) {
-                _printf("%d bytes #{LBL}\"%s\"## at 0x%x\n", ptr->size, ptr->name, (uint32)ptr + sizeof(mm_header));
+                _printf("%d bytes #{LBL}\"%s\"## at 0x%x\n", ptr->size, ptr->name, (uint32) ptr + sizeof(mm_header));
                 total_blocks++;
                 total_bytes += ptr->size;
         }

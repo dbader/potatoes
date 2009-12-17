@@ -86,7 +86,7 @@ void mm_init(uint32 start, uint32 end)
  * uses dprintf() )
  */
 void mm_init_output() {
-        printf("#{LGR}POTATOES - $Rev$ - "__DATE__" "__TIME__"##\n");
+        printf("#{LGR}POTATOES (DEV) - $Rev$ - "__DATE__" "__TIME__"##\n");
         dprint_separator();
 
         dprintf("#{LBL}mm:## init\n");

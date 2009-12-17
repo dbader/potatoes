@@ -25,5 +25,6 @@
 
 void shell_cmd_snapshot(int argc, char *argv[]);
 void shell_cmd_speed(int argc, char *argv[]);
+void shell_cmd_memview(int argc, char *argv[]);
 
 #endif /*__APPS_H*/

@@ -631,6 +631,7 @@ struct shell_cmd_t shell_cmds[] = {
                 {"synth",       shell_cmd_synth,        "Synthesizer tool"},
                 {"kill",        shell_cmd_kill,         "Terminates the given process"},
                 {"nice",        shell_cmd_nice,         "Modifies thread priorities"},
+                {"memview",     shell_cmd_memview,      "Memory viewer tool"},
                 {"",            NULL,                   ""} // The Terminator
 };
 
