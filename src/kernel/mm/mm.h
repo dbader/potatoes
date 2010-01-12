@@ -27,7 +27,7 @@
 #define __MM_H_
 
 /**
- * the structure of a header of an occupied memory block (size: 4 * 32bit = 128bit)
+ * the structure of a header of an occupied memory block
  */
 typedef struct mm_header {
         struct mm_header *prev;         // pointer to the header of the previous occupied block
