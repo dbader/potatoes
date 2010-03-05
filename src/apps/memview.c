@@ -39,11 +39,8 @@
 #include "../kernel/include/const.h"
 #include "../kernel/io/io.h"
 #include "../kernel/pm/pm_main.h"
-
 #include "../kernel/mm/mm.h"
-
-#include "games.h" /* for the key constants */
-//#include "memview.h"
+#include "games.h" /* for the KEY_... constants */
 
 extern uint32 heap_get_size(heap_t *heap);
 extern bool keydown(char key, int fd);
@@ -145,9 +142,13 @@ void mark_visual_block(uint32 start, uint32 size)
         while (block_pos < sizeof(mv_disp)) {
                 if (size < mv_bytes_per_block) {
                         /* Visual blocks which are not completely filled by the first allocated
-                         * block 'inside them' are marked yellow. Note that this does not necessarily
+                         * block 'inside them' are marked pink. Note that this does not necessarily
                          * mean the block is not completely occupied. Maybe we should also mark
-                         * these blocks red. Yet somehow, I feel they are special :) */
+                         * these blocks red. Yet somehow, I feel they are special :)
+                         *
+                         * TODO: ideally the meaning of a pink block should be that the visual block is not
+                         *       completely filled (even by multiple allocated blocks - so we would have to
+                         *       keep track of that).*/
                         mv_disp[block_pos] = PINK;
                         break;
                 } else {
@@ -213,9 +214,18 @@ void mv_show_stats()
         mm_header *ptr;
         int total_bytes = 0;
         int total_blocks = 0;
+        int total_free_bytes = 0;
+        int total_free_blocks = 0;
+        int position;
+
         for (ptr = kernel_heap->start->next; ptr != kernel_heap->end->next; ptr = ptr->next) {
                 total_blocks++;
                 total_bytes += ptr->size;
+                position = ((int) (ptr->prev) + sizeof(mm_header) + (ptr->prev)->size);
+                if ((int)ptr!=position && ptr != kernel_heap->end) {
+                        total_free_blocks++;
+                        total_free_bytes += (int)ptr - position - sizeof(mm_header);
+                }
         }
 
         _printf("#{YEL}MEMVIEW STATS##\n--------------------------------------------------------------------------------\n");
@@ -225,6 +235,7 @@ void mv_show_stats()
         _printf("Display resolution: 1 block = %d bytes\n\n", mv_bytes_per_block);
         _printf("%d bytes in %d blocks\n", total_bytes, total_blocks);
         _printf("Average block size: %d bytes\n", total_bytes / total_blocks);
+        _printf("Average free block size: %d bytes\n", total_free_bytes / total_free_blocks);
 
         _fgetch(_open("/dev/stdin", 0, 0));
 }
@@ -610,10 +621,10 @@ void memview_main(void)
         mv_total_mem = (uint32)kernel_heap->end + sizeof (mm_header) - (uint32)kernel_heap->start;
         mv_bytes_per_block = mv_total_mem / (25 * 80);
 
-        _printf("Welcome to #{YEL}memview##, the #{BLU}POTATOES## #{GRE}visual memory viewer## tool!\n\n");
+        _printf("Welcome to #{YEL}memview##, the #{BLU}POTATOES## #{GRE}visual memory viewer## tool!\n");
         _printf("Kernel heap from 0x%x to 0x%x\n", (uint32)kernel_heap->start, (uint32)kernel_heap->end + sizeof (mm_header));
         _printf("%dkb heap size\nNote: the kernel heap size changes as the heap expands and contracts\n", mv_total_mem / 1024);
-        _printf("Initial resolution: 1 block = %dkb\n\n", mv_bytes_per_block / 1024);
+        _printf("Initial resolution: 1 block = %dkb\n", mv_bytes_per_block / 1024);
         _printf("\n#{YEL}Usage:##\nu - update view\na - allocate block\nf - free block\ni - zoom in\no - zoom out\nb - do memory benchmark\ns - show statistics screen\nESCAPE - exit memview\n\n");
         _printf("#{YEL}Block types:##\n#{GRE}### - completely free region\n#{PIN}### - only partly occupied by first allocation\n");
         _printf("#{RED}### - completely filled region\n#{DAR}### - region outside kernel heap\n\n[Press any key to start]\n");
@@ -655,14 +666,14 @@ void memview_main(void)
                         update_view();
                         break;
 
-                case 's':
+                case 's': // stats screen
                         mv_switch_to_textmode();
                         mv_show_stats();
                         mv_switch_to_graphicsmode();
                         update_view();
                         break;
 
-                case 'b':
+                case 'b': // memory manager benchmark
                         mv_switch_to_textmode();
                         mv_do_benchmark();
                         mv_switch_to_graphicsmode();

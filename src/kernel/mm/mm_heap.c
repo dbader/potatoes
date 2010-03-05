@@ -45,7 +45,7 @@
  */
 heap_t* create_heap(uint32 start_addr, uint32 end_addr, uint32 max_addr, uint8 supervisor, uint8 readonly,
                 uint32 heap_addr)
-{
+                {
         heap_t *kheap = (heap_t*) heap_addr;
         //dprintf("heap position: 0x%x\n", (uint32)kheap);
         // All our assumptions are made on startAddress and endAddress being page-aligned.
@@ -89,7 +89,7 @@ heap_t* create_heap(uint32 start_addr, uint32 end_addr, uint32 max_addr, uint8 s
         kernel_heap->readonly = readonly;
 
         return kernel_heap;
-}
+                }
 
 /**
  * Returns the total size of a heap.
@@ -202,15 +202,15 @@ uint32 heap_contract(uint32 new_size, heap_t *heap)
 /**
  * Sets up a new block in the heap.
  *
- * @param ptr           pointer to the block after the one to be inserted
- * @param end_of_prev   end of the block before the one to be inserted
+ * @param next_block    pointer to the block after the one to be inserted
+ * @param position      end of the block before the one to be inserted
  * @param size          size of the new block
  * @param name          name of the new block
  *
  * @return              the header of the new block
  */
 mm_header* heap_setup_block(mm_header* next_block, uint32 position, size_t size, char* name)
-{
+                {
         mm_header *new_header = (mm_header*) (position);
 
         // set the properties of the new block
@@ -225,7 +225,7 @@ mm_header* heap_setup_block(mm_header* next_block, uint32 position, size_t size,
         next_block->prev = new_header;
 
         return new_header;
-}
+                }
 
 //#define MEM_FAILSAFE
 
@@ -242,7 +242,7 @@ void* mem = (void*) 0x500000; // assume this is past the kernel code...
  * @return              pointer to the allocated space
  */
 void* heap_mallocn(size_t size, char *name, uint8 page_aligned, heap_t *heap)
-{
+                {
 #ifdef MEM_FAILSAFE
         void *ret = mem;
         mem += size;
@@ -255,7 +255,7 @@ void* heap_mallocn(size_t size, char *name, uint8 page_aligned, heap_t *heap)
         //dprintf("kernel_heap->start: 0x%x; kernel_heap->end: 0x%x\n", (uint32)kernel_heap->start, (uint32)kernel_heap->end);
         //dprintf("kernel_heap->start->next: 0x%x; kernel_heap->end->next: 0x%x\n", (uint32)kernel_heap->start->next, (uint32)kernel_heap->end->next);
 
-        /********************************************FIRST FIT*********************************************/
+        /********************************************FIRST FIT********************************************* /
         // we loop through the whole list of allocated blocks and search for a hole which is big enough
         for (current_block = heap->start->next; current_block != heap->end->next; current_block = current_block->next) {
 
@@ -273,7 +273,62 @@ void* heap_mallocn(size_t size, char *name, uint8 page_aligned, heap_t *heap)
                 }
         }
         /**************************************************************************************************/
+        /***************************************WORST FIT**************************************************/
+        mm_header *tmp_header = NULL;
+        uint32 biggest_hole_size = 0;
 
+        // we loop through the whole list of allocated blocks and search for the biggest hole
+        for (current_block = kernel_heap->start->next; current_block != kernel_heap->end->next; current_block = current_block->next) {
+
+                // compute the beginning of the current hole
+                position = ((uint32) (current_block->prev) + sizeof(mm_header) + (current_block->prev)->size);
+
+                // see if the current hole is the biggest one (so far) that fits
+                if ((uint32) current_block - position >= (size + sizeof(mm_header)) && (uint32) current_block - position > biggest_hole_size) {
+                        tmp_header = current_block;
+                        biggest_hole_size = (uint32) current_block - position;
+                }
+        }
+
+        if (tmp_header != NULL) {
+                position = ((uint32) (tmp_header->prev) + sizeof(mm_header) + (tmp_header->prev)->size);
+                // the random offset - not reasonable but nice for visualisation :-)
+                // + rand() % (biggest_hole_size - (size + sizeof(mm_header)));
+
+                // setup the new block
+                new_header = heap_setup_block(tmp_header, position, size, name);
+
+                // we need to return a void-pointer pointing to the start of the block (and not of the header)
+                return (void*) ((uint32) new_header + sizeof(mm_header));
+        }
+        /**************************************************************************************************/
+        /*********************************BEST FIT********************************************************** /
+                mm_header *tmp_header = NULL;
+                uint32 smallest_hole_size = heap_get_size(heap);
+
+                // we loop through the whole list of allocated blocks and search for the biggest hole
+                for (current_block = kernel_heap->start->next; current_block != kernel_heap->end->next; current_block = current_block->next) {
+
+                        // compute the beginning of the current hole
+                        position = ((uint32) (current_block->prev) + sizeof(mm_header) + (current_block->prev)->size);
+
+                        // see if the current hole is the smallest one (so far) that fits
+                        if ((uint32) current_block - position >= (size + sizeof(mm_header)) && (uint32) current_block - position < smallest_hole_size) {
+                                tmp_header = current_block;
+                                smallest_hole_size = (uint32) current_block - position;
+                        }
+                }
+
+                if (tmp_header != NULL) {
+                        position = ((uint32) (tmp_header->prev) + sizeof(mm_header) + (tmp_header->prev)->size);
+
+                        // setup the new block
+                        new_header = heap_setup_block(tmp_header, position, size, name);
+
+                        // we need to return a void-pointer pointing to the start of the block (and not of the header)
+                        return (void*) ((uint32) new_header + sizeof(mm_header));
+                }
+                 /**************************************************************************************************/
         // we found no hole that is big enough -> the heap needs to be expanded
         uint32 old_size = heap_get_size(heap);
         heap_expand(old_size + (size / (HEAP_EXPAND_STEP_SIZE) + 1) * HEAP_EXPAND_STEP_SIZE, heap);
@@ -286,7 +341,7 @@ void* heap_mallocn(size_t size, char *name, uint8 page_aligned, heap_t *heap)
         }
 
         return heap_mallocn(size, name, page_aligned, heap);
-}
+                }
 
 /**
  * Frees a memory block.
