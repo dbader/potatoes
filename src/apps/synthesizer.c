@@ -1,4 +1,4 @@
-/* $Id: io_synthesizer.c 239 2008-10-26 23:19:15Z dtraytel $
+/* $Id: synthesizer.c 12 2009-11-30 18:52:20Z dtraytel $
 ********************************************************************************
 * _____   ____ _______    _______ ____  ______  _____                          *
 *|  __ \ / __ \__   __|/\|__   __/ __ \|  ____|/ ____|          Copyright 2008 *
@@ -18,13 +18,116 @@
  *
  * @author Dmitriy Traytel
  * @author $LastChangedBy: dtraytel $
- * @version $Rev: 239 $
+ * @version $Rev: 12 $
  */
 
 #include "../kernel/io/io.h"
 #include "../kernel/pm/pm_main.h"
 #include "../kernel/pm/syscalls_cli.h"
 #include "games.h"
+
+#include "shell_utils.h"
+
+#include "../kernel/include/string.h"
+#include "../kernel/include/stdlib.h"
+
+/**
+ * Stores a frequency and a duration.
+ */
+typedef struct {
+        int frequency;
+        int duration;
+} Tone;
+
+/**
+ * Parse a sound string.
+ *
+ * This will parse a sound string like "C1 1 D1 2 CSH2 3", allocate a new
+ * buffer and return it, along with a sentinel that consists of a tone with its
+ * duration set to -1.
+ *
+ * As an extension, it also supports pauses, represented by a number without a
+ * prefixed note. For example, "C1 1 2 D1 3" represents the note C1 for 1 tick,
+ * 2 ticks worth of pausing, and D1 for 3 ticks. Pauses are represented by a
+ * frequency of 0.
+ *
+ * This function will break if it encounters an error, and return all the data
+ * that has been parsed so far.
+ *
+ * @param str the null-terminated string to be parsed
+ * @returns the resulting tones, to be freed with free()
+ */
+static Tone *parse_sound(char *str) {
+        int length = 0; // Number of tones that have been parsed
+        int max_length = 16; // Number of tones that we can store
+        Tone *ret = (Tone *) mallocn(max_length * sizeof(Tone), "parse_sound() buffer");
+
+        while(1) {
+                // Eat leading white space
+                while(*str != '\0' && isspace(*str))
+                        ++str;
+
+                // Find the longest string in note_names that matches the one
+                // at our current position
+                int best_match_length = 0;
+                int best_note;
+                for(int note = 0; note < (sizeof(note_names)/ sizeof(note_names[0])); ++note) {
+                        int i;
+                        for(i = 0; str[i] != '\0' && note_names[note][i] == str[i]; ++i) ;
+                        if(i > best_match_length) {
+                                best_match_length = i;
+                                best_note = note;
+                        }
+                }
+
+                str += best_match_length; // Advance so we can continue
+                                         // parsing.
+
+                if(*str < '0' || *str > '9')
+                        break; // What follows must always be a number, either
+                              // the octave or the duration of the pause.
+
+                Tone tone;
+                if(best_match_length <= 0) {
+                        tone.frequency = 0; // an empty note means a pause.
+                } else {
+                        int octave = strtol(str, &str, 10);
+
+                        if(octave < 0 || octave > 7)
+                                break;
+
+                        tone.frequency = notes[best_note][octave];
+                }
+
+                tone.duration = strtol(str, &str, 0);
+                if(tone.duration < 0) {
+                        break;
+                }
+
+                // Exponentially expand the size of our array if necessary.
+                // Reserve one entry for the next note and one for the
+                // sentinel.
+                if(length + 2 >= max_length) {
+                        max_length *= 2;
+                        Tone *new_ret = (Tone *) mallocn(max_length * 2 * sizeof(Tone), "parse_sound() buffer");
+                        memcpy(new_ret, ret, length);
+                        free(ret);
+                        ret = new_ret;
+                }
+
+                // Append the note we just parsed.
+                ret[length].frequency = tone.frequency;
+                ret[length].duration = tone.duration;
+                ++length;
+        }
+
+        // add sentinel (this is safe to do w/o range checking since we already
+        // reserved one entry)
+        ret[length].frequency = 0;
+        ret[length].duration = -1;
+
+        return ret;
+}
 
 static void handle_note(int keyboard, int key, int note, int octave){
         int note_length = 0;
@@ -33,34 +136,23 @@ static void handle_note(int keyboard, int key, int note, int octave){
                 note_length++;
                 halt();
         }
-        if(note == NOTE_C) {
-                _printf("C%d %d ", octave, note_length);
-        } else if(note == NOTE_CSH) {
-                _printf("CSH%d %d ", octave, note_length);
-        } else if(note == NOTE_D) {
-                _printf("D%d %d ", octave, note_length);
-        } else if(note == NOTE_DSH) {
-                _printf("DSH%d %d ", octave, note_length);
-        } else if(note == NOTE_E) {
-                _printf("E%d %d ", octave, note_length);
-        } else if(note == NOTE_F) {
-                _printf("F%d %d ", octave, note_length);
-        } else if(note == NOTE_FSH) {
-                _printf("FSH%d %d ", octave, note_length);
-        } else if(note == NOTE_G) {
-                _printf("G%d %d ", octave, note_length);
-        } else if(note == NOTE_GSH) {
-                _printf("GSH%d %d ", octave, note_length);
-        } else if(note == NOTE_A) {
-                _printf("A%d %d ", octave, note_length);
-        } else if(note == NOTE_ASH) {
-                _printf("ASH%d %d ", octave, note_length);
-        } else if(note == NOTE_B) {
-                _printf("B%d %d ", octave, note_length);
-        } else if(note == NOTE_C) {
-                _printf("C%d %d ", octave, note_length);
-        }
+
+        if(note >= 0 && note < 12)
+                _printf("%s%d %d ", note_names[note], octave, note_length);
+
         end_beep();
+}
+
+static void play_tone(Tone *tone) {
+        if(tone->frequency > 0)
+            start_beep(tone->frequency);
+
+        int duration;
+        for(duration = tone->duration; duration > 0; --duration)
+                halt();
+
+        if(tone->frequency > 0)
+            end_beep();
 }
 
 void synth() {
@@ -112,7 +204,7 @@ void synth() {
                 if(keydown(KEY_J,keyboard)) {
                         handle_note(keyboard, KEY_J, NOTE_B, octave);
                 }
-                if(keydown(KEY_K,keyboard)) {
+                if(keydown(KEY_K,keyboard) && octave < 7) {
                         handle_note(keyboard, KEY_K, NOTE_C, octave+1);
                 }
         }
@@ -122,5 +214,35 @@ void synth() {
 
 void shell_cmd_synth(int argc, char *argv[])
 {
-        pm_create_thread("SYNTH", synth, 4096);
+        if(argc > 1) {
+                int fd = _open(shell_makepath(argv[1]), 0, 0);
+                if(fd <= 0) {
+                        _printf("synth: can't open %s for reading\n", argv[1]);
+                        return;
+                }
+
+                int size = _seek(fd, 0, SEEK_END);
+                if(size < 0) {
+                        _printf("synth: %s has a negative size. Trying to open a special file?\n", argv[1]);
+                        return;
+                }
+                _seek(fd, 0, SEEK_SET);
+
+                char *str = malloc(size + 1);
+                _read(fd, str, size);
+                str[size] = '\0';
+
+                Tone *tones = parse_sound(str);
+
+                Tone *tone;
+                for(tone = tones; tone->duration >= 0; ++tone)
+                        play_tone(tone);
+
+                free(tones);
+                free(str);
+
+                return;
+        } else {
+            pm_create_thread("SYNTH", synth, 4096);
+        }
 }

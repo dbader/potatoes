@@ -123,10 +123,8 @@ int _fputs(char *s, int fd)
  * Prints formatted output to STDOUT. @see printf
  * This exists as a stub to ease the separation of the shell
  * from the kernel code (as of now, the shell could simply call the kernel printf).
- *
- * TODO: refactor format logic into vprintf()
  */
-void _printf(char *fmt, ...) //TODO: @Daniel: redundant. --> better solution possible?
+void _printf(char *fmt, ...)
 {
         char buf[255];
         va_list arg_list;

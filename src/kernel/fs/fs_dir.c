@@ -48,7 +48,7 @@ block_nr find_filename(dir_entry file_list[DIR_ENTRIES_PER_BLOCK], char *name)
 {
         for (int i = 0; i < DIR_ENTRIES_PER_BLOCK; i++) {
                 if (strcmp(file_list[i].name, name) == 0) {
-                        fs_dprintf("[fs_dir] found file with inode on block %d\n", file_list[i].inode);
+                        fs_dprintf("[fs_dir] found file with inode on block %d, name = %s\n", file_list[i].inode, name);
                         return file_list[i].inode;
                 }
         }
@@ -111,11 +111,11 @@ block_nr insert_file_into_dir(block_nr dir_inode_blk, char *name)
 
         } while (insert_pos == NOT_FOUND);
 
-        (dir_inode->i_size)++;  //update #entries
+        dir_inode->i_size = MAX(dir_inode->i_size, pos + BLOCK_SIZE); // update inode size.
         dir_inode->i_modify_ts = time;
         write_inode(dir_inode); //write back modified directory inode
 
-        fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
+        fs_dprintf("[fs_dir] directory now has a size of %i blocks.\n", dir_inode->i_size/BLOCK_SIZE);
 
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
 
@@ -170,6 +170,8 @@ block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name)
                 }
 
                 if (contains_filename(dir_cache, name)) {
+                        // TODO: delete last block if it isn't used anymore,
+                        //       stuff entries together if there's too much wasted space.
                         delete_pos = delete_entry(dir_cache, name);
                 }
 
@@ -181,11 +183,10 @@ block_nr delete_file_from_dir(block_nr dir_inode_blk, char *name)
 
         wrt_block(dir_entry_blk, dir_cache, sizeof(dir_cache)); //write back modified dir_entry_block
 
-        (dir_inode->i_size)--;  //update #entries
         dir_inode->i_modify_ts = time;
         write_inode(dir_inode); //write back modified directory inode
 
-        fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
+        //fs_dprintf("[fs_dir] directory now contains %d files.\n", dir_inode->i_size);
 
         if (dir_inode_blk != ROOT_INODE_BLOCK) {
                 free(dir_inode);

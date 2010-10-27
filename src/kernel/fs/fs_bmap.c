@@ -189,9 +189,6 @@ block_nr alloc_block(block_nr start)
  */
 void dump_bmap()
 {
-        uint8 byte = 0;
-        uint8 bit  = 0;
-
         if (bmap == NULL) {
                 fs_dprintf("[fs_bmap] BMAP is NULL\n");
                 return;

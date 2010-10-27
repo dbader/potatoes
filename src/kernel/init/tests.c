@@ -835,15 +835,23 @@ void test_batch_files()
 
 void atoi_test()
 {
-        dprintf("ATOI test:\n%i - should be 42\n"
-                        "%i - should be 1337\n"
-                        "%i - should be 1234567890\n"
-                        "%i - should be 0\n",
-                        atoi("42"),
-                        atoi("1337"),
-                        atoi("1234567890"),
-                        atoi("0")
-        );
+        char *c;
+        dprintf("ATOI and STRTOL test:\n"
+                "%i - should be 42\n"
+                "%i - should be 1337\n"
+                "%i - should be 1234567890\n"
+                "%i - should be 0\n"
+                "%i - should be -2147483648\n"
+                "%i - should be -45054\n"
+                "%c - should be 8\n",
+                atoi("42"),
+                atoi("1337"),
+                atoi("\t\r\n1234567890"),
+                atoi("0"),
+                atoi("-2147483648"),
+                strtol("  -0xAfFeg", 0, 0),
+                (strtol("012345678", &c, 0), *c)
+                );
 }
 
 extern bool create_fs();
