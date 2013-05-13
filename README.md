@@ -4,9 +4,4 @@
 
 ## Screenshots
 
-![POTATOES header](https://raw.github.com/dbader/potatoes/master/screenshots/cmds.jpg)
-![POTATOES header](https://raw.github.com/dbader/potatoes/master/screenshots/io.jpg)
-![POTATOES header](https://raw.github.com/dbader/potatoes/master/screenshots/pm.jpg)
-![POTATOES header](https://raw.github.com/dbader/potatoes/master/screenshots/snake.jpg)
-![POTATOES header](https://raw.github.com/dbader/potatoes/master/screenshots/pong.jpg)
-![POTATOES header](https://raw.github.com/dbader/potatoes/master/screenshots/brainfuck.jpg)
+Please see [wiki/Screenshots](https://github.com/dbader/potatoes/wiki/Screenshots).
